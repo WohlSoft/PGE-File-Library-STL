@@ -4,6 +4,7 @@ This library is a part of PGE Project.
 ==================================================
             Supported file formats:
 ==================================================
+```
 *.lvl   SMBX 1...64 Level File         -  Read/Write
 *.wld   SMBX 1...64 World File         -  Read/Write
 *.sav   SMBX 1...64 Game save File     -  Read only
@@ -17,11 +18,14 @@ This library is a part of PGE Project.
 *.wld   SMBX 65-38A World File         -  (planned)Read/Write
 *.wld   SMBX 65-38A World settings     -  (planned)Read/Write
 *.sav   SMBX 65-38A Game save File     -  (planned)Read/Write
+```
 
 ==================================================
 Use library with this header:
 
+```C++
 #include "file_formats.h"
+```
 
 ==================================================
 
@@ -41,10 +45,15 @@ not readable by SMBX Engine. You can write a file like binary, but when you catc
 write a CRLF bytes yourself!
 
 2) When you saving a level file (World file is not requires that), you should prepare data structure before saving it:
+```C++
 FileFormats::smbx64LevelPrepare(YourLevelData);     //To initialize order priorities fields and mark all star NPCs
+```
 
 3) If you trying to use PGE File data in the LunaLUA, before fill internal arrays, need to apply next set of the functions:
 
+```C++
 FileFormats::smbx64LevelPrepare(YourLevelData);     //To initialize order priorities fields and mark all star NPCs
 FileFormats::smbx64LevelSortBlocks(YourLevelData);  //Order blocks
 FileFormats::smbx64LevelSortBGOs(YourLevelData);    //Order BGO's
+```
+
