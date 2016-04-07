@@ -1,9 +1,9 @@
 #PGE File Library v 0.3.1.10
-==================================================
+----
 This library is a part of PGE Project.
-==================================================
-            Supported file formats:
-==================================================
+----
+Supported file formats:
+
 ```
 *.lvl   SMBX 1...64 Level File         -  Read/Write
 *.wld   SMBX 1...64 World File         -  Read/Write
@@ -20,14 +20,14 @@ This library is a part of PGE Project.
 *.sav   SMBX 65-38A Game save File     -  (planned)Read/Write
 ```
 
-==================================================
+----
 Use library with this header:
 
 ```C++
 #include "file_formats.h"
 ```
 
-==================================================
+----
 
 Library parses and generates RAW text string into internal.
 You must read entire file data into std::string before parse,
