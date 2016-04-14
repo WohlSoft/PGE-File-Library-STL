@@ -226,8 +226,7 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                 if(IsEmpty(fields_ns)) continue;
 
                 //Store data into list
-
-                PGESTRINGList value; //= fields[i].split(':');
+                PGESTRINGList value;
                 PGE_SPLITSTRING(value, fields[i], ":");
 
                 if(value.size()!=2)
