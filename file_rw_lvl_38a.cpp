@@ -256,8 +256,24 @@ inline void SMBX65_Num2Exp(T source, PGESTRING &expression)
     }
 }
 
+template<typename T>
+inline void SMBX65_mapBGID_From(T &bgID)
+{
+    if(bgID==2)
+        bgID=13;
+    else if( (bgID >= 3) && (bgID <= 13) )
+        bgID -= 1;
+}
 
-
+template<typename T>
+inline T SMBX65_mapBGID_To(T bgID)
+{
+    if(bgID==13)
+        bgID=2;
+    else if( (bgID >= 2) && (bgID <= 12) )
+        bgID += 1;
+    return bgID;
+}
 
 /***********  Pre-defined values dependent to NPC Generator Effect field value  **************/
 
@@ -413,6 +429,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         &section.background,
                                         //musicfile=custom music file[***urlencode!***]
                                         MakeCSVPostProcessor(&section.music_file, PGEUrlDecodeFunc));
+
+                SMBX65_mapBGID_From(section.background);//Convert into SMBX64 ID set
 
                 section.lock_left_scroll = (scroll_lock_x == "1");
                 section.lock_right_scroll = (scroll_lock_x == "2");
@@ -798,6 +816,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                                                                      );
                                                              if(customBG)
                                                                  nextSet.background_id = bgID;
+                                                             SMBX65_mapBGID_From(nextSet.background_id);//Convert into SMBX64 ID set
                                                          }),
                                                          MakeCSVIterator(dataReader, ':', [&eventdata](const PGESTRING& nextFieldStr){
                                                              auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -1239,6 +1258,8 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
+
+            SMBX65_mapBGID_From(section.background);//Convert into SMBX64 ID set
 
             section.size_left = (long)round(x);
             section.size_top = (long)round(y);
@@ -2394,6 +2415,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                             if(!SMBX64::IsFloat(eLine))
                                                 goto badfile;
                                             eventdata.sets[id].background_id=(long)round(toFloat(eLine));
+                                            SMBX65_mapBGID_From(eventdata.sets[id].background_id);//Convert into SMBX64 ID set
                                         }
                                         break;
                                     }
@@ -2947,7 +2969,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //    music=music number[same as smbx1.3]
         out << "|" << fromNum(sct.music_id);
     //    background=background number[same as the filename in 'background2' folder]
-        out << "|" << fromNum(sct.background);
+        out << "|" << fromNum( SMBX65_mapBGID_To(sct.background) );
     //    musicfile=custom music file[***urlencode!***]
         out << "|" << PGE_URLENC(sct.music_file);
         out << "\n";
@@ -3419,7 +3441,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //                btype=[0=don't change][1=default][2=custom]
             out << "," << fromNum(section_bg);
     //                backgroundid=[when btype=2]custom background id
-            out << "," << fromNum( evt.sets[j].background_id >=0 ? evt.sets[j].background_id : 0 );
+            out << "," << fromNum( evt.sets[j].background_id >=0 ? SMBX65_mapBGID_To(evt.sets[j].background_id) : 0 );
         }
         out << "/";
 

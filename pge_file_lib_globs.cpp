@@ -202,7 +202,7 @@ namespace PGE_FileFormats_misc
 
     QString      base64_encode(QString &source)
     {
-        std::string out(source.toUtf8().data());
+        std::string out = source.toStdString();
         if( (out.size()==0) || (out[out.size()-1]!='\0') )
             out.push_back('\0');
         return QString::fromStdString(
