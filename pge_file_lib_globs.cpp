@@ -780,7 +780,7 @@ namespace PGE_FileFormats_misc
     bool TextFileInput::eof()
     {
         #ifdef PGE_FILES_QT
-        return file.atEnd();
+        return stream.atEnd();
         #else
         return stream.eof();
         #endif
