@@ -28,14 +28,8 @@
 
 namespace PGEExtendedFormat
 {
-    const char *section_title_valid_chars    = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    const int   section_title_valid_chars_len= 38;
-
     const char *heximal_valid_chars    = "0123456789ABCDEFabcdef";
     const int   heximal_valid_chars_len= 22;
-
-    const char *uint_vc = "0123456789";
-    const int   uint_vc_len = 10;
 
     bool isDegit(PGEChar c)
     {
@@ -226,8 +220,7 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                 if(IsEmpty(fields_ns)) continue;
 
                 //Store data into list
-
-                PGESTRINGList value; //= fields[i].split(':');
+                PGESTRINGList value;
                 PGE_SPLITSTRING(value, fields[i], ":");
 
                 if(value.size()!=2)
@@ -260,8 +253,21 @@ PGESTRING PGEFile::lastError()
 
 bool PGEFile::IsSectionTitle(PGESTRING in)
 {
-    using namespace PGEExtendedFormat;
-    return isValid(in, section_title_valid_chars, section_title_valid_chars_len);
+    for(int i=0; i<(signed)in.size();i++)
+    {
+        #ifdef PGE_FILES_QT
+        char cc = in[i].toLatin1();
+        #else
+        char &cc = in[i];
+        #endif
+        if(
+             ((cc < 'A') || (cc > 'Z')) &&
+             ((cc < '0') || (cc > '9')) &&
+             (cc != '_')
+           )
+            return false;
+    }
+    return true;
 }
 
 
