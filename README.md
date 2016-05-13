@@ -16,7 +16,7 @@ Supported file formats:
 *.meta  PGE-X non-SMBX64 Meta File     -  Read/Write
 *.lvl   SMBX 65-38A Level File         -  Read/Write
 *.wld   SMBX 65-38A World File         -  (planned)Read/Write
-*.wld   SMBX 65-38A World settings     -  (planned)Read/Write
+*.wls   SMBX 65-38A World settings     -  (planned)Read/Write
 *.sav   SMBX 65-38A Game save File     -  (planned)Read/Write
 ```
 
