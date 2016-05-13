@@ -137,7 +137,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
     return true;
 }
 
-bool SMBX64::IsQuotedString(PGESTRING in) // QUOTED STRING
+bool SMBX64::IsQuotedString(PGESTRING in)
 {
     //This is INVERTED validator. If false - good, true - bad.
     #define QStrGOOD true
@@ -157,74 +157,4 @@ bool SMBX64::IsQuotedString(PGESTRING in) // QUOTED STRING
     return QStrGOOD;
 }
 
-bool SMBX64::IsCSVBool(PGESTRING in) //Worded BOOL
-{
-    return ( (in=="#TRUE#")||(in=="#FALSE#") );
-}
 
-bool SMBX64::IsBool(PGESTRING in) //Digital BOOL
-{
-    if((in.size()!=1) || (IsEmpty(in)) )
-        return true;
-    return ((PGEGetChar(in[0])=='1')||(PGEGetChar(in[0])=='0'));
-}
-
-//Convert from string to internal data
-bool SMBX64::wBoolR(PGESTRING in)
-{
-    return ((in=="#TRUE#")?true:false);
-}
-
-PGESTRING SMBX64::StrToStr(PGESTRING in)
-{
-    PGESTRING target = in;
-    if(IsEmpty(target))
-        return target;
-    if(target[0]==PGEChar('\"'))
-        PGE_RemStrRng(target, 0, 1);
-    if((!IsEmpty(target)) && (target[target.size()-1]==PGEChar('\"')))
-        PGE_RemStrRng(target, target.size()-1, 1);
-
-    target=PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
-    return target;
-}
-
-
-//SMBX64 parameter string generators
-PGESTRING SMBX64::IntS(long input)
-{  return fromNum(input)+"\n"; }
-
-PGESTRING SMBX64::FloatS(float input)
-{  return fromNum(input)+"\n"; }
-
-PGESTRING SMBX64::BoolS(bool input)
-{  return PGESTRING( (input)?"#TRUE#":"#FALSE#" )+"\n"; }
-
-PGESTRING SMBX64::qStrS(PGESTRING input)
-{
-    input = PGE_RemSubSTRING(input, "\n");
-    input = PGE_RemSubSTRING(input, "\r");
-    input = PGE_RemSubSTRING(input, "\t");
-    input = PGE_RemSubSTRING(input, "\"");
-    return PGESTRING("\"")+input+PGESTRING("\"\n");
-}
-
-PGESTRING SMBX64::qStrS_multiline(PGESTRING input)
-{
-    input = PGE_RemSubSTRING(input, "\t");
-    input = PGE_RemSubSTRING(input, "\"");
-    return PGESTRING("\"")+input+PGESTRING("\"\n");
-}
-
-
-
-
-double SMBX64::t65_to_ms(double t65)
-{
-    return t65 * (1000.0/65.0);
-}
-
-double SMBX64::ms_to_65(double ms)
-{
-    return ms * (65.0/1000.0);
-}

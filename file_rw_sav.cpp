@@ -29,6 +29,7 @@
 #include "save_filedata.h"
 #include "smbx64.h"
 #include "smbx64_macro.h"
+#include "CSVUtils.h"
 
 //*********************************************************
 //****************READ FILE FORMAT*************************
@@ -91,115 +92,125 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
     //Enable strict mode for SMBX LVL file format
     FileData.smbx64strict = true;
 
-    ///////////////////////////////////////Begin file///////////////////////////////////////
-    nextLine(); UIntVar(file_format, line);//File format number
-    FileData.version = file_format;
-    nextLine(); UIntVar(FileData.lives, line); //Number of lives
-    nextLine(); UIntVar(FileData.coins, line); //Number of coins
-    nextLine(); SIntVar(FileData.worldPosX, line);  //World map pos X
-    nextLine(); SIntVar(FileData.worldPosY, line);  //World map pos Y
-
-    for(i=0; i< (ge(56)? 5 : 2) ;i++)
+    try
     {
-        saveCharState charState;
-        charState = CreateSavCharacterState();
-        nextLine(); UIntVar(charState.state, line);//Character's power up state
-        nextLine(); UIntVar(charState.itemID, line) //ID of item in the slot
-        if(ge(10)) { nextLine();UIntVar(charState.mountType, line); } //Type of mount
-        nextLine(); UIntVar(charState.mountID, line); //ID of mount
-        if(lt(10)) { if(charState.mountID>0) charState.mountType=1; }
-        if(ge(56)) { nextLine(); UIntVar(charState.health, line); } //ID of mount
-        FileData.characterStates.push_back(charState);
-    }
+        ///////////////////////////////////////Begin file///////////////////////////////////////
+        nextLine(); SMBX64::ReadUInt(&file_format, line);//File format number
+        FileData.version = file_format;
+        nextLine(); SMBX64::ReadUInt(&FileData.lives, line); //Number of lives
+        nextLine(); SMBX64::ReadUInt(&FileData.coins, line); //Number of coins
+        nextLine(); SMBX64::ReadSInt(&FileData.worldPosX, line);  //World map pos X
+        nextLine(); SMBX64::ReadSInt(&FileData.worldPosY, line);  //World map pos Y
 
-    nextLine(); UIntVar(FileData.musicID, line);//ID of music
-    nextLine();
-    if(line=="" || in.eof()) goto successful;
-
-    if(ge(56)) { wBoolVar(FileData.gameCompleted, line);}//Game was complited
-
-    arrayIdCounter=1;
-
-    nextLine();
-    while((line!="next")&&(!in.eof()))
-    {
-        visibleItem level;
-        level.first=arrayIdCounter;
-        level.second=false;
-        wBoolVar(level.second, line); //Is level shown
-
-        FileData.visibleLevels.push_back(level);
-        arrayIdCounter++;
-        nextLine();
-    }
-
-    arrayIdCounter=1;
-    nextLine();
-    while((line!="next")&&(!in.eof()))
-    {
-        visibleItem level;
-        level.first=arrayIdCounter;
-        level.second=false;
-        wBoolVar(level.second, line); //Is path shown
-
-        FileData.visiblePaths.push_back(level);
-        arrayIdCounter++;
-        nextLine();
-    }
-
-    arrayIdCounter=1;
-    nextLine();
-    while((line!="next")&&(!in.eof()))
-    {
-        visibleItem level;
-        level.first=arrayIdCounter;
-        level.second=false;
-        wBoolVar(level.second, line); //Is Scenery shown
-
-        FileData.visibleScenery.push_back(level);
-        arrayIdCounter++;
-        nextLine();
-    }
-
-    if(ge(7))
-    {
-        nextLine();
-        while((line!="next")&&(!IsNULL(line)))
+        for(i=0; i< (ge(56)? 5 : 2) ;i++)
         {
-            starOnLevel gottenStar;
-            gottenStar.first="";
-            gottenStar.second=0;
+            saveCharState charState;
+            charState = CreateSavCharacterState();
+            nextLine(); SMBX64::ReadUInt(&charState.state, line);//Character's power up state
+            nextLine(); SMBX64::ReadUInt(&charState.itemID, line); //ID of item in the slot
+                    if(ge(10)) { nextLine(); SMBX64::ReadUInt(&charState.mountType, line); } //Type of mount
+            nextLine(); SMBX64::ReadUInt(&charState.mountID, line); //ID of mount
+            if(lt(10)) { if(charState.mountID>0) charState.mountType=1; }
+            if(ge(56)) { nextLine(); SMBX64::ReadUInt(&charState.health, line); } //ID of mount
+            FileData.characterStates.push_back(charState);
+        }
 
-            strVar(gottenStar.first, line);//Level file
-            if(ge(16)) { nextLine(); UIntVar(gottenStar.second, line); } //Section ID
+        nextLine(); SMBX64::ReadUInt(&FileData.musicID, line);//ID of music
+        nextLine();
+        if(line=="" || in.eof())
+            goto successful;
 
-            FileData.gottenStars.push_back(gottenStar);
+        if(ge(56)) { SMBX64::ReadCSVBool(&FileData.gameCompleted, line);}//Game was complited
+
+        arrayIdCounter=1;
+
+        nextLine();
+        while((line!="next")&&(!in.eof()))
+        {
+            visibleItem level;
+            level.first=arrayIdCounter;
+            level.second=false;
+            SMBX64::ReadCSVBool(&level.second, line); //Is level shown
+
+            FileData.visibleLevels.push_back(level);
+            arrayIdCounter++;
             nextLine();
         }
-    }
 
-    if(ge(21))
-    {
+        arrayIdCounter=1;
         nextLine();
-        if(line=="" || in.eof()) goto successful;
-        UIntVar(FileData.totalStars, line);//Total Number of stars
+        while((line!="next")&&(!in.eof()))
+        {
+            visibleItem level;
+            level.first=arrayIdCounter;
+            level.second=false;
+            SMBX64::ReadCSVBool(&level.second, line); //Is path shown
+
+            FileData.visiblePaths.push_back(level);
+            arrayIdCounter++;
+            nextLine();
+        }
+
+        arrayIdCounter=1;
+        nextLine();
+        while((line!="next")&&(!in.eof()))
+        {
+            visibleItem level;
+            level.first=arrayIdCounter;
+            level.second=false;
+            SMBX64::ReadCSVBool(&level.second, line); //Is Scenery shown
+
+            FileData.visibleScenery.push_back(level);
+            arrayIdCounter++;
+            nextLine();
+        }
+
+        if(ge(7))
+        {
+            nextLine();
+            while((line!="next")&&(!IsNULL(line)))
+            {
+                starOnLevel gottenStar;
+                gottenStar.first="";
+                gottenStar.second=0;
+
+                SMBX64::ReadStr(&gottenStar.first, line);//Level file
+                if(ge(16)) { nextLine(); SMBX64::ReadUInt(&gottenStar.second, line); } //Section ID
+
+                FileData.gottenStars.push_back(gottenStar);
+                nextLine();
+            }
+        }
+
+        if(ge(21))
+        {
+            nextLine();
+            if(line=="" || in.eof())
+                goto successful;
+            SMBX64::ReadUInt(&FileData.totalStars, line);//Total Number of stars
+        }
+
+    successful:        
+        ///////////////////////////////////////EndFile///////////////////////////////////////
+        FileData.ReadFileValid=true;
+        return true;
     }
-
-    successful:
-
-    ///////////////////////////////////////EndFile///////////////////////////////////////
-    FileData.ReadFileValid=true;
-    return true;
-
-    badfile:    //If file format is not correct
-    if(file_format>0)
-        FileData.ERROR_info="Detected file format: SMBX-"+fromNum(file_format)+" is invalid";
-    else
-        FileData.ERROR_info="It is not an SMBX game save file";
-    FileData.ERROR_linenum=in.getCurrentLineNumber();
-    FileData.ERROR_linedata=line;
-    FileData.ReadFileValid=false;
-    return false;
+    catch(const std::exception& err)
+    {
+        if( file_format > 0 )
+            FileData.ERROR_info = "Detected file format: SMBX-" + fromNum( file_format ) + " is invalid\n";
+        else
+            FileData.ERROR_info = "It is not an SMBX game save file\n";
+        #ifdef PGE_FILES_QT
+        FileData.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
+        #else
+        FileData.ERROR_info += exception_to_pretty_string(err);
+        #endif
+        FileData.ERROR_linenum = in.getCurrentLineNumber();
+        FileData.ERROR_linedata=line;
+        FileData.ReadFileValid=false;
+        return false;
+    }
 }
 
 

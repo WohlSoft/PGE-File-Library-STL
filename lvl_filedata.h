@@ -810,7 +810,7 @@ struct LevelData
     //! Line data where error was occouped
     PGESTRING ERROR_linedata;
     //! Number of line where error was occouped
-    int       ERROR_linenum;
+    long      ERROR_linenum;
     /*!
      * \brief File format
      */

@@ -846,15 +846,15 @@ bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConf
     }
     if(FileData.en_name && !IsEmpty(FileData.name))
     {
-        out << "name=" + SMBX64::qStrS(FileData.name);
+        out << "name=" + SMBX64::WriteStr(FileData.name);
     }
     if(FileData.en_image && !IsEmpty(FileData.image))
     {
-        out << "image=" + SMBX64::qStrS(FileData.image);
+        out << "image=" + SMBX64::WriteStr(FileData.image);
     }
     if(FileData.en_script && !IsEmpty(FileData.script))
     {
-        out << "script=" + SMBX64::qStrS(FileData.script);
+        out << "script=" + SMBX64::WriteStr(FileData.script);
     }
     if(FileData.en_grid)
     {
