@@ -80,9 +80,9 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
 /*! \def PGEX_StrArrVal(Mark, targetValue)
     \brief Parse Plain text string array value by requested Marker and write into target variable
 */
-#define PGEX_StrArrVal(Mark, targetValue)  else if(v.marker==Mark) { if(PGEFile::IsStringArray(v.value)) \
-                                                targetValue = PGEFile::X2STRArr(v.value); \
-                                                else goto badfile; }
+#define PGEX_StrArrVal(Mark, targetValue)  else if(v.marker==Mark) { bool valid=false;\
+                                                targetValue = PGEFile::X2STRArr(v.value, &valid); \
+                                                if(!valid) goto badfile; }
 
 /*! \def PGEX_BoolVal(Mark, targetValue)
     \brief Parse boolean flag value by requested Marker and write into target variable

@@ -385,9 +385,9 @@ bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, 
         for(i=0;i<(signed)metaData.bookmarks.size(); i++)
         {
             //Bookmark name
-            out << PGEFile::value("BM", PGEFile::qStrS(metaData.bookmarks[i].bookmarkName));
-            out << PGEFile::value("X", PGEFile::IntS(metaData.bookmarks[i].x));
-            out << PGEFile::value("Y", PGEFile::IntS(metaData.bookmarks[i].y));
+            out << PGEFile::value("BM", PGEFile::WriteStr(metaData.bookmarks[i].bookmarkName));
+            out << PGEFile::value("X", PGEFile::WriteInt(metaData.bookmarks[i].x));
+            out << PGEFile::value("Y", PGEFile::WriteInt(metaData.bookmarks[i].y));
             out << "\n";
         }
         out << "META_BOOKMARKS_END\n";
@@ -402,8 +402,8 @@ bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, 
                 {
                     out << "EVENT\n";
                     if(!x->marker().isEmpty())
-                        out << PGEFile::value("TL", PGEFile::qStrS( x->marker() ) );
-                    out << PGEFile::value("ET", PGEFile::IntS( (int)x->eventType() ) );
+                        out << PGEFile::value("TL", PGEFile::WriteStr( x->marker() ) );
+                    out << PGEFile::value("ET", PGEFile::WriteInt( (int&)x->eventType() ) );
                     out << "\n";
 
                     if(x->basicCommands().size()>0)
@@ -411,14 +411,14 @@ bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, 
                         out << "BASIC_COMMANDS\n";
                         foreach(BasicCommand *y, x->basicCommands())
                         {
-                            out << PGEFile::value("N", PGEFile::qStrS( y->marker() ) );
+                            out << PGEFile::value("N", PGEFile::WriteStr( y->marker() ) );
                             if(QString(y->metaObject()->className())=="MemoryCommand")
                             {
                                 MemoryCommand *z = dynamic_cast<MemoryCommand*>(y);
-                                out << PGEFile::value("CT", PGEFile::qStrS( "MEMORY" ) );
-                                out << PGEFile::value("HX", PGEFile::IntS( z->hexValue() ) );
-                                out << PGEFile::value("FT", PGEFile::IntS( (int)z->fieldType() ) );
-                                out << PGEFile::value("V", PGEFile::FloatS( z->getValue() ) );
+                                out << PGEFile::value("CT", PGEFile::WriteStr( "MEMORY" ) );
+                                out << PGEFile::value("HX", PGEFile::WriteInt( z->hexValue() ) );
+                                out << PGEFile::value("FT", PGEFile::WriteInt( (int&)z->fieldType() ) );
+                                out << PGEFile::value("V", PGEFile::WriteFloat( z->getValue() ) );
                             }
                             out << "\n";
                         }

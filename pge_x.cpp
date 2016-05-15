@@ -209,32 +209,96 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
         }
         else
         {
-            PGESTRINGList fields;
-            PGESTRING srcData_nc = encodeEscape(src_data[q]);
-            PGE_SPLITSTRING(fields, srcData_nc, ";");
             PGEX_Item dataItem;
-            dataItem.type = PGEX_Struct;
-            for(int i=0;i<(signed)fields.size();i++)
+            PGESTRING &srcData_nc = src_data[q];
+            enum States
             {
-                PGESTRING fields_ns = removeSpaces(fields[i]);
-                if(IsEmpty(fields_ns)) continue;
-
-                //Store data into list
-                PGESTRINGList value;
-                PGE_SPLITSTRING(value, fields[i], ":");
-
-                if(value.size()!=2)
+                STATE_MARKER=0,
+                STATE_VALUE=1,
+                STATE_ERROR=2
+            };
+            int state = 0, size = srcData_nc.size(), tail = srcData_nc.size()-1;
+            PGEX_Val dataValue;
+            int escape = 0;
+            for(int i=0; i<size; i++)
+            {
+                if(state==STATE_ERROR)
                 {
-                    valid=false; break;
+                    valid = false;
+                    break;
                 }
-
-                PGEX_Val dataValue;
-                    dataValue.marker = value[0];
-                    dataValue.value = value[1];
-                dataItem.values.push_back(dataValue);
+                PGEChar c = srcData_nc[i];
+                if(escape > 0)
+                {
+                    escape--;
+                }
+                if( (c == '\\') && (escape==0) )
+                {   //Skip escape sequence
+                    escape = 2;
+                }
+                switch(state)
+                {
+                    case STATE_MARKER:
+                        if( (c == ';') && (escape==0) )
+                        {
+                            state = STATE_ERROR;
+                            continue;
+                        }
+                        if( (c == ':') && (escape==0) )
+                        {
+                            state = STATE_VALUE;
+                            continue;
+                        }
+                        dataValue.marker.push_back(c);
+                    break;
+                    case STATE_VALUE:
+                        if( (c == ':') && (escape==0) )
+                        {
+                            state = STATE_ERROR;
+                            continue;
+                        }
+                        if( ((c == ';') && (escape==0)) || (i == tail) )
+                        {
+                            //STORE DATA
+                            dataItem.values.push_back( dataValue );
+                            dataValue.marker.clear();
+                            dataValue.value.clear();
+                            state = STATE_MARKER;
+                            continue;
+                        }
+                        dataValue.value.push_back(c);
+                    break;
+                    case STATE_ERROR:
+                    break;
+                }
             }
+            dataItem.type = PGEX_Struct;
             entryData.type = PGEX_Struct;
             entryData.data.push_back(dataItem);
+//            PGE_SPLITSTRING(fields, srcData_nc, ";");
+//            PGEX_Item dataItem;
+//            dataItem.type = PGEX_Struct;
+//            for(int i=0;i<(signed)fields.size(); i++)
+//            {
+//                PGESTRING fields_ns = removeSpaces(fields[i]);
+//                if(IsEmpty(fields_ns)) continue;
+
+//                //Store data into list
+//                PGESTRINGList value;
+//                PGE_SPLITSTRING(value, fields[i], ":");
+
+//                if( value.size() != 2 )
+//                {
+//                    valid = false; break;
+//                }
+
+//                PGEX_Val dataValue;
+//                    dataValue.marker = value[0];
+//                    dataValue.value = value[1];
+//                dataItem.values.push_back(dataValue);
+//            }
+//            entryData.type = PGEX_Struct;
+//            entryData.data.push_back(dataItem);
         }
         if(!valid) break;
     }
@@ -417,6 +481,7 @@ bool PGEFile::IsStringArray(PGESTRING in) // String array
 {
     bool valid=true;
     int i=0, depth=0, comma=0;
+    bool escape=false;
     while(i<(signed)in.size())
     {
         switch(depth)
@@ -439,10 +504,12 @@ bool PGEFile::IsStringArray(PGESTRING in) // String array
             }
             break;
         case 2://Inside entry
-                 if(in[i]=='"'){ depth=1;comma=0;}    //Close value
-            else if(in[i]=='['){ valid=false;}
-            else if(in[i]==']'){ valid=false;}
-            else if(in[i]==','){ valid=false;}
+                 if((in[i]=='"')&&(!escape)){ depth=1;comma=0; }//Close value
+            else if((in[i]=='[')&&(!escape)){ valid=false; }
+            else if((in[i]==']')&&(!escape)){ valid=false; }
+            else if((in[i]==',')&&(!escape)){ valid=false; }
+            else if((in[i]=='\\')&&(!escape)){ escape=true; break; }
+            escape=false;
             break;
         }
         if(!valid) break;//Stop parsing on invalid
@@ -452,17 +519,49 @@ bool PGEFile::IsStringArray(PGESTRING in) // String array
 }
 
 
-PGESTRINGList PGEFile::X2STRArr(PGESTRING src)
+PGESTRINGList PGEFile::X2STRArr(PGESTRING in, bool *_valid)
 {
     PGESTRINGList strArr;
-    src=PGE_RemSubSTRING(src, "[");
-    src=PGE_RemSubSTRING(src, "]");
-    PGE_SPLITSTRING(strArr, src, ",");
-    for(int i=0; i<(signed)strArr.size(); i++)
+    PGESTRING entry;
+    bool valid=true;
+    int i=0, depth=0, comma=0;
+    bool escape=false;
+    while(i<(signed)in.size())
     {
-        strArr[i] = X2STRING(strArr[i]);
+        switch(depth)
+        {
+        case 0://outside array
+                if(in[i]=='[') { depth=1; comma++; }
+                else valid=false;
+             break;
+        case 1://between entries
+            switch(comma)
+            {
+                case 0:
+                         if(in[i]==']') depth=0;//Close array
+                    else if(in[i]==',') comma++;//Close array
+                    else valid=false;
+                    break;
+                case 1:
+                    if(in[i]=='"')     depth=2;//Open value
+                    else valid=false;
+            }
+            break;
+        case 2://Inside entry
+                 if( (in[i]=='"')&&(!escape) )
+                 { strArr.push_back( X2STRING(entry) ); entry.clear(); depth=1; comma=0; }//Close value
+            else if((in[i]=='[')&&(!escape)){  valid=false; break; }
+            else if((in[i]==']')&&(!escape)){  valid=false; break; }
+            else if((in[i]==',')&&(!escape)){  valid=false; break; }
+            else if((in[i]=='\\')&&(!escape)){ escape=true; break; }
+            entry.push_back(in[i]);
+            escape=false;
+            break;
+        }
+        if(!valid) break;//Stop parsing on invalid
+        i++;
     }
-
+    if(_valid) *_valid = valid;
     return strArr;
 }
 
@@ -476,50 +575,77 @@ PGELIST<bool > PGEFile::X2BollArr(PGESTRING src)
     return arr;
 }
 
-PGELIST<PGESTRINGList > PGEFile::splitDataLine(PGESTRING src_data, bool *valid)
+PGELIST<PGESTRINGList > PGEFile::splitDataLine(PGESTRING src_data, bool *_valid)
 {
     PGELIST<PGESTRINGList > entryData;
-
-    bool wrong=false;
-
-    PGESTRING encoded=encodeEscape(src_data);
-    PGESTRINGList fields;
-    PGE_SPLITSTRING(fields, encoded, ";");
-
-    for(int i=0;i<(signed)fields.size();i++)
+    bool valid = true;
+    enum States
     {
-        PGESTRING fields_ns = removeSpaces(fields[i]);
-        if(IsEmpty(fields_ns)) continue;
-        PGESTRINGList value;
-        PGE_SPLITSTRING(value, fields[i], ":");
-
-        if(value.size()!=2) {wrong=true; break;}
-        entryData.push_back(value);
+        STATE_MARKER=0,
+        STATE_VALUE=1,
+        STATE_ERROR=2
+    };
+    int state = 0, size = src_data.size(), tail = src_data.size()-1;
+    PGESTRING marker;
+    PGESTRING value;
+    int escape=0;
+    for(int i=0; i<size; i++)
+    {
+        if(state==STATE_ERROR)
+        {
+            valid = false;
+            break;
+        }
+        PGEChar c = src_data[i];
+        if(escape > 0)
+        {
+            escape--;
+        }
+        if( (c == '\\') && (escape==0) )
+        {   //Skip escape sequence
+            escape = 2;
+        }
+        switch(state)
+        {
+            case STATE_MARKER:
+                if( (c == ';') && (escape==0) )
+                {
+                    state = STATE_ERROR;
+                    continue;
+                }
+                if( (c == ':') && (escape==0) )
+                {
+                    state = STATE_VALUE;
+                    continue;
+                }
+                marker.push_back(c);
+            break;
+                case STATE_VALUE:
+                if( (c == ':') && (escape==0) )
+                {
+                    state = STATE_ERROR;
+                    continue;
+                }
+                if( ((c == ';') && (escape==0)) || (i == tail) )
+                {
+                    //STORE ENTRY!
+                    PGESTRINGList fields;
+                    fields.push_back(marker);
+                    fields.push_back(value);
+                    entryData.push_back(fields);
+                    marker.clear();
+                    value.clear();
+                    state = STATE_MARKER;
+                    continue;
+                }
+                value.push_back(c);
+            break;
+            case STATE_ERROR:
+            break;
+        }
     }
-
-    if(valid) * valid = (!wrong);
+    if(_valid) * _valid = valid;
     return entryData;
-}
-
-
-PGESTRING PGEFile::IntS(long input)
-{
-    return fromNum(input);
-}
-
-PGESTRING PGEFile::BoolS(bool input)
-{
-    return PGESTRING((input)?"1":"0");
-}
-
-PGESTRING PGEFile::FloatS(double input)
-{
-    return fromNum(input);//fromNum(input, 'g', 10);
-}
-
-PGESTRING PGEFile::qStrS(PGESTRING input)
-{
-    return "\""+escapeString(input)+"\"";
 }
 
 PGESTRING PGEFile::hStrS(PGESTRING input)
@@ -527,24 +653,22 @@ PGESTRING PGEFile::hStrS(PGESTRING input)
     return PGEGetChar(input);
 }
 
-PGESTRING PGEFile::strArrayS(PGESTRINGList input)
+PGESTRING PGEFile::WriteStrArr(PGESTRINGList &input)
 {
     PGESTRING output;
-
-    if(IsEmpty(input)) return PGESTRING("");
-
+    if(IsEmpty(input))
+        return PGESTRING("");
     output.append("[");
-
-    for(int i=0; i< (signed)input.size(); i++)
+    for(int i=0; i<(signed)input.size(); i++)
     {
-        output.append(qStrS(input[i])+(i<(signed)input.size()-1?",":""));
+        output.append( WriteStr(input[i]) );
+        output.append(i<(signed)input.size()-1 ? ",":"");
     }
-
     output.append("]");
     return output;
 }
 
-PGESTRING PGEFile::intArrayS(PGELIST<int> input)
+PGESTRING PGEFile::WriteIntArr(PGELIST<int> input)
 {
     PGESTRING output;
     if(input.empty()) return PGESTRING("");
@@ -557,7 +681,7 @@ PGESTRING PGEFile::intArrayS(PGELIST<int> input)
     return output;
 }
 
-PGESTRING PGEFile::BoolArrayS(PGELIST<bool> input)
+PGESTRING PGEFile::WriteBoolArr(PGELIST<bool> input)
 {
     PGESTRING output;
     for(int i=0;i<(signed)input.size(); i++)
@@ -567,82 +691,89 @@ PGESTRING PGEFile::BoolArrayS(PGELIST<bool> input)
     return output;
 }
 
-PGESTRING PGEFile::encodeEscape(PGESTRING input)
-{
-    PGESTRING output = input;
-    output=PGE_ReplSTRING(output, "\\n", "==n==");
-    output=PGE_ReplSTRING(output, "\\r", "==r==");
-    output=PGE_ReplSTRING(output, "\\\"", "==q==");
-    output=PGE_ReplSTRING(output, "\\\\", "==sl==");
-    output=PGE_ReplSTRING(output, "\\;", "==Sc==");
-    output=PGE_ReplSTRING(output, "\\:", "==Cl==");
-    output=PGE_ReplSTRING(output, "\\[", "==Os==");
-    output=PGE_ReplSTRING(output, "\\]", "==Cs==");
-    output=PGE_ReplSTRING(output, "\\,", "==Cm==");
-    output=PGE_ReplSTRING(output, "\\%", "==Pc==");
-    return output;
-}
-
-PGESTRING PGEFile::decodeEscape(PGESTRING input)
-{
-    PGESTRING output = input;
-    output=PGE_ReplSTRING(output, "==n==", "\\n");
-    output=PGE_ReplSTRING(output, "==r==", "\\r");
-    output=PGE_ReplSTRING(output, "==q==", "\\\"");
-    output=PGE_ReplSTRING(output, "==sl==","\\\\");
-    output=PGE_ReplSTRING(output, "==Sc==", "\\;");
-    output=PGE_ReplSTRING(output, "==Cl==", "\\:");
-    output=PGE_ReplSTRING(output, "==Os==", "\\[");
-    output=PGE_ReplSTRING(output, "==Cs==", "\\]");
-    output=PGE_ReplSTRING(output, "==Cm==", "\\,");
-    output=PGE_ReplSTRING(output, "==Pc==", "\\%");
-    return output;
-}
-
 PGESTRING PGEFile::X2STRING(PGESTRING input)
 {
-    return restoreString(
-                decodeEscape(
-                    removeQuotes(input)
-                )
-            );
+    restoreString(input, true);
+    return input;
 }
 
-PGESTRING PGEFile::restoreString(PGESTRING input)
+void PGEFile::restoreString(PGESTRING &input, bool removeQuotes)
 {
-    PGESTRING output = input;
-    output=PGE_ReplSTRING(output, "\\n", "\n");
-    output=PGE_ReplSTRING(output, "\\r", "\r");
-    output=PGE_ReplSTRING(output, "\\\"", "\"");
-    output=PGE_ReplSTRING(output, "\\;", ";");
-    output=PGE_ReplSTRING(output, "\\:", ":");
-    output=PGE_ReplSTRING(output, "\\[", "[");
-    output=PGE_ReplSTRING(output, "\\]", "]");
-    output=PGE_ReplSTRING(output, "\\,", ",");
-    output=PGE_ReplSTRING(output, "\\%", "%");
-    output=PGE_ReplSTRING(output, "\\\\", "\\");
-    return output;
+    PGESTRING &output = input;
+    const unsigned int first = 0;
+    unsigned int j = 0, size = input.size(), tail = input.size()-1;
+    for(unsigned int i=0; i < size; i++, j++)
+    {
+        if(removeQuotes && ( (i == first) || (i == tail) ) )
+        {
+        ReCheckQuotie:
+            //Skip quotie character at begin/end
+            if(input[i]=='\"')
+            {
+                i++;
+                if( i == tail ) goto ReCheckQuotie;
+            }
+            if(i >= size)
+                break;
+        }
+        if(input[i]=='\\')
+        {
+            unsigned int k = i+1;
+            if( k >= size )
+            {
+                output[j]='\\';
+                continue;
+            }
+            char c = PGEGetChar(input[k]);
+            switch(c)
+            {
+                case 'n':  output[j] = '\n'; i++; break;
+                case 'r':  output[j] = '\r'; i++; break;
+                case '\"': output[j] = '\"'; i++; break;
+                case ';':  output[j] = ';';  i++; break;
+                case ':':  output[j] = ':';  i++; break;
+                case '[':  output[j] = '[';  i++; break;
+                case ']':  output[j] = ']';  i++; break;
+                case ',':  output[j] = ',';  i++; break;
+                case '%':  output[j] = '%';  i++; break;
+                case '\\': output[j] = '\\'; i++; break;
+                default:   output[j++] = input[i];
+                           output[j]   = input[k]; i++; break;
+            }
+        } else {
+            output[j] = input[i];
+        }
+    }
+    output.resize(j);
 }
 
-PGESTRING PGEFile::escapeString(PGESTRING input)
+void PGEFile::escapeString(PGESTRING &output, const PGESTRING &input, bool addQuotes)
 {
-    PGESTRING output = input;
-    output=PGE_ReplSTRING(output, "\\", "\\\\");
-    output=PGE_ReplSTRING(output, "\n", "\\n");
-    output=PGE_ReplSTRING(output, "\r", "\\r");
-    output=PGE_ReplSTRING(output, "\"", "\\\"");
-    output=PGE_ReplSTRING(output, ";", "\\;");
-    output=PGE_ReplSTRING(output, ":", "\\:");
-    output=PGE_ReplSTRING(output, "[", "\\[");
-    output=PGE_ReplSTRING(output, "]", "\\]");
-    output=PGE_ReplSTRING(output, ",", "\\,");
-    output=PGE_ReplSTRING(output, "%", "\\%");
-    return output;
+    int j = 0, size = input.size();
+    output.resize(size*2+(addQuotes ? 2:0));
+    if(addQuotes)
+        output[j++] = '\"';
+    for(int i=0; i < size; i++, j++)
+    {
+        char c = PGEGetChar(input[i]);
+        switch(c)
+        {
+            case '\n': output[j++]='\\'; output[j] = 'n'; break;
+            case '\r': output[j++]='\\'; output[j] = 'r'; break;
+            case '\"': output[j++]='\\'; output[j] = '\"'; break;
+            case ';':  output[j++]='\\'; output[j] = ';';  break;
+            case ':':  output[j++]='\\'; output[j] = ':';  break;
+            case '[':  output[j++]='\\'; output[j] = '[';  break;
+            case ']':  output[j++]='\\'; output[j] = ']';  break;
+            case ',':  output[j++]='\\'; output[j] = ',';  break;
+            case '%':  output[j++]='\\'; output[j] = '%';  break;
+            case '\\': output[j++]='\\'; output[j] = '\\'; break;
+            default:   output[j] = input[i]; break;
+        }
+    }
+    if(addQuotes)
+        output[j++] = '\"';
+    output.resize(j);
 }
 
-PGESTRING PGEFile::value(PGESTRING marker, PGESTRING data)
-{
-    PGESTRING out;
-    out +=marker+":"+data+";";
-    return out;
-}
+
