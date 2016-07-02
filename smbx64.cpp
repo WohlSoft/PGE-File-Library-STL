@@ -20,8 +20,8 @@
 
 namespace smbx64Format
 {
-    const char *uint_vc = "0123456789";
-    const int   uint_vc_len = 10;
+    //const char *uint_vc = "0123456789";
+    //const int   uint_vc_len = 10;
 
     bool isDegit(PGEChar c)
     {
@@ -32,7 +32,7 @@ namespace smbx64Format
     {
         if(IsEmpty(s)) return false;
         int i, j;
-        for(i=0;i<(signed)s.size();i++)
+        for(i=0;i<signed(s.size());i++)
         {
             bool found=false;
             for(j=0;j<valid_chars_len;j++) {
@@ -99,7 +99,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
     bool decimal=false;
     bool pow10  =false;
     bool sign   =false;
-    for(int i=((PGEGetChar(in[0])=='-')?1:0); i<(signed)in.size(); i++)
+    for(int i=((PGEGetChar(in[0])=='-')?1:0); i<signed(in.size()); i++)
     {
         if((!decimal) &&(!pow10))
         {
@@ -107,7 +107,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
             {
                 in[i]='.';//replace comma with a dot
                 decimal=true;
-                if(i==((signed)in.size()-1)) return false;
+                if(i==(signed(in.size())-1)) return false;
                 continue;
             }
         }
@@ -116,7 +116,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
             if((PGEGetChar(in[i])=='E')||(PGEGetChar(in[i])=='e'))
             {
                 pow10=true;
-                if(i==((signed)in.size()-1)) return false;
+                if(i==(signed(in.size())-1)) return false;
                 continue;
             }
         }
@@ -127,7 +127,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
                 sign=true;
                 if((PGEGetChar(in[i])=='+')||(PGEGetChar(in[i])=='-'))
                 {
-                    if(i==((signed)in.size()-1)) return false;
+                    if(i==(signed(in.size())-1)) return false;
                     continue;
                 }
             }
@@ -143,12 +143,12 @@ bool SMBX64::IsQuotedString(PGESTRING in)
     #define QStrGOOD true
     #define QStrBAD false
     int i=0;
-    for(i=0; i<(signed)in.size();i++)
+    for(i=0; i<signed(in.size());i++)
     {
         if(i==0)
         {
             if(in[i]!='"') return QStrBAD;
-        } else if(i==(signed)in.size()-1) {
+        } else if(i==signed(in.size())-1) {
             if(in[i]!='"') return QStrBAD;
         } else if(in[i]=='"') return QStrBAD;
         else if(in[i]=='"') return QStrBAD;
