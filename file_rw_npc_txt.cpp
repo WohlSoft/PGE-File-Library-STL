@@ -118,7 +118,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="gfxoffsetx")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsSInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
@@ -133,7 +133,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="gfxoffsety")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsSInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
@@ -149,7 +149,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="width")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -164,7 +164,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="height")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -180,7 +180,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="gfxwidth")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -195,7 +195,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="gfxheight")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -210,7 +210,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="score")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -225,7 +225,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="health")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -242,7 +242,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="playerblock")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -257,7 +257,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="playerblocktop")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -272,7 +272,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="npcblock")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -287,7 +287,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="npcblocktop")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -302,7 +302,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="grabside")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -317,7 +317,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="grabtop")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -332,7 +332,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="jumphurt")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -347,7 +347,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="nohurt")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -362,7 +362,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="noblockcollision")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -377,7 +377,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="cliffturn")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -392,7 +392,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="noyoshi")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -407,7 +407,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="foreground")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -422,7 +422,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="speed")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsFloat(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_FLT(inf.getCurrentLineNumber(), line);
@@ -437,7 +437,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="nofireball")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -452,7 +452,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="nogravity")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -467,7 +467,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="frames")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -482,7 +482,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="framespeed")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
@@ -530,7 +530,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="nohammer")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
@@ -545,7 +545,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(Params[0]=="noshell")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
-            Params[1]=PGE_RemSubSTRING(Params[1], " ");//Delete spaces
+            Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsBool(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
