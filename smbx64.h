@@ -277,12 +277,12 @@ namespace SMBX64
     /*!
      * \brief Validate digital boolean value (0 or 1)
      * \param in raw value
-     * \return true if value is INVALID
+     * \return true if value is valid
      */
     inline bool IsBool(PGESTRING in) //Digital BOOL
     {
         if((in.size()!=1) || (IsEmpty(in)) )
-            return true;
+            return false;
         return ((PGEGetChar(in[0])=='1')||(PGEGetChar(in[0])=='0'));
     }
 
