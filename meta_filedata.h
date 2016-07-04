@@ -71,6 +71,10 @@ public:
     bool untitled;
     //! Is this level was modified before crash occouped?
     bool modifyed;
+    //! Recent file format ID (specific enum in the format structure declaration)
+    int fmtID;
+    //! Recent file format version
+    int fmtVer;
     //! Full original file path file which was opened before crash occouped
     PGESTRING fullPath;
     //! Full episode path of file which was opened before crash occouped

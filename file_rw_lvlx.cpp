@@ -262,6 +262,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_ValueBegin()
                     PGEX_BoolVal("UT", FileData.metaData.crash.untitled) //Untitled
                     PGEX_BoolVal("MD", FileData.metaData.crash.modifyed) //Modyfied
+                    PGEX_SIntVal("FF", FileData.metaData.crash.fmdID) //Recent File format
+                    PGEX_SIntVal("FV", FileData.metaData.crash.fmdVer) //Recent File format version
                     PGEX_StrVal ("N",  FileData.metaData.crash.filename) //Filename
                     PGEX_StrVal ("P",  FileData.metaData.crash.path) //Path
                     PGEX_StrVal ("FP", FileData.metaData.crash.fullPath) //Full file Path
@@ -1563,6 +1565,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "META_SYS_CRASH\n";
             out << PGEFile::value("UT", PGEFile::BoolS(FileData.metaData.crash.untitled));
             out << PGEFile::value("MD", PGEFile::BoolS(FileData.metaData.crash.modifyed));
+            out << PGEFile::value("FF", PGEFile::IntS(FileData.metaData.crash.fmdID));
+            out << PGEFile::value("FV", PGEFile::IntS(FileData.metaData.crash.fmdVer));
             out << PGEFile::value("N", PGEFile::qStrS(FileData.metaData.crash.filename));
             out << PGEFile::value("P", PGEFile::qStrS(FileData.metaData.crash.path));
             out << PGEFile::value("FP", PGEFile::qStrS(FileData.metaData.crash.fullPath));
