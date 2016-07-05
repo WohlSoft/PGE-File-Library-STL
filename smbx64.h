@@ -163,9 +163,13 @@ namespace SMBX64
             *out = false;
         else if(input == "#TRUE#")
             *out = true;
+        if(input == "false")
+            *out = false;
+        else if(input == "true")
+            *out = true;
         else if( input == "0" || input == "" )
             *out = false;
-        else if( input == "!0" )
+        else if( input == "!0" || input == "1" )
             *out = true;
         else
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
@@ -177,9 +181,13 @@ namespace SMBX64
             *out = 0;
         else if(input == "#TRUE#")
             *out = 1;
+        if(input == "false")
+            *out = 0;
+        else if(input == "true")
+            *out = 1;
         else if( input == "0" || input == "" )
             *out = 0;
-        else if( input == "!0" )
+        else if( input == "!0" || input == "1"  )
             *out = 1;
         else
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
@@ -191,9 +199,13 @@ namespace SMBX64
             *out = 0;
         else if(input == "#TRUE#")
             *out = 1;
+        if(input == "false")
+            *out = 0;
+        else if(input == "true")
+            *out = 1;
         else if( input == "0" || input == "" )
             *out = 0;
-        else if( input == "!0" )
+        else if( input == "!0" || input == "1" )
             *out = 1;
         else
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
