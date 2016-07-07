@@ -163,7 +163,7 @@ namespace SMBX64
             *out = false;
         else if(input == "#TRUE#")
             *out = true;
-        if(input == "false")
+        else if(input == "false")
             *out = false;
         else if(input == "true")
             *out = true;
@@ -181,7 +181,7 @@ namespace SMBX64
             *out = 0;
         else if(input == "#TRUE#")
             *out = 1;
-        if(input == "false")
+        else if(input == "false")
             *out = 0;
         else if(input == "true")
             *out = 1;
@@ -199,7 +199,7 @@ namespace SMBX64
             *out = 0;
         else if(input == "#TRUE#")
             *out = 1;
-        if(input == "false")
+        else if(input == "false")
             *out = 0;
         else if(input == "true")
             *out = 1;
