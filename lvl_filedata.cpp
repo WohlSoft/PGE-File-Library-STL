@@ -221,34 +221,35 @@ LevelNPC    FileFormats::CreateLvlNpc()
 {
     LevelNPC dummyNPC;
     dummyNPC.x = 0;
-    dummyNPC.y = 0 ;
+    dummyNPC.y = 0;
     dummyNPC.direct = -1;
-    dummyNPC.id=0;
-    dummyNPC.contents=0;
-    dummyNPC.special_data=0;
-    dummyNPC.special_data2=0;
-    dummyNPC.generator=false;
-    dummyNPC.generator_type=1;
-    dummyNPC.generator_direct=1;
-    dummyNPC.generator_period=20;
-    dummyNPC.generator_custom_angle=0.0;
-    dummyNPC.generator_branches=1;
-    dummyNPC.generator_angle_range=360.0;
-    dummyNPC.generator_initial_speed=10.0;
-    dummyNPC.msg="";
-    dummyNPC.friendly=false;
-    dummyNPC.nomove=false;
-    dummyNPC.is_boss=false;
+    dummyNPC.id = 0;
+    dummyNPC.contents = 0;
+    dummyNPC.special_data = 0;
+    dummyNPC.special_data2 = 0;
+    dummyNPC.generator = false;
+    dummyNPC.generator_type = 1;
+    dummyNPC.generator_direct = 1;
+    dummyNPC.generator_period = 20;
+    dummyNPC.generator_custom_angle = 0.0;
+    dummyNPC.generator_branches = 1;
+    dummyNPC.generator_angle_range = 360.0;
+    dummyNPC.generator_initial_speed = 10.0;
+    dummyNPC.msg = "";
+    dummyNPC.friendly = false;
+    dummyNPC.nomove = false;
+    dummyNPC.is_boss = false;
     dummyNPC.layer = "Default";
-    dummyNPC.event_activate="";
-    dummyNPC.event_die="";
-    dummyNPC.event_talk="";
-    dummyNPC.event_emptylayer="";
-    dummyNPC.attach_layer="";
+    dummyNPC.event_activate = "";
+    dummyNPC.event_die = "";
+    dummyNPC.event_talk = "";
+    dummyNPC.event_emptylayer = "";
+    dummyNPC.attach_layer = "";
 
-    dummyNPC.array_id=0;
-    dummyNPC.index=0;
-    dummyNPC.is_star=false;
+    dummyNPC.array_id   = 0;
+    dummyNPC.index      = 0;
+    dummyNPC.is_star    = false;
+    dummyNPC.userdata   = nullptr;
     return dummyNPC;
 }
 
@@ -290,8 +291,10 @@ LevelDoor  FileFormats::CreateLvlWarp()
     dummyDoor.cannon_exit=false;
     dummyDoor.cannon_exit_speed=10.0f;
 
-    dummyDoor.array_id = 0;
-    dummyDoor.index = 0;
+    dummyDoor.array_id       = 0;
+    dummyDoor.index          = 0;
+    dummyDoor.userdata_enter = nullptr;
+    dummyDoor.userdata_exit  = nullptr;
 
     return dummyDoor;
 }
@@ -315,6 +318,7 @@ LevelBlock  FileFormats::CreateLvlBlock()
 
     dummyBlock.array_id = 0;
     dummyBlock.index = 0;
+    dummyBlock.userdata = nullptr;
     return dummyBlock;
 }
 
@@ -336,6 +340,7 @@ LevelBGO FileFormats::CreateLvlBgo()
 
     dummyBGO.array_id  = 0;
     dummyBGO.index = 0;
+    dummyBGO.userdata = nullptr;
     return dummyBGO;
 }
 
@@ -358,6 +363,7 @@ LevelPhysEnv FileFormats::CreateLvlPhysEnv()
 
     dummyWater.array_id = 0;
     dummyWater.index = 0;
+    dummyWater.userdata = nullptr;
     return dummyWater;
 }
 
@@ -476,6 +482,7 @@ PlayerPoint FileFormats::CreateLvlPlayerPoint(int id)
     dummyPlayer.x=0;
     dummyPlayer.y=0;
     dummyPlayer.w=24;
+    dummyPlayer.userdata = nullptr;
     switch(id)
     {
     case 1:

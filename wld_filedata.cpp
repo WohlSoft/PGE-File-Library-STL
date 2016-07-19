@@ -47,6 +47,7 @@ WorldTiles FileFormats::CreateWldTile()
     dummyTile.x = 0;
     dummyTile.y = 0;
     dummyTile.index = 0;
+    dummyTile.userdata = nullptr;
 
     return dummyTile;
 }
@@ -59,6 +60,7 @@ WorldScenery FileFormats::CreateWldScenery()
     dummyScen.index = 0;
     dummyScen.x = 0;
     dummyScen.y = 0;
+    dummyScen.userdata = nullptr;
 
     return dummyScen;
 }
@@ -71,6 +73,7 @@ WorldPaths FileFormats::CreateWldPath()
     dummyPath.index = 0;
     dummyPath.x = 0;
     dummyPath.y = 0;
+    dummyPath.userdata = nullptr;
 
     return dummyPath;
 }
@@ -105,6 +108,8 @@ WorldLevels FileFormats::CreateWldLevel()
     dummyLevel.top_exit = -1;
     dummyLevel.left_exit = -1;
 
+    dummyLevel.userdata = nullptr;
+
     return dummyLevel;
 }
 
@@ -116,7 +121,8 @@ WorldMusic FileFormats::CreateWldMusicbox()
     dummyMusicBox.index = 0;
     dummyMusicBox.x = 0;
     dummyMusicBox.y = 0;
-    dummyMusicBox.music_file="";
+    dummyMusicBox.music_file = "";
+    dummyMusicBox.userdata = nullptr;
 
     return dummyMusicBox;
 }

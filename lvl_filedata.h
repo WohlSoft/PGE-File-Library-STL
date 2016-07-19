@@ -94,6 +94,8 @@ struct PlayerPoint
     long w;
     //! Initial direction of playable character (-1 is left, 1 is right, 0 is right by default)
     int direction;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 /*!
@@ -136,6 +138,8 @@ struct LevelBlock
     unsigned int array_id;
     //! Recent array index where block was saved (used to speed-up settings synchronization)
     unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 
@@ -192,7 +196,8 @@ struct LevelBGO
     unsigned int array_id;
     //! Recent array index where block was saved (used to speed-up settings synchronization)
     unsigned int index;
-
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 
@@ -304,6 +309,8 @@ struct LevelNPC
     unsigned int index;
     //!< Is this NPC a star (Copying from lvl_npc.ini config on file read). Stars are special bonus which required by player to be able enter into some doors/warps
     bool is_star;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 /*!
@@ -416,6 +423,10 @@ struct LevelDoor
     unsigned int array_id;
     //!< Recent array index where block was saved (used to speed-up settings synchronization)
     unsigned int index;
+    //! User data pointer for entrance, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata_enter;
+    //! User data pointer for exit, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata_exit;
 };
 
 /*!
@@ -470,6 +481,8 @@ struct LevelPhysEnv
     unsigned int array_id;
     //! Recent array index where block was saved (used to speed-up settings synchronization)
     unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 /*!
@@ -496,7 +509,6 @@ struct LevelLayer
  */
 struct LevelEvent_Sets
 {
-
     LevelEvent_Sets();
     enum SetActions{
         LESet_Nothing=-1,

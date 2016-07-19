@@ -37,6 +37,8 @@ struct WorldTiles
     //editing
     unsigned int array_id;
     unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 struct WorldScenery
@@ -48,6 +50,8 @@ struct WorldScenery
     //editing
     unsigned int array_id;
     unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 struct WorldPaths
@@ -59,6 +63,8 @@ struct WorldPaths
     //editing
     unsigned int array_id;
     unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 struct WorldLevels
@@ -83,6 +89,8 @@ struct WorldLevels
     //editing
     unsigned int array_id;
     unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 struct WorldMusic
@@ -95,6 +103,8 @@ struct WorldMusic
     //editing
     unsigned int array_id;
     unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 struct WorldData
