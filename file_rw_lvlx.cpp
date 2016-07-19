@@ -36,12 +36,12 @@
 bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileData)
 {
     CreateLevelHeader(FileData);
-    FileData.RecentFormat = LevelData::PGEX;
+    FileData.meta.RecentFormat = LevelData::PGEX;
 
     PGE_FileFormats_misc::TextFileInput inf;
     if(!inf.open(filePath, true))
     {
-        FileData.ReadFileValid=false;
+        FileData.meta.ReadFileValid=false;
         return false;
     }
 
@@ -49,8 +49,8 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
     int str_count=0;
     bool valid=false;
     PGE_FileFormats_misc::FileInfo in_1(filePath);
-    FileData.filename = in_1.basename();
-    FileData.path = in_1.dirpath();
+    FileData.meta.filename = in_1.basename();
+    FileData.meta.path = in_1.dirpath();
 
     #define NextLine(line) str_count++;line = inf.readLine();
 
@@ -118,15 +118,15 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
     FileData.CurSection=0;
     FileData.playmusic=0;
 
-    FileData.ReadFileValid=true;
+    FileData.meta.ReadFileValid=true;
 
     return true;
 
 badfile:
-    FileData.ERROR_info="Invalid file format";
-    FileData.ERROR_linenum=str_count;
-    FileData.ERROR_linedata=line;
-    FileData.ReadFileValid=false;
+    FileData.meta.ERROR_info="Invalid file format";
+    FileData.meta.ERROR_linenum=str_count;
+    FileData.meta.ERROR_linedata=line;
+    FileData.meta.ReadFileValid=false;
     return false;
 }
 
@@ -139,10 +139,10 @@ bool FileFormats::ReadExtendedLvlFileF(PGESTRING  filePath, LevelData &FileData)
     if(!file.open(filePath, true))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadExtendedLvlFile(file, FileData);
@@ -155,10 +155,10 @@ bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadExtendedLvlFile(file, FileData);
@@ -171,18 +171,18 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
     PGESTRING line;  /*Current Line data*/
     //LevelData FileData;
     CreateLevelData(FileData);
-    FileData.RecentFormat = LevelData::PGEX;
+    FileData.meta.RecentFormat = LevelData::PGEX;
 
     //Add path data
     if(filePath.size() > 0)
     {
         PGE_FileFormats_misc::FileInfo  in_1(filePath);
-        FileData.filename = in_1.basename();
-        FileData.path = in_1.dirpath();
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
     }
 
-    FileData.untitled = false;
-    FileData.modified = false;
+    FileData.meta.untitled = false;
+    FileData.meta.modified = false;
 
     LevelSection lvl_section;
 
@@ -527,8 +527,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("EE", block.event_emptylayer) //Hit event slot
                 }
 
-                block.array_id = FileData.blocks_array_id++;
-                block.index = FileData.blocks.size();
+                block.meta.array_id = FileData.blocks_array_id++;
+                block.meta.index = FileData.blocks.size();
                 FileData.blocks.push_back(block);
             }
         }//BLOCK
@@ -556,8 +556,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal  ("LR", bgodata.layer) //Layer name
                 }
 
-                bgodata.array_id = FileData.bgo_array_id++;
-                bgodata.index = FileData.bgo.size();
+                bgodata.meta.array_id = FileData.bgo_array_id++;
+                bgodata.meta.index = FileData.bgo.size();
                 FileData.bgo.push_back(bgodata);
             }
         }//BGO
@@ -608,8 +608,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("EF", npcdata.event_nextframe)//Evemt slot "Trigger every frame"
                 }
 
-                npcdata.array_id = FileData.npc_array_id++;
-                npcdata.index = FileData.npc.size();
+                npcdata.meta.array_id = FileData.npc_array_id++;
+                npcdata.meta.index = FileData.npc.size();
                 FileData.npc.push_back(npcdata);
             }
         }//TILES
@@ -639,8 +639,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_FloatVal("MV",physiczone.max_velocity) //Maximal velocity
                     PGEX_StrVal("EO",  physiczone.touch_event) //Touch event/script
                 }
-                physiczone.array_id = FileData.physenv_array_id++;
-                physiczone.index = FileData.physez.size();
+                physiczone.meta.array_id = FileData.physenv_array_id++;
+                physiczone.meta.index = FileData.physez.size();
                 FileData.physez.push_back(physiczone);
             }
         }//PHYSICS
@@ -693,8 +693,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 door.isSetIn = ( !door.lvl_i );
                 door.isSetOut = ( !door.lvl_o || (door.lvl_i));
 
-                door.array_id = FileData.doors_array_id++;
-                door.index = FileData.doors.size();
+                door.meta.array_id = FileData.doors_array_id++;
+                door.meta.index = FileData.doors.size();
                 FileData.doors.push_back(door);
             }
         }//DOORS
@@ -724,12 +724,12 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
                 if(found)
                 {
-                    layer.array_id = FileData.layers[q].array_id;
+                    layer.meta.array_id = FileData.layers[q].meta.array_id;
                     FileData.layers[q] = layer;
                 }
                 else
                 {
-                    layer.array_id = FileData.layers_array_id++;
+                    layer.meta.array_id = FileData.layers_array_id++;
                     FileData.layers.push_back(layer);
                 }
             }
@@ -1404,12 +1404,12 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
                 if(found)
                 {
-                    event.array_id = FileData.events[q].array_id;
+                    event.meta.array_id = FileData.events[q].meta.array_id;
                     FileData.events[q] = event;
                 }
                 else
                 {
-                    event.array_id = FileData.events_array_id++;
+                    event.meta.array_id = FileData.events_array_id++;
                     FileData.events.push_back(event);
                 }
             }
@@ -1467,16 +1467,16 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
     ///////////////////////////////////////EndFile///////////////////////////////////////
 
     errorString.clear(); //If no errors, clear string;
-    FileData.ReadFileValid=true;
+    FileData.meta.ReadFileValid=true;
     return true;
 
     badfile:    //If file format is not correct
 
-    FileData.ERROR_info=errorString;
-    FileData.ERROR_linenum=in.getCurrentLineNumber();
-    FileData.ERROR_linedata=line;
+    FileData.meta.ERROR_info=errorString;
+    FileData.meta.ERROR_linenum=in.getCurrentLineNumber();
+    FileData.meta.ERROR_linedata=line;
 
-    FileData.ReadFileValid=false;
+    FileData.meta.ReadFileValid=false;
     return false;
 }
 
@@ -1514,7 +1514,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 {
     long i;
 
-    FileData.RecentFormat = LevelData::PGEX;
+    FileData.meta.RecentFormat = LevelData::PGEX;
 
     //Count placed stars on this level
     FileData.stars=0;

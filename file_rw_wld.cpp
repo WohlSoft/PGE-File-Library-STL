@@ -33,33 +33,33 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
     SMBX64_FileBegin();
     errorString.clear();
     CreateWorldHeader(FileData);
-    FileData.RecentFormat = WorldData::SMBX64;
-    FileData.RecentFormatVersion = 64;
+    FileData.meta.RecentFormat = WorldData::SMBX64;
+    FileData.meta.RecentFormatVersion = 64;
 
     PGE_FileFormats_misc::TextFileInput in;
     if(!in.open(filePath, false))
     {
-        FileData.ReadFileValid=false;
+        FileData.meta.ReadFileValid=false;
         return false;
     }
 
     PGE_FileFormats_misc::FileInfo in_1(filePath);
-    FileData.filename = in_1.basename();
-    FileData.path = in_1.dirpath();
+    FileData.meta.filename = in_1.basename();
+    FileData.meta.path = in_1.dirpath();
 
     in.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
 
-    FileData.untitled = false;
-    FileData.modified = false;
+    FileData.meta.untitled = false;
+    FileData.meta.modified = false;
 
     //Enable strict mode for SMBX WLD file format
-    FileData.smbx64strict = true;
+    FileData.meta.smbx64strict = true;
 
     try
     {
         nextLine();   //Read first Line
         SMBX64::ReadUInt(&file_format, line); //File format number
-        FileData.RecentFormatVersion = file_format;
+        FileData.meta.RecentFormatVersion = file_format;
 
         nextLine();
         SMBX64::ReadStr(&FileData.EpisodeTitle, line); //Episode name
@@ -111,7 +111,7 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
         }
         #endif
 
-        FileData.ReadFileValid=true;
+        FileData.meta.ReadFileValid=true;
         in.close();
         return true;
     }
@@ -119,17 +119,17 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
     {
         in.close();
         if( file_format > 0 )
-            FileData.ERROR_info = "Detected file format: SMBX-" + fromNum( file_format ) + " is invalid\n";
+            FileData.meta.ERROR_info = "Detected file format: SMBX-" + fromNum( file_format ) + " is invalid\n";
         else
-            FileData.ERROR_info = "It is not an SMBX world map file\n";
+            FileData.meta.ERROR_info = "It is not an SMBX world map file\n";
         #ifdef PGE_FILES_QT
-        FileData.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
+        FileData.meta.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
         #else
         FileData.ERROR_info += exception_to_pretty_string(err);
         #endif
-        FileData.ERROR_linenum = in.getCurrentLineNumber();
-        FileData.ERROR_linedata=line;
-        FileData.ReadFileValid=false;
+        FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
+        FileData.meta.ERROR_linedata=line;
+        FileData.meta.ReadFileValid=false;
         return false;
     }
 }
@@ -143,10 +143,10 @@ bool FileFormats::ReadSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData)
     if(!file.open(filePath, false))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadSMBX64WldFile(file, FileData);
@@ -159,10 +159,10 @@ bool FileFormats::ReadSMBX64WldFileRaw(PGESTRING &rawdata, PGESTRING  filePath, 
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadSMBX64WldFile(file, FileData);
@@ -175,35 +175,35 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
 
     CreateWorldData(FileData);
 
-    FileData.RecentFormat = WorldData::SMBX64;
-    FileData.RecentFormatVersion = 64;
+    FileData.meta.RecentFormat = WorldData::SMBX64;
+    FileData.meta.RecentFormatVersion = 64;
 
     //Add path data
     if(!IsEmpty(filePath))
     {
         PGE_FileFormats_misc::FileInfo in_1(filePath);
-        FileData.filename = in_1.basename();
-        FileData.path = in_1.dirpath();
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
     }
 
-    FileData.untitled = false;
-    FileData.modified = false;
+    FileData.meta.untitled = false;
+    FileData.meta.modified = false;
 
     //Enable strict mode for SMBX WLD file format
-    FileData.smbx64strict = true;
+    FileData.meta.smbx64strict = true;
 
-    WorldTiles tile;
+    WorldTerrainTile tile;
     WorldScenery scen;
-    WorldPaths pathitem;
-    WorldLevels lvlitem;
-    WorldMusic musicbox;
+    WorldPathTile pathitem;
+    WorldLevelTile lvlitem;
+    WorldMusicBox musicbox;
 
     try
     {
         ///////////////////////////////////////Begin file///////////////////////////////////////
         //File format number
         nextLine(); SMBX64::ReadUInt(&file_format, line);
-        FileData.RecentFormatVersion = file_format;
+        FileData.meta.RecentFormatVersion = file_format;
 
         //Episode title
         nextLine(); SMBX64::ReadStr(&FileData.EpisodeTitle, line);
@@ -264,9 +264,9 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine(); SMBX64::ReadSIntFromFloat(&tile.y, line);//Tile y
             nextLine(); SMBX64::ReadUInt(&tile.id, line);//Tile ID
 
-            tile.array_id = FileData.tile_array_id;
+            tile.meta.array_id = FileData.tile_array_id;
             FileData.tile_array_id++;
-            tile.index = FileData.tiles.size(); //Apply element index
+            tile.meta.index = FileData.tiles.size(); //Apply element index
 
             FileData.tiles.push_back(tile);
             nextLine();
@@ -281,9 +281,9 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine(); SMBX64::ReadSIntFromFloat(&scen.y, line);//Scenery y
             nextLine(); SMBX64::ReadUInt(&scen.id, line);//Scenery ID
 
-            scen.array_id = FileData.scene_array_id;
+            scen.meta.array_id = FileData.scene_array_id;
             FileData.scene_array_id++;
-            scen.index = FileData.scenery.size(); //Apply element index
+            scen.meta.index = FileData.scenery.size(); //Apply element index
 
             FileData.scenery.push_back(scen);
 
@@ -299,9 +299,9 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine(); SMBX64::ReadSIntFromFloat(&pathitem.y, line);//Path y
             nextLine(); SMBX64::ReadUInt(&pathitem.id,line);//Path ID
 
-            pathitem.array_id = FileData.path_array_id;
+            pathitem.meta.array_id = FileData.path_array_id;
             FileData.path_array_id++;
-            pathitem.index = FileData.paths.size(); //Apply element index
+            pathitem.meta.index = FileData.paths.size(); //Apply element index
 
             FileData.paths.push_back(pathitem);
 
@@ -340,9 +340,9 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
                     lvlitem.gamestart=true;
             }
 
-            lvlitem.array_id = FileData.level_array_id;
+            lvlitem.meta.array_id = FileData.level_array_id;
             FileData.level_array_id++;
-            lvlitem.index = FileData.levels.size(); //Apply element index
+            lvlitem.meta.index = FileData.levels.size(); //Apply element index
 
             FileData.levels.push_back(lvlitem);
 
@@ -358,9 +358,9 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine(); SMBX64::ReadSIntFromFloat(&musicbox.y, line);//MusicBox y
             nextLine(); SMBX64::ReadUInt(&musicbox.id, line);//MusicBox ID
 
-            musicbox.array_id = FileData.musicbox_array_id;
+            musicbox.meta.array_id = FileData.musicbox_array_id;
             FileData.musicbox_array_id++;
-            musicbox.index = FileData.music.size(); //Apply element index
+            musicbox.meta.index = FileData.music.size(); //Apply element index
 
             FileData.music.push_back(musicbox);
 
@@ -368,23 +368,23 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
         }
         nextLine(); // Read last line
         ///////////////////////////////////////EndFile///////////////////////////////////////
-        FileData.ReadFileValid=true;
+        FileData.meta.ReadFileValid=true;
         return true;
     }
     catch(const std::exception& err)
     {
         if( file_format > 0 )
-            FileData.ERROR_info = "Detected file format: SMBX-"+fromNum(file_format)+" is invalid\n";
+            FileData.meta.ERROR_info = "Detected file format: SMBX-"+fromNum(file_format)+" is invalid\n";
         else
-            FileData.ERROR_info = "It is not an SMBX world map file\n";
+            FileData.meta.ERROR_info = "It is not an SMBX world map file\n";
         #ifdef PGE_FILES_QT
-        FileData.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
+        FileData.meta.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
         #else
         FileData.ERROR_info += exception_to_pretty_string(err);
         #endif
-        FileData.ERROR_linenum  = in.getCurrentLineNumber();
-        FileData.ERROR_linedata = line;
-        FileData.ReadFileValid  = false;
+        FileData.meta.ERROR_linenum  = in.getCurrentLineNumber();
+        FileData.meta.ERROR_linedata = line;
+        FileData.meta.ReadFileValid  = false;
         return false;
     }
 }
@@ -427,8 +427,8 @@ bool FileFormats::WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, Worl
     else
     if(file_format>64) file_format = 64;
 
-    FileData.RecentFormat = WorldData::SMBX64;
-    FileData.RecentFormatVersion = file_format;
+    FileData.meta.RecentFormat = WorldData::SMBX64;
+    FileData.meta.RecentFormatVersion = file_format;
 
     out << SMBX64::WriteSInt(file_format);              //Format version
     out << SMBX64::WriteStr(FileData.EpisodeTitle);   //Episode title

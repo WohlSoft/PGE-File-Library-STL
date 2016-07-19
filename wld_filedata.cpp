@@ -39,51 +39,37 @@ int FileFormats::smbx64WorldCheckLimits(WorldData &wld)
 }
 
 
-WorldTiles FileFormats::CreateWldTile()
+WorldTerrainTile FileFormats::CreateWldTile()
 {
-    WorldTiles dummyTile;
-    dummyTile.array_id=0;
+    WorldTerrainTile dummyTile;
     dummyTile.id = 0;
     dummyTile.x = 0;
     dummyTile.y = 0;
-    dummyTile.index = 0;
-    dummyTile.userdata = nullptr;
-
     return dummyTile;
 }
 
 WorldScenery FileFormats::CreateWldScenery()
 {
     WorldScenery dummyScen;
-    dummyScen.array_id = 0;
     dummyScen.id = 0;
-    dummyScen.index = 0;
     dummyScen.x = 0;
     dummyScen.y = 0;
-    dummyScen.userdata = nullptr;
-
     return dummyScen;
 }
 
-WorldPaths FileFormats::CreateWldPath()
+WorldPathTile FileFormats::CreateWldPath()
 {
-    WorldPaths dummyPath;
-    dummyPath.array_id = 0;
+    WorldPathTile dummyPath;
     dummyPath.id = 0;
-    dummyPath.index = 0;
     dummyPath.x = 0;
     dummyPath.y = 0;
-    dummyPath.userdata = nullptr;
-
     return dummyPath;
 }
 
-WorldLevels FileFormats::CreateWldLevel()
+WorldLevelTile FileFormats::CreateWldLevel()
 {
-    WorldLevels dummyLevel;
-    dummyLevel.array_id = 0;
+    WorldLevelTile dummyLevel;
     dummyLevel.id = 0;
-    dummyLevel.index = 0;
 
     dummyLevel.x = 0;
     dummyLevel.y = 0;
@@ -108,45 +94,21 @@ WorldLevels FileFormats::CreateWldLevel()
     dummyLevel.top_exit = -1;
     dummyLevel.left_exit = -1;
 
-    dummyLevel.userdata = nullptr;
-
     return dummyLevel;
 }
 
-WorldMusic FileFormats::CreateWldMusicbox()
+WorldMusicBox FileFormats::CreateWldMusicbox()
 {
-    WorldMusic dummyMusicBox;
-    dummyMusicBox.array_id = 0;
+    WorldMusicBox dummyMusicBox;
     dummyMusicBox.id = 0;
-    dummyMusicBox.index = 0;
     dummyMusicBox.x = 0;
     dummyMusicBox.y = 0;
     dummyMusicBox.music_file = "";
-    dummyMusicBox.userdata = nullptr;
-
     return dummyMusicBox;
 }
 
 void FileFormats::CreateWorldHeader(WorldData &NewFileData)
 {
-    NewFileData.ReadFileValid = true;
-    NewFileData.modified = true;
-    NewFileData.untitled = true;
-    NewFileData.smbx64strict = false;
-    NewFileData.filename = "";
-    NewFileData.path = "";
-
-    NewFileData.RecentFormat = WorldData::PGEX;
-    NewFileData.RecentFormatVersion = 64;
-
-    NewFileData.ERROR_info = "";
-    NewFileData.ERROR_linedata = "";
-    NewFileData.ERROR_linenum = -1;
-
-    NewFileData.metaData.ReadFileValid=true;
-    NewFileData.metaData.ERROR_info="";
-    NewFileData.metaData.ERROR_linedata="";
-    NewFileData.metaData.ERROR_linenum=-1;
     //Meta-data
     #ifdef PGE_EDITOR
     NewFileData.metaData.script.reset();

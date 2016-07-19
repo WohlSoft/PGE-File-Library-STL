@@ -28,91 +28,116 @@
 #include "meta_filedata.h"
 
 //////////////////////World file Data//////////////////////
-struct WorldTiles
+/**
+ * @brief Terrain tile
+ */
+struct WorldTerrainTile
 {
+    //! Position X
     long x;
+    //! Position Y
     long y;
+    //! ID of terrain tile
     unsigned long id;
-
-    //editing
-    unsigned int array_id;
-    unsigned int index;
-    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
-    void* userdata;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
+/**
+ * @brief Scenery object
+ */
 struct WorldScenery
 {
+    //! Position X
     long x;
+    //! Position Y
     long y;
+    //! ID of scenery object
     unsigned long id;
-
-    //editing
-    unsigned int array_id;
-    unsigned int index;
-    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
-    void* userdata;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
-struct WorldPaths
+/**
+ * @brief Path tile
+ */
+struct WorldPathTile
 {
+    //! Position X
     long x;
+    //! Position Y
     long y;
+    //! ID of path tile
     unsigned long id;
-
-    //editing
-    unsigned int array_id;
-    unsigned int index;
-    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
-    void* userdata;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
-struct WorldLevels
+/**
+ * @brief Level entrance tile
+ */
+struct WorldLevelTile
 {
+    //! Position X
     long x;
+    //! PositionY
     long y;
+    //! ID of level entrance object
     unsigned long id;
+    //! Target level file to enter
     PGESTRING lvlfile;
+    //! Visible title of the level
     PGESTRING title;
+    //! Open top path on exit code
     int top_exit;
+    //! Open left path on exit code
     int left_exit;
+    //! Open bottom path on exit code
     int bottom_exit;
+    //! Open right path on exit code
     int right_exit;
+    //! Target Warp-ID to enter level
     unsigned long entertowarp;
+    //! Level is always shown on map even not opened
     bool alwaysVisible;
+    //! Show path background image under main sprite
     bool pathbg;
+    //! Is this level entrance point is initial position of player on game start
     bool gamestart;
+    //! Teleport to X coordinate of the world map (-1 don't teleport)
     long gotox;
+    //! Teleport to Y coordinate of the world map (-1 don't teleport)
     long gotoy;
+    //! Show big path background image under main sprite
     bool bigpathbg;
-
-    //editing
-    unsigned int array_id;
-    unsigned int index;
-    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
-    void* userdata;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
-struct WorldMusic
+/**
+ * @brief Music box object
+ */
+struct WorldMusicBox
 {
+    //! Position X
     long x;
+    //! Position Y
     long y;
+    //! ID of starnard music box
     unsigned long id;
+    //! Custom music file to play on touch
     PGESTRING music_file;
-
-    //editing
-    unsigned int array_id;
-    unsigned int index;
-    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
-    void* userdata;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
+/**
+ * @brief World map data structure
+ */
 struct WorldData
 {
-    bool ReadFileValid;
-    PGESTRING ERROR_info;
-    PGESTRING ERROR_linedata;
-    int       ERROR_linenum;
+    //! Helper meta-data
+    FileFormatMeta meta;
     /*!
      * \brief File format
      */
@@ -125,10 +150,6 @@ struct WorldData
         //! SMBX-38A WLD file format
         SMBX38A
     };
-    //! Recently used (open or save) file format
-    int RecentFormat;
-    //! Recently used format version (for SMBX1...64 files only)
-    int RecentFormatVersion;
 
     PGESTRING EpisodeTitle;
     bool nocharacter1;
@@ -152,30 +173,24 @@ struct WorldData
     PGESTRING author4;
     PGESTRING author5;
 
-    PGELIST<WorldTiles > tiles;
+    PGELIST<WorldTerrainTile > tiles;
     unsigned int tile_array_id;
     PGELIST<WorldScenery > scenery;
     unsigned int scene_array_id;
-    PGELIST<WorldPaths > paths;
+    PGELIST<WorldPathTile > paths;
     unsigned int path_array_id;
-    PGELIST<WorldLevels > levels;
+    PGELIST<WorldLevelTile > levels;
     unsigned int level_array_id;
-    PGELIST<WorldMusic > music;
+    PGELIST<WorldMusicBox > music;
     unsigned int musicbox_array_id;
 
     //meta:
     MetaData metaData;
 
     //editing:
-    int CurSection;
-    bool playmusic;
-    int currentMusic;
-    bool modified;
-    bool untitled;
-    bool smbx64strict;
-    PGESTRING filename;
-    PGESTRING path;
-
+    int     CurSection;
+    bool    playmusic;
+    int     currentMusic;
 };
 
 #endif // WLD_FILEDATA_H

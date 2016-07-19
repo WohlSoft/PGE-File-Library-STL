@@ -41,9 +41,7 @@ GamesaveData FileFormats::CreateGameSaveData()
 {
     GamesaveData newData;
 
-    newData.ReadFileValid = true;
-
-    newData.version = 0;
+    newData.meta.RecentFormatVersion = 0;
 
     newData.lives = 3;
     newData.coins = 0;
@@ -59,11 +57,6 @@ GamesaveData FileFormats::CreateGameSaveData()
     newData.worldPosY = 0;
     newData.gameCompleted = false;
 
-    newData.modified = false;
-    newData.untitled = true;
-    newData.smbx64strict = false;
-    newData.filename = "";
-    newData.path = "";
     newData.characterStates.push_back(CreateSavCharacterState());
     newData.currentCharacter.push_back(1);
 

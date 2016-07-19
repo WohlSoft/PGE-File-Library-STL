@@ -42,10 +42,10 @@ bool FileFormats::ReadSMBX64SavFileF(PGESTRING  filePath, GamesaveData &FileData
     if(!file.open(filePath, false))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadSMBX64SavFile(file, FileData);
@@ -58,10 +58,10 @@ bool FileFormats::ReadSMBX64SavFileRaw(PGESTRING &rawdata, PGESTRING  filePath, 
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadSMBX64SavFile(file, FileData);
@@ -79,24 +79,24 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
     //GamesaveData FileData;
     FileData = CreateGameSaveData();
 
-    FileData.untitled = false;
+    FileData.meta.untitled = false;
 
     //Add path data
     if(!IsEmpty(filePath))
     {
         PGE_FileFormats_misc::FileInfo in_1(filePath);
-        FileData.filename = in_1.basename();
-        FileData.path = in_1.dirpath();
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
     }
 
     //Enable strict mode for SMBX LVL file format
-    FileData.smbx64strict = true;
+    FileData.meta.smbx64strict = true;
 
     try
     {
         ///////////////////////////////////////Begin file///////////////////////////////////////
         nextLine(); SMBX64::ReadUInt(&file_format, line);//File format number
-        FileData.version = file_format;
+        FileData.meta.RecentFormatVersion = file_format;
         nextLine(); SMBX64::ReadUInt(&FileData.lives, line); //Number of lives
         nextLine(); SMBX64::ReadUInt(&FileData.coins, line); //Number of coins
         nextLine(); SMBX64::ReadSInt(&FileData.worldPosX, line);  //World map pos X
@@ -192,23 +192,23 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
 
     successful:        
         ///////////////////////////////////////EndFile///////////////////////////////////////
-        FileData.ReadFileValid=true;
+        FileData.meta.ReadFileValid=true;
         return true;
     }
     catch(const std::exception& err)
     {
         if( file_format > 0 )
-            FileData.ERROR_info = "Detected file format: SMBX-" + fromNum( file_format ) + " is invalid\n";
+            FileData.meta.ERROR_info = "Detected file format: SMBX-" + fromNum( file_format ) + " is invalid\n";
         else
-            FileData.ERROR_info = "It is not an SMBX game save file\n";
+            FileData.meta.ERROR_info = "It is not an SMBX game save file\n";
         #ifdef PGE_FILES_QT
-        FileData.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
+        FileData.meta.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
         #else
         FileData.ERROR_info += exception_to_pretty_string(err);
         #endif
-        FileData.ERROR_linenum = in.getCurrentLineNumber();
-        FileData.ERROR_linedata=line;
-        FileData.ReadFileValid=false;
+        FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
+        FileData.meta.ERROR_linedata=line;
+        FileData.meta.ReadFileValid=false;
         return false;
     }
 }

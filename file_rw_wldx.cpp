@@ -43,12 +43,12 @@
 bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileData)
 {
     CreateWorldHeader(FileData);
-    FileData.RecentFormat = WorldData::PGEX;
+    FileData.meta.RecentFormat = WorldData::PGEX;
 
     PGE_FileFormats_misc::TextFileInput  inf;
     if(!inf.open(filePath, true))
     {
-        FileData.ReadFileValid=false;
+        FileData.meta.ReadFileValid=false;
         return false;
     }
 
@@ -56,8 +56,8 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
     int str_count=0;
     bool valid=false;
     PGE_FileFormats_misc::FileInfo in_1(filePath);
-    FileData.filename = in_1.basename();
-    FileData.path = in_1.dirpath();
+    FileData.meta.filename = in_1.basename();
+    FileData.meta.path = in_1.dirpath();
 
     //Find level header part
     do{
@@ -147,17 +147,17 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
     FileData.CurSection=0;
     FileData.playmusic=0;
 
-    FileData.ReadFileValid=true;
+    FileData.meta.ReadFileValid=true;
 
     inf.close();
     return true;
 
 badfile:
     inf.close();
-    FileData.ERROR_info="Invalid file format";
-    FileData.ERROR_linenum=str_count;
-    FileData.ERROR_linedata=line;
-    FileData.ReadFileValid=false;
+    FileData.meta.ERROR_info="Invalid file format";
+    FileData.meta.ERROR_linenum=str_count;
+    FileData.meta.ERROR_linedata=line;
+    FileData.meta.ReadFileValid=false;
     return false;
 }
 
@@ -168,10 +168,10 @@ bool FileFormats::ReadExtendedWldFileF(PGESTRING  filePath, WorldData &FileData)
     if(!file.open(filePath, true))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadExtendedWldFile(file, FileData);
@@ -184,10 +184,10 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadExtendedWldFile(file, FileData);
@@ -201,24 +201,24 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
      PGESTRING filePath = in.getFilePath();
 
      CreateWorldData(FileData);
-     FileData.RecentFormat = WorldData::PGEX;
+     FileData.meta.RecentFormat = WorldData::PGEX;
 
      //Add path data
      if(!IsEmpty(filePath))
      {
          PGE_FileFormats_misc::FileInfo in_1(filePath);
-         FileData.filename = in_1.basename();
-         FileData.path = in_1.dirpath();
+         FileData.meta.filename = in_1.basename();
+         FileData.meta.path = in_1.dirpath();
      }
 
-     FileData.untitled = false;
-     FileData.modified = false;
+     FileData.meta.untitled = false;
+     FileData.meta.modified = false;
 
-     WorldTiles tile;
+     WorldTerrainTile tile;
      WorldScenery scen;
-     WorldPaths pathitem;
-     WorldMusic musicbox;
-     WorldLevels lvlitem;
+     WorldPathTile pathitem;
+     WorldMusicBox musicbox;
+     WorldLevelTile lvlitem;
 
      ///////////////////////////////////////Begin file///////////////////////////////////////
      PGEX_FileParseTree(in.readAll());
@@ -329,8 +329,8 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                      PGEX_SIntVal("Y",  tile.y) //Y Position
                  }
 
-                 tile.array_id = FileData.tile_array_id++;
-                 tile.index = FileData.tiles.size();
+                 tile.meta.array_id = FileData.tile_array_id++;
+                 tile.meta.index = FileData.tiles.size();
                  FileData.tiles.push_back(tile);
              }
          }//TILES
@@ -356,8 +356,8 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                      PGEX_SIntVal("Y", scen.y) //Y Position
                  }
 
-                 scen.array_id = FileData.scene_array_id++;
-                 scen.index = FileData.scenery.size();
+                 scen.meta.array_id = FileData.scene_array_id++;
+                 scen.meta.index = FileData.scenery.size();
                  FileData.scenery.push_back(scen);
              }
          }//SCENERY
@@ -382,8 +382,8 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                      PGEX_SIntVal("X", pathitem.x) //X Position
                      PGEX_SIntVal("Y", pathitem.y) //Y Position
                  }
-                 pathitem.array_id = FileData.path_array_id++;
-                 pathitem.index = FileData.paths.size();
+                 pathitem.meta.array_id = FileData.path_array_id++;
+                 pathitem.meta.index = FileData.paths.size();
                  FileData.paths.push_back(pathitem);
              }
          }//PATHS
@@ -409,8 +409,8 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                      PGEX_SIntVal("Y", musicbox.y) //X Position
                      PGEX_StrVal ("MF", musicbox.music_file) //Custom music file
                  }
-                 musicbox.array_id = FileData.musicbox_array_id++;
-                 musicbox.index = FileData.music.size();
+                 musicbox.meta.array_id = FileData.musicbox_array_id++;
+                 musicbox.meta.index = FileData.music.size();
                  FileData.music.push_back(musicbox);
              }
          }//MUSICBOXES
@@ -447,8 +447,8 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                      PGEX_BoolVal("BP", lvlitem.pathbg) //Path background
                      PGEX_BoolVal("BG", lvlitem.bigpathbg) //Big path background
                  }
-                 lvlitem.array_id = FileData.level_array_id++;
-                 lvlitem.index = FileData.levels.size();
+                 lvlitem.meta.array_id = FileData.level_array_id++;
+                 lvlitem.meta.index = FileData.levels.size();
                  FileData.levels.push_back(lvlitem);
              }
          }//LEVELS
@@ -457,16 +457,16 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
      ///////////////////////////////////////EndFile///////////////////////////////////////
 
      errorString.clear(); //If no errors, clear string;
-     FileData.ReadFileValid=true;
+     FileData.meta.ReadFileValid=true;
 
      return true;
 
      badfile:    //If file format not corrects
-         FileData.ERROR_info=errorString;
-         FileData.ERROR_linenum=str_count;
-         FileData.ERROR_linedata=line;
+         FileData.meta.ERROR_info=errorString;
+         FileData.meta.ERROR_linenum=str_count;
+         FileData.meta.ERROR_linedata=line;
 
-         FileData.ReadFileValid=false;
+         FileData.meta.ReadFileValid=false;
 
      return false;
 }
@@ -506,7 +506,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
     long i;
     bool addArray=false;
 
-    FileData.RecentFormat = WorldData::PGEX;
+    FileData.meta.RecentFormat = WorldData::PGEX;
 
     addArray=false;
     for(int z=0; z<(signed)FileData.nocharacter.size();z++)
@@ -650,7 +650,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
     {
         out << "LEVELS\n";
 
-        WorldLevels defLvl = CreateWldLevel();
+        WorldLevelTile defLvl = CreateWldLevel();
         for(i=0; i<(signed)FileData.levels.size();i++)
         {
             out << PGEFile::value("ID", PGEFile::WriteInt(FileData.levels[i].id ));

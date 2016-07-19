@@ -39,10 +39,10 @@ bool FileFormats::ReadExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileDa
     if(!file.open(filePath, true))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadExtendedSaveFile(file, FileData);
@@ -55,10 +55,10 @@ bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, PGESTRING filePath
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadExtendedSaveFile(file, FileData);
@@ -79,15 +79,15 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
     if(!IsEmpty(fPath))
     {
         PGE_FileFormats_misc::FileInfo in_1(fPath);
-        FileData.filename = in_1.basename();
-        FileData.path = in_1.dirpath();
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
     }
 
     FileData.characterStates.clear();
     FileData.currentCharacter.clear();
 
-    FileData.untitled = false;
-    FileData.modified = false;
+    FileData.meta.untitled = false;
+    FileData.meta.modified = false;
 
     ///////////////////////////////////////Begin file///////////////////////////////////////
     PGEX_FileParseTree(in.readAll());
@@ -242,15 +242,15 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
     }
     ///////////////////////////////////////EndFile///////////////////////////////////////
     errorString.clear(); //If no errors, clear string;
-    FileData.ReadFileValid=true;
+    FileData.meta.ReadFileValid=true;
 
     return true;
 
 badfile:    //If file format not corrects
-    FileData.ERROR_info=errorString;
-    FileData.ERROR_linenum=str_count;
-    FileData.ERROR_linedata=line;
-    FileData.ReadFileValid=false;
+    FileData.meta.ERROR_info=errorString;
+    FileData.meta.ERROR_linenum=str_count;
+    FileData.meta.ERROR_linedata=line;
+    FileData.meta.ReadFileValid=false;
     return false;
 }
 

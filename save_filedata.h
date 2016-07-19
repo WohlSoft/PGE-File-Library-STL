@@ -27,6 +27,7 @@
 #define SAVE_FILEDATA_H
 
 #include "pge_file_lib_globs.h"
+#include "meta_filedata.h"
 
 //! Game Save specific Visible element entry <array-id, is-vizible>
 typedef PGEPAIR<unsigned int, bool > visibleItem;
@@ -66,12 +67,8 @@ struct savePlayerState
  */
 struct GamesaveData
 {
-    bool ReadFileValid;
-    PGESTRING ERROR_info;
-    PGESTRING ERROR_linedata;
-    int       ERROR_linenum;
-
-    int version;
+    //! Helper meta-data
+    FileFormatMeta meta;
 
     int lives;               //!< Number of lives
     unsigned int coins;      //!< Number of coins
@@ -96,13 +93,6 @@ struct GamesaveData
     PGEVECTOR<visibleItem > visiblePaths;
     PGEVECTOR<visibleItem > visibleScenery;
     PGEVECTOR<starOnLevel > gottenStars;
-
-    //editing:
-    bool modified;
-    bool untitled;
-    bool smbx64strict;
-    PGESTRING filename;
-    PGESTRING path;
 };
 
 #endif // SAVE_FILEDATA_H

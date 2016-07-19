@@ -602,7 +602,7 @@ public:
      * \brief Initializes World map specific Tile entry structure with default properties
      * \return Initialized with default properties World map specific Tile entry structure
      */
-    static WorldTiles       CreateWldTile();
+    static WorldTerrainTile       CreateWldTile();
     /*!
      * \brief Initializes World map specific Scenery entry structure with default properties
      * \return Initialized with default properties World map specific Scenery entry structure
@@ -612,17 +612,17 @@ public:
      * \brief Initializes World map specific Path entry structure with default properties
      * \return Initialized with default properties World map specific Path entry structure
      */
-    static WorldPaths       CreateWldPath();
+    static WorldPathTile       CreateWldPath();
     /*!
      * \brief Initializes World map specific Level Entrance point entry structure with default properties
      * \return Initialized with default properties World map specific Level Entrance point entry structure
      */
-    static WorldLevels      CreateWldLevel();
+    static WorldLevelTile      CreateWldLevel();
     /*!
      * \brief Initializes World map specific Music Box entry structure with default properties
      * \return Initialized with default properties World map specific Music Box entry structure
      */
-    static WorldMusic       CreateWldMusicbox();
+    static WorldMusicBox       CreateWldMusicbox();
 
 
 /****************************Save of game file********************************/

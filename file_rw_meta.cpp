@@ -38,10 +38,10 @@ bool FileFormats::ReadNonSMBX64MetaDataF(PGESTRING filePath, MetaData &FileData)
     if(!file.open(filePath, true))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadNonSMBX64MetaDataFile(file, FileData);
@@ -54,10 +54,10 @@ bool FileFormats::ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, PGESTRING filePat
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadNonSMBX64MetaDataFile(file, FileData);
@@ -326,15 +326,15 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
     ///////////////////////////////////////EndFile///////////////////////////////////////
 
     errorString.clear(); //If no errors, clear string;
-    FileData.ReadFileValid=true;
+    FileData.meta.ReadFileValid=true;
     return true;
 
     badfile:    //If file format is not correct
     //BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
-    FileData.ERROR_info=errorString;
-    FileData.ERROR_linenum=str_count;
-    FileData.ERROR_linedata=line;
-    FileData.ReadFileValid=false;
+    FileData.meta.ERROR_info=errorString;
+    FileData.meta.ERROR_linenum=str_count;
+    FileData.meta.ERROR_linedata=line;
+    FileData.meta.ReadFileValid=false;
 
     FileData.bookmarks.clear();
 
