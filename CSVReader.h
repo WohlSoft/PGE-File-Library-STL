@@ -23,6 +23,7 @@ TODO:
 
 namespace CSVReader {
 
+#if !defined(_MSC_VER) || _MSC_VER > 1800
 
     // ========= Exceptions START ===========
     /*!
@@ -155,13 +156,14 @@ namespace CSVReader {
             return str;
         }
     };
-    template<class StrElementType, class StrElementTraits>
-    constexpr IfStreamReader<StrElementType, StrElementTraits> MakeIfStreamReader(std::basic_ifstream<StrElementType, StrElementTraits>* reader)
+
+    template<class StrElementType, class StrElementTraits >
+    constexpr IfStreamReader<StrElementType, StrElementTraits > MakeIfStreamReader(std::basic_ifstream<StrElementType, StrElementTraits >* reader)
     {
-        return IfStreamReader<StrElementType, StrElementTraits>(reader);
+        return IfStreamReader<StrElementType, StrElementTraits >(reader);
     }
 
-    template<class StrElementType, class StrElementTraits, class StrElementAlloc>
+    template<class StrElementType, class StrElementTraits, class StrElementAlloc >
     struct StringReader
     {
         using target_istringstream = std::basic_istringstream<StrElementType, StrElementTraits, StrElementAlloc>;
@@ -178,10 +180,11 @@ namespace CSVReader {
             return str;
         }
     };
-    template<class StrElementType, class StrElementTraits, class StrElementAlloc>
-    constexpr StringReader<StrElementType, StrElementTraits, StrElementAlloc> MakeStringReader(const std::basic_string<StrElementType, StrElementTraits, StrElementAlloc>& str)
+
+    template<class StrElementType, class StrElementTraits, class StrElementAlloc >
+    constexpr StringReader<StrElementType, StrElementTraits, StrElementAlloc > MakeStringReader(const std::basic_string<StrElementType, StrElementTraits, StrElementAlloc > &str)
     {
-        return StringReader<StrElementType, StrElementTraits, StrElementAlloc>(str);
+        return StringReader<StrElementType, StrElementTraits, StrElementAlloc >(str);
     }
 
     template<class StrT>
@@ -916,9 +919,8 @@ namespace CSVReader {
     {
         return CSVIterator<StrT, CharT, StrTUtils, Converter>(sep, iteratorFunc);
     }
+#endif
 }
-
-
 
 
 #endif

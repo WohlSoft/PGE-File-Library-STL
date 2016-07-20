@@ -60,6 +60,12 @@ constexpr std::function<void(T&)> MakeMinFunc(T min){
     };
 }
 
+#if !defined(_MSC_VER) || _MSC_VER > 1800
+    #define ReadSMBX38Level ReadSMBX38ALvlFile
+#else
+    #define ReadSMBX38Level ReadSMBX38ALvlFile_OLD
+#endif
+
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
@@ -69,7 +75,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     errorString.clear();
     CreateLevelHeader(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
-
+#if !defined(_MSC_VER) || _MSC_VER > 1800
     PGE_FileFormats_misc::TextFileInput inf;
     if(!inf.open(filePath, false))
     {
@@ -118,6 +124,11 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     FileData.playmusic = 0;
 
     return true;
+#else
+    FileData.meta.ReadFileValid = false;
+    FileData.meta.ERROR_info = "Unsupported on MSVC2013";
+    return false;
+#endif
 }
 
 bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
@@ -133,7 +144,7 @@ bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
         FileData.meta.ReadFileValid = false;
         return false;
     }
-    return ReadSMBX38ALvlFile(file, FileData);
+    return ReadSMBX38Level(file, FileData);
 }
 
 bool FileFormats::ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  LevelData &FileData)
@@ -149,7 +160,7 @@ bool FileFormats::ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath,
         FileData.meta.ReadFileValid = false;
         return false;
     }
-    return ReadSMBX38ALvlFile(file, FileData);
+    return ReadSMBX38Level(file, FileData);
 }
 
 struct LevelEvent_layers
@@ -310,6 +321,7 @@ constexpr int SMBX65_NpcGeneratorDirections[29] =
 //LevelData FileFormats::ReadSMBX65by38ALvlFile(PGESTRING RawData, PGESTRING filePath)
 bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)
 {
+
     SMBX65_FileBeginN();
     PGESTRING filePath = in.getFilePath();
     errorString.clear();
@@ -317,6 +329,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
     FileData.meta.RecentFormat = LevelData::SMBX38A;
 
+#if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.LevelName = "" ;
     FileData.stars = 0;
     FileData.CurSection = 0;
@@ -997,6 +1010,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
     FileData.meta.ReadFileValid = true;
     return true;
+#else
+    FileData.meta.ReadFileValid = false;
+    FileData.meta.ERROR_info = "Unsupported on MSVC2013";
+    return false;
+#endif
 }
 
 
