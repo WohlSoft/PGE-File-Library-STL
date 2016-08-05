@@ -231,25 +231,50 @@ public:
      * \param input signed or unsigned integer
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING IntS(long input);
+    template<typename T>
+    static inline PGESTRING WriteInt(T &input)
+    {
+        return fromNum(input);
+    }
     /*!
      * \brief Encode boolean value into PGE-X string
      * \param input boolean flag
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING BoolS(bool input);
+    static inline PGESTRING WriteBool(bool &input)
+    {
+        return PGESTRING((input)?"1":"0");
+    }
+
     /*!
      * \brief Encode floating point numeric value into PGE-X string
      * \param input floating point number
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING FloatS(double input);
+    template<typename T>
+    static PGESTRING WriteFloat(T &input)
+    {
+        return fromNum(input);
+    }
+
     /*!
      * \brief Encode string into PGE-X escaped string
      * \param input Plain text string
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING qStrS(PGESTRING input);
+    static inline PGESTRING WriteStr(PGESTRING &input)
+    {
+        PGESTRING output;
+        escapeString(output, input, true);
+        return output;
+    }
+    static inline PGESTRING WriteStr(const char*input)
+    {
+        PGESTRING in(input);
+        PGESTRING output;
+        escapeString(output, in, true);
+        return output;
+    }
     /*!
      * \brief [WIP] This function must encode string into heximal line
      * \param input Plain text string
@@ -261,19 +286,19 @@ public:
      * \param input List of plain text strings
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING strArrayS(PGESTRINGList input);
+    static PGESTRING WriteStrArr(PGESTRINGList &input);
     /*!
      * \brief Encode array of integers into PGE-X escaped string
      * \param input List of integer numbers
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING intArrayS(PGELIST<int > input);
+    static PGESTRING WriteIntArr(PGELIST<int > input);
     /*!
      * \brief Encode array of booleans into PGE-X escaped string
      * \param input List of boolean flags
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING BoolArrayS(PGELIST<bool > input);
+    static PGESTRING WriteBoolArr(PGELIST<bool > input);
 
     /*!
      * \brief Decodes PGE-X string into plain text string
@@ -286,7 +311,7 @@ public:
      * \param src Encoded PGE-X string value
      * \return List of plain text strings
      */
-    static PGESTRINGList X2STRArr(PGESTRING src);
+    static PGESTRINGList X2STRArr(PGESTRING in, bool *_valid=NULL);
     /*!
      * \brief Decodes PGE-X Boolean array into array of boolean flags
      * \param src Encoded PGE-X boolean array
@@ -296,28 +321,16 @@ public:
 
     /*!
      * \brief Applies PGE-X escape sequensions to the plain text string
-     * \param input plain text string
-     * \return Plain text string with applied escape sequensions
+     * \param [__out] output Target string where result will be recorded
+     * \param [__in]  input plain text string
+     * \param [__in]  addQuotes adds quotes to begin and end of the output string
      */
-    static PGESTRING escapeString(PGESTRING input);
+    static void escapeString(PGESTRING &output, const PGESTRING &input, bool addQuotes=false);
     /*!
      * \brief Decodes PGE-X escape-sequensions
-     * \param input Plain text string with applied escape sequensions
-     * \return Plain text string
+     * \param [__inout] input Plain text string with applied escape sequensions
      */
-    static PGESTRING restoreString(PGESTRING input);
-    /*!
-     * \brief Replaced escape-sequensions with special working strings
-     * \param input Plain text string with applied escape sequensions
-     * \return Encoded string
-     */
-    static PGESTRING encodeEscape(PGESTRING input);
-    /*!
-     * \brief Replaced special working strings into escape-sequensions
-     * \param input Encoded string
-     * \return Plain text string with applied escape sequensions
-     */
-    static PGESTRING decodeEscape(PGESTRING input);
+    static void restoreString(PGESTRING &input, bool removeQuotes=false);
 
     /*!
      * \brief Builds PGE-X raw value with specific marker and raw data string
@@ -325,7 +338,12 @@ public:
      * \param data PGE-X raw string
      * \return PGE-X Entry field
      */
-    static PGESTRING value(PGESTRING marker, PGESTRING data);
+    static inline PGESTRING value(PGESTRING &&marker, PGESTRING &&data)
+    {
+        PGESTRING out;
+        out +=marker+":"+data+";";
+        return out;
+    }
 
     /*!
      * \brief Removed double quites from begin and end of string if there are exists

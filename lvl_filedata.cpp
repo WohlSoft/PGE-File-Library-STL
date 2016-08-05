@@ -100,7 +100,7 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
                 while ( (
                            (lvl.blocks[R].x > piv.x)||
                            ((lvl.blocks[R].x == piv.x) && (lvl.blocks[R].y > piv.y))||
-                           ((lvl.blocks[R].x == piv.x) && (lvl.blocks[R].y == piv.y) && (lvl.blocks[R].array_id >= piv.array_id))
+                           ((lvl.blocks[R].x == piv.x) && (lvl.blocks[R].y == piv.y) && (lvl.blocks[R].meta.array_id >= piv.meta.array_id))
                         ) && (L<R) ) R--;
                 if (L<R) lvl.blocks[L++]=lvl.blocks[R];
 
@@ -108,7 +108,7 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
                        (
                           (lvl.blocks[L].x < piv.x)||
                           ((lvl.blocks[L].x == piv.x) && (lvl.blocks[L].y < piv.y))||
-                          ((lvl.blocks[L].x == piv.x) && (lvl.blocks[L].y == piv.y) && (lvl.blocks[L].array_id <= piv.array_id) )
+                          ((lvl.blocks[L].x == piv.x) && (lvl.blocks[L].y == piv.y) && (lvl.blocks[L].meta.array_id <= piv.meta.array_id) )
                        ) && (L<R)) L++;
                 if (L<R) lvl.blocks[R--]=lvl.blocks[L];
             }
@@ -156,7 +156,7 @@ void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
                           /*((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x > piv.x))||
                             ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y > piv.y))||
                             ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y == piv.y) && (lvl.bgo[R].array_id >= piv.array_id))*/
-                            ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].array_id >= piv.array_id))
+                            ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].meta.array_id >= piv.meta.array_id))
                          ) && (L<R) ) R--;
                 if (L<R) lvl.bgo[L++]=lvl.bgo[R];
 
@@ -166,7 +166,7 @@ void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
                          /*((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x < piv.x))||
                            ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y < piv.y))||
                            ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y == piv.y) && (lvl.bgo[L].array_id <= piv.array_id))*/
-                           ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].array_id <= piv.array_id))
+                           ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].meta.array_id <= piv.meta.array_id))
                         ) && (L<R)) L++;
                 if (L<R) lvl.bgo[R--]=lvl.bgo[L];
             }
@@ -221,34 +221,33 @@ LevelNPC    FileFormats::CreateLvlNpc()
 {
     LevelNPC dummyNPC;
     dummyNPC.x = 0;
-    dummyNPC.y = 0 ;
+    dummyNPC.y = 0;
     dummyNPC.direct = -1;
-    dummyNPC.id=0;
-    dummyNPC.contents=0;
-    dummyNPC.special_data=0;
-    dummyNPC.special_data2=0;
-    dummyNPC.generator=false;
-    dummyNPC.generator_type=1;
-    dummyNPC.generator_direct=1;
-    dummyNPC.generator_period=20;
-    dummyNPC.generator_custom_angle=0.0;
-    dummyNPC.generator_branches=1;
-    dummyNPC.generator_angle_range=360.0;
-    dummyNPC.generator_initial_speed=10.0;
-    dummyNPC.msg="";
-    dummyNPC.friendly=false;
-    dummyNPC.nomove=false;
-    dummyNPC.is_boss=false;
+    dummyNPC.id = 0;
+    dummyNPC.contents = 0;
+    dummyNPC.special_data = 0;
+    dummyNPC.special_data2 = 0;
+    dummyNPC.generator = false;
+    dummyNPC.generator_type = 1;
+    dummyNPC.generator_direct = 1;
+    dummyNPC.generator_period = 20;
+    dummyNPC.generator_custom_angle = 0.0;
+    dummyNPC.generator_branches = 1;
+    dummyNPC.generator_angle_range = 360.0;
+    dummyNPC.generator_initial_speed = 10.0;
+    dummyNPC.msg = "";
+    dummyNPC.friendly = false;
+    dummyNPC.nomove = false;
+    dummyNPC.is_boss = false;
     dummyNPC.layer = "Default";
-    dummyNPC.event_activate="";
-    dummyNPC.event_die="";
-    dummyNPC.event_talk="";
-    dummyNPC.event_emptylayer="";
-    dummyNPC.attach_layer="";
+    dummyNPC.event_activate = "";
+    dummyNPC.event_die = "";
+    dummyNPC.event_talk = "";
+    dummyNPC.event_emptylayer = "";
+    dummyNPC.attach_layer = "";
 
-    dummyNPC.array_id=0;
-    dummyNPC.index=0;
-    dummyNPC.is_star=false;
+    dummyNPC.is_star    = false;
+
     return dummyNPC;
 }
 
@@ -290,8 +289,8 @@ LevelDoor  FileFormats::CreateLvlWarp()
     dummyDoor.cannon_exit=false;
     dummyDoor.cannon_exit_speed=10.0f;
 
-    dummyDoor.array_id = 0;
-    dummyDoor.index = 0;
+    dummyDoor.userdata_enter = nullptr;
+    dummyDoor.userdata_exit  = nullptr;
 
     return dummyDoor;
 }
@@ -313,8 +312,6 @@ LevelBlock  FileFormats::CreateLvlBlock()
     dummyBlock.event_hit = "";
     dummyBlock.event_emptylayer = "";
 
-    dummyBlock.array_id = 0;
-    dummyBlock.index = 0;
     return dummyBlock;
 }
 
@@ -334,8 +331,6 @@ LevelBGO FileFormats::CreateLvlBgo()
     dummyBGO.smbx64_sp = -1;
     dummyBGO.smbx64_sp_apply = -1;
 
-    dummyBGO.array_id  = 0;
-    dummyBGO.index = 0;
     return dummyBGO;
 }
 
@@ -356,8 +351,6 @@ LevelPhysEnv FileFormats::CreateLvlPhysEnv()
     dummyWater.max_velocity = 0.0;
     dummyWater.touch_event = "";
 
-    dummyWater.array_id = 0;
-    dummyWater.index = 0;
     return dummyWater;
 }
 
@@ -411,8 +404,6 @@ LevelSMBX64Event FileFormats::CreateLvlEvent()
         dummyEvent.sets.push_back(events_sets);
     }
 
-
-    dummyEvent.array_id=0;
     return dummyEvent;
 }
 
@@ -462,8 +453,6 @@ LevelSection FileFormats::CreateLvlSection()
 LevelLayer FileFormats::CreateLvlLayer()
 {
     LevelLayer dummyLayer;
-    dummyLayer.array_id = 0;
-    dummyLayer.name = "";
     dummyLayer.hidden = false;
     dummyLayer.locked = false;
     return dummyLayer;
@@ -476,6 +465,7 @@ PlayerPoint FileFormats::CreateLvlPlayerPoint(int id)
     dummyPlayer.x=0;
     dummyPlayer.y=0;
     dummyPlayer.w=24;
+    dummyPlayer.userdata = nullptr;
     switch(id)
     {
     case 1:
@@ -550,7 +540,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
 
     if(!lstart)
     {
-        events.array_id = FileData.events_array_id;
+        events.meta.array_id = FileData.events_array_id;
         FileData.events_array_id++;
 
         events.name = "Level - Start";
@@ -558,7 +548,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
     }
     if(!pstart)
     {
-        events.array_id = FileData.events_array_id;
+        events.meta.array_id = FileData.events_array_id;
         FileData.events_array_id++;
 
         events.name = "P Switch - Start";
@@ -566,7 +556,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
     }
     if(!pend)
     {
-        events.array_id = FileData.events_array_id;
+        events.meta.array_id = FileData.events_array_id;
         FileData.events_array_id++;
 
         events.name = "P Switch - End";
@@ -577,22 +567,10 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
 
 void FileFormats::CreateLevelHeader(LevelData &NewFileData)
 {
-    NewFileData.ReadFileValid = true;
-    NewFileData.modified = true;
-    NewFileData.untitled = true;
-    NewFileData.smbx64strict = false;
-
-    NewFileData.RecentFormat = LevelData::PGEX;
-    NewFileData.RecentFormatVersion = 64;
-
-    NewFileData.ERROR_info = "";
-    NewFileData.ERROR_linedata = "";
-    NewFileData.ERROR_linenum = -1;
-
     NewFileData.CurSection=0;
     NewFileData.playmusic=0;
-    NewFileData.filename = "";
-    NewFileData.path = "";
+    NewFileData.meta.filename = "";
+    NewFileData.meta.path = "";
 
     NewFileData.open_level_on_fail = "";
     NewFileData.open_level_on_fail_warpID = 0;
@@ -604,10 +582,6 @@ void FileFormats::CreateLevelHeader(LevelData &NewFileData)
     #ifdef PGE_EDITOR
     NewFileData.metaData.script = NULL;
     #endif
-    NewFileData.metaData.ReadFileValid=true;
-    NewFileData.metaData.ERROR_info="";
-    NewFileData.metaData.ERROR_linedata="";
-    NewFileData.metaData.ERROR_linenum=-1;
 }
 
 void FileFormats::CreateLevelData(LevelData &NewFileData)
@@ -658,19 +632,19 @@ void FileFormats::CreateLevelData(LevelData &NewFileData)
         layers.hidden = false;
         layers.locked = false;
         layers.name = "Default";
-        layers.array_id = NewFileData.layers_array_id++;
+        layers.meta.array_id = NewFileData.layers_array_id++;
         NewFileData.layers.push_back(layers);
 
         layers.hidden = true;
         layers.locked = false;
         layers.name = "Destroyed Blocks";
-        layers.array_id = NewFileData.layers_array_id++;
+        layers.meta.array_id = NewFileData.layers_array_id++;
         NewFileData.layers.push_back(layers);
 
         layers.hidden = false;
         layers.locked = false;
         layers.name = "Spawned NPCs";
-        layers.array_id = NewFileData.layers_array_id++;
+        layers.meta.array_id = NewFileData.layers_array_id++;
         NewFileData.layers.push_back(layers);
 
     NewFileData.events.clear();
@@ -681,19 +655,19 @@ void FileFormats::CreateLevelData(LevelData &NewFileData)
 
     LevelSMBX64Event events = CreateLvlEvent();
 
-        events.array_id = NewFileData.events_array_id;
+        events.meta.array_id = NewFileData.events_array_id;
         NewFileData.events_array_id++;
 
         events.name = "Level - Start";
         NewFileData.events.push_back(events);
 
-        events.array_id = NewFileData.events_array_id;
+        events.meta.array_id = NewFileData.events_array_id;
         NewFileData.events_array_id++;
 
         events.name = "P Switch - Start";
         NewFileData.events.push_back(events);
 
-        events.array_id = NewFileData.events_array_id;
+        events.meta.array_id = NewFileData.events_array_id;
         NewFileData.events_array_id++;
 
         events.name = "P Switch - End";

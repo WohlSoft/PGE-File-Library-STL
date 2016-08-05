@@ -38,10 +38,10 @@ bool FileFormats::ReadNonSMBX64MetaDataF(PGESTRING filePath, MetaData &FileData)
     if(!file.open(filePath, true))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadNonSMBX64MetaDataFile(file, FileData);
@@ -54,10 +54,10 @@ bool FileFormats::ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, PGESTRING filePat
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
     return ReadNonSMBX64MetaDataFile(file, FileData);
@@ -326,15 +326,15 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
     ///////////////////////////////////////EndFile///////////////////////////////////////
 
     errorString.clear(); //If no errors, clear string;
-    FileData.ReadFileValid=true;
+    FileData.meta.ReadFileValid=true;
     return true;
 
     badfile:    //If file format is not correct
     //BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
-    FileData.ERROR_info=errorString;
-    FileData.ERROR_linenum=str_count;
-    FileData.ERROR_linedata=line;
-    FileData.ReadFileValid=false;
+    FileData.meta.ERROR_info=errorString;
+    FileData.meta.ERROR_linenum=str_count;
+    FileData.meta.ERROR_linedata=line;
+    FileData.meta.ReadFileValid=false;
 
     FileData.bookmarks.clear();
 
@@ -385,9 +385,9 @@ bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, 
         for(i=0;i<(signed)metaData.bookmarks.size(); i++)
         {
             //Bookmark name
-            out << PGEFile::value("BM", PGEFile::qStrS(metaData.bookmarks[i].bookmarkName));
-            out << PGEFile::value("X", PGEFile::IntS(metaData.bookmarks[i].x));
-            out << PGEFile::value("Y", PGEFile::IntS(metaData.bookmarks[i].y));
+            out << PGEFile::value("BM", PGEFile::WriteStr(metaData.bookmarks[i].bookmarkName));
+            out << PGEFile::value("X", PGEFile::WriteInt(metaData.bookmarks[i].x));
+            out << PGEFile::value("Y", PGEFile::WriteInt(metaData.bookmarks[i].y));
             out << "\n";
         }
         out << "META_BOOKMARKS_END\n";
@@ -402,8 +402,8 @@ bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, 
                 {
                     out << "EVENT\n";
                     if(!x->marker().isEmpty())
-                        out << PGEFile::value("TL", PGEFile::qStrS( x->marker() ) );
-                    out << PGEFile::value("ET", PGEFile::IntS( (int)x->eventType() ) );
+                        out << PGEFile::value("TL", PGEFile::WriteStr( x->marker() ) );
+                    out << PGEFile::value("ET", PGEFile::WriteInt( (int&)x->eventType() ) );
                     out << "\n";
 
                     if(x->basicCommands().size()>0)
@@ -411,14 +411,14 @@ bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, 
                         out << "BASIC_COMMANDS\n";
                         foreach(BasicCommand *y, x->basicCommands())
                         {
-                            out << PGEFile::value("N", PGEFile::qStrS( y->marker() ) );
+                            out << PGEFile::value("N", PGEFile::WriteStr( y->marker() ) );
                             if(QString(y->metaObject()->className())=="MemoryCommand")
                             {
                                 MemoryCommand *z = dynamic_cast<MemoryCommand*>(y);
-                                out << PGEFile::value("CT", PGEFile::qStrS( "MEMORY" ) );
-                                out << PGEFile::value("HX", PGEFile::IntS( z->hexValue() ) );
-                                out << PGEFile::value("FT", PGEFile::IntS( (int)z->fieldType() ) );
-                                out << PGEFile::value("V", PGEFile::FloatS( z->getValue() ) );
+                                out << PGEFile::value("CT", PGEFile::WriteStr( "MEMORY" ) );
+                                out << PGEFile::value("HX", PGEFile::WriteInt( z->hexValue() ) );
+                                out << PGEFile::value("FT", PGEFile::WriteInt( (int&)z->fieldType() ) );
+                                out << PGEFile::value("V", PGEFile::WriteFloat( z->getValue() ) );
                             }
                             out << "\n";
                         }

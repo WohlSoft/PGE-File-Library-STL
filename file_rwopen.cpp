@@ -34,11 +34,11 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
     PGESTRING firstLine;
     if(!file.open(filePath))
     {
-        FileData.ReadFileValid = false;
-        FileData.ERROR_info="Can't open file";
-        FileData.ERROR_linedata="";
-        FileData.ERROR_linenum=-1;
-        errorString = FileData.ERROR_info;
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info="Can't open file";
+        FileData.meta.ERROR_linedata="";
+        FileData.meta.ERROR_linenum=-1;
+        errorString = FileData.meta.ERROR_info;
         return false;
     }
     firstLine = file.read(8);
@@ -49,7 +49,7 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
         //Read SMBX65-38A LVL File
         if(!ReadSMBX38ALvlFileF( filePath, FileData ))
         {
-            errorString = FileData.ERROR_info;
+            errorString = FileData.meta.ERROR_info;
             return false;
         }
     }
@@ -58,7 +58,7 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
         //Read SMBX LVL File
         if(!ReadSMBX64LvlFileF( filePath, FileData ))
         {
-            errorString = FileData.ERROR_info;
+            errorString = FileData.meta.ERROR_info;
             return false;
         }
     }
@@ -66,7 +66,7 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
     {   //Read PGE LVLX File
         if(!ReadExtendedLvlFileF( filePath, FileData ))
         {
-            errorString = FileData.ERROR_info;
+            errorString = FileData.meta.ERROR_info;
             return false;
         }
     }
@@ -92,10 +92,10 @@ bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData& data)
     PGESTRING firstLine;
     if(!file.open(filePath))
     {
-        data.ReadFileValid = false;
-        data.ERROR_info="Can't open file";
-        data.ERROR_linedata="";
-        data.ERROR_linenum=-1;
+        data.meta.ReadFileValid = false;
+        data.meta.ERROR_info="Can't open file";
+        data.meta.ERROR_linedata="";
+        data.meta.ERROR_linenum=-1;
         return false;
     }
     firstLine = file.readLine();
@@ -218,10 +218,10 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
     PGESTRING firstLine;
     if(!file.open(filePath))
     {
-        data.ERROR_info="Can't open file";
-        data.ERROR_linedata="";
-        data.ERROR_linenum=-1;
-        data.ReadFileValid = false;
+        data.meta.ERROR_info="Can't open file";
+        data.meta.ERROR_linedata="";
+        data.meta.ERROR_linenum=-1;
+        data.meta.ReadFileValid = false;
         return false;
     }
 
@@ -233,7 +233,7 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
         //Read SMBX WLD File
         if(!ReadSMBX64WldFileF( filePath, data ))
         {
-            errorString = data.ERROR_info;
+            errorString = data.meta.ERROR_info;
             return false;
         }
     }
@@ -242,7 +242,7 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
         //Read PGE WLDX File
         if(!ReadExtendedWldFileF( filePath, data ))
         {
-            errorString = data.ERROR_info;
+            errorString = data.meta.ERROR_info;
             return false;
         }
     }
@@ -262,10 +262,10 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
     PGE_FileFormats_misc::TextFileInput file;
     if(!file.open(filePath))
     {
-        data.ERROR_info="Can't open file";
-        data.ERROR_linedata="";
-        data.ERROR_linenum=-1;
-        data.ReadFileValid = false;
+        data.meta.ERROR_info="Can't open file";
+        data.meta.ERROR_linedata="";
+        data.meta.ERROR_linenum=-1;
+        data.meta.ReadFileValid = false;
         return false;
     }
     PGESTRING firstLine;
@@ -280,7 +280,7 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
     {   //Read PGE WLDX File
         return ReadExtendedWldFileHeader( filePath, data);
     }
-    return data.ReadFileValid;
+    return data.meta.ReadFileValid;
 }
 
 bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFormats::WorldFileFormat format, unsigned int FormatVersion)

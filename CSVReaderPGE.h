@@ -7,6 +7,8 @@
 
 #include "pge_file_lib_globs.h"
 
+#if !defined(_MSC_VER) || _MSC_VER > 1800
+
 namespace CSVReader {
     struct CSVPGEReader
     {
@@ -149,6 +151,7 @@ namespace CSVReader {
 
 }
 
+#endif
 
 
 #endif // CSVREADERQT

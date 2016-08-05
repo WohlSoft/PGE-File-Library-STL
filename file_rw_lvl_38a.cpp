@@ -60,6 +60,12 @@ constexpr std::function<void(T&)> MakeMinFunc(T min){
     };
 }
 
+#if !defined(_MSC_VER) || _MSC_VER > 1800
+    #define ReadSMBX38Level ReadSMBX38ALvlFile
+#else
+    #define ReadSMBX38Level ReadSMBX38ALvlFile_OLD
+#endif
+
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
@@ -68,17 +74,17 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
 {
     errorString.clear();
     CreateLevelHeader(FileData);
-    FileData.RecentFormat = LevelData::SMBX38A;
-
+    FileData.meta.RecentFormat = LevelData::SMBX38A;
+#if !defined(_MSC_VER) || _MSC_VER > 1800
     PGE_FileFormats_misc::TextFileInput inf;
     if(!inf.open(filePath, false))
     {
-        FileData.ReadFileValid=false;
+        FileData.meta.ReadFileValid=false;
         return false;
     }
     PGE_FileFormats_misc::FileInfo in_1(filePath);
-    FileData.filename = in_1.basename();
-    FileData.path = in_1.dirpath();
+    FileData.meta.filename = in_1.basename();
+    FileData.meta.path = in_1.dirpath();
 
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
     try
@@ -107,17 +113,22 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     }
     catch(const std::exception& err)
     {
-        FileData.ReadFileValid=false;
-        FileData.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + "format\n"
+        FileData.meta.ReadFileValid=false;
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + "format\n"
                 "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
-        FileData.ERROR_linenum = inf.getCurrentLineNumber();
-        FileData.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
+        FileData.meta.ERROR_linedata = "";
         return false;
     }
     FileData.CurSection = 0;
     FileData.playmusic = 0;
 
     return true;
+#else
+    FileData.meta.ReadFileValid = false;
+    FileData.meta.ERROR_info = "Unsupported on MSVC2013";
+    return false;
+#endif
 }
 
 bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
@@ -127,13 +138,13 @@ bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
     if(!file.open(filePath, false))
     {
         errorString="Failed to open file for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
-    return ReadSMBX38ALvlFile(file, FileData);
+    return ReadSMBX38Level(file, FileData);
 }
 
 bool FileFormats::ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  LevelData &FileData)
@@ -143,13 +154,13 @@ bool FileFormats::ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath,
     if(!file.open(&rawdata, filePath))
     {
         errorString="Failed to open raw string for read";
-        FileData.ERROR_info = errorString;
-        FileData.ERROR_linedata = "";
-        FileData.ERROR_linenum = -1;
-        FileData.ReadFileValid = false;
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
-    return ReadSMBX38ALvlFile(file, FileData);
+    return ReadSMBX38Level(file, FileData);
 }
 
 struct LevelEvent_layers
@@ -256,8 +267,24 @@ inline void SMBX65_Num2Exp(T source, PGESTRING &expression)
     }
 }
 
+template<typename T>
+inline void SMBX65_mapBGID_From(T &bgID)
+{
+    if(bgID==2)
+        bgID=13;
+    else if( (bgID >= 3) && (bgID <= 13) )
+        bgID -= 1;
+}
 
-
+template<typename T>
+inline T SMBX65_mapBGID_To(T bgID)
+{
+    if(bgID==13)
+        bgID=2;
+    else if( (bgID >= 2) && (bgID <= 12) )
+        bgID += 1;
+    return bgID;
+}
 
 /***********  Pre-defined values dependent to NPC Generator Effect field value  **************/
 
@@ -294,20 +321,22 @@ constexpr int SMBX65_NpcGeneratorDirections[29] =
 //LevelData FileFormats::ReadSMBX65by38ALvlFile(PGESTRING RawData, PGESTRING filePath)
 bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)
 {
+
     SMBX65_FileBeginN();
     PGESTRING filePath = in.getFilePath();
     errorString.clear();
     CreateLevelData(FileData);
 
-    FileData.RecentFormat = LevelData::SMBX38A;
+    FileData.meta.RecentFormat = LevelData::SMBX38A;
 
+#if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.LevelName = "" ;
     FileData.stars = 0;
     FileData.CurSection = 0;
     FileData.playmusic = 0;
 
     //Enable strict mode for SMBX LVL file format
-    FileData.smbx64strict = false;
+    FileData.meta.smbx64strict = false;
 
     //Begin all ArrayID's here;
     FileData.blocks_array_id = 1;
@@ -338,8 +367,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     if(!IsEmpty(filePath))
     {
         PGE_FileFormats_misc::FileInfo in_1(filePath);
-        FileData.filename = in_1.basename();
-        FileData.path = in_1.dirpath();
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
     }
 
     in.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
@@ -414,6 +443,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         //musicfile=custom music file[***urlencode!***]
                                         MakeCSVPostProcessor(&section.music_file, PGEUrlDecodeFunc));
 
+                SMBX65_mapBGID_From(section.background);//Convert into SMBX64 ID set
+
                 section.lock_left_scroll = (scroll_lock_x == "1");
                 section.lock_right_scroll = (scroll_lock_x == "2");
                 section.lock_up_scroll = (scroll_lock_y == "1");
@@ -453,7 +484,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         &blockdata.w,
                                         &blockdata.h);
 
-                blockdata.array_id = FileData.blocks_array_id++;
+                blockdata.meta.array_id = FileData.blocks_array_id++;
                 FileData.blocks.push_back(blockdata);
             } else if(identifier == "T") {
                 // T|layer|id|x|y
@@ -464,7 +495,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         &bgodata.x,
                                         &bgodata.y);
 
-                bgodata.array_id = FileData.bgo_array_id++;
+                bgodata.meta.array_id = FileData.bgo_array_id++;
                 FileData.bgo.push_back(bgodata);
             } else if(identifier == "N") {
                 // N|layer|id|x|y|b1,b2,b3,b4|sp|e1,e2,e3,e4,e5,e6,e7|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
@@ -556,7 +587,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     case 4: npcdata.generator_type = LevelNPC::NPC_GENERATOR_APPEAR; break;
                 }
 
-                npcdata.array_id = FileData.npc_array_id++;
+                npcdata.meta.array_id = FileData.npc_array_id++;
                 FileData.npc.push_back(npcdata);
             } else if(identifier == "Q") {
                 // Q|layer|x|y|w|h|b1,b2,b3,b4,b5|event
@@ -576,7 +607,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         MakeCSVPostProcessor(&phyEnv.touch_event, PGEUrlDecodeFunc)
                                         );
 
-                phyEnv.array_id = FileData.physenv_array_id++;
+                phyEnv.meta.array_id = FileData.physenv_array_id++;
                 FileData.physez.push_back(phyEnv);
             } else if(identifier == "W") {
                 // W|layer|x|y|ex|ey|type|enterd|exitd|sn,msg,hide|locked,noyoshi,canpick,bomb,hidef,anpc,mini,size|lik|liid|noexit|wx|wy|le|we
@@ -649,7 +680,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 doordata.isSetIn = (doordata.lvl_i ? false : true);
                 doordata.isSetOut = (doordata.lvl_o ? false : true) || doordata.lvl_i;
 
-                doordata.array_id = FileData.doors_array_id++;
+                doordata.meta.array_id = FileData.doors_array_id++;
                 FileData.doors.push_back(doordata);
             } else if(identifier == "L") {
                 // L|name|status
@@ -659,7 +690,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         MakeCSVPostProcessor(&layerdata.hidden, PGEFilpBool)
                                         );
 
-                layerdata.array_id = FileData.layers_array_id++;
+                layerdata.meta.array_id = FileData.layers_array_id++;
                 FileData.layers.push_back(layerdata);
             } else if(identifier == "E") {
                 // E|name|msg|ea|el|elm|epy|eps|eef|ecn|evc|ene
@@ -798,6 +829,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                                                                      );
                                                              if(customBG)
                                                                  nextSet.background_id = bgID;
+                                                             SMBX65_mapBGID_From(nextSet.background_id);//Convert into SMBX64 ID set
                                                          }),
                                                          MakeCSVIterator(dataReader, ':', [&eventdata](const PGESTRING& nextFieldStr){
                                                              auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -906,7 +938,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 eventdata.trigger_timer = (long)round(SMBX64::t65_to_ms(trigger_time_raw)/100.0);
                 eventdata.timer_def.interval = SMBX64::t65_to_ms(timer_def_interval_raw);
 
-                eventdata.array_id = FileData.events_array_id++;
+                eventdata.meta.array_id = FileData.events_array_id++;
                 FileData.events.push_back(eventdata);
 
             } else if(identifier == "V") {
@@ -951,7 +983,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             try{
                 std::rethrow_exception(possibleNestedException->nested_ptr());
             }catch(const parse_error& parseErr){
-                FileData.ERROR_linenum = parseErr.get_line_number();
+                FileData.meta.ERROR_linenum = parseErr.get_line_number();
             }catch(...){
                 // Do Nothing
             }
@@ -959,15 +991,15 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
 
         // Now fill in the error data.
-        FileData.ReadFileValid=false;
-        FileData.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + "format\n"
+        FileData.meta.ReadFileValid=false;
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + "format\n"
                 "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
 
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
-        if(FileData.ERROR_linenum == 0)
-            FileData.ERROR_linenum = in.getCurrentLineNumber();
+        if(FileData.meta.ERROR_linenum == 0)
+            FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
 
-        FileData.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata = "";
         return false;
     }
 
@@ -976,8 +1008,13 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     FileData.CurSection = 0;
     FileData.playmusic = 0;
 
-    FileData.ReadFileValid = true;
+    FileData.meta.ReadFileValid = true;
     return true;
+#else
+    FileData.meta.ReadFileValid = false;
+    FileData.meta.ERROR_info = "Unsupported on MSVC2013";
+    return false;
+#endif
 }
 
 
@@ -990,7 +1027,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
     errorString.clear();
     CreateLevelData(FileData);
 
-    FileData.RecentFormat = LevelData::SMBX38A;
+    FileData.meta.RecentFormat = LevelData::SMBX38A;
 
     FileData.LevelName="";
     FileData.stars=0;
@@ -998,7 +1035,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
     FileData.playmusic=0;
 
     //Enable strict mode for SMBX LVL file format
-    FileData.smbx64strict = false;
+    FileData.meta.smbx64strict = false;
 
     //Begin all ArrayID's here;
     FileData.blocks_array_id = 1;
@@ -1029,8 +1066,8 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
     if(!IsEmpty(filePath))
     {
         PGE_FileFormats_misc::FileInfo in_1(filePath);
-        FileData.filename = in_1.basename();
-        FileData.path = in_1.dirpath();
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
     }
 
     in.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
@@ -1240,6 +1277,8 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 }
             }
 
+            SMBX65_mapBGID_From(section.background);//Convert into SMBX64 ID set
+
             section.size_left = (long)round(x);
             section.size_top = (long)round(y);
             section.size_right = (long)round(x+w);
@@ -1349,7 +1388,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
-            blockdata.array_id = FileData.blocks_array_id++;
+            blockdata.meta.array_id = FileData.blocks_array_id++;
             FileData.blocks.push_back(blockdata);
         }
 
@@ -1391,7 +1430,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
-            bgodata.array_id = FileData.bgo_array_id++;
+            bgodata.meta.array_id = FileData.bgo_array_id++;
             FileData.bgo.push_back(bgodata);
         }
 
@@ -1641,7 +1680,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
-            npcdata.array_id = FileData.npc_array_id++;
+            npcdata.meta.array_id = FileData.npc_array_id++;
             FileData.npc.push_back(npcdata);
         }
 
@@ -1756,7 +1795,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
-            waters.array_id = FileData.physenv_array_id++;
+            waters.meta.array_id = FileData.physenv_array_id++;
             FileData.physez.push_back(waters);
         }
 
@@ -1981,7 +2020,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
-            doordata.array_id = FileData.doors_array_id++;
+            doordata.meta.array_id = FileData.doors_array_id++;
             FileData.doors.push_back(doordata);
         }
 
@@ -2007,7 +2046,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
-            layerdata.array_id = FileData.layers_array_id++;
+            layerdata.meta.array_id = FileData.layers_array_id++;
             FileData.layers.push_back(layerdata);
         }
 
@@ -2394,6 +2433,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                             if(!SMBX64::IsFloat(eLine))
                                                 goto badfile;
                                             eventdata.sets[id].background_id=(long)round(toFloat(eLine));
+                                            SMBX65_mapBGID_From(eventdata.sets[id].background_id);//Convert into SMBX64 ID set
                                         }
                                         break;
                                     }
@@ -2713,7 +2753,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     } break;
                 }
             }
-            eventdata.array_id = FileData.events_array_id++;
+            eventdata.meta.array_id = FileData.events_array_id++;
             FileData.events.push_back(eventdata);
         }
 
@@ -2804,13 +2844,13 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
     FileData.CurSection=0;
     FileData.playmusic=0;
 
-    FileData.ReadFileValid=true;
+    FileData.meta.ReadFileValid=true;
     return true;
 badfile:
-    FileData.ReadFileValid=false;
-    FileData.ERROR_info="Invalid file format, detected file SMBX-"+fromNum(file_format)+"format";
-    FileData.ERROR_linenum = in.getCurrentLineNumber();
-    FileData.ERROR_linedata=line;
+    FileData.meta.ReadFileValid=false;
+    FileData.meta.ERROR_info="Invalid file format, detected file SMBX-"+fromNum(file_format)+"format";
+    FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
+    FileData.meta.ERROR_linedata=line;
     return false;
 }
 
@@ -2846,7 +2886,7 @@ bool FileFormats::WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata
 bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData)
 {
     long i = 0;
-    FileData.RecentFormat = LevelData::SMBX38A;
+    FileData.meta.RecentFormat = LevelData::SMBX38A;
 
     //Count placed stars on this level
     FileData.stars = smbx64CountStars(FileData);
@@ -2947,7 +2987,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //    music=music number[same as smbx1.3]
         out << "|" << fromNum(sct.music_id);
     //    background=background number[same as the filename in 'background2' folder]
-        out << "|" << fromNum(sct.background);
+        out << "|" << fromNum( SMBX65_mapBGID_To(sct.background) );
     //    musicfile=custom music file[***urlencode!***]
         out << "|" << PGE_URLENC(sct.music_file);
         out << "\n";
@@ -3419,7 +3459,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //                btype=[0=don't change][1=default][2=custom]
             out << "," << fromNum(section_bg);
     //                backgroundid=[when btype=2]custom background id
-            out << "," << fromNum( evt.sets[j].background_id >=0 ? evt.sets[j].background_id : 0 );
+            out << "," << fromNum( evt.sets[j].background_id >=0 ? SMBX65_mapBGID_To(evt.sets[j].background_id) : 0 );
         }
         out << "/";
 

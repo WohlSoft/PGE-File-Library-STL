@@ -31,7 +31,8 @@
  */
 struct NPCConfigFile
 {
-    bool ReadFileValid;
+    bool        ReadFileValid;
+    PGESTRING   unknownLines;
 
 /*
  * SMBX64 Standard

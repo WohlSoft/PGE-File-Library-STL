@@ -30,6 +30,63 @@
 #include <script/scriptholder.h>
 #endif
 
+/**
+ * @brief Common data structure meta-data
+ */
+struct FileFormatMeta
+{
+    FileFormatMeta():
+        ReadFileValid(true),
+        ERROR_linenum(-1),
+        RecentFormat(0),
+        RecentFormatVersion(0),
+        modified(true),
+        untitled(true),
+        smbx64strict(false)
+    {}
+    //! Is file parsed correctly, false if some error is occouped
+    bool ReadFileValid;
+    //! Error messsage
+    PGESTRING ERROR_info;
+    //! Line data where error was occouped
+    PGESTRING ERROR_linedata;
+    //! Number of line where error was occouped
+    long      ERROR_linenum;
+    //! Recently used (open or save) file format
+    int RecentFormat;
+    //! Recently used format version (for SMBX1...64 files only)
+    int RecentFormatVersion;
+    //! Is file was modified since open?
+    bool modified;
+    //! Is this level made from scratch and was not saved into file?
+    bool untitled;
+    //! Enable SMBX64 Standard restrictions
+    //! (disable unsupported features and warn about limit exiting)
+    bool smbx64strict;
+    //! Recent file name since file was opened
+    PGESTRING filename;
+    //! Recent file path where file was located since it was opened
+    PGESTRING path;
+};
+
+/**
+ * @brief Common element meta-data
+ */
+struct ElementMeta
+{
+    ElementMeta() :
+        array_id(0),
+        index(0),
+        userdata(nullptr) {}
+    //! Array-ID is an unique key value identificates each unique element object.
+    //! Re-counts on each file reloading
+    unsigned int array_id;
+    //! Recent array index where element was saved (used to speed-up settings synchronization)
+    unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
+};
+
 /*!
  * \brief Position bookmark entry structure
  */
@@ -71,6 +128,10 @@ public:
     bool untitled;
     //! Is this level was modified before crash occouped?
     bool modifyed;
+    //! Recent file format ID (specific enum in the format structure declaration)
+    int fmtID;
+    //! Recent file format version
+    int fmtVer;
     //! Full original file path file which was opened before crash occouped
     PGESTRING fullPath;
     //! Full episode path of file which was opened before crash occouped
@@ -97,15 +158,8 @@ struct MetaData
     std::shared_ptr<ScriptHolder> script;
     #endif
 
-    //! [Used by file parses] Contains a result of file parsing: if true - file was parsed successfully,
-    //! if false - parsing was aborted with errors
-    bool      ReadFileValid;
-    //! [Used by file parses] Contains description of error
-    PGESTRING ERROR_info;
-    //! [Used by file parses] Contains data of line in the file where error was occopued
-    PGESTRING ERROR_linedata;
-    //! [Used by file parses] Contains number of line in the file where error was occouped
-    int       ERROR_linenum;
+    //!Helper meta-data
+    FileFormatMeta meta;
 };
 
 #endif // META_FILEDATA_H

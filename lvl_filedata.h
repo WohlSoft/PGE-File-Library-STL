@@ -94,6 +94,8 @@ struct PlayerPoint
     long w;
     //! Initial direction of playable character (-1 is left, 1 is right, 0 is right by default)
     int direction;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata;
 };
 
 /*!
@@ -131,11 +133,15 @@ struct LevelBlock
 /*
  * Editor-only parameters which are not saving into file
  */
+    //! Helper meta-data
+    ElementMeta meta;
     //! Array-ID is an unique key value identificates each unique block object.
     //! Re-counts on each file reloading
-    unsigned int array_id;
+    //unsigned int array_id;
     //! Recent array index where block was saved (used to speed-up settings synchronization)
-    unsigned int index;
+    //unsigned int index;
+    //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
+    //void* userdata;
 };
 
 
@@ -188,11 +194,8 @@ struct LevelBGO
  */
     //! Automatically calculated value of SMBX64 Order priority
     long smbx64_sp_apply;
-    //! Array-ID is an unique key value identificates each unique block object. Re-counts on each file reloading
-    unsigned int array_id;
-    //! Recent array index where block was saved (used to speed-up settings synchronization)
-    unsigned int index;
-
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
 
@@ -298,12 +301,10 @@ struct LevelNPC
 /*
  * Editor-only parameters which are not saving into file
  */
-    //! Array-ID is an unique key value identificates each unique block object. Re-counts on each file reloading.
-    unsigned int array_id;
-    //!< Recent array index where block was saved (used to speed-up settings synchronization)
-    unsigned int index;
     //!< Is this NPC a star (Copying from lvl_npc.ini config on file read). Stars are special bonus which required by player to be able enter into some doors/warps
     bool is_star;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
 /*!
@@ -412,10 +413,12 @@ struct LevelDoor
 /*
  * Editor-only parameters which are not saving into file
  */
-    //! Array-ID is an unique key value identificates each unique block object. Re-counts on each file reloading
-    unsigned int array_id;
-    //!< Recent array index where block was saved (used to speed-up settings synchronization)
-    unsigned int index;
+    //! Helper meta-data
+    ElementMeta meta;
+    //! User data pointer for entrance, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata_enter;
+    //! User data pointer for exit, Useful in the editors to have direct pointer to pre-placed elements
+    void* userdata_exit;
 };
 
 /*!
@@ -466,10 +469,8 @@ struct LevelPhysEnv
 /*
  * Editor-only parameters which are not saving into file
  */
-    //! Array-ID is an unique key value identificates each unique block object. Re-counts on each file reloading
-    unsigned int array_id;
-    //! Recent array index where block was saved (used to speed-up settings synchronization)
-    unsigned int index;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
 /*!
@@ -487,8 +488,8 @@ struct LevelLayer
 /*
  * Editor-only parameters which are not saving into file
  */
-    //!< Array-ID is an unique key value identificates each unique block object. Re-counts on each file reloading.
-    unsigned int array_id;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
 /*!
@@ -496,7 +497,6 @@ struct LevelLayer
  */
 struct LevelEvent_Sets
 {
-
     LevelEvent_Sets();
     enum SetActions{
         LESet_Nothing=-1,
@@ -767,8 +767,8 @@ struct LevelSMBX64Event
 /*
  * Editor-only parameters which are not saving into file
  */
-    //! Array-ID is an unique key value identificates each unique block object. Re-counts on each file reloading
-    unsigned int array_id;
+    //! Helper meta-data
+    ElementMeta meta;
 };
 
 /*!
@@ -803,14 +803,10 @@ struct LevelData
  */
     //! Total number of stars on the level
     int stars;
-    //! Is file parsed correctly, false if some error is occouped
-    bool ReadFileValid;
-    //! Error messsage
-    PGESTRING ERROR_info;
-    //! Line data where error was occouped
-    PGESTRING ERROR_linedata;
-    //! Number of line where error was occouped
-    int       ERROR_linenum;
+
+    //!Helper meta-data
+    FileFormatMeta meta;
+
     /*!
      * \brief File format
      */
@@ -823,10 +819,6 @@ struct LevelData
         //! SMBX-38A LVL File Format
         SMBX38A
     };
-    //! Recently used (open or save) file format
-    int RecentFormat;
-    //! Recently used format version (for SMBX1...64 files only)
-    int RecentFormatVersion;
 
     //! Understandable name of the level
     PGESTRING LevelName;
@@ -892,17 +884,6 @@ struct LevelData
     int CurSection;
     //! is music playing button pressed?
     bool playmusic;
-    //! Is level was modified since open?
-    bool modified;
-    //! Is this level made from scratch and was not saved into file?
-    bool untitled;
-    //! Enable SMBX64 Standard restrictions
-    //! (disable unsupported features and warn about limit exiting)
-    bool smbx64strict;
-    //! Recent file name since file was opened
-    PGESTRING filename;
-    //! Recent file path where file was located since it was opened
-    PGESTRING path;
 
 /*
  * Helpful functions

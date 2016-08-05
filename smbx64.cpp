@@ -20,8 +20,8 @@
 
 namespace smbx64Format
 {
-    const char *uint_vc = "0123456789";
-    const int   uint_vc_len = 10;
+    //const char *uint_vc = "0123456789";
+    //const int   uint_vc_len = 10;
 
     bool isDegit(PGEChar c)
     {
@@ -32,7 +32,7 @@ namespace smbx64Format
     {
         if(IsEmpty(s)) return false;
         int i, j;
-        for(i=0;i<(signed)s.size();i++)
+        for(i=0;i<signed(s.size());i++)
         {
             bool found=false;
             for(j=0;j<valid_chars_len;j++) {
@@ -99,7 +99,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
     bool decimal=false;
     bool pow10  =false;
     bool sign   =false;
-    for(int i=((PGEGetChar(in[0])=='-')?1:0); i<(signed)in.size(); i++)
+    for(int i=((PGEGetChar(in[0])=='-')?1:0); i<signed(in.size()); i++)
     {
         if((!decimal) &&(!pow10))
         {
@@ -107,7 +107,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
             {
                 in[i]='.';//replace comma with a dot
                 decimal=true;
-                if(i==((signed)in.size()-1)) return false;
+                if(i==(signed(in.size())-1)) return false;
                 continue;
             }
         }
@@ -116,7 +116,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
             if((PGEGetChar(in[i])=='E')||(PGEGetChar(in[i])=='e'))
             {
                 pow10=true;
-                if(i==((signed)in.size()-1)) return false;
+                if(i==(signed(in.size())-1)) return false;
                 continue;
             }
         }
@@ -127,7 +127,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
                 sign=true;
                 if((PGEGetChar(in[i])=='+')||(PGEGetChar(in[i])=='-'))
                 {
-                    if(i==((signed)in.size()-1)) return false;
+                    if(i==(signed(in.size())-1)) return false;
                     continue;
                 }
             }
@@ -137,18 +137,18 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
     return true;
 }
 
-bool SMBX64::IsQuotedString(PGESTRING in) // QUOTED STRING
+bool SMBX64::IsQuotedString(PGESTRING in)
 {
     //This is INVERTED validator. If false - good, true - bad.
     #define QStrGOOD true
     #define QStrBAD false
     int i=0;
-    for(i=0; i<(signed)in.size();i++)
+    for(i=0; i<signed(in.size());i++)
     {
         if(i==0)
         {
             if(in[i]!='"') return QStrBAD;
-        } else if(i==(signed)in.size()-1) {
+        } else if(i==signed(in.size())-1) {
             if(in[i]!='"') return QStrBAD;
         } else if(in[i]=='"') return QStrBAD;
         else if(in[i]=='"') return QStrBAD;
@@ -157,74 +157,4 @@ bool SMBX64::IsQuotedString(PGESTRING in) // QUOTED STRING
     return QStrGOOD;
 }
 
-bool SMBX64::IsCSVBool(PGESTRING in) //Worded BOOL
-{
-    return ( (in=="#TRUE#")||(in=="#FALSE#") );
-}
 
-bool SMBX64::IsBool(PGESTRING in) //Digital BOOL
-{
-    if((in.size()!=1) || (IsEmpty(in)) )
-        return true;
-    return ((PGEGetChar(in[0])=='1')||(PGEGetChar(in[0])=='0'));
-}
-
-//Convert from string to internal data
-bool SMBX64::wBoolR(PGESTRING in)
-{
-    return ((in=="#TRUE#")?true:false);
-}
-
-PGESTRING SMBX64::StrToStr(PGESTRING in)
-{
-    PGESTRING target = in;
-    if(IsEmpty(target))
-        return target;
-    if(target[0]==PGEChar('\"'))
-        PGE_RemStrRng(target, 0, 1);
-    if((!IsEmpty(target)) && (target[target.size()-1]==PGEChar('\"')))
-        PGE_RemStrRng(target, target.size()-1, 1);
-
-    target=PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
-    return target;
-}
-
-
-//SMBX64 parameter string generators
-PGESTRING SMBX64::IntS(long input)
-{  return fromNum(input)+"\n"; }
-
-PGESTRING SMBX64::FloatS(float input)
-{  return fromNum(input)+"\n"; }
-
-PGESTRING SMBX64::BoolS(bool input)
-{  return PGESTRING( (input)?"#TRUE#":"#FALSE#" )+"\n"; }
-
-PGESTRING SMBX64::qStrS(PGESTRING input)
-{
-    input = PGE_RemSubSTRING(input, "\n");
-    input = PGE_RemSubSTRING(input, "\r");
-    input = PGE_RemSubSTRING(input, "\t");
-    input = PGE_RemSubSTRING(input, "\"");
-    return PGESTRING("\"")+input+PGESTRING("\"\n");
-}
-
-PGESTRING SMBX64::qStrS_multiline(PGESTRING input)
-{
-    input = PGE_RemSubSTRING(input, "\t");
-    input = PGE_RemSubSTRING(input, "\"");
-    return PGESTRING("\"")+input+PGESTRING("\"\n");
-}
-
-
-
-
-double SMBX64::t65_to_ms(double t65)
-{
-    return t65 * (1000.0/65.0);
-}
-
-double SMBX64::ms_to_65(double ms)
-{
-    return ms * (65.0/1000.0);
-}
