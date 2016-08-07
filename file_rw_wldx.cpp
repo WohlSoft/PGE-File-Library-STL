@@ -23,11 +23,6 @@
 #include "pge_x_macro.h"
 #include "pge_file_lib_sys.h"
 
-#ifdef PGE_FILES_USE_MESSAGEBOXES
-#include <QMessageBox>
-#endif
-
-
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************

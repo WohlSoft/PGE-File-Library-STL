@@ -20,9 +20,6 @@
 #include <QFileInfo>
 #include <QDir>
 #endif
-#ifdef PGE_FILES_USE_MESSAGEBOXES
-#include <QMessageBox>
-#endif
 
 #include "file_formats.h"
 #include "pge_file_lib_globs.h"
