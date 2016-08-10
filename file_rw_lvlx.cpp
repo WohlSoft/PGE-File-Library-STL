@@ -52,12 +52,16 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
 
     //Find level header part
     do{
-    str_count++;NextLine(line);
-    }while((line!="HEAD") && (!IsNULL(line)));
+        str_count++; NextLine(line);
+    } while((line!="HEAD") && (!IsNULL(line)));
 
     PGESTRINGList header;
+    bool closed = false;
+
+    if(line != "HEAD")//Header not found, this level is head-less
+        goto skipHeaderParse;
+
     NextLine(line);
-    bool closed=false;
     while((line!="HEAD_END") && (!IsNULL(line)))
     {
         header.push_back(line);
@@ -111,6 +115,7 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
     if(!closed)
         goto badfile;
 
+skipHeaderParse:
     FileData.CurSection=0;
     FileData.playmusic=0;
 
@@ -688,6 +693,16 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                 door.isSetIn = ( !door.lvl_i );
                 door.isSetOut = ( !door.lvl_o || (door.lvl_i));
+                if(!door.isSetIn && door.isSetOut)
+                {
+                    door.ix = door.ox;
+                    door.iy = door.oy;
+                }
+                if(!door.isSetOut && door.isSetIn)
+                {
+                    door.ox = door.ix;
+                    door.oy = door.iy;
+                }
 
                 door.meta.array_id = FileData.doors_array_id++;
                 door.meta.index = FileData.doors.size();
