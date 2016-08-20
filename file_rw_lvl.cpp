@@ -181,10 +181,6 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
         FileData.meta.path = in_1.dirpath();
     }
 
-    #ifdef PGE_EDITOR
-    FileData.metaData.script.reset(); //set NULL to pointers in the Meta
-    #endif
-
     try
     {
         ///////////////////////////////////////Begin file///////////////////////////////////////

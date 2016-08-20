@@ -70,10 +70,6 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 
     if(PGE_FileFormats_misc::TextFileInput::exists(filePath+".meta"))
     {
-        #ifdef PGE_EDITOR
-        if(FileData.metaData.script)
-            FileData.metaData.script.reset();
-        #endif
         if( ! ReadNonSMBX64MetaDataF( filePath+".meta", FileData.metaData ) )
             errorString = "Can't open meta-file";
     }
@@ -144,12 +140,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
             }
 
             //save additional meta data
-            if(
-                (!FileData.metaData.bookmarks.empty())
-            #ifdef PGE_EDITOR
-                ||((FileData.metaData.script)&&(!FileData.metaData.script->events().isEmpty()))
-            #endif
-                )
+            if( !FileData.metaData.bookmarks.empty() )
             {
                 if(!FileFormats::WriteNonSMBX64MetaDataF(filePath+".meta", FileData.metaData))
                 {
