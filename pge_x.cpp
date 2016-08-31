@@ -340,15 +340,37 @@ bool PGEFile::IsQoutedString(PGESTRING in) // QUOTED STRING
 {
     //return QRegExp("^\"(?:[^\"\\\\]|\\\\.)*\"$").exactMatch(in);
     int i=0;
+    bool escape=false;
     for(i=0; i<(signed)in.size();i++)
     {
         if(i==0)
         {
-            if(in[i]!='"') return false;
-        } else if(i==(signed)in.size()-1) {
-            if(in[i]!='"') return false;
-        } else if(in[i]=='"') return false;
-        else if(in[i]=='"') return false;
+            if(in[i]!='"')
+                return false;
+        }
+        else
+        if(i==signed(in.size())-1)
+        {
+            if( (in[i]!='"') || escape )
+                return false;
+        }
+        else
+        if((in[i]=='\\') && !escape)
+        {
+            escape=true;
+            continue;
+        }
+        else
+        if((in[i]=='"') && !escape)
+        {
+            return false;
+        }
+        else
+        if((in[i]=='"') && !escape)
+        {
+            return false;
+        }
+        escape=false;
     }
     if(i==0) return false;
     return true;
