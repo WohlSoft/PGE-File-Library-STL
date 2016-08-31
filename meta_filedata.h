@@ -25,11 +25,6 @@
 #include "pge_file_lib_globs.h"
 #include <memory>
 
-//Editor's headers shouldn't appears in the engine
-#ifdef PGE_EDITOR
-#include <script/scriptholder.h>
-#endif
-
 /**
  * @brief Common data structure meta-data
  */
@@ -153,9 +148,6 @@ struct MetaData
     #ifdef PGE_EDITOR
     //! Crash backup of Editor's special data
     CrashData crash;
-    //only for level
-    //! (For levels only) If pointer is not null, level contains a script
-    std::shared_ptr<ScriptHolder> script;
     #endif
 
     //!Helper meta-data

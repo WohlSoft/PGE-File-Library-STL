@@ -110,9 +110,6 @@ WorldMusicBox FileFormats::CreateWldMusicbox()
 void FileFormats::CreateWorldHeader(WorldData &NewFileData)
 {
     //Meta-data
-    #ifdef PGE_EDITOR
-    NewFileData.metaData.script.reset();
-    #endif
     NewFileData.CurSection=0;
     NewFileData.playmusic=0;
     NewFileData.currentMusic = 0;

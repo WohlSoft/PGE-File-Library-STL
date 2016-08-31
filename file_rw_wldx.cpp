@@ -23,11 +23,6 @@
 #include "pge_x_macro.h"
 #include "pge_file_lib_sys.h"
 
-#ifdef PGE_FILES_USE_MESSAGEBOXES
-#include <QMessageBox>
-#endif
-
-
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
@@ -65,8 +60,12 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
     }while((line!="HEAD") && (!inf.eof()));
 
     PGESTRINGList header;
+    bool closed = false;
+
+    if(line != "HEAD")//Header not found, this world map is head-less
+        goto skipHeaderParse;
+
     str_count++;line = inf.readLine();
-    bool closed=false;
     while((line!="HEAD_END") && (!inf.eof()))
     {
         header.push_back(line);
@@ -144,6 +143,7 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
     if(!closed)
         goto badfile;
 
+skipHeaderParse:
     FileData.CurSection=0;
     FileData.playmusic=0;
 

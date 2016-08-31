@@ -39,6 +39,7 @@ typedef PGEPAIR<PGESTRING, int > starOnLevel;
  */
 struct saveCharState
 {
+    saveCharState() : id(1), state(1), itemID(0), mountType(0), mountID(0), health(1) {}
     //! ID of playable character
     int id;
     //! Curent ID of playable character's state

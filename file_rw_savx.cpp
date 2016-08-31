@@ -24,9 +24,6 @@
 #ifdef PGE_FILES_QT
 #include <QDir>
 #include <QFileInfo>
-#ifdef PGE_FILES_USE_MESSAGEBOXES
-#include <QMessageBox>
-#endif
 #endif
 
 //*********************************************************

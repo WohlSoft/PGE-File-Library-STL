@@ -22,14 +22,6 @@
 #include "pge_x.h"
 #include "pge_x_macro.h"
 
-#ifdef PGE_EDITOR
-#include <script/commands/memorycommand.h>
-#endif
-#ifdef PGE_FILES_USE_MESSAGEBOXES
-#include <QMessageBox>
-#endif
-
-
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
@@ -56,12 +48,16 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
 
     //Find level header part
     do{
-    str_count++;NextLine(line);
-    }while((line!="HEAD") && (!IsNULL(line)));
+        str_count++; NextLine(line);
+    } while((line!="HEAD") && (!IsNULL(line)));
 
     PGESTRINGList header;
+    bool closed = false;
+
+    if(line != "HEAD")//Header not found, this level is head-less
+        goto skipHeaderParse;
+
     NextLine(line);
-    bool closed=false;
     while((line!="HEAD_END") && (!IsNULL(line)))
     {
         header.push_back(line);
@@ -115,6 +111,7 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
     if(!closed)
         goto badfile;
 
+skipHeaderParse:
     FileData.CurSection=0;
     FileData.playmusic=0;
 
@@ -270,131 +267,9 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
             }
         }//meta sys crash
-
-        PGEX_Section("META_SCRIPT_EVENTS")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
-            if(f_section.subTree.size()>0)
-            {
-                if(!FileData.metaData.script)
-                    FileData.metaData.script.reset(new ScriptHolder());
-            }
-
-            //Read subtree
-            for(int subtree=0;subtree<f_section.subTree.size();subtree++)
-            {
-                if(f_section.subTree[subtree].name=="EVENT")
-                {
-                    if(f_section.type!=PGEFile::PGEX_Struct)
-                    {
-                        errorString=PGESTRING("Wrong section data syntax:\nSection [%1]\nSubtree [%2]").
-                                    arg(f_section.name).
-                                    arg(f_section.subTree[subtree].name);
-                        goto badfile;
-                    }
-
-                    EventCommand * event = new EventCommand(EventCommand::EVENTTYPE_LOAD);
-
-                    for(int sdata=0;sdata<f_section.subTree[subtree].data.size();sdata++)
-                    {
-                        if(f_section.subTree[subtree].data[sdata].type!=PGEFile::PGEX_Struct)
-                        {
-                            errorString=PGESTRING("Wrong data item syntax:\nSubtree [%1]\nData line %2")
-                                    .arg(f_section.subTree[subtree].name)
-                                    .arg(sdata);
-                            goto badfile;
-                        }
-
-                        PGEFile::PGEX_Item x = f_section.subTree[subtree].data[sdata];
-
-                        //Get values
-                        for(int sval=0;sval<x.values.size();sval++) //Look markers and values
-                        {
-                            PGEX_ValueBegin()
-                            if(v.marker=="TL") //Marker
-                            {
-                                if(PGEFile::IsQoutedString(v.value))
-                                    event->setMarker(PGEFile::X2STRING(v.value));
-                                else
-                                    goto badfile;
-                            }
-                            else
-                            if(v.marker=="ET") //Event type
-                            {
-                                if(PGEFile::IsIntS(v.value))
-                                    event->setEventType( (EventCommand::EventType)toInt(v.value) );
-                                else
-                                    goto badfile;
-                            }
-                        }
-                    }//Event header
-
-                    //Basic commands subtree
-                    if(event->eventType()==EventCommand::EVENTTYPE_LOAD)
-                    {
-                        for(int subtree2=0;subtree2<f_section.subTree[subtree].subTree.size();subtree2++)
-                        {
-                            if(f_section.subTree[subtree2].subTree[subtree2].name=="BASIC_COMMANDS")
-                            {
-                                if(f_section.type!=PGEFile::PGEX_Struct)
-                                {
-                                    errorString=PGESTRING("Wrong section data syntax:\nSection [%1]\nSubtree [%2]\nSubtree [%2]").
-                                                arg(f_section.name).
-                                                arg(f_section.subTree[subtree].name).
-                                                arg(f_section.subTree[subtree].subTree[subtree2].name);
-                                    goto badfile;
-                                }
-
-                                for(int sdata=0;sdata<f_section.subTree[subtree].subTree[subtree2].data.size();sdata++)
-                                {
-                                    if(f_section.subTree[subtree].subTree[subtree2].data[sdata].type!=PGEFile::PGEX_Struct)
-                                    {
-                                        errorString=PGESTRING("Wrong data item syntax:\nSubtree [%1]\nData line %2")
-                                                .arg(f_section.subTree[subtree].subTree[subtree2].name)
-                                                .arg(sdata);
-                                        goto badfile;
-                                    }
-
-                                    PGEFile::PGEX_Item x = f_section.subTree[subtree].subTree[subtree2].data[sdata];
-
-                                    PGESTRING name="";
-                                    PGESTRING commandType="";
-                                    int hx=0;
-                                    int ft=0;
-                                    double vf=0.0;
-
-                                    //Get values
-                                    PGEX_Values() //Look markers and values
-                                    {
-                                        PGEX_ValueBegin()
-                                        PGEX_StrVal("N", name) //Command name
-                                        PGEX_StrVal("CT", commandType) //Command type
-                                        //MemoryCommand specific values
-                                        PGEX_SIntVal("HX", hx) //Heximal value
-                                        PGEX_SIntVal("FT", ft) //Field type
-                                        PGEX_FloatVal("V", vf) //Value
-                                    }
-
-                                    if(commandType=="MEMORY")
-                                    {
-                                        MemoryCommand *cmd =
-                                           new MemoryCommand(hx,(MemoryCommand::FieldType)ft, vf);
-                                        cmd->setMarker(name);
-                                        event->addBasicCommand(cmd);
-                                    }
-                                }//commands list
-                            }//Basic command subtree
-                        }//subtrees
-                    }
-
-                    FileData.metaData.script->revents() << event;
-                }//EVENT tree
-
-            }//META_SCRIPT_EVENTS subtree
-        }//META_SCRIPT_EVENTS Section
         #endif
         ///////////////////////////////MetaDATA//End////////////////////////////////////////
+
 
         ///////////////////SECTION//////////////////////
         PGEX_Section("SECTION")
@@ -692,6 +567,16 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                 door.isSetIn = ( !door.lvl_i );
                 door.isSetOut = ( !door.lvl_o || (door.lvl_i));
+                if(!door.isSetIn && door.isSetOut)
+                {
+                    door.ix = door.ox;
+                    door.iy = door.oy;
+                }
+                if(!door.isSetOut && door.isSetIn)
+                {
+                    door.ox = door.ix;
+                    door.oy = door.iy;
+                }
 
                 door.meta.array_id = FileData.doors_array_id++;
                 door.meta.index = FileData.doors.size();
@@ -1572,42 +1457,6 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             out << PGEFile::value("FP", PGEFile::WriteStr(FileData.metaData.crash.fullPath));
             out << "\n";
         out << "META_SYS_CRASH_END\n";
-    }
-
-    if(FileData.metaData.script)
-    {
-        if(!FileData.metaData.script->events().isEmpty())
-        {
-            out << "META_SCRIPT_EVENTS\n";
-            foreach(EventCommand* x, FileData.metaData.script->events())
-            {
-                out << "EVENT\n";
-                out << PGEFile::value("TL", PGEFile::WriteStr( x->marker() ) );
-                out << PGEFile::value("ET", PGEFile::WriteInt( x->eventType() ) );
-                out << "\n";
-
-                if(x->basicCommands().size()>0)
-                {
-                    out << "BASIC_COMMANDS\n";
-                    foreach(BasicCommand *y, x->basicCommands())
-                    {
-                        out << PGEFile::value("N", PGEFile::WriteStr( y->marker() ) );
-                        if(PGESTRING(y->metaObject()->className())=="MemoryCommand")
-                        {
-                            MemoryCommand *z = dynamic_cast<MemoryCommand*>(y);
-                            out << PGEFile::value("CT", PGEFile::WriteStr( "MEMORY" ) );
-                            out << PGEFile::value("HX", PGEFile::WriteInt( z->hexValue() ) );
-                            out << PGEFile::value("FT", PGEFile::WriteInt( z->fieldType() ) );
-                            out << PGEFile::value("V", PGEFile::WriteFloat( z->getValue() ) );
-                        }
-                        out << "\n";
-                    }
-                    out << "BASIC_COMMANDS_END\n";
-                }
-                out << "EVENT_END\n";
-            }
-            out << "META_SCRIPT_EVENTS_END\n";
-        }
     }
     #endif
     //////////////////////////////////////MetaData///END//////////////////////////////////////////

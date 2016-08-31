@@ -577,11 +577,6 @@ void FileFormats::CreateLevelHeader(LevelData &NewFileData)
 
     NewFileData.LevelName = "";
     NewFileData.stars = 0;
-
-    //Meta-data
-    #ifdef PGE_EDITOR
-    NewFileData.metaData.script = NULL;
-    #endif
 }
 
 void FileFormats::CreateLevelData(LevelData &NewFileData)

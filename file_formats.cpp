@@ -23,9 +23,6 @@
 #ifdef PGE_EDITOR
 #include <common_features/themes.h>
 #endif
-#ifdef PGE_FILES_USE_MESSAGEBOXES
-#include <QMessageBox>
-#endif
 
 PGESTRING FileFormats::errorString="";
 
