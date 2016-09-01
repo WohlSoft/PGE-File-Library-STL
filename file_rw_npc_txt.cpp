@@ -429,7 +429,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.speed=toFloat(PGE_ReplSTRING(Params[1], PGESTRING(","), PGESTRING(".")));
+                FileData.speed=toDouble(PGE_ReplSTRING(Params[1], PGESTRING(","), PGESTRING(".")));
                 FileData.en_speed=true;
             }
         }

@@ -135,7 +135,7 @@ struct NPCConfigFile
     //! Is Speed modifier field us using?
     bool en_speed;
     //! Speed modifier field
-    float speed;
+    double speed;
 
     //! Is "Immune to fire" flag using?
     bool en_nofireball;
