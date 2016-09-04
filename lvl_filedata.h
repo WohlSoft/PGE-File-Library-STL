@@ -553,9 +553,9 @@ struct LevelEvent_MoveLayer
     //! Name of moving layer
     PGESTRING name;
     //! Speed X of layer
-    float speed_x;
+    double speed_x;
     //! Speed Y of layer
-    float speed_y;
+    double speed_y;
 
     //! Expression for X speed/coordinate
     PGESTRING expression_x;
@@ -591,9 +591,9 @@ struct LevelEvent_SpawnEffect
     //! Expression for Y position
     PGESTRING expression_y;
     //! Initial speed X (pixels per 1/65 second)
-    float speed_x;
+    double speed_x;
     //! Initial speed Y (pixels per 1/65 second)
-    float speed_y;
+    double speed_y;
     //! Expression for X speed
     PGESTRING expression_sx;
     //! Expression for Y speed
@@ -619,9 +619,9 @@ struct LevelEvent_SpawnNPC
     //! Spawn NPC at Y position
     long y;
     //! Spawn NPC with initial keenetic speed X
-    float speed_x;
+    double speed_x;
     //! Spawn NPC with initial keenetic speed Y
-    float speed_y;
+    double speed_y;
     //! Expression for X position
     PGESTRING expression_x;
     //! Expression for Y position
@@ -653,7 +653,7 @@ struct LevelEvent_SetTimer
     //! Time left (ticks)
     long  count;
     //! Lenght of every tick (miliseconds per every tick)
-    float interval;
+    double interval;
     enum CountDirection{
         DIR_REVERSE=0,
         DIR_FORWARD=1
@@ -754,13 +754,13 @@ struct LevelSMBX64Event
     //! Install layer motion settings for layer if is not empt
     PGESTRING movelayer;
     //! Set layer X motion in pixels per 1/65
-    float layer_speed_x;
+    double layer_speed_x;
     //! Set layer Y motion in pixels per 1/65
-    float layer_speed_y;
+    double layer_speed_y;
     //! Setup autoscrool X speed in pixels per 1/65
-    float move_camera_x;
+    double move_camera_x;
     //! Setup autoscrool Y speed in pixels per 1/65
-    float move_camera_y;
+    double move_camera_y;
     //! Setup autoscrool for section ID (starts from 0)
     long scroll_section;
 
