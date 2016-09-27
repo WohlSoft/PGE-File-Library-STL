@@ -569,8 +569,7 @@ void FileFormats::CreateLevelHeader(LevelData &NewFileData)
 {
     NewFileData.CurSection=0;
     NewFileData.playmusic=0;
-    NewFileData.meta.filename = "";
-    NewFileData.meta.path = "";
+    NewFileData.meta = FileFormatMeta();
 
     NewFileData.open_level_on_fail = "";
     NewFileData.open_level_on_fail_warpID = 0;
@@ -617,6 +616,8 @@ void FileFormats::CreateLevelData(LevelData &NewFileData)
     NewFileData.physez.clear();
 
     NewFileData.layers.clear();
+    NewFileData.variables.clear();
+    NewFileData.scripts.clear();
 
     //Create system layers
         //Default
