@@ -735,8 +735,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                                                     MakeCSVPostProcessor(&movingLayer.expression_y, PGEUrlDecodeFunc),
                                                                     &movingLayer.way
                                                                     );
-                                            SMBX65_Exp2Float(movingLayer.expression_x, movingLayer.speed_x);
-                                            SMBX65_Exp2Float(movingLayer.expression_y, movingLayer.speed_y);
+                                            SMBX65_Exp2Double(movingLayer.expression_x, movingLayer.speed_x);
+                                            SMBX65_Exp2Double(movingLayer.expression_y, movingLayer.speed_y);
                                             eventdata.moving_layers.push_back(movingLayer);
                                             eventdata.movelayer = movingLayer.name;
                                             eventdata.layer_speed_x = movingLayer.speed_x;
@@ -883,8 +883,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                                                         );
                                                 SMBX65_Exp2Int(effect.expression_x, effect.x);
                                                 SMBX65_Exp2Int(effect.expression_y, effect.y);
-                                                SMBX65_Exp2Float(effect.expression_sx, effect.speed_x);
-                                                SMBX65_Exp2Float(effect.expression_sy, effect.speed_y);
+                                                SMBX65_Exp2Double(effect.expression_sx, effect.speed_x);
+                                                SMBX65_Exp2Double(effect.expression_sy, effect.speed_y);
                                                 eventdata.spawn_effects.push_back(effect);
                                                 break;
                                             }
@@ -903,8 +903,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                                                     );
                                             SMBX65_Exp2Int(spawnnpc.expression_x, spawnnpc.x);
                                             SMBX65_Exp2Int(spawnnpc.expression_y, spawnnpc.y);
-                                            SMBX65_Exp2Float(spawnnpc.expression_sx, spawnnpc.speed_x);
-                                            SMBX65_Exp2Float(spawnnpc.expression_sy, spawnnpc.speed_y);
+                                            SMBX65_Exp2Double(spawnnpc.expression_sx, spawnnpc.speed_x);
+                                            SMBX65_Exp2Double(spawnnpc.expression_sy, spawnnpc.speed_y);
                                             eventdata.spawn_npc.push_back(spawnnpc);
                                         }),
                                         // &spawn_npcs,
@@ -2162,12 +2162,12 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                         break;
                                         case 1:
                                             ml.expression_x=PGE_URLDEC(eLine);
-                                            SMBX65_Exp2Float(ml.expression_x, ml.speed_x);
+                                            SMBX65_Exp2Double(ml.expression_x, ml.speed_x);
                                             eventdata.layer_speed_x=ml.speed_x;
                                         break;
                                         case 2:
                                             ml.expression_y=PGE_URLDEC(eLine);
-                                            SMBX65_Exp2Float(ml.expression_y, ml.speed_y);
+                                            SMBX65_Exp2Double(ml.expression_y, ml.speed_y);
                                             eventdata.layer_speed_y=ml.speed_y;
                                         break;
                                         case 3:
@@ -2565,12 +2565,12 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                         //        sx=effect horizontal speed[***urlencode!***][syntax]
                                         case 3:
                                             effect.expression_sx = PGE_URLDEC(eLine);
-                                            SMBX65_Exp2Float( effect.expression_sx, effect.speed_x );
+                                            SMBX65_Exp2Double( effect.expression_sx, effect.speed_x );
                                             break;
                                         //        sy=effect vertical speed[***urlencode!***][syntax]
                                         case 4:
                                             effect.expression_sy = PGE_URLDEC(eLine);
-                                            SMBX65_Exp2Float( effect.expression_sy, effect.speed_y );
+                                            SMBX65_Exp2Double( effect.expression_sy, effect.speed_y );
                                             break;
                                         //        grv=to decide whether the effects are affected by gravity[0=false !0=true]
                                         case 5: effect.gravity = (eLine!="0"); break;
@@ -2630,12 +2630,12 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                 //sx=npc horizontal speed[***urlencode!***][syntax]
                                 case 3:
                                     spawnnpc.expression_sx = PGE_URLDEC(eLine);
-                                    SMBX65_Exp2Float( spawnnpc.expression_sx, spawnnpc.speed_x );
+                                    SMBX65_Exp2Double( spawnnpc.expression_sx, spawnnpc.speed_x );
                                     break;
                                 //sy=npc vertical speed[***urlencode!***][syntax]
                                 case 4:
                                     spawnnpc.expression_sy = PGE_URLDEC(eLine);
-                                    SMBX65_Exp2Float( spawnnpc.expression_sy, spawnnpc.speed_y );
+                                    SMBX65_Exp2Double( spawnnpc.expression_sy, spawnnpc.speed_y );
                                     break;
                                 //sp=advanced settings of generated npc
                                 case 5:
