@@ -376,7 +376,7 @@ public:
      * \brief Initializes Level specific Player spawn point entry structure with default properties
      * \return Initialized with default properties level specific Player spawn point entry structure
      */
-    static PlayerPoint      CreateLvlPlayerPoint(int id=0);
+    static PlayerPoint      CreateLvlPlayerPoint(unsigned int id=0);
     /*!
      * \brief Initializes Level specific Section Settings entry structure with default properties
      * \return Initialized with default properties level specific Section Settings entry structure

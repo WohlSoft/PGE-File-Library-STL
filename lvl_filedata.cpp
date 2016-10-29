@@ -458,7 +458,7 @@ LevelLayer FileFormats::CreateLvlLayer()
     return dummyLayer;
 }
 
-PlayerPoint FileFormats::CreateLvlPlayerPoint(int id)
+PlayerPoint FileFormats::CreateLvlPlayerPoint(unsigned int id)
 {
     PlayerPoint dummyPlayer;
     dummyPlayer.id=id;
@@ -475,7 +475,7 @@ PlayerPoint FileFormats::CreateLvlPlayerPoint(int id)
         dummyPlayer.h=60;
         break;
     default:
-        dummyPlayer.h=32;
+        dummyPlayer.h=32;//-V112
     }
 
     dummyPlayer.direction=1;

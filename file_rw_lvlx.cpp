@@ -21,6 +21,7 @@
 #include "file_strlist.h"
 #include "pge_x.h"
 #include "pge_x_macro.h"
+#include <cfloat>
 
 //*********************************************************
 //****************READ FILE FORMAT*************************
@@ -29,27 +30,29 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
 {
     CreateLevelHeader(FileData);
     FileData.meta.RecentFormat = LevelData::PGEX;
-
     PGE_FileFormats_misc::TextFileInput inf;
+
     if(!inf.open(filePath, true))
     {
-        FileData.meta.ReadFileValid=false;
+        FileData.meta.ReadFileValid = false;
         return false;
     }
 
     PGESTRING line;
-    int str_count=0;
-    bool valid=false;
+    int str_count = 0;
+    bool valid = false;
     PGE_FileFormats_misc::FileInfo in_1(filePath);
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
-
-    #define NextLine(line) str_count++;line = inf.readLine();
+#define NextLine(line) str_count++;line = inf.readLine();
 
     //Find level header part
-    do{
-        str_count++; NextLine(line);
-    } while((line!="HEAD") && (!IsNULL(line)));
+    do
+    {
+        str_count++;
+        NextLine(line);
+    }
+    while((line != "HEAD") && (!IsNULL(line)));
 
     PGESTRINGList header;
     bool closed = false;
@@ -58,50 +61,52 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
         goto skipHeaderParse;
 
     NextLine(line);
-    while((line!="HEAD_END") && (!IsNULL(line)))
+
+    while((line != "HEAD_END") && (!IsNULL(line)))
     {
         header.push_back(line);
-        str_count++;NextLine(line);
-        if(line=="HEAD_END") closed=true;
+        str_count++;
+        NextLine(line);
+
+        if(line == "HEAD_END") closed = true;
     }
+
     if(!closed) goto badfile;
 
-    for(int qq=0; qq<(signed)header.size(); qq++)
+    for(int qq = 0; qq < static_cast<signed>(header.size()); qq++)
     {
-        PGESTRING &header_line=header[qq];
+        PGESTRING &header_line = header[qq];
         PGELIST<PGESTRINGList >data = PGEFile::splitDataLine(header_line, &valid);
 
-        for(int i=0;i<(signed)data.size();i++)
+        for(int i = 0; i < static_cast<signed>(data.size()); i++)
         {
-            if(data[i].size()!=2) goto badfile;
-            if(data[i][0]=="TL") //Level Title
+            if(data[i].size() != 2) goto badfile;
+
+            if(data[i][0] == "TL") //Level Title
             {
                 if(PGEFile::IsQoutedString(data[i][1]))
                     FileData.LevelName = PGEFile::X2STRING(data[i][1]);
                 else
                     goto badfile;
             }
-            else
-            if(data[i][0]=="SZ") //Starz number
+            else if(data[i][0] == "SZ") //Starz number
             {
                 if(PGEFile::IsIntU(data[i][1]))
                     FileData.stars = toInt(data[i][1]);
                 else
                     goto badfile;
             }
-            else
-            if(data[i][0]=="DL") //Open Level on player's fail
+            else if(data[i][0] == "DL") //Open Level on player's fail
             {
                 if(PGEFile::IsQoutedString(data[i][1]))
                     FileData.open_level_on_fail = PGEFile::X2STRING(data[i][1]);
                 else
                     goto badfile;
             }
-            else
-            if(data[i][0]=="DE") //Target WarpID of fail-level entrace
+            else if(data[i][0] == "DE") //Target WarpID of fail-level entrace
             {
                 if(PGEFile::IsIntU(data[i][1]))
-                    FileData.open_level_on_fail_warpID = toInt(data[i][1]);
+                    FileData.open_level_on_fail_warpID = toUInt(data[i][1]);
                 else
                     goto badfile;
             }
@@ -112,18 +117,15 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
         goto badfile;
 
 skipHeaderParse:
-    FileData.CurSection=0;
-    FileData.playmusic=0;
-
-    FileData.meta.ReadFileValid=true;
-
+    FileData.CurSection = 0;
+    FileData.playmusic = 0;
+    FileData.meta.ReadFileValid = true;
     return true;
-
 badfile:
-    FileData.meta.ERROR_info="Invalid file format";
-    FileData.meta.ERROR_linenum=str_count;
-    FileData.meta.ERROR_linedata=line;
-    FileData.meta.ReadFileValid=false;
+    FileData.meta.ERROR_info = "Invalid file format";
+    FileData.meta.ERROR_linenum = static_cast<long>(str_count);
+    FileData.meta.ERROR_linedata = line;
+    FileData.meta.ReadFileValid = false;
     return false;
 }
 
@@ -133,15 +135,17 @@ bool FileFormats::ReadExtendedLvlFileF(PGESTRING  filePath, LevelData &FileData)
 {
     errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
+
     if(!file.open(filePath, true))
     {
-        errorString="Failed to open file for read";
+        errorString = "Failed to open file for read";
         FileData.meta.ERROR_info = errorString;
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
     }
+
     return ReadExtendedLvlFile(file, FileData);
 }
 
@@ -149,15 +153,17 @@ bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath
 {
     errorString.clear();
     PGE_FileFormats_misc::RawTextInput file;
+
     if(!file.open(&rawdata, filePath))
     {
-        errorString="Failed to open raw string for read";
+        errorString = "Failed to open raw string for read";
         FileData.meta.ERROR_info = errorString;
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
     }
+
     return ReadExtendedLvlFile(file, FileData);
 }
 
@@ -180,9 +186,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
     FileData.meta.untitled = false;
     FileData.meta.modified = false;
-
     LevelSection lvl_section;
-
     PlayerPoint player;
     LevelBlock block;
     LevelBGO bgodata;
@@ -193,10 +197,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
     LevelSMBX64Event event;
     LevelVariable variable;
     LevelScript script;
-
     ///////////////////////////////////////Begin file///////////////////////////////////////
     PGEX_FileParseTree(in.readAll());
-
     PGEX_FetchSection() //look sections
     {
         PGEX_FetchSection_begin()
@@ -211,27 +213,23 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 {
                     PGEX_ValueBegin()
                     PGEX_StrVal("TL", FileData.LevelName) //Level Title
-                    PGEX_UIntVal("SZ", FileData.stars) //Starz number
+                    PGEX_USIntVal("SZ", FileData.stars) //Starz number
                     PGEX_StrVal("DL", FileData.open_level_on_fail) //Open level on fail
                     PGEX_UIntVal("DE", FileData.open_level_on_fail_warpID) //Open level's warpID on fail
                 }
             }
         }//HEADER
-
         ///////////////////////////////MetaDATA/////////////////////////////////////////////
         PGEX_Section("META_BOOKMARKS")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
-
                 Bookmark meta_bookmark;
-                meta_bookmark.bookmarkName = "";
+                meta_bookmark.bookmarkName.clear();
                 meta_bookmark.x = 0;
                 meta_bookmark.y = 0;
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
@@ -242,18 +240,15 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 FileData.metaData.bookmarks.push_back(meta_bookmark);
             }
         }
-
         ////////////////////////meta bookmarks////////////////////////
-        #ifdef PGE_EDITOR
+#ifdef PGE_EDITOR
         PGEX_Section("META_SYS_CRASH")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
-
-                FileData.metaData.crash.used=true;
+                FileData.metaData.crash.used = true;
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
@@ -261,38 +256,33 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("MD", FileData.metaData.crash.modifyed) //Modyfied
                     PGEX_SIntVal("FF", FileData.metaData.crash.fmtID) //Recent File format
                     PGEX_SIntVal("FV", FileData.metaData.crash.fmtVer) //Recent File format version
-                    PGEX_StrVal ("N",  FileData.metaData.crash.filename) //Filename
-                    PGEX_StrVal ("P",  FileData.metaData.crash.path) //Path
-                    PGEX_StrVal ("FP", FileData.metaData.crash.fullPath) //Full file Path
+                    PGEX_StrVal("N",  FileData.metaData.crash.filename)  //Filename
+                    PGEX_StrVal("P",  FileData.metaData.crash.path)  //Path
+                    PGEX_StrVal("FP", FileData.metaData.crash.fullPath)  //Full file Path
                 }
             }
         }//meta sys crash
-        #endif
+#endif
         ///////////////////////////////MetaDATA//End////////////////////////////////////////
-
-
         ///////////////////SECTION//////////////////////
         PGEX_Section("SECTION")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 lvl_section = CreateLvlSection();
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-
-                    PGEX_UIntVal("SC", lvl_section.id) //Section ID
-                    PGEX_SIntVal("L",  lvl_section.size_left) //Left side
-                    PGEX_SIntVal("R",  lvl_section.size_right)//Right side
-                    PGEX_SIntVal("T",  lvl_section.size_top) //Top side
-                    PGEX_SIntVal("B",  lvl_section.size_bottom)//Bottom side
+                    PGEX_USIntVal("SC", lvl_section.id) //Section ID
+                    PGEX_SLongVal("L",  lvl_section.size_left) //Left side
+                    PGEX_SLongVal("R",  lvl_section.size_right)//Right side
+                    PGEX_SLongVal("T",  lvl_section.size_top) //Top side
+                    PGEX_SLongVal("B",  lvl_section.size_bottom)//Bottom side
                     PGEX_UIntVal("MZ", lvl_section.music_id)//Stuff music ID
                     PGEX_UIntVal("BG", lvl_section.background)//Stuff music ID
-                    PGEX_StrVal ("MF", lvl_section.music_file)//External music file path
+                    PGEX_StrVal("MF", lvl_section.music_file) //External music file path
                     PGEX_BoolVal("CS", lvl_section.wrap_h)//Connect sides horizontally
                     PGEX_BoolVal("CSV", lvl_section.wrap_v)//Connect sides vertically
                     PGEX_BoolVal("OE", lvl_section.OffScreenEn)//Offscreen exit
@@ -302,16 +292,17 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("SU", lvl_section.lock_down_scroll)//Up-way scroll only (No Turn-forward)
                     PGEX_BoolVal("UW", lvl_section.underwater)//Underwater bit
                 }
-                lvl_section.PositionX=lvl_section.size_left-10;
-                lvl_section.PositionY=lvl_section.size_top-10;
-
+                lvl_section.PositionX = lvl_section.size_left - 10;
+                lvl_section.PositionY = lvl_section.size_top - 10;
                 //add captured value into array
-                bool found=false;
-                int q=0;
+                bool found = false;
+                int q = 0;
+                int sections_count = static_cast<int>(FileData.sections.size());
 
-                if(lvl_section.id >= (signed)FileData.sections.size())
+                if(lvl_section.id >= sections_count)
                 {
-                    int needToAdd = (FileData.sections.size()-1) - lvl_section.id;
+                    int needToAdd = (FileData.sections.size() - 1) - lvl_section.id;
+
                     while(needToAdd > 0)
                     {
                         LevelSection dummySct = CreateLvlSection();
@@ -321,46 +312,49 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     }
                 }
 
-                for(q=0; q<(signed)FileData.sections.size();q++)
+                for(q = 0; q < sections_count; q++)
                 {
-                    if(FileData.sections[q].id==lvl_section.id){found=true; break;}
+                    if(FileData.sections[q].id == lvl_section.id)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
+
                 if(found)
                     FileData.sections[q] = lvl_section;
                 else
-                {
                     FileData.sections.push_back(lvl_section);
-                }
             }
         }//SECTION
-
-
-
         ///////////////////STARTPOINT//////////////////////
         PGEX_Section("STARTPOINT")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 player = CreateLvlPlayerPoint();
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
                     PGEX_UIntVal("ID", player.id) //ID of player point
-                    PGEX_SIntVal("X",  player.x)
-                    PGEX_SIntVal("Y",  player.y)
+                    PGEX_SLongVal("X", player.x)
+                    PGEX_SLongVal("Y", player.y)
                     PGEX_SIntVal("D",  player.direction)
                 }
-
                 //add captured value into array
-                bool found=false;
-                int q=0;
-                for(q=0; q<(signed)FileData.players.size();q++)
+                bool found = false;
+                int q = 0;
+                int playersCount = static_cast<int>(FileData.players.size());
+
+                for(q = 0; q < playersCount; q++)
                 {
-                    if(FileData.players[q].id==player.id){found=true; break;}
+                    if(FileData.players[q].id == player.id)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
 
                 PlayerPoint sz = CreateLvlPlayerPoint(player.id);
@@ -373,27 +367,23 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     FileData.players.push_back(player);
             }
         }//STARTPOINT
-
-
         ///////////////////BLOCK//////////////////////
         PGEX_Section("BLOCK")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 block = CreateLvlBlock();
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal("ID", block.id) //Block ID
-                    PGEX_SIntVal("X", block.x) // Position X
-                    PGEX_SIntVal("Y", block.y) //Position Y
-                    PGEX_UIntVal("W", block.w) //Width
-                    PGEX_UIntVal("H", block.h) //Height
-                    PGEX_SIntVal("CN", block.npc_id) //Contains (coins/NPC)
+                    PGEX_ULongVal("ID", block.id) //Block ID
+                    PGEX_SLongVal("X", block.x) // Position X
+                    PGEX_SLongVal("Y", block.y) //Position Y
+                    PGEX_USLongVal("W", block.w) //Width
+                    PGEX_USLongVal("H", block.h) //Height
+                    PGEX_SLongVal("CN", block.npc_id) //Contains (coins/NPC)
                     PGEX_BoolVal("IV", block.invisible) //Invisible
                     PGEX_BoolVal("SL", block.slippery) //Slippery
                     PGEX_StrVal("LR", block.layer) //Layer name
@@ -401,70 +391,59 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("EH", block.event_hit) //Hit event slot
                     PGEX_StrVal("EE", block.event_emptylayer) //Hit event slot
                 }
-
                 block.meta.array_id = FileData.blocks_array_id++;
-                block.meta.index = FileData.blocks.size();
+                block.meta.index = static_cast<unsigned int>(FileData.blocks.size());
                 FileData.blocks.push_back(block);
             }
         }//BLOCK
-
-
         ///////////////////BGO//////////////////////
         PGEX_Section("BGO")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 bgodata = CreateLvlBgo();
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal ("ID", bgodata.id) //BGO ID
-                    PGEX_SIntVal ("X",  bgodata.x) //X Position
-                    PGEX_SIntVal ("Y",  bgodata.y) //Y Position
+                    PGEX_ULongVal("ID", bgodata.id)  //BGO ID
+                    PGEX_SLongVal("X",  bgodata.x)  //X Position
+                    PGEX_SLongVal("Y",  bgodata.y)  //Y Position
                     PGEX_FloatVal("ZO", bgodata.z_offset) //Z Offset
-                    PGEX_SIntVal ("ZP", bgodata.z_mode) //Z Position
-                    PGEX_SIntVal ("SP", bgodata.smbx64_sp) //SMBX64 Sorting priority
-                    PGEX_StrVal  ("LR", bgodata.layer) //Layer name
+                    PGEX_SIntVal("ZP", bgodata.z_mode)  //Z Position
+                    PGEX_SLongVal("SP", bgodata.smbx64_sp)  //SMBX64 Sorting priority
+                    PGEX_StrVal("LR", bgodata.layer)   //Layer name
                 }
-
                 bgodata.meta.array_id = FileData.bgo_array_id++;
-                bgodata.meta.index = FileData.bgo.size();
+                bgodata.meta.index = static_cast<unsigned int>(FileData.bgo.size());
                 FileData.bgo.push_back(bgodata);
             }
         }//BGO
-
-
         ///////////////////NPC//////////////////////
         PGEX_Section("NPC")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 npcdata = CreateLvlNpc();
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-
-                    PGEX_UIntVal("ID", npcdata.id) //NPC ID
-                    PGEX_SIntVal("X", npcdata.x) //X position
-                    PGEX_SIntVal("Y", npcdata.y) //Y position
+                    PGEX_ULongVal("ID", npcdata.id) //NPC ID
+                    PGEX_SLongVal("X", npcdata.x) //X position
+                    PGEX_SLongVal("Y", npcdata.y) //Y position
                     PGEX_SIntVal("D", npcdata.direct) //Direction
-                    PGEX_SIntVal("CN", npcdata.contents) //Contents of container-NPC
-                    PGEX_SIntVal("S1", npcdata.special_data) //Special value 1
-                    PGEX_SIntVal("S2", npcdata.special_data2) //Special value 2
+                    PGEX_SLongVal("CN", npcdata.contents) //Contents of container-NPC
+                    PGEX_SLongVal("S1", npcdata.special_data) //Special value 1
+                    PGEX_SLongVal("S2", npcdata.special_data2) //Special value 2
                     PGEX_BoolVal("GE", npcdata.generator) //Generator
                     PGEX_SIntVal("GT", npcdata.generator_type) //Generator type
                     PGEX_SIntVal("GD", npcdata.generator_direct) //Generator direction
-                    PGEX_UIntVal("GM", npcdata.generator_period) //Generator period
+                    PGEX_USIntVal("GM", npcdata.generator_period) //Generator period
                     PGEX_FloatVal("GA", npcdata.generator_custom_angle) //Generator custom angle
-                    PGEX_UIntVal("GB",  npcdata.generator_branches) //Generator number of branches
+                    PGEX_USIntVal("GB",  npcdata.generator_branches) //Generator number of branches
                     PGEX_FloatVal("GR", npcdata.generator_angle_range) //Generator angle range
                     PGEX_FloatVal("GS", npcdata.generator_initial_speed) //Generator custom initial speed
                     PGEX_StrVal("MG", npcdata.msg) //Message
@@ -482,74 +461,67 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("EO", npcdata.event_touch)//Event slot "On touch"
                     PGEX_StrVal("EF", npcdata.event_nextframe)//Evemt slot "Trigger every frame"
                 }
-
                 npcdata.meta.array_id = FileData.npc_array_id++;
-                npcdata.meta.index = FileData.npc.size();
+                npcdata.meta.index = static_cast<unsigned int>(FileData.npc.size());
                 FileData.npc.push_back(npcdata);
             }
         }//TILES
-
         ///////////////////PHYSICS//////////////////////
         PGEX_Section("PHYSICS")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 physiczone = CreateLvlPhysEnv();
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal("ET", physiczone.env_type) //Environment type
-                    PGEX_SIntVal("X",  physiczone.x) //X position
-                    PGEX_SIntVal("Y",  physiczone.y) //Y position
-                    PGEX_UIntVal("W",  physiczone.w) //Width
-                    PGEX_UIntVal("H",  physiczone.h) //Height
-                    PGEX_StrVal ("LR", physiczone.layer) //Layer
-                    PGEX_FloatVal("FR",physiczone.friction) //Friction
-                    PGEX_FloatVal("AD",physiczone.accel_direct) //Custom acceleration direction
-                    PGEX_FloatVal("AC",physiczone.accel) //Custom acceleration
-                    PGEX_FloatVal("MV",physiczone.max_velocity) //Maximal velocity
+                    PGEX_USIntVal("ET", physiczone.env_type) //Environment type
+                    PGEX_SLongVal("X",  physiczone.x) //X position
+                    PGEX_SLongVal("Y",  physiczone.y) //Y position
+                    PGEX_USLongVal("W",  physiczone.w) //Width
+                    PGEX_USLongVal("H",  physiczone.h) //Height
+                    PGEX_StrVal("LR", physiczone.layer)  //Layer
+                    PGEX_FloatVal("FR", physiczone.friction) //Friction
+                    PGEX_FloatVal("AD", physiczone.accel_direct) //Custom acceleration direction
+                    PGEX_FloatVal("AC", physiczone.accel) //Custom acceleration
+                    PGEX_FloatVal("MV", physiczone.max_velocity) //Maximal velocity
                     PGEX_StrVal("EO",  physiczone.touch_event) //Touch event/script
                 }
                 physiczone.meta.array_id = FileData.physenv_array_id++;
-                physiczone.meta.index = FileData.physez.size();
+                physiczone.meta.index = static_cast<unsigned int>(FileData.physez.size());
                 FileData.physez.push_back(physiczone);
             }
         }//PHYSICS
-
         ///////////////////DOORS//////////////////////
         PGEX_Section("DOORS")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 door = CreateLvlWarp();
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_SIntVal("IX", door.ix) //Input point
-                    PGEX_SIntVal("IY", door.iy) //Input point
-                    PGEX_SIntVal("OX", door.ox) //Output point
-                    PGEX_SIntVal("OY", door.oy) //Output point
+                    PGEX_SLongVal("IX", door.ix) //Input point
+                    PGEX_SLongVal("IY", door.iy) //Input point
+                    PGEX_SLongVal("OX", door.ox) //Output point
+                    PGEX_SLongVal("OY", door.oy) //Output point
                     PGEX_UIntVal("IL", door.length_i) //Length of entrance (input) point
                     PGEX_UIntVal("OL", door.length_o) //Length of exit (output) point
-                    PGEX_UIntVal("DT", door.type) //Input point
-                    PGEX_UIntVal("ID", door.idirect) //Input direction
-                    PGEX_UIntVal("OD", door.odirect) //Output direction
-                    PGEX_SIntVal("WX", door.world_x) //Target world map point
-                    PGEX_SIntVal("WY", door.world_y) //Target world map point
-                    PGEX_StrVal ("LF", door.lname) //Target level file
-                    PGEX_UIntVal("LI", door.warpto) //Target level file's input warp
+                    PGEX_USIntVal("DT", door.type) //Input point
+                    PGEX_USIntVal("ID", door.idirect) //Input direction
+                    PGEX_USIntVal("OD", door.odirect) //Output direction
+                    PGEX_SLongVal("WX", door.world_x) //Target world map point
+                    PGEX_SLongVal("WY", door.world_y) //Target world map point
+                    PGEX_StrVal("LF", door.lname)  //Target level file
+                    PGEX_USLongVal("LI", door.warpto) //Target level file's input warp
                     PGEX_BoolVal("ET", door.lvl_i) //Level Entrance
                     PGEX_BoolVal("EX", door.lvl_o) //Level exit
-                    PGEX_UIntVal("SL", door.stars) //Stars limit
-                    PGEX_StrVal ("SM", door.stars_msg) //Message about stars/leeks
+                    PGEX_USIntVal("SL", door.stars) //Stars limit
+                    PGEX_StrVal("SM", door.stars_msg)  //Message about stars/leeks
                     PGEX_BoolVal("NV", door.novehicles) //No Vehicles
                     PGEX_BoolVal("SH", door.star_num_hide) //Don't show stars number
                     PGEX_BoolVal("AI", door.allownpc) //Allow grabbed items
@@ -560,18 +532,19 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("SR", door.special_state_required) //Required a special state to enter
                     PGEX_BoolVal("PT", door.cannon_exit) //Cannon exit
                     PGEX_FloatVal("PS", door.cannon_exit_speed) //Cannon exit speed
-                    PGEX_StrVal ("LR", door.layer) //Layer
-                    PGEX_StrVal ("EE", door.event_enter) //On-Enter event slot
+                    PGEX_StrVal("LR", door.layer)  //Layer
+                    PGEX_StrVal("EE", door.event_enter)  //On-Enter event slot
                     PGEX_BoolVal("TW", door.two_way) //Two-way warp
                 }
+                door.isSetIn = (!door.lvl_i);
+                door.isSetOut = (!door.lvl_o || (door.lvl_i));
 
-                door.isSetIn = ( !door.lvl_i );
-                door.isSetOut = ( !door.lvl_o || (door.lvl_i));
                 if(!door.isSetIn && door.isSetOut)
                 {
                     door.ix = door.ox;
                     door.iy = door.oy;
                 }
+
                 if(!door.isSetOut && door.isSetIn)
                 {
                     door.ox = door.ix;
@@ -579,11 +552,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
 
                 door.meta.array_id = FileData.doors_array_id++;
-                door.meta.index = FileData.doors.size();
+                door.meta.index = static_cast<unsigned int>(FileData.doors.size());
                 FileData.doors.push_back(door);
             }
         }//DOORS
-
         ///////////////////LAYERS//////////////////////
         PGEX_Section("LAYERS")
         {
@@ -595,18 +567,23 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_StrVal ("LR", layer.name) //Layer name
+                    PGEX_StrVal("LR", layer.name)  //Layer name
                     PGEX_BoolVal("HD", layer.hidden) //Hidden
                     PGEX_BoolVal("LC", layer.locked) //Locked
                 }
-
                 //add captured value into array
-                bool found=false;
-                int q=0;
-                for(q=0; q<(signed)FileData.layers.size();q++)
+                bool found = false;
+                int q = 0;
+
+                for(q = 0; q < static_cast<signed>(FileData.layers.size()); q++)
                 {
-                    if(FileData.layers[q].name==layer.name){found=true; break;}
+                    if(FileData.layers[q].name == layer.name)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
+
                 if(found)
                 {
                     layer.meta.array_id = FileData.layers[q].meta.array_id;
@@ -619,60 +596,53 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
             }
         }//LAYERS
-
         //EVENTS comming soon
-//                else
-//                if(sct.first=="EVENTS_CLASSIC") //Action-styled events
-//                {
-//                    foreach(PGESTRINGList value, sectData) //Look markers and values
-//                    {
-//                            //  if(v.marker=="TL") //Level Title
-//                            //  {
-//                            //      if(PGEFile::IsQStr(v.value))
-//                            //          FileData.LevelName = PGEFile::X2STR(v.value);
-//                            //      else
-//                            //          goto badfile;
-//                            //  }
-//                            //  else
-//                            //  if(v.marker=="SZ") //Starz number
-//                            //  {
-//                            //      if(PGEFile::IsIntU(v.value))
-//                            //          FileData.stars = toInt(v.value);
-//                            //      else
-//                            //          goto badfile;
-//                            //  }
-//                    }
-//                }//EVENTS
-
+        //                else
+        //                if(sct.first=="EVENTS_CLASSIC") //Action-styled events
+        //                {
+        //                    foreach(PGESTRINGList value, sectData) //Look markers and values
+        //                    {
+        //                            //  if(v.marker=="TL") //Level Title
+        //                            //  {
+        //                            //      if(PGEFile::IsQStr(v.value))
+        //                            //          FileData.LevelName = PGEFile::X2STR(v.value);
+        //                            //      else
+        //                            //          goto badfile;
+        //                            //  }
+        //                            //  else
+        //                            //  if(v.marker=="SZ") //Starz number
+        //                            //  {
+        //                            //      if(PGEFile::IsIntU(v.value))
+        //                            //          FileData.stars = toInt(v.value);
+        //                            //      else
+        //                            //          goto badfile;
+        //                            //  }
+        //                    }
+        //                }//EVENTS
         ///////////////////EVENTS_CLASSIC//////////////////////
         PGEX_Section("EVENTS_CLASSIC")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
-
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 event = CreateLvlEvent();
-
                 PGESTRINGList musicSets;
                 PGESTRINGList bgSets;
                 PGESTRINGList ssSets;
-
                 PGESTRINGList movingLayers;
                 PGESTRINGList newSectionSettingsSets;
                 PGESTRINGList spawnNPCs;
                 PGESTRINGList spawnEffectss;
                 PGESTRINGList variablesToUpdate;
                 PGELIST<bool > controls;
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-
-                    PGEX_StrVal ("ET", event.name) //Event Title
-                    PGEX_StrVal ("MG", event.msg) //Event Message
-                    PGEX_UIntVal("SD", event.sound_id) //Play Sound ID
-                    PGEX_UIntVal("EG", event.end_game) //End game algorithm
+                    PGEX_StrVal("ET", event.name)  //Event Title
+                    PGEX_StrVal("MG", event.msg)  //Event Message
+                    PGEX_USLongVal("SD", event.sound_id) //Play Sound ID
+                    PGEX_USLongVal("EG", event.end_game) //End game algorithm
                     PGEX_StrArrVal("LH", event.layers_hide) //Hide layers
                     PGEX_StrArrVal("LS", event.layers_show) //Show layers
                     PGEX_StrArrVal("LT", event.layers_toggle) //Toggle layers
@@ -690,23 +660,23 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrArrVal("SEF",  spawnEffectss)    //Effects to spawn
                     PGEX_StrArrVal("UV",   variablesToUpdate) //Variables to update
                     PGEX_StrVal("TSCR", event.trigger_script) //Trigger script
-                    PGEX_UIntVal("TAPI", event.trigger_api_id) //Trigger script
+                    PGEX_USIntVal("TAPI", event.trigger_api_id) //Trigger script
                     PGEX_BoolVal("TMR", event.timer_def.enable) //Enable timer
-                    PGEX_UIntVal("TMC", event.timer_def.count) //Count of timer units
+                    PGEX_USLongVal("TMC", event.timer_def.count) //Count of timer units
                     PGEX_FloatVal("TMI", event.timer_def.interval) //Interval of timer tick
-                    PGEX_UIntVal("TMD", event.timer_def.count_dir) //Direction of count
+                    PGEX_USIntVal("TMD", event.timer_def.count_dir) //Direction of count
                     PGEX_BoolVal("TMV", event.timer_def.show) //Show timer on screen
                     //-------------------
                     PGEX_StrVal("TE", event.trigger) //Trigger event
-                    PGEX_UIntVal("TD", event.trigger_timer) //Trigger delay
+                    PGEX_USLongVal("TD", event.trigger_timer) //Trigger delay
                     PGEX_BoolVal("DS", event.nosmoke) //Disable smoke
-                    PGEX_UIntVal("AU", event.autostart) //Auto start
+                    PGEX_USIntVal("AU", event.autostart) //Auto start
                     PGEX_StrVal("AUC", event.autostart_condition) //Auto start condition
                     PGEX_BoolArrVal("PC", controls) //Player controls
-                    PGEX_StrVal  ("ML", event.movelayer) //Move layer
+                    PGEX_StrVal("ML", event.movelayer)   //Move layer
                     PGEX_FloatVal("MX", event.layer_speed_x) //Layer motion speed X
                     PGEX_FloatVal("MY", event.layer_speed_y) //Layer motion speed Y
-                    PGEX_SIntVal("AS", event.scroll_section) //Autoscroll section ID
+                    PGEX_SLongVal("AS", event.scroll_section) //Autoscroll section ID
                     PGEX_FloatVal("AX", event.move_camera_x) //Autoscroll speed X
                     PGEX_FloatVal("AY", event.move_camera_y) //Autoscroll speed Y
                 }
@@ -714,151 +684,170 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //Parse new-style parameters
                 if(!newSectionSettingsSets.empty())
                 {
-                    for(int q=0; q<(signed)newSectionSettingsSets.size(); q++)
+                    for(int q = 0; q < static_cast<signed>(newSectionSettingsSets.size()); q++)
                     {
                         LevelEvent_Sets sectionSet;
-                        bool valid=false;
-                        PGELIST<PGESTRINGList> sssData=PGEFile::splitDataLine(newSectionSettingsSets[q], &valid);
+                        bool valid = false;
+                        PGELIST<PGESTRINGList> sssData = PGEFile::splitDataLine(newSectionSettingsSets[q], &valid);
+
                         if(!valid)
                         {
-                            errorString="Wrong section settings event encoded sub-entry";
+                            errorString = "Wrong section settings event encoded sub-entry";
                             goto badfile;
                         }
 
-                        for(int ssi=0; ssi < (signed)sssData.size(); ssi++)
+                        for(int ssi = 0; ssi < static_cast<signed>(sssData.size()); ssi++)
                         {
                             PGESTRINGList &param = sssData[ssi];
-                            if(param[0]=="ID")
+
+                            if(param[0] == "ID")
                             {
-                                errorString="Invalid sectionID value type";
+                                errorString = "Invalid sectionID value type";
+
                                 if(PGEFile::IsIntU(param[1]))
-                                    sectionSet.id = toInt(param[1]);
+                                    sectionSet.id = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SL")
+                            else if(param[0] == "SL")
                             {
-                                errorString="Invalid Section size left value type";
+                                errorString = "Invalid Section size left value type";
+
                                 if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_left = toInt(param[1]);
+                                    sectionSet.position_left = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="ST")
+                            else if(param[0] == "ST")
                             {
-                                errorString="Invalid Section size top value type";
+                                errorString = "Invalid Section size top value type";
+
                                 if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_top = toInt(param[1]);
+                                    sectionSet.position_top = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SB")
+                            else if(param[0] == "SB")
                             {
-                                errorString="Invalid Section size bottom value type";
+                                errorString = "Invalid Section size bottom value type";
+
                                 if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_bottom = toInt(param[1]);
+                                    sectionSet.position_bottom = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SR")
+                            else if(param[0] == "SR")
                             {
-                                errorString="Invalid Section size right value type";
+                                errorString = "Invalid Section size right value type";
+
                                 if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_right = toInt(param[1]);
+                                    sectionSet.position_right = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SXX")
+                            else if(param[0] == "SXX")
                             {
-                                errorString="Invalid Section pos x expression value type";
+                                errorString = "Invalid Section pos x expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     sectionSet.expression_pos_x = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SYX")
+                            else if(param[0] == "SYX")
                             {
-                                errorString="Invalid Section pos y expression value type";
+                                errorString = "Invalid Section pos y expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     sectionSet.expression_pos_y = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SWX")
+                            else if(param[0] == "SWX")
                             {
-                                errorString="Invalid Section pos w expression value type";
+                                errorString = "Invalid Section pos w expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     sectionSet.expression_pos_w = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SWH")
+                            else if(param[0] == "SWH")
                             {
-                                errorString="Invalid Section pos h expression value type";
+                                errorString = "Invalid Section pos h expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     sectionSet.expression_pos_h = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="MI")
+                            else if(param[0] == "MI")
                             {
-                                errorString="Invalid Section music ID value type";
+                                errorString = "Invalid Section music ID value type";
+
                                 if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.music_id= toInt(param[1]);
+                                    sectionSet.music_id = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="MF")
+                            else if(param[0] == "MF")
                             {
-                                errorString="Invalid Section music file value type";
+                                errorString = "Invalid Section music file value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     sectionSet.music_file = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="BG")
+                            else if(param[0] == "BG")
                             {
-                                errorString="Invalid Section background ID value type";
+                                errorString = "Invalid Section background ID value type";
+
                                 if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.background_id= toInt(param[1]);
+                                    sectionSet.background_id = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="AS")
+                            else if(param[0] == "AS")
                             {
-                                errorString="Invalid Section Autoscroll value type";
+                                errorString = "Invalid Section Autoscroll value type";
+
                                 if(PGEFile::IsBool(param[1]))
-                                    sectionSet.autoscrol = (bool)toInt(param[1]);
+                                    sectionSet.autoscrol = static_cast<bool>(toInt(param[1]));
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="AX")
+                            else if(param[0] == "AX")
                             {
-                                errorString="Invalid Section Autoscroll X value type";
+                                errorString = "Invalid Section Autoscroll X value type";
+
                                 if(PGEFile::IsFloat(param[1]))
                                     sectionSet.autoscrol_x = toFloat(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="AY")
+                            else if(param[0] == "AY")
                             {
-                                errorString="Invalid Section Autoscroll Y value type";
+                                errorString = "Invalid Section Autoscroll Y value type";
+
                                 if(PGEFile::IsFloat(param[1]))
                                     sectionSet.autoscrol_y = toFloat(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="AXX")
+                            else if(param[0] == "AXX")
                             {
-                                errorString="Invalid Section Autoscroll X expression value type";
+                                errorString = "Invalid Section Autoscroll X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     sectionSet.expression_autoscrool_x = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="AYX")
+                            else if(param[0] == "AYX")
                             {
-                                errorString="Invalid Section Autoscroll y expression value type";
+                                errorString = "Invalid Section Autoscroll y expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     sectionSet.expression_autoscrool_y = PGEFile::X2STRING(param[1]);
                                 else
@@ -867,125 +856,149 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                         }//for parameters
 
                         if(
-                          ( (sectionSet.id<0) || (sectionSet.id>=(signed)event.sets.size()) )
-                           )//Append sections
+                            ((sectionSet.id < 0) || (sectionSet.id >= static_cast<long>(event.sets.size())))
+                        )//Append sections
                         {
-                            if( sectionSet.id < 0 )
+                            if(sectionSet.id < 0)
                             {
-                                errorString="Section settings event contains negative section ID value or missed!";
+                                errorString = "Section settings event contains negative section ID value or missed!";
                                 goto badfile;//Missmatched section ID!
                             }
-                            int last=event.sets.size()-1;
-                            while( sectionSet.id >= (signed)event.sets.size() )
+
+                            long last = static_cast<long>(event.sets.size() - 1);
+
+                            while(sectionSet.id >= static_cast<long>(event.sets.size()))
                             {
                                 LevelEvent_Sets set;
-                                set.id=last;
+                                set.id = last;
                                 event.sets.push_back(set);
                                 last++;
                             }
                         }
-                        event.sets[sectionSet.id] = sectionSet;
+
+                        event.sets[static_cast<int>(sectionSet.id)] = sectionSet;
                     }//for section settings entries
                 }//If new-styled section settings are gotten
-
                 //Parse odl-style parameters
                 else
                 {
                     //Apply MusicSets
-                    int q=0;
-                    for(q=0;q<(signed)event.sets.size() && q<(signed)musicSets.size(); q++)
+                    int q = 0;
+
+                    for(q = 0; q < static_cast<signed>(event.sets.size()) && q < static_cast<signed>(musicSets.size()); q++)
                     {
-                        event.sets[q].id = q;
+                        event.sets[q].id = static_cast<long>(q);
+
                         if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
-                        event.sets[q].music_id = toInt(musicSets[q]);
+
+                        event.sets[q].music_id = toLong(musicSets[q]);
                     }
 
                     //Apply Background sets
-                    for(q=0;q<(signed)event.sets.size() && q<(signed)bgSets.size(); q++)
+                    for(q = 0; q < static_cast<signed>(event.sets.size()) && q < static_cast<signed>(bgSets.size()); q++)
                     {
-                        event.sets[q].id = q;
+                        event.sets[q].id = static_cast<long>(q);
+
                         if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
-                        event.sets[q].background_id = toInt(bgSets[q]);
+
+                        event.sets[q].background_id = toLong(bgSets[q]);
                     }
 
                     //Apply section sets
-                    for(q=0;q<(signed)event.sets.size() && q<(signed)ssSets.size(); q++)
+                    for(q = 0; q < static_cast<signed>(event.sets.size()) && q < static_cast<signed>(ssSets.size()); q++)
                     {
-                        event.sets[q].id = q;
+                        event.sets[q].id = static_cast<long>(q);
                         PGESTRINGList sizes;
                         PGE_SPLITSTRING(sizes, ssSets[q], ",");
-                        if(sizes.size()!=4) goto badfile;
+
+                        if(sizes.size() != 4) goto badfile; //-V112
+
                         if(!PGEFile::IsIntS(sizes[0])) goto badfile;
-                        event.sets[q].position_left = toInt(sizes[0]);
+
+                        event.sets[q].position_left = toLong(sizes[0]);
+
                         if(!PGEFile::IsIntS(sizes[1])) goto badfile;
-                        event.sets[q].position_top = toInt(sizes[1]);
+
+                        event.sets[q].position_top = toLong(sizes[1]);
+
                         if(!PGEFile::IsIntS(sizes[2])) goto badfile;
-                        event.sets[q].position_bottom = toInt(sizes[2]);
+
+                        event.sets[q].position_bottom = toLong(sizes[2]);
+
                         if(!PGEFile::IsIntS(sizes[3])) goto badfile;
-                        event.sets[q].position_right = toInt(sizes[3]);
+
+                        event.sets[q].position_right = toLong(sizes[3]);
                     }
                 }
 
                 //Parse Moving layers
                 if(!movingLayers.empty())
                 {
-                    for(int q=0; q<(signed)movingLayers.size(); q++)
+                    for(int q = 0; q < static_cast<signed>(movingLayers.size()); q++)
                     {
                         LevelEvent_MoveLayer moveLayer;
-                        bool valid=false;
-                        PGELIST<PGESTRINGList> mlaData=PGEFile::splitDataLine(movingLayers[q], &valid);
+                        bool valid = false;
+                        PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(movingLayers[q], &valid);
+
                         if(!valid)
                         {
-                            errorString="Wrong Move layer event encoded sub-entry";
+                            errorString = "Wrong Move layer event encoded sub-entry";
                             goto badfile;
                         }
 
-                        for(int ssi=0; ssi < (signed)mlaData.size(); ssi++)
+                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
-                            if(param[0]=="LN")
+
+                            if(param[0] == "LN")
                             {
-                                errorString="Invalid Moving layer name value type";
+                                errorString = "Invalid Moving layer name value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     moveLayer.name = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SX")
+                            else if(param[0] == "SX")
                             {
-                                errorString="Invalid movelayer speed X value type";
+                                errorString = "Invalid movelayer speed X value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    moveLayer.speed_x = toFloat(param[1]);
+                                    moveLayer.speed_x = toDouble(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SY")
+                            else if(param[0] == "SY")
                             {
-                                errorString="Invalid movelayer speed Y value type";
+                                errorString = "Invalid movelayer speed Y value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    moveLayer.speed_y = toFloat(param[1]);
+                                    moveLayer.speed_y = toDouble(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="AXX")
+                            else if(param[0] == "AXX")
                             {
-                                errorString="Invalid movelayer speed X expression value type";
+                                errorString = "Invalid movelayer speed X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     moveLayer.expression_x = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="AYX")
+                            else if(param[0] == "AYX")
                             {
-                                errorString="Invalid movelayer speed Y expression value type";
+                                errorString = "Invalid movelayer speed Y expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     moveLayer.expression_y = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="MW")
+                            else if(param[0] == "MW")
                             {
-                                errorString="Invalid movelayer way type value type";
+                                errorString = "Invalid movelayer way type value type";
+
                                 if(PGEFile::IsIntU(param[1]))
                                     moveLayer.way = toInt(param[1]);
                                 else
@@ -997,101 +1010,112 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     }//for moving layers entries
                 }//If SMBX38A moving layers are gotten
 
-
                 //Parse NPCs to spawn
                 if(!spawnNPCs.empty())
                 {
-                    for(int q=0; q<(signed)spawnNPCs.size(); q++)
+                    for(int q = 0; q < static_cast<signed>(spawnNPCs.size()); q++)
                     {
                         LevelEvent_SpawnNPC spawnNPC;
-                        bool valid=false;
+                        bool valid = false;
                         PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(spawnNPCs[q], &valid);
+
                         if(!valid)
                         {
-                            errorString="Wrong Spawn NPC event encoded sub-entry";
+                            errorString = "Wrong Spawn NPC event encoded sub-entry";
                             goto badfile;
                         }
 
-                        for(int ssi=0; ssi < (signed)mlaData.size(); ssi++)
+                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
-                            if(param[0]=="ID")
+
+                            if(param[0] == "ID")
                             {
-                                errorString="Invalid Spawn NPC ID value type";
+                                errorString = "Invalid Spawn NPC ID value type";
+
                                 if(PGEFile::IsIntU(param[1]))
-                                    spawnNPC.id = toInt(param[1]);
+                                    spawnNPC.id = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SX")
+                            else if(param[0] == "SX")
                             {
-                                errorString="Invalid Spawn NPC X value type";
+                                errorString = "Invalid Spawn NPC X value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.x = toFloat(param[1]);
+                                    spawnNPC.x = static_cast<long>(toFloat(param[1]));
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SY")
+                            else if(param[0] == "SY")
                             {
-                                errorString="Invalid Spawn NPC Y value type";
+                                errorString = "Invalid Spawn NPC Y value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.y = toFloat(param[1]);
+                                    spawnNPC.y = static_cast<long>(toFloat(param[1]));
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SXX")
+                            else if(param[0] == "SXX")
                             {
-                                errorString="Invalid  Spawn NPC X expression value type";
+                                errorString = "Invalid  Spawn NPC X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnNPC.expression_x = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SYX")
+                            else if(param[0] == "SYX")
                             {
-                                errorString="Invalid Spawn NPC X expression value type";
+                                errorString = "Invalid Spawn NPC X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnNPC.expression_y = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSX")
+                            else if(param[0] == "SSX")
                             {
-                                errorString="Invalid Spawn NPC X value type";
+                                errorString = "Invalid Spawn NPC X value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.speed_x = toFloat(param[1]);
+                                    spawnNPC.speed_x = static_cast<long>(toFloat(param[1]));
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSY")
+                            else if(param[0] == "SSY")
                             {
-                                errorString="Invalid Spawn NPC Y value type";
+                                errorString = "Invalid Spawn NPC Y value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.speed_y = toFloat(param[1]);
+                                    spawnNPC.speed_y = static_cast<long>(toFloat(param[1]));
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSXX")
+                            else if(param[0] == "SSXX")
                             {
-                                errorString="Invalid  Spawn NPC Speed X expression value type";
+                                errorString = "Invalid  Spawn NPC Speed X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnNPC.expression_sx = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSYX")
+                            else if(param[0] == "SSYX")
                             {
-                                errorString="Invalid Spawn NPC Speed Y expression value type";
+                                errorString = "Invalid Spawn NPC Speed Y expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnNPC.expression_sy = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSS")
+                            else if(param[0] == "SSS")
                             {
-                                errorString="Invalid  Spawn NPC Special value type";
+                                errorString = "Invalid  Spawn NPC Special value type";
+
                                 if(PGEFile::IsIntU(param[1]))
-                                    spawnNPC.special = toInt(param[1]);
+                                    spawnNPC.special = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
@@ -1101,117 +1125,130 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     }//for Spawn NPC
                 }//If SMBX38A NPC Spawning lists are gotten
 
-
                 //Parse Effects to spawn
                 if(!spawnEffectss.empty())
                 {
-                    for(int q=0; q<(signed)spawnEffectss.size(); q++)
+                    for(int q = 0; q < static_cast<signed>(spawnEffectss.size()); q++)
                     {
                         LevelEvent_SpawnEffect spawnEffect;
-                        bool valid=false;
-                        PGELIST<PGESTRINGList> mlaData=PGEFile::splitDataLine(spawnEffectss[q], &valid);
+                        bool valid = false;
+                        PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(spawnEffectss[q], &valid);
+
                         if(!valid)
                         {
-                            errorString="Wrong Spawn Effect event encoded sub-entry";
+                            errorString = "Wrong Spawn Effect event encoded sub-entry";
                             goto badfile;
                         }
 
-                        for(int ssi=0; ssi < (signed)mlaData.size(); ssi++)
+                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
-                            if(param[0]=="ID")
+
+                            if(param[0] == "ID")
                             {
-                                errorString="Invalid Spawn Effect ID value type";
+                                errorString = "Invalid Spawn Effect ID value type";
+
                                 if(PGEFile::IsIntU(param[1]))
-                                    spawnEffect.id = toInt(param[1]);
+                                    spawnEffect.id = toLong(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SX")
+                            else if(param[0] == "SX")
                             {
-                                errorString="Invalid Spawn Effect X value type";
+                                errorString = "Invalid Spawn Effect X value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.x = toFloat(param[1]);
+                                    spawnEffect.x = static_cast<long>(toFloat(param[1]));
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SY")
+                            else if(param[0] == "SY")
                             {
-                                errorString="Invalid Spawn Effect Y value type";
+                                errorString = "Invalid Spawn Effect Y value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.y = toFloat(param[1]);
+                                    spawnEffect.y = static_cast<long>(toFloat(param[1]));
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SXX")
+                            else if(param[0] == "SXX")
                             {
-                                errorString="Invalid  Spawn NPC X expression value type";
+                                errorString = "Invalid  Spawn NPC X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnEffect.expression_x = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SYX")
+                            else if(param[0] == "SYX")
                             {
-                                errorString="Invalid Spawn NPC X expression value type";
+                                errorString = "Invalid Spawn NPC X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnEffect.expression_y = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSX")
+                            else if(param[0] == "SSX")
                             {
-                                errorString="Invalid Spawn NPC X value type";
+                                errorString = "Invalid Spawn NPC X value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.speed_x = toFloat(param[1]);
+                                    spawnEffect.speed_x = toDouble(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSY")
+                            else if(param[0] == "SSY")
                             {
-                                errorString="Invalid Spawn NPC Y value type";
+                                errorString = "Invalid Spawn NPC Y value type";
+
                                 if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.speed_y = toFloat(param[1]);
+                                    spawnEffect.speed_y = toDouble(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSXX")
+                            else if(param[0] == "SSXX")
                             {
-                                errorString="Invalid  Spawn NPC Speed X expression value type";
+                                errorString = "Invalid  Spawn NPC Speed X expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnEffect.expression_sx = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="SSYX")
+                            else if(param[0] == "SSYX")
                             {
-                                errorString="Invalid Spawn NPC Speed Y expression value type";
+                                errorString = "Invalid Spawn NPC Speed Y expression value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     spawnEffect.expression_sy = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="FP")
+                            else if(param[0] == "FP")
                             {
-                                errorString="Invalid  Spawn Effect FPS value type";
+                                errorString = "Invalid  Spawn Effect FPS value type";
+
                                 if(PGEFile::IsIntS(param[1]))
                                     spawnEffect.fps = toInt(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="TTL")
+                            else if(param[0] == "TTL")
                             {
-                                errorString="Invalid Spawn Effect time to live value type";
+                                errorString = "Invalid Spawn Effect time to live value type";
+
                                 if(PGEFile::IsIntS(param[1]))
                                     spawnEffect.max_life_time = toInt(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="GT")
+                            else if(param[0] == "GT")
                             {
-                                errorString="Invalid Spawn Effect Gravity value type";
+                                errorString = "Invalid Spawn Effect Gravity value type";
+
                                 if(PGEFile::IsBool(param[1]))
-                                    spawnEffect.gravity = (bool)toInt(param[1]);
+                                    spawnEffect.gravity = static_cast<bool>(toInt(param[1]));
                                 else
                                     goto badfile;
                             }
@@ -1221,35 +1258,38 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     }//for Spawn Effect
                 }//If SMBX38A Effect Spawning lists are gotten
 
-
                 //Parse Variables to update
                 if(!variablesToUpdate.empty())
                 {
-                    for(int q=0; q<(signed)variablesToUpdate.size(); q++)
+                    for(int q = 0; q < static_cast<signed>(variablesToUpdate.size()); q++)
                     {
                         LevelEvent_UpdateVariable variableToUpdate;
-                        bool valid=false;
-                        PGELIST<PGESTRINGList> mlaData=PGEFile::splitDataLine(variablesToUpdate[q], &valid);
+                        bool valid = false;
+                        PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(variablesToUpdate[q], &valid);
+
                         if(!valid)
                         {
-                            errorString="Wrong Variable to update event encoded sub-entry";
+                            errorString = "Wrong Variable to update event encoded sub-entry";
                             goto badfile;
                         }
 
-                        for(int ssi=0; ssi < (signed)mlaData.size(); ssi++)
+                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
-                            if(param[0]=="N")
+
+                            if(param[0] == "N")
                             {
-                                errorString="Invalid Variable to update name value type";
+                                errorString = "Invalid Variable to update name value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     variableToUpdate.name = PGEFile::X2STRING(param[1]);
                                 else
                                     goto badfile;
                             }
-                            else if(param[0]=="V")
+                            else if(param[0] == "V")
                             {
-                                errorString="Invalid Variable to update new value type";
+                                errorString = "Invalid Variable to update new value type";
+
                                 if(PGEFile::IsQoutedString(param[1]))
                                     variableToUpdate.newval = PGEFile::X2STRING(param[1]);
                                 else
@@ -1261,32 +1301,48 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     }//for Variable update events
                 }//If SMBX38A variable update lists are gotten
 
-
                 //Convert boolean array into control flags
-                    // SMBX64-only
-                if(controls.size()>=1)  event.ctrl_up = controls[0];
-                if(controls.size()>=2)  event.ctrl_down = controls[1];
-                if(controls.size()>=3)  event.ctrl_left = controls[2];
-                if(controls.size()>=4)  event.ctrl_right = controls[3];
-                if(controls.size()>=5)  event.ctrl_run = controls[4];
-                if(controls.size()>=6)  event.ctrl_jump = controls[5];
-                if(controls.size()>=7)  event.ctrl_drop = controls[6];
-                if(controls.size()>=8)  event.ctrl_start = controls[7];
-                if(controls.size()>=9)  event.ctrl_altrun = controls[8];
-                if(controls.size()>=10) event.ctrl_altjump = controls[9];
-                    // SMBX64-only end
-                    // SMBX-38A begin
-                if(controls.size()>=11) event.ctrls_enable = controls[10];
-                if(controls.size()>=12) event.ctrl_lock_keyboard = controls[11];
-                    // SMBX-38A end
+                // SMBX64-only
+                if(controls.size() >= 1)  event.ctrl_up = controls[0];
 
+                if(controls.size() >= 2)  event.ctrl_down = controls[1];
+
+                if(controls.size() >= 3)  event.ctrl_left = controls[2];
+
+                if(controls.size() >= 4)  event.ctrl_right = controls[3]; //-V112
+
+                if(controls.size() >= 5)  event.ctrl_run = controls[4];
+
+                if(controls.size() >= 6)  event.ctrl_jump = controls[5];
+
+                if(controls.size() >= 7)  event.ctrl_drop = controls[6];
+
+                if(controls.size() >= 8)  event.ctrl_start = controls[7];
+
+                if(controls.size() >= 9)  event.ctrl_altrun = controls[8];
+
+                if(controls.size() >= 10) event.ctrl_altjump = controls[9];
+
+                // SMBX64-only end
+                // SMBX-38A begin
+                if(controls.size() >= 11) event.ctrls_enable = controls[10];
+
+                if(controls.size() >= 12) event.ctrl_lock_keyboard = controls[11];
+
+                // SMBX-38A end
                 //add captured value into array
-                bool found=false;
-                int q=0;
-                for(q=0; q<(signed)FileData.events.size();q++)
+                bool found = false;
+                int q = 0;
+
+                for(q = 0; q < static_cast<signed>(FileData.events.size()); q++)
                 {
-                    if(FileData.events[q].name==event.name){found=true; break;}
+                    if(FileData.events[q].name == event.name)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
+
                 if(found)
                 {
                     event.meta.array_id = FileData.events[q].meta.array_id;
@@ -1299,7 +1355,6 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
             }
         }//EVENTS_CLASSIC
-
         ///////////////////VARIABLES//////////////////////
         PGEX_Section("VARIABLES")
         {
@@ -1317,7 +1372,6 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 FileData.variables.push_back(variable);
             }
         }//VARIABLES
-
         ///////////////////SCRIPTS//////////////////////
         PGEX_Section("SCRIPTS")
         {
@@ -1329,39 +1383,35 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_StrVal ("N", script.name) //Variable name
-                    PGEX_SIntVal ("L", script.language) //Variable name
+                    PGEX_StrVal("N", script.name)  //Variable name
+                    PGEX_SIntVal("L", script.language)  //Variable name
                     PGEX_StrVal("S", script.script) //Script text
                 }
 
                 switch(script.language)
                 {
-                    case LevelScript::LANG_LUA:
-                    case LevelScript::LANG_TEASCRIPT:
-                    case LevelScript::LANG_AUTOCODE:
-                        break;
-                    default:
-                        script.language=LevelScript::LANG_LUA;//LUA by default if any other language code!
+                case LevelScript::LANG_LUA:
+                case LevelScript::LANG_TEASCRIPT:
+                case LevelScript::LANG_AUTOCODE:
+                    break;
+
+                default:
+                    script.language = LevelScript::LANG_LUA; //LUA by default if any other language code!
                 }
 
                 FileData.variables.push_back(variable);
             }
         }//SCRIPTS
-
     }
     ///////////////////////////////////////EndFile///////////////////////////////////////
-
     errorString.clear(); //If no errors, clear string;
-    FileData.meta.ReadFileValid=true;
+    FileData.meta.ReadFileValid = true;
     return true;
-
-    badfile:    //If file format is not correct
-
-    FileData.meta.ERROR_info=errorString;
-    FileData.meta.ERROR_linenum=in.getCurrentLineNumber();
-    FileData.meta.ERROR_linedata=line;
-
-    FileData.meta.ReadFileValid=false;
+badfile:    //If file format is not correct
+    FileData.meta.ERROR_info = errorString;
+    FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
+    FileData.meta.ERROR_linedata = line;
+    FileData.meta.ReadFileValid = false;
     return false;
 }
 
@@ -1375,11 +1425,13 @@ bool FileFormats::WriteExtendedLvlFileF(PGESTRING filePath, LevelData &FileData)
 {
     errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
+
     if(!file.open(filePath, true, false, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString="Failed to open file for write";
+        errorString = "Failed to open file for write";
         return false;
     }
+
     return WriteExtendedLvlFile(file, FileData);
 }
 
@@ -1387,42 +1439,48 @@ bool FileFormats::WriteExtendedLvlFileRaw(LevelData &FileData, PGESTRING &rawdat
 {
     errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
+
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString="Failed to open raw string for write";
+        errorString = "Failed to open raw string for write";
         return false;
     }
+
     return WriteExtendedLvlFile(file, FileData);
 }
 
 bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData)
 {
-    long i;
-
+    int i;
     FileData.meta.RecentFormat = LevelData::PGEX;
-
     //Count placed stars on this level
-    FileData.stars=0;
-    for(i=0;i<(signed)FileData.npc.size();i++)
+    FileData.stars = 0;
+
+    for(i = 0; i < static_cast<int>(FileData.npc.size()); i++)
     {
         if(FileData.npc[i].is_star)
             FileData.stars++;
     }
 
     //HEAD section
-    if( (!IsEmpty(FileData.LevelName))||
-        (FileData.stars > 0) ||
-        (!IsEmpty(FileData.open_level_on_fail))||
-        (FileData.open_level_on_fail_warpID>0))
+    if((!IsEmpty(FileData.LevelName)) ||
+       (FileData.stars > 0) ||
+       (!IsEmpty(FileData.open_level_on_fail)) ||
+       (FileData.open_level_on_fail_warpID > 0))
     {
         out << "HEAD\n";
+
         if(!IsEmpty(FileData.LevelName))
             out << PGEFile::value("TL", PGEFile::WriteStr(FileData.LevelName)); // Level title
+
         out << PGEFile::value("SZ", PGEFile::WriteInt(FileData.stars));      // Stars number
+
         if(!IsEmpty(FileData.open_level_on_fail))
             out << PGEFile::value("DL", PGEFile::WriteStr(FileData.open_level_on_fail)); // Open level on fail
-        if(FileData.open_level_on_fail_warpID>0)
+
+        if(FileData.open_level_on_fail_warpID > 0)
             out << PGEFile::value("DE", PGEFile::WriteInt(FileData.open_level_on_fail_warpID));    // Open WarpID of level on fail
+
         out << "\n";
         out << "HEAD_END\n";
     }
@@ -1432,126 +1490,149 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     if(!FileData.metaData.bookmarks.empty())
     {
         out << "META_BOOKMARKS\n";
-        for(i=0;i<(signed)FileData.metaData.bookmarks.size(); i++)
+
+        for(i = 0; i < static_cast<int>(FileData.metaData.bookmarks.size()); i++)
         {
+            Bookmark &bm = FileData.metaData.bookmarks[i];
             //Bookmark name
-            out << PGEFile::value("BM", PGEFile::WriteStr(FileData.metaData.bookmarks[i].bookmarkName));
-            out << PGEFile::value("X", PGEFile::WriteFloat(FileData.metaData.bookmarks[i].x));
-            out << PGEFile::value("Y", PGEFile::WriteFloat(FileData.metaData.bookmarks[i].y));
+            out << PGEFile::value("BM", PGEFile::WriteStr(bm.bookmarkName));
+            out << PGEFile::value("X", PGEFile::WriteFloat(bm.x));
+            out << PGEFile::value("Y", PGEFile::WriteFloat(bm.y));
             out << "\n";
         }
+
         out << "META_BOOKMARKS_END\n";
     }
 
-    #ifdef PGE_EDITOR
+#ifdef PGE_EDITOR
+
     //Some System information
     if(FileData.metaData.crash.used)
     {
         out << "META_SYS_CRASH\n";
-            out << PGEFile::value("UT", PGEFile::WriteBool(FileData.metaData.crash.untitled));
-            out << PGEFile::value("MD", PGEFile::WriteBool(FileData.metaData.crash.modifyed));
-            out << PGEFile::value("FF", PGEFile::WriteInt(FileData.metaData.crash.fmtID));
-            out << PGEFile::value("FV", PGEFile::WriteInt(FileData.metaData.crash.fmtVer));
-            out << PGEFile::value("N", PGEFile::WriteStr(FileData.metaData.crash.filename));
-            out << PGEFile::value("P", PGEFile::WriteStr(FileData.metaData.crash.path));
-            out << PGEFile::value("FP", PGEFile::WriteStr(FileData.metaData.crash.fullPath));
-            out << "\n";
+        out << PGEFile::value("UT", PGEFile::WriteBool(FileData.metaData.crash.untitled));
+        out << PGEFile::value("MD", PGEFile::WriteBool(FileData.metaData.crash.modifyed));
+        out << PGEFile::value("FF", PGEFile::WriteInt(FileData.metaData.crash.fmtID));
+        out << PGEFile::value("FV", PGEFile::WriteInt(FileData.metaData.crash.fmtVer));
+        out << PGEFile::value("N", PGEFile::WriteStr(FileData.metaData.crash.filename));
+        out << PGEFile::value("P", PGEFile::WriteStr(FileData.metaData.crash.path));
+        out << PGEFile::value("FP", PGEFile::WriteStr(FileData.metaData.crash.fullPath));
+        out << "\n";
         out << "META_SYS_CRASH_END\n";
     }
-    #endif
+
+#endif
     //////////////////////////////////////MetaData///END//////////////////////////////////////////
-
-
     //SECTION section
-
     //Count available level sections
-    int totalSections=0;
-    for(i=0; i< (signed)FileData.sections.size(); i++)
+    int totalSections = 0;
+
+    for(i = 0; i < static_cast<int>(FileData.sections.size()); i++)
     {
+        LevelSection &section = FileData.sections[i];
+
         if(
-                (FileData.sections[i].size_bottom==0) &&
-                (FileData.sections[i].size_left==0) &&
-                (FileData.sections[i].size_right==0) &&
-                (FileData.sections[i].size_top==0)
-           )
+            (section.size_bottom == 0) &&
+            (section.size_left == 0) &&
+            (section.size_right == 0) &&
+            (section.size_top == 0)
+        )
             continue; //Skip unitialized sections
+
         totalSections++;
     }
 
     //Don't store section data entry if no data to add
-    if(totalSections>0)
+    if(totalSections > 0)
     {
         out << "SECTION\n";
-        for(i=0; i< (signed)FileData.sections.size(); i++)
+
+        for(i = 0; i < static_cast<int>(FileData.sections.size()); i++)
         {
+            LevelSection &section = FileData.sections[i];
+
             if(
-                    (FileData.sections[i].size_bottom==0) &&
-                    (FileData.sections[i].size_left==0) &&
-                    (FileData.sections[i].size_right==0) &&
-                    (FileData.sections[i].size_top==0)
-               )
+                (section.size_bottom == 0) &&
+                (section.size_left == 0) &&
+                (section.size_right == 0) &&
+                (section.size_top == 0)
+            )
                 continue; //Skip unitialized sections
-            out << PGEFile::value("SC", PGEFile::WriteInt(FileData.sections[i].id));  // Section ID
-            out << PGEFile::value("L", PGEFile::WriteInt(FileData.sections[i].size_left));  // Left size
-            out << PGEFile::value("R", PGEFile::WriteInt(FileData.sections[i].size_right));  // Right size
-            out << PGEFile::value("T", PGEFile::WriteInt(FileData.sections[i].size_top));  // Top size
-            out << PGEFile::value("B", PGEFile::WriteInt(FileData.sections[i].size_bottom));  // Bottom size
 
-            out << PGEFile::value("MZ", PGEFile::WriteInt(FileData.sections[i].music_id));  // Music ID
-            out << PGEFile::value("MF", PGEFile::WriteStr(FileData.sections[i].music_file));  // Music file
+            out << PGEFile::value("SC", PGEFile::WriteInt(section.id));  // Section ID
+            out << PGEFile::value("L", PGEFile::WriteInt(section.size_left));  // Left size
+            out << PGEFile::value("R", PGEFile::WriteInt(section.size_right));  // Right size
+            out << PGEFile::value("T", PGEFile::WriteInt(section.size_top));  // Top size
+            out << PGEFile::value("B", PGEFile::WriteInt(section.size_bottom));  // Bottom size
+            out << PGEFile::value("MZ", PGEFile::WriteInt(section.music_id));  // Music ID
+            out << PGEFile::value("MF", PGEFile::WriteStr(section.music_file));  // Music file
+            out << PGEFile::value("BG", PGEFile::WriteInt(section.background));  // Background ID
+            //out << PGEFile::value("BG", PGEFile::WriteStr(section.background_file));  // Background file
 
-            out << PGEFile::value("BG", PGEFile::WriteInt(FileData.sections[i].background));  // Background ID
-            //out << PGEFile::value("BG", PGEFile::WriteStr(FileData.sections[i].background_file));  // Background file
+            if(section.wrap_h)
+                out << PGEFile::value("CS", PGEFile::WriteBool(section.wrap_h));  // Connect sides horizontally
 
-            if(FileData.sections[i].wrap_h)
-                out << PGEFile::value("CS", PGEFile::WriteBool(FileData.sections[i].wrap_h));  // Connect sides horizontally
-            if(FileData.sections[i].wrap_v)
-                out << PGEFile::value("CSV", PGEFile::WriteBool(FileData.sections[i].wrap_v));  // Connect sides vertically
-            if(FileData.sections[i].OffScreenEn)
-                out << PGEFile::value("OE", PGEFile::WriteBool(FileData.sections[i].OffScreenEn));  // Offscreen exit
-            if(FileData.sections[i].lock_left_scroll)
-                out << PGEFile::value("SR", PGEFile::WriteBool(FileData.sections[i].lock_left_scroll));  // Right-way scroll only (No Turn-back)
-            if(FileData.sections[i].lock_right_scroll)
-                out << PGEFile::value("SL", PGEFile::WriteBool(FileData.sections[i].lock_right_scroll));  // Left-way scroll only (No Turn-back)
-            if(FileData.sections[i].lock_up_scroll)
-                out << PGEFile::value("SD", PGEFile::WriteBool(FileData.sections[i].lock_up_scroll));  // Down-way scroll only (No Turn-back)
-            if(FileData.sections[i].lock_down_scroll)
-                out << PGEFile::value("SU", PGEFile::WriteBool(FileData.sections[i].lock_down_scroll));  // Up-way scroll only (No Turn-back)
-            if(FileData.sections[i].underwater)
-                out << PGEFile::value("UW", PGEFile::WriteBool(FileData.sections[i].underwater));  // Underwater bit
-            //out << PGEFile::value("SL", PGEFile::WriteBool(FileData.sections[i].noforward));  // Left-way scroll only (No Turn-forward)
+            if(section.wrap_v)
+                out << PGEFile::value("CSV", PGEFile::WriteBool(section.wrap_v));  // Connect sides vertically
+
+            if(section.OffScreenEn)
+                out << PGEFile::value("OE", PGEFile::WriteBool(section.OffScreenEn));  // Offscreen exit
+
+            if(section.lock_left_scroll)
+                out << PGEFile::value("SR", PGEFile::WriteBool(section.lock_left_scroll));  // Right-way scroll only (No Turn-back)
+
+            if(section.lock_right_scroll)
+                out << PGEFile::value("SL", PGEFile::WriteBool(section.lock_right_scroll));  // Left-way scroll only (No Turn-back)
+
+            if(section.lock_up_scroll)
+                out << PGEFile::value("SD", PGEFile::WriteBool(section.lock_up_scroll));  // Down-way scroll only (No Turn-back)
+
+            if(section.lock_down_scroll)
+                out << PGEFile::value("SU", PGEFile::WriteBool(section.lock_down_scroll));  // Up-way scroll only (No Turn-back)
+
+            if(section.underwater)
+                out << PGEFile::value("UW", PGEFile::WriteBool(section.underwater));  // Underwater bit
+
+            //out << PGEFile::value("SL", PGEFile::WriteBool(section.noforward));  // Left-way scroll only (No Turn-forward)
             out << "\n";
         }
+
         out << "SECTION_END\n";
     }
 
     //STARTPOINT section
-    int totalPlayerPoints=0;
-    for(i=0; i< (signed)FileData.players.size(); i++)
+    int totalPlayerPoints = 0;
+
+    for(i = 0; i < static_cast<int>(FileData.players.size()); i++)
     {
-        if((FileData.players[i].w==0)&&
-           (FileData.players[i].h==0))
+        PlayerPoint &pp = FileData.players[i];
+
+        if((pp.w == 0) && (pp.h == 0))
             continue; //Skip empty points
+
         totalPlayerPoints++;
     }
 
     //Don't store section data entry if no data to add
-    if(totalPlayerPoints>0)
+    if(totalPlayerPoints > 0)
     {
         out << "STARTPOINT\n";
-        for(i=0; i< (signed)FileData.players.size(); i++)
+
+        for(i = 0; i < static_cast<int>(FileData.players.size()); i++)
         {
-            if((FileData.players[i].w==0)&&
-               (FileData.players[i].h==0))
+            PlayerPoint &pp = FileData.players[i];
+
+            if((pp.w == 0) &&
+               (pp.h == 0))
                 continue; //Skip empty points
 
-            out << PGEFile::value("ID", PGEFile::WriteInt(FileData.players[i].id));  // Player ID
-            out << PGEFile::value("X", PGEFile::WriteInt(FileData.players[i].x));  // Player X
-            out << PGEFile::value("Y", PGEFile::WriteInt(FileData.players[i].y));  // Player Y
-            out << PGEFile::value("D", PGEFile::WriteInt(FileData.players[i].direction));  // Direction -1 left, 1 right
-
+            out << PGEFile::value("ID", PGEFile::WriteInt(pp.id));  // Player ID
+            out << PGEFile::value("X", PGEFile::WriteInt(pp.x));  // Player X
+            out << PGEFile::value("Y", PGEFile::WriteInt(pp.y));  // Player Y
+            out << PGEFile::value("D", PGEFile::WriteInt(pp.direction));  // Direction -1 left, 1 right
             out << "\n";
         }
+
         out << "STARTPOINT_END\n";
     }
 
@@ -1559,43 +1640,44 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     if(!FileData.blocks.empty())
     {
         out << "BLOCK\n";
-
         LevelBlock defBlock = CreateLvlBlock();
 
-        for(i=0;i<(signed)FileData.blocks.size();i++)
+        for(i = 0; i < static_cast<int>(FileData.blocks.size()); i++)
         {
+            LevelBlock &blk = FileData.blocks[i];
             //Type ID
-            out << PGEFile::value("ID", PGEFile::WriteInt(FileData.blocks[i].id));  // Block ID
-
+            out << PGEFile::value("ID", PGEFile::WriteInt(blk.id));  // Block ID
             //Position
-            out << PGEFile::value("X", PGEFile::WriteInt(FileData.blocks[i].x));  // Block X
-            out << PGEFile::value("Y", PGEFile::WriteInt(FileData.blocks[i].y));  // Block Y
-
+            out << PGEFile::value("X", PGEFile::WriteInt(blk.x));  // Block X
+            out << PGEFile::value("Y", PGEFile::WriteInt(blk.y));  // Block Y
             //Size
-            out << PGEFile::value("W", PGEFile::WriteInt(FileData.blocks[i].w));  // Block Width (sizable only)
-            out << PGEFile::value("H", PGEFile::WriteInt(FileData.blocks[i].h));  // Block Height (sizable only)
+            out << PGEFile::value("W", PGEFile::WriteInt(blk.w));  // Block Width (sizable only)
+            out << PGEFile::value("H", PGEFile::WriteInt(blk.h));  // Block Height (sizable only)
 
             //Included NPC
-            if(FileData.blocks[i].npc_id!=0) //Write only if not zero
-                out << PGEFile::value("CN", PGEFile::WriteInt(FileData.blocks[i].npc_id));  // Included NPC
+            if(blk.npc_id != 0) //Write only if not zero
+                out << PGEFile::value("CN", PGEFile::WriteInt(blk.npc_id));  // Included NPC
 
             //Boolean flags
-            if(FileData.blocks[i].invisible)
-                out << PGEFile::value("IV", PGEFile::WriteBool(FileData.blocks[i].invisible));  // Invisible
-            if(FileData.blocks[i].slippery)
-                out << PGEFile::value("SL", PGEFile::WriteBool(FileData.blocks[i].slippery));  // Slippery flag
+            if(blk.invisible)
+                out << PGEFile::value("IV", PGEFile::WriteBool(blk.invisible));  // Invisible
+
+            if(blk.slippery)
+                out << PGEFile::value("SL", PGEFile::WriteBool(blk.slippery));  // Slippery flag
 
             //Layer
-            if(FileData.blocks[i].layer!=defBlock.layer) //Write only if not default
-                out << PGEFile::value("LR", PGEFile::WriteStr(FileData.blocks[i].layer));  // Layer
+            if(blk.layer != defBlock.layer) //Write only if not default
+                out << PGEFile::value("LR", PGEFile::WriteStr(blk.layer));  // Layer
 
             //Event Slots
-            if(!IsEmpty(FileData.blocks[i].event_destroy))
-                out << PGEFile::value("ED", PGEFile::WriteStr(FileData.blocks[i].event_destroy));
-            if(!IsEmpty(FileData.blocks[i].event_hit))
-                out << PGEFile::value("EH", PGEFile::WriteStr(FileData.blocks[i].event_hit));
-            if(!IsEmpty(FileData.blocks[i].event_emptylayer))
-                out << PGEFile::value("EE", PGEFile::WriteStr(FileData.blocks[i].event_emptylayer));
+            if(!IsEmpty(blk.event_destroy))
+                out << PGEFile::value("ED", PGEFile::WriteStr(blk.event_destroy));
+
+            if(!IsEmpty(blk.event_hit))
+                out << PGEFile::value("EH", PGEFile::WriteStr(blk.event_hit));
+
+            if(!IsEmpty(blk.event_emptylayer))
+                out << PGEFile::value("EE", PGEFile::WriteStr(blk.event_emptylayer));
 
             out << "\n";
         }
@@ -1607,27 +1689,27 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     if(!FileData.bgo.empty())
     {
         out << "BGO\n";
-
         LevelBGO defBGO = CreateLvlBgo();
 
-        for(i=0;i<(signed)FileData.bgo.size();i++)
+        for(i = 0; i < static_cast<int>(FileData.bgo.size()); i++)
         {
-            out << PGEFile::value("ID", PGEFile::WriteInt(FileData.bgo[i].id));  // BGO ID
-
+            LevelBGO &bgo = FileData.bgo[i];
+            out << PGEFile::value("ID", PGEFile::WriteInt(bgo.id));  // BGO ID
             //Position
-            out << PGEFile::value("X", PGEFile::WriteInt(FileData.bgo[i].x));  // BGO X
-            out << PGEFile::value("Y", PGEFile::WriteInt(FileData.bgo[i].y));  // BGO Y
+            out << PGEFile::value("X", PGEFile::WriteInt(bgo.x));  // BGO X
+            out << PGEFile::value("Y", PGEFile::WriteInt(bgo.y));  // BGO Y
 
-            if(FileData.bgo[i].z_offset!=defBGO.z_offset)
-                out << PGEFile::value("ZO", PGEFile::WriteFloat(FileData.bgo[i].z_offset));  // BGO Z-Offset
-            if(FileData.bgo[i].z_mode!=defBGO.z_mode)
-                out << PGEFile::value("ZP", PGEFile::WriteInt(FileData.bgo[i].z_mode));  // BGO Z-Mode
+            if(fabs(bgo.z_offset - defBGO.z_offset) > DBL_EPSILON)
+                out << PGEFile::value("ZO", PGEFile::WriteFloat(bgo.z_offset));  // BGO Z-Offset
 
-            if(FileData.bgo[i].smbx64_sp != -1)
-                out << PGEFile::value("SP", PGEFile::WriteInt(FileData.bgo[i].smbx64_sp));  // BGO SMBX64 Sort Priority
+            if(bgo.z_mode != defBGO.z_mode)
+                out << PGEFile::value("ZP", PGEFile::WriteInt(bgo.z_mode));  // BGO Z-Mode
 
-            if(FileData.bgo[i].layer!=defBGO.layer) //Write only if not default
-                out << PGEFile::value("LR", PGEFile::WriteStr(FileData.bgo[i].layer));  // Layer
+            if(bgo.smbx64_sp != -1)
+                out << PGEFile::value("SP", PGEFile::WriteInt(bgo.smbx64_sp));  // BGO SMBX64 Sort Priority
+
+            if(bgo.layer != defBGO.layer) //Write only if not default
+                out << PGEFile::value("LR", PGEFile::WriteStr(bgo.layer));  // Layer
 
             out << "\n";
         }
@@ -1639,74 +1721,85 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     if(!FileData.npc.empty())
     {
         out << "NPC\n";
-
         LevelNPC defNPC = CreateLvlNpc();
 
-        for(i=0;i<(signed)FileData.npc.size();i++)
+        for(i = 0; i < static_cast<int>(FileData.npc.size()); i++)
         {
-            out << PGEFile::value("ID", PGEFile::WriteInt(FileData.npc[i].id));  // NPC ID
-
+            LevelNPC &npc = FileData.npc[i];
+            out << PGEFile::value("ID", PGEFile::WriteInt(npc.id));  // NPC ID
             //Position
-            out << PGEFile::value("X", PGEFile::WriteInt(FileData.npc[i].x));  // NPC X
-            out << PGEFile::value("Y", PGEFile::WriteInt(FileData.npc[i].y));  // NPC Y
+            out << PGEFile::value("X", PGEFile::WriteInt(npc.x));  // NPC X
+            out << PGEFile::value("Y", PGEFile::WriteInt(npc.y));  // NPC Y
+            out << PGEFile::value("D", PGEFile::WriteInt(npc.direct));  // NPC Direction
 
-            out << PGEFile::value("D", PGEFile::WriteInt(FileData.npc[i].direct));  // NPC Direction
+            if(npc.contents != 0)
+                out << PGEFile::value("CN", PGEFile::WriteInt(npc.contents));  // Contents of container
 
-            if(FileData.npc[i].contents != 0)
-                out << PGEFile::value("CN", PGEFile::WriteInt(FileData.npc[i].contents));  // Contents of container
-            if(FileData.npc[i].special_data!=defNPC.special_data)
-                out << PGEFile::value("S1", PGEFile::WriteInt(FileData.npc[i].special_data));  // Special value 1
-            if(FileData.npc[i].special_data2!=defNPC.special_data2)
-                out << PGEFile::value("S2", PGEFile::WriteInt(FileData.npc[i].special_data2));  // Special value 2
+            if(npc.special_data != defNPC.special_data)
+                out << PGEFile::value("S1", PGEFile::WriteInt(npc.special_data));  // Special value 1
 
-            if(FileData.npc[i].generator)
+            if(npc.special_data2 != defNPC.special_data2)
+                out << PGEFile::value("S2", PGEFile::WriteInt(npc.special_data2));  // Special value 2
+
+            if(npc.generator)
             {
-                out << PGEFile::value("GE", PGEFile::WriteBool(FileData.npc[i].generator));  // NPC Generator
-                out << PGEFile::value("GT", PGEFile::WriteInt(FileData.npc[i].generator_type));  // Generator type
-                out << PGEFile::value("GD", PGEFile::WriteInt(FileData.npc[i].generator_direct));  // Generator direct
-                out << PGEFile::value("GM", PGEFile::WriteInt(FileData.npc[i].generator_period));  // Generator time
-                if(FileData.npc[i].generator_direct==0)
+                out << PGEFile::value("GE", PGEFile::WriteBool(npc.generator));  // NPC Generator
+                out << PGEFile::value("GT", PGEFile::WriteInt(npc.generator_type));  // Generator type
+                out << PGEFile::value("GD", PGEFile::WriteInt(npc.generator_direct));  // Generator direct
+                out << PGEFile::value("GM", PGEFile::WriteInt(npc.generator_period));  // Generator time
+
+                if(npc.generator_direct == 0)
                 {
-                    out << PGEFile::value("GA", PGEFile::WriteFloat(FileData.npc[i].generator_custom_angle));  // Generator custom angle
-                    out << PGEFile::value("GB", PGEFile::WriteInt(FileData.npc[i].generator_branches));  // Generator branches
-                    out << PGEFile::value("GR", PGEFile::WriteFloat(FileData.npc[i].generator_angle_range));  // Generator angle range
-                    out << PGEFile::value("GS", PGEFile::WriteFloat(FileData.npc[i].generator_initial_speed));  // Generator initial speed
+                    out << PGEFile::value("GA", PGEFile::WriteFloat(npc.generator_custom_angle));  // Generator custom angle
+                    out << PGEFile::value("GB", PGEFile::WriteInt(npc.generator_branches));  // Generator branches
+                    out << PGEFile::value("GR", PGEFile::WriteFloat(npc.generator_angle_range));  // Generator angle range
+                    out << PGEFile::value("GS", PGEFile::WriteFloat(npc.generator_initial_speed));  // Generator initial speed
                 }
             }
 
-            if(!IsEmpty(FileData.npc[i].msg))
-                out << PGEFile::value("MG", PGEFile::WriteStr(FileData.npc[i].msg));  // Message
+            if(!IsEmpty(npc.msg))
+                out << PGEFile::value("MG", PGEFile::WriteStr(npc.msg));  // Message
 
-            if(FileData.npc[i].friendly)
-                out << PGEFile::value("FD", PGEFile::WriteBool(FileData.npc[i].friendly));  // Friendly
-            if(FileData.npc[i].nomove)
-                out << PGEFile::value("NM", PGEFile::WriteBool(FileData.npc[i].nomove));  // Idle
-            if(FileData.npc[i].is_boss)
-                out << PGEFile::value("BS", PGEFile::WriteBool(FileData.npc[i].is_boss));  // Set as boss
+            if(npc.friendly)
+                out << PGEFile::value("FD", PGEFile::WriteBool(npc.friendly));  // Friendly
 
-            if(FileData.npc[i].layer!=defNPC.layer) //Write only if not default
-                out << PGEFile::value("LR", PGEFile::WriteStr(FileData.npc[i].layer));  // Layer
+            if(npc.nomove)
+                out << PGEFile::value("NM", PGEFile::WriteBool(npc.nomove));  // Idle
 
-            if(!IsEmpty(FileData.npc[i].attach_layer))
-                out << PGEFile::value("LA", PGEFile::WriteStr(FileData.npc[i].attach_layer));  // Attach layer
-            if(!IsEmpty(FileData.npc[i].send_id_to_variable))
-                out << PGEFile::value("SV", PGEFile::WriteStr(FileData.npc[i].send_id_to_variable)); //Send ID to variable
+            if(npc.is_boss)
+                out << PGEFile::value("BS", PGEFile::WriteBool(npc.is_boss));  // Set as boss
+
+            if(npc.layer != defNPC.layer) //Write only if not default
+                out << PGEFile::value("LR", PGEFile::WriteStr(npc.layer));  // Layer
+
+            if(!IsEmpty(npc.attach_layer))
+                out << PGEFile::value("LA", PGEFile::WriteStr(npc.attach_layer));  // Attach layer
+
+            if(!IsEmpty(npc.send_id_to_variable))
+                out << PGEFile::value("SV", PGEFile::WriteStr(npc.send_id_to_variable)); //Send ID to variable
 
             //Event slots
-            if(!IsEmpty(FileData.npc[i].event_activate))
-                out << PGEFile::value("EA", PGEFile::WriteStr(FileData.npc[i].event_activate));
-            if(!IsEmpty(FileData.npc[i].event_die))
-                out << PGEFile::value("ED", PGEFile::WriteStr(FileData.npc[i].event_die));
-            if(!IsEmpty(FileData.npc[i].event_talk))
-                out << PGEFile::value("ET", PGEFile::WriteStr(FileData.npc[i].event_talk));
-            if(!IsEmpty(FileData.npc[i].event_emptylayer))
-                out << PGEFile::value("EE", PGEFile::WriteStr(FileData.npc[i].event_emptylayer));
-            if(!IsEmpty(FileData.npc[i].event_grab))
-                out << PGEFile::value("EG", PGEFile::WriteStr(FileData.npc[i].event_grab));
-            if(!IsEmpty(FileData.npc[i].event_touch))
-                out << PGEFile::value("EO", PGEFile::WriteStr(FileData.npc[i].event_touch));
-            if(!IsEmpty(FileData.npc[i].event_touch))
-                out << PGEFile::value("EF", PGEFile::WriteStr(FileData.npc[i].event_nextframe));
+            if(!IsEmpty(npc.event_activate))
+                out << PGEFile::value("EA", PGEFile::WriteStr(npc.event_activate));
+
+            if(!IsEmpty(npc.event_die))
+                out << PGEFile::value("ED", PGEFile::WriteStr(npc.event_die));
+
+            if(!IsEmpty(npc.event_talk))
+                out << PGEFile::value("ET", PGEFile::WriteStr(npc.event_talk));
+
+            if(!IsEmpty(npc.event_emptylayer))
+                out << PGEFile::value("EE", PGEFile::WriteStr(npc.event_emptylayer));
+
+            if(!IsEmpty(npc.event_grab))
+                out << PGEFile::value("EG", PGEFile::WriteStr(npc.event_grab));
+
+            if(!IsEmpty(npc.event_touch))
+                out << PGEFile::value("EO", PGEFile::WriteStr(npc.event_touch));
+
+            if(!IsEmpty(npc.event_touch))
+                out << PGEFile::value("EF", PGEFile::WriteStr(npc.event_nextframe));
+
             out << "\n";
         }
 
@@ -1719,153 +1812,165 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "PHYSICS\n";
         LevelPhysEnv defPhys = CreateLvlPhysEnv();
 
-        for(i=0;i<(signed)FileData.physez.size();i++)
+        for(i = 0; i < static_cast<int>(FileData.physez.size()); i++)
         {
-            out << PGEFile::value("ET", PGEFile::WriteInt(FileData.physez[i].env_type));
-
+            LevelPhysEnv &physEnv = FileData.physez[i];
+            out << PGEFile::value("ET", PGEFile::WriteInt(physEnv.env_type));
             //Position
-            out << PGEFile::value("X", PGEFile::WriteInt(FileData.physez[i].x));  // Physic Env X
-            out << PGEFile::value("Y", PGEFile::WriteInt(FileData.physez[i].y));  // Physic Env Y
-
+            out << PGEFile::value("X", PGEFile::WriteInt(physEnv.x));  // Physic Env X
+            out << PGEFile::value("Y", PGEFile::WriteInt(physEnv.y));  // Physic Env Y
             //Size
-            out << PGEFile::value("W", PGEFile::WriteInt(FileData.physez[i].w));  // Physic Env Width
-            out << PGEFile::value("H", PGEFile::WriteInt(FileData.physez[i].h));  // Physic Env Height
+            out << PGEFile::value("W", PGEFile::WriteInt(physEnv.w));  // Physic Env Width
+            out << PGEFile::value("H", PGEFile::WriteInt(physEnv.h));  // Physic Env Height
 
-            if(FileData.physez[i].env_type==LevelPhysEnv::ENV_CUSTOM_LIQUID)
-                out << PGEFile::value("FR", PGEFile::WriteFloat(FileData.physez[i].friction)); //Friction
-            if(FileData.physez[i].accel_direct>=0.0)
-                out << PGEFile::value("AD", PGEFile::WriteFloat(FileData.physez[i].accel_direct)); //Acceleration direction
-            if(FileData.physez[i].accel!=0.0)
-                out << PGEFile::value("AC", PGEFile::WriteFloat(FileData.physez[i].accel)); //Acceleration
-            if(FileData.physez[i].max_velocity != 0.0)
-                out << PGEFile::value("MV", PGEFile::WriteFloat(FileData.physez[i].max_velocity)); //Max-velocity
-            if(FileData.physez[i].layer != defPhys.layer) //Write only if not default
-                out << PGEFile::value("LR", PGEFile::WriteStr(FileData.physez[i].layer));  // Layer
-            if(!IsEmpty(FileData.physez[i].touch_event))
-                out << PGEFile::value("EO", PGEFile::WriteStr(FileData.physez[i].touch_event));  // Touch event slot
+            if(physEnv.env_type == LevelPhysEnv::ENV_CUSTOM_LIQUID)
+                out << PGEFile::value("FR", PGEFile::WriteFloat(physEnv.friction)); //Friction
+
+            if(physEnv.accel_direct >= 0.0)
+                out << PGEFile::value("AD", PGEFile::WriteFloat(physEnv.accel_direct)); //Acceleration direction
+
+            if(physEnv.accel != 0.0)
+                out << PGEFile::value("AC", PGEFile::WriteFloat(physEnv.accel)); //Acceleration
+
+            if(physEnv.max_velocity != 0.0)
+                out << PGEFile::value("MV", PGEFile::WriteFloat(physEnv.max_velocity)); //Max-velocity
+
+            if(physEnv.layer != defPhys.layer) //Write only if not default
+                out << PGEFile::value("LR", PGEFile::WriteStr(physEnv.layer));  // Layer
+
+            if(!IsEmpty(physEnv.touch_event))
+                out << PGEFile::value("EO", PGEFile::WriteStr(physEnv.touch_event));  // Touch event slot
+
             out << "\n";
         }
 
         out << "PHYSICS_END\n";
     }
 
-
     //DOORS section
     if(!FileData.doors.empty())
     {
         out << "DOORS\n";
-
         LevelDoor defDoor = CreateLvlWarp();
-        for(i=0;i<(signed)FileData.doors.size();i++)
+
+        for(i = 0; i < static_cast<int>(FileData.doors.size()); i++)
         {
-            if( ((!FileData.doors[i].lvl_o) && (!FileData.doors[i].lvl_i)) || ((FileData.doors[i].lvl_o) && (!FileData.doors[i].lvl_i)) )
-                if(!FileData.doors[i].isSetIn) continue; // Skip broken door
-            if( ((!FileData.doors[i].lvl_o) && (!FileData.doors[i].lvl_i)) || ((FileData.doors[i].lvl_i)) )
-                if(!FileData.doors[i].isSetOut) continue; // Skip broken door
+            LevelDoor &warp = FileData.doors[i];
+
+            if(((!warp.lvl_o) && (!warp.lvl_i)) || ((warp.lvl_o) && (!warp.lvl_i)))
+                if(!warp.isSetIn) continue; // Skip broken door
+
+            if(((!warp.lvl_o) && (!warp.lvl_i)) || ((warp.lvl_i)))
+                if(!warp.isSetOut) continue; // Skip broken door
 
             //Entrance
-            if(FileData.doors[i].isSetIn)
+            if(warp.isSetIn)
             {
-                out << PGEFile::value("IX", PGEFile::WriteInt(FileData.doors[i].ix));  // Warp Input X
-                out << PGEFile::value("IY", PGEFile::WriteInt(FileData.doors[i].iy));  // Warp Input Y
+                out << PGEFile::value("IX", PGEFile::WriteInt(warp.ix));  // Warp Input X
+                out << PGEFile::value("IY", PGEFile::WriteInt(warp.iy));  // Warp Input Y
             }
 
-            if(FileData.doors[i].isSetOut)
+            if(warp.isSetOut)
             {
-                out << PGEFile::value("OX", PGEFile::WriteInt(FileData.doors[i].ox));  // Warp Output X
-                out << PGEFile::value("OY", PGEFile::WriteInt(FileData.doors[i].oy));  // Warp Output Y
+                out << PGEFile::value("OX", PGEFile::WriteInt(warp.ox));  // Warp Output X
+                out << PGEFile::value("OY", PGEFile::WriteInt(warp.oy));  // Warp Output Y
             }
 
-            if(FileData.doors[i].length_i != 32)
-                out << PGEFile::value("IL", PGEFile::WriteInt(FileData.doors[i].length_i));  //Length of entrance
-            if(FileData.doors[i].length_o != 32)
-                out << PGEFile::value("OL", PGEFile::WriteInt(FileData.doors[i].length_o));  //Length of exit
+            if(warp.length_i != 32) //-V112
+                out << PGEFile::value("IL", PGEFile::WriteInt(warp.length_i));  //Length of entrance
 
-            out << PGEFile::value("DT", PGEFile::WriteInt(FileData.doors[i].type));  // Warp type
+            if(warp.length_o != 32) //-V112
+                out << PGEFile::value("OL", PGEFile::WriteInt(warp.length_o));  //Length of exit
 
-            out << PGEFile::value("ID", PGEFile::WriteInt(FileData.doors[i].idirect));  // Warp Input direction
-            out << PGEFile::value("OD", PGEFile::WriteInt(FileData.doors[i].odirect));  // Warp Outpu direction
+            out << PGEFile::value("DT", PGEFile::WriteInt(warp.type));  // Warp type
+            out << PGEFile::value("ID", PGEFile::WriteInt(warp.idirect));  // Warp Input direction
+            out << PGEFile::value("OD", PGEFile::WriteInt(warp.odirect));  // Warp Outpu direction
 
-
-            if(FileData.doors[i].world_x != -1 && FileData.doors[i].world_y != -1)
+            if(warp.world_x != -1 && warp.world_y != -1)
             {
-                out << PGEFile::value("WX", PGEFile::WriteInt(FileData.doors[i].world_x));  // World X
-                out << PGEFile::value("WY", PGEFile::WriteInt(FileData.doors[i].world_y));  // World Y
+                out << PGEFile::value("WX", PGEFile::WriteInt(warp.world_x));  // World X
+                out << PGEFile::value("WY", PGEFile::WriteInt(warp.world_y));  // World Y
             }
 
-            if(!IsEmpty(FileData.doors[i].lname))
+            if(!IsEmpty(warp.lname))
             {
-                out << PGEFile::value("LF", PGEFile::WriteStr(FileData.doors[i].lname));  // Warp to level file
-                out << PGEFile::value("LI", PGEFile::WriteInt(FileData.doors[i].warpto));  // Warp arrayID
+                out << PGEFile::value("LF", PGEFile::WriteStr(warp.lname));  // Warp to level file
+                out << PGEFile::value("LI", PGEFile::WriteInt(warp.warpto));  // Warp arrayID
             }
 
-            if(FileData.doors[i].lvl_i)
-                out << PGEFile::value("ET", PGEFile::WriteBool(FileData.doors[i].lvl_i));  // Level Entance
+            if(warp.lvl_i)
+                out << PGEFile::value("ET", PGEFile::WriteBool(warp.lvl_i));  // Level Entance
 
-            if(FileData.doors[i].lvl_o)
-                out << PGEFile::value("EX", PGEFile::WriteBool(FileData.doors[i].lvl_o));  // Level Exit
+            if(warp.lvl_o)
+                out << PGEFile::value("EX", PGEFile::WriteBool(warp.lvl_o));  // Level Exit
 
-            if(FileData.doors[i].stars>0)
-                out << PGEFile::value("SL", PGEFile::WriteInt(FileData.doors[i].stars));  // Need a stars
+            if(warp.stars > 0)
+                out << PGEFile::value("SL", PGEFile::WriteInt(warp.stars));  // Need a stars
 
-            if(!IsEmpty(FileData.doors[i].stars_msg))
-                out << PGEFile::value("SM", PGEFile::WriteStr(FileData.doors[i].stars_msg));  // Message for start requirement
+            if(!IsEmpty(warp.stars_msg))
+                out << PGEFile::value("SM", PGEFile::WriteStr(warp.stars_msg));  // Message for start requirement
 
-            if(FileData.doors[i].star_num_hide)
-                out << PGEFile::value("SH", PGEFile::WriteBool(FileData.doors[i].star_num_hide));  // Don't show number of stars
+            if(warp.star_num_hide)
+                out << PGEFile::value("SH", PGEFile::WriteBool(warp.star_num_hide));  // Don't show number of stars
 
-            if(FileData.doors[i].novehicles)
-                out << PGEFile::value("NV", PGEFile::WriteBool(FileData.doors[i].novehicles));  // Deny Vehicles
+            if(warp.novehicles)
+                out << PGEFile::value("NV", PGEFile::WriteBool(warp.novehicles));  // Deny Vehicles
 
-            if(FileData.doors[i].allownpc)
-                out << PGEFile::value("AI", PGEFile::WriteBool(FileData.doors[i].allownpc));  // Allow Items
+            if(warp.allownpc)
+                out << PGEFile::value("AI", PGEFile::WriteBool(warp.allownpc));  // Allow Items
 
-            if(FileData.doors[i].locked)
-                out << PGEFile::value("LC", PGEFile::WriteBool(FileData.doors[i].locked));  // Locked door
+            if(warp.locked)
+                out << PGEFile::value("LC", PGEFile::WriteBool(warp.locked));  // Locked door
 
-            if(FileData.doors[i].need_a_bomb)
-                out << PGEFile::value("LB", PGEFile::WriteBool(FileData.doors[i].need_a_bomb));  //Need a bomb to open door
+            if(warp.need_a_bomb)
+                out << PGEFile::value("LB", PGEFile::WriteBool(warp.need_a_bomb));  //Need a bomb to open door
 
-            if(FileData.doors[i].hide_entering_scene)
-                out << PGEFile::value("HS", PGEFile::WriteBool(FileData.doors[i].hide_entering_scene));   //Hide entrance scene
+            if(warp.hide_entering_scene)
+                out << PGEFile::value("HS", PGEFile::WriteBool(warp.hide_entering_scene));   //Hide entrance scene
 
-            if(FileData.doors[i].allownpc_interlevel)
-                out << PGEFile::value("AL", PGEFile::WriteBool(FileData.doors[i].allownpc_interlevel));   //Allow Items inter-level
+            if(warp.allownpc_interlevel)
+                out << PGEFile::value("AL", PGEFile::WriteBool(warp.allownpc_interlevel));   //Allow Items inter-level
 
-            if(FileData.doors[i].special_state_required)
-                out << PGEFile::value("SR", PGEFile::WriteBool(FileData.doors[i].special_state_required));//Special state required
+            if(warp.special_state_required)
+                out << PGEFile::value("SR", PGEFile::WriteBool(warp.special_state_required));//Special state required
 
-            if(FileData.doors[i].cannon_exit)
+            if(warp.cannon_exit)
             {
-                out << PGEFile::value("PT", PGEFile::WriteBool(FileData.doors[i].cannon_exit));//cannon exit
-                out << PGEFile::value("PS", PGEFile::WriteFloat(FileData.doors[i].cannon_exit_speed));//cannon exit projectile speed
+                out << PGEFile::value("PT", PGEFile::WriteBool(warp.cannon_exit));//cannon exit
+                out << PGEFile::value("PS", PGEFile::WriteFloat(warp.cannon_exit_speed));//cannon exit projectile speed
             }
 
-            if(FileData.doors[i].layer!=defDoor.layer) //Write only if not default
-                out << PGEFile::value("LR", PGEFile::WriteStr(FileData.doors[i].layer));  // Layer
+            if(warp.layer != defDoor.layer) //Write only if not default
+                out << PGEFile::value("LR", PGEFile::WriteStr(warp.layer));  // Layer
 
-            if(!IsEmpty(FileData.doors[i].event_enter)) //Write only if not default
-                out << PGEFile::value("EE", PGEFile::WriteStr(FileData.doors[i].event_enter));  // On-Enter event
+            if(!IsEmpty(warp.event_enter)) //Write only if not default
+                out << PGEFile::value("EE", PGEFile::WriteStr(warp.event_enter));  // On-Enter event
 
-            if(FileData.doors[i].two_way)
-                out << PGEFile::value("TW", PGEFile::WriteBool(FileData.doors[i].two_way)); //Two-way warp
+            if(warp.two_way)
+                out << PGEFile::value("TW", PGEFile::WriteBool(warp.two_way)); //Two-way warp
 
             out << "\n";
         }
 
         out << "DOORS_END\n";
     }
+
     //LAYERS section
     if(!FileData.layers.empty())
     {
         out << "LAYERS\n";
-        for(i=0;i<(signed)FileData.layers.size();i++)
+
+        for(i = 0; i < static_cast<int>(FileData.layers.size()); i++)
         {
-            out << PGEFile::value("LR", PGEFile::WriteStr(FileData.layers[i].name));  // Layer name
-            if(FileData.layers[i].hidden)
-                out << PGEFile::value("HD", PGEFile::WriteBool(FileData.layers[i].hidden));  // Hidden
-            if(FileData.layers[i].locked)
-                out << PGEFile::value("LC", PGEFile::WriteBool(FileData.layers[i].locked));  // Locked
+            LevelLayer &layer = FileData.layers[i];
+            out << PGEFile::value("LR", PGEFile::WriteStr(layer.name));  // Layer name
+
+            if(layer.hidden)
+                out << PGEFile::value("HD", PGEFile::WriteBool(layer.hidden));  // Hidden
+
+            if(layer.locked)
+                out << PGEFile::value("LC", PGEFile::WriteBool(layer.locked));  // Locked
+
             out << "\n";
         }
 
@@ -1873,41 +1978,43 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     }
 
     //EVENTS section (action styled)
-        //EVENT sub-section of action-styled events
-
+    //EVENT sub-section of action-styled events
 
     //EVENTS_CLASSIC (SMBX-Styled events)
     if(!FileData.events.empty())
     {
         out << "EVENTS_CLASSIC\n";
-        bool addArray=false;
-        for(i=0;i<(signed)FileData.events.size();i++)
+        bool addArray = false;
+
+        for(i = 0; i < static_cast<int>(FileData.events.size()); i++)
         {
+            LevelSMBX64Event &event = FileData.events[i];
+            out << PGEFile::value("ET", PGEFile::WriteStr(event.name));  // Event name
 
-            out << PGEFile::value("ET", PGEFile::WriteStr(FileData.events[i].name));  // Event name
+            if(!IsEmpty(event.msg))
+                out << PGEFile::value("MG", PGEFile::WriteStr(event.msg));  // Show Message
 
-            if(!IsEmpty(FileData.events[i].msg))
-                out << PGEFile::value("MG", PGEFile::WriteStr(FileData.events[i].msg));  // Show Message
+            if(event.sound_id != 0)
+                out << PGEFile::value("SD", PGEFile::WriteInt(event.sound_id));  // Play Sound ID
 
-            if(FileData.events[i].sound_id!=0)
-                out << PGEFile::value("SD", PGEFile::WriteInt(FileData.events[i].sound_id));  // Play Sound ID
+            if(event.end_game != 0)
+                out << PGEFile::value("EG", PGEFile::WriteInt(event.end_game));  // End game
 
-            if(FileData.events[i].end_game!=0)
-                out << PGEFile::value("EG", PGEFile::WriteInt(FileData.events[i].end_game));  // End game
+            if(!event.layers_hide.empty())
+                out << PGEFile::value("LH", PGEFile::WriteStrArr(event.layers_hide));  // Hide Layers
 
-            if(!FileData.events[i].layers_hide.empty())
-                out << PGEFile::value("LH", PGEFile::WriteStrArr(FileData.events[i].layers_hide));  // Hide Layers
-            if(!FileData.events[i].layers_show.empty())
-                out << PGEFile::value("LS", PGEFile::WriteStrArr(FileData.events[i].layers_show));  // Show Layers
-            if(!FileData.events[i].layers_toggle.empty())
-                out << PGEFile::value("LT", PGEFile::WriteStrArr(FileData.events[i].layers_toggle));  // Toggle Layers
+            if(!event.layers_show.empty())
+                out << PGEFile::value("LS", PGEFile::WriteStrArr(event.layers_show));  // Show Layers
+
+            if(!event.layers_toggle.empty())
+                out << PGEFile::value("LT", PGEFile::WriteStrArr(event.layers_toggle));  // Toggle Layers
 
             /*
             PGESTRINGList musicSets;
             addArray=false;
-            for(int ttt=0; ttt<(signed)FileData.events[i].sets.size(); ttt++)
+            for(int ttt=0; ttt<(signed)event.sets.size(); ttt++)
             {
-                musicSets.push_back(fromNum(FileData.events[i].sets[ttt].music_id));
+                musicSets.push_back(fromNum(event.sets[ttt].music_id));
             }
             for(int tt=0; tt<(signed)musicSets.size(); tt++)
             { if(musicSets[tt]!="-1") addArray=true; }
@@ -1916,9 +2023,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
 
             addArray=false;
-            for(int ttt=0; ttt<(signed)FileData.events[i].sets.size(); ttt++)
+            for(int ttt=0; ttt<(signed)event.sets.size(); ttt++)
             {
-                musicSets.push_back(FileData.events[i].sets[ttt].music_file);
+                musicSets.push_back(event.sets[ttt].music_file);
             }
             for(int tt=0; tt<(signed)musicSets.size(); tt++)
             { if(!musicSets[tt].PGESTRINGisEmpty()) addArray=true; }
@@ -1928,9 +2035,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             PGESTRINGList backSets;
             addArray=false;
-            for(int tt=0; tt<(signed)FileData.events[i].sets.size(); tt++)
+            for(int tt=0; tt<(signed)event.sets.size(); tt++)
             {
-                backSets.push_back(fromNum(FileData.events[i].sets[tt].background_id));
+                backSets.push_back(fromNum(event.sets[tt].background_id));
             }
             for(int tt=0; tt<(signed)backSets.size(); tt++)
             { if(backSets[tt]!="-1") addArray=true; }
@@ -1940,9 +2047,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             PGESTRINGList sizeSets;
             addArray=false;
-            for(int tt=0; tt<(signed)FileData.events[i].sets.size(); tt++)
+            for(int tt=0; tt<(signed)event.sets.size(); tt++)
             {
-                LevelEvent_Sets &x=FileData.events[i].sets[tt];
+                LevelEvent_Sets &x=event.sets[tt];
                 QString sizeSect=   fromNum(x.position_left)+","+
                                     fromNum(x.position_top)+","+
                                     fromNum(x.position_bottom)+","+
@@ -1955,197 +2062,224 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("SS", PGEFile::WriteStrArr(sizeSets));// Change section's sizes
             */
             PGESTRINGList sectionSettingsSets;
-            addArray=false;
-            for(int tt=0; tt<(signed)FileData.events[i].sets.size(); tt++)
+
+            for(int tt = 0; tt < static_cast<int>(event.sets.size()); tt++)
             {
                 bool hasParams = false;
                 PGESTRING sectionSettings;
-                LevelEvent_Sets &x = FileData.events[i].sets[tt];
+                LevelEvent_Sets &x = event.sets[tt];
                 sectionSettings += PGEFile::value("ID", PGEFile::WriteInt(x.id));
-                bool customSize = (x.position_left != LevelEvent_Sets::LESet_Nothing)&&
+                bool customSize = (x.position_left != LevelEvent_Sets::LESet_Nothing) &&
                                   (x.position_left != LevelEvent_Sets::LESet_ResetDefault);
-                if( x.position_left != -1 )
+
+                if(x.position_left != -1)
                 {
                     sectionSettings += PGEFile::value("SL", PGEFile::WriteInt(x.position_left));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( customSize && (x.position_top != 0) )
+
+                if(customSize && (x.position_top != 0))
                 {
                     sectionSettings += PGEFile::value("ST", PGEFile::WriteInt(x.position_top));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( customSize && (x.position_bottom != 0) )
+
+                if(customSize && (x.position_bottom != 0))
                 {
                     sectionSettings += PGEFile::value("SB", PGEFile::WriteInt(x.position_bottom));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( customSize && (x.position_right != 0) )
+
+                if(customSize && (x.position_right != 0))
                 {
                     sectionSettings += PGEFile::value("SR", PGEFile::WriteInt(x.position_right));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( !IsEmpty(x.expression_pos_x) && (x.expression_pos_x != "0") )
+
+                if(!IsEmpty(x.expression_pos_x) && (x.expression_pos_x != "0"))
                 {
                     sectionSettings += PGEFile::value("SXX", PGEFile::WriteStr(x.expression_pos_x));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( !IsEmpty(x.expression_pos_y) && (x.expression_pos_y != "0") )
+
+                if(!IsEmpty(x.expression_pos_y) && (x.expression_pos_y != "0"))
                 {
                     sectionSettings += PGEFile::value("SYX", PGEFile::WriteStr(x.expression_pos_y));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( !IsEmpty(x.expression_pos_w) && (x.expression_pos_w != "0") )
+
+                if(!IsEmpty(x.expression_pos_w) && (x.expression_pos_w != "0"))
                 {
                     sectionSettings += PGEFile::value("SWX", PGEFile::WriteStr(x.expression_pos_w));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( !IsEmpty(x.expression_pos_h) && (x.expression_pos_h != "0") )
+
+                if(!IsEmpty(x.expression_pos_h) && (x.expression_pos_h != "0"))
                 {
                     sectionSettings += PGEFile::value("SHX", PGEFile::WriteStr(x.expression_pos_h));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( x.music_id != LevelEvent_Sets::LESet_Nothing )
+
+                if(x.music_id != LevelEvent_Sets::LESet_Nothing)
                 {
                     sectionSettings += PGEFile::value("MI", PGEFile::WriteInt(x.music_id));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( !IsEmpty(x.music_file) )
+
+                if(!IsEmpty(x.music_file))
                 {
                     sectionSettings += PGEFile::value("MF", PGEFile::WriteStr(x.music_file));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( x.background_id != LevelEvent_Sets::LESet_Nothing )
+
+                if(x.background_id != LevelEvent_Sets::LESet_Nothing)
                 {
                     sectionSettings += PGEFile::value("BG", PGEFile::WriteInt(x.background_id));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( x.autoscrol )
+
+                if(x.autoscrol)
                 {
                     sectionSettings += PGEFile::value("AS", PGEFile::WriteBool(x.autoscrol));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( x.autoscrol_x != 0.0f )
+
+                if(x.autoscrol_x != 0.0f)
                 {
                     sectionSettings += PGEFile::value("AX", PGEFile::WriteFloat(x.autoscrol_x));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( x.autoscrol_y != 0.0f )
+
+                if(x.autoscrol_y != 0.0f)
                 {
                     sectionSettings += PGEFile::value("AY", PGEFile::WriteFloat(x.autoscrol_y));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( !IsEmpty(x.expression_autoscrool_x) && (x.expression_autoscrool_x != "0") )
+
+                if(!IsEmpty(x.expression_autoscrool_x) && (x.expression_autoscrool_x != "0"))
                 {
                     sectionSettings += PGEFile::value("AXX", PGEFile::WriteStr(x.expression_autoscrool_x));
-                    hasParams=true;
+                    hasParams = true;
                 }
-                if( !IsEmpty(x.expression_autoscrool_y) && (x.expression_autoscrool_y != "0") )
+
+                if(!IsEmpty(x.expression_autoscrool_y) && (x.expression_autoscrool_y != "0"))
                 {
                     sectionSettings += PGEFile::value("AYX", PGEFile::WriteStr(x.expression_autoscrool_y));
-                    hasParams=true;
+                    hasParams = true;
                 }
+
                 if(hasParams)
                     sectionSettingsSets.push_back(sectionSettings);
             }
+
             if(!sectionSettingsSets.empty())
                 out << PGEFile::value("SSS", PGEFile::WriteStrArr(sectionSettingsSets));//Change section's settings
 
-
-
-            if(!IsEmpty(FileData.events[i].trigger))
+            if(!IsEmpty(event.trigger))
             {
-                out << PGEFile::value("TE", PGEFile::WriteStr(FileData.events[i].trigger)); // Trigger Event
-                if(FileData.events[i].trigger_timer>0)
-                    out << PGEFile::value("TD", PGEFile::WriteInt(FileData.events[i].trigger_timer)); // Trigger delay
+                out << PGEFile::value("TE", PGEFile::WriteStr(event.trigger)); // Trigger Event
+
+                if(event.trigger_timer > 0)
+                    out << PGEFile::value("TD", PGEFile::WriteInt(event.trigger_timer)); // Trigger delay
             }
-            if(!IsEmpty(FileData.events[i].trigger_script))
-                out << PGEFile::value("TSCR", PGEFile::WriteStr(FileData.events[i].trigger_script));
 
-            if(FileData.events[i].trigger_api_id != 0)
-                out << PGEFile::value("TAPI", PGEFile::WriteInt(FileData.events[i].trigger_api_id));
+            if(!IsEmpty(event.trigger_script))
+                out << PGEFile::value("TSCR", PGEFile::WriteStr(event.trigger_script));
 
-            if(FileData.events[i].nosmoke)
-                out << PGEFile::value("DS", PGEFile::WriteBool(FileData.events[i].nosmoke)); // Disable Smoke
-            if(FileData.events[i].autostart > 0 )
-                out << PGEFile::value("AU", PGEFile::WriteInt(FileData.events[i].autostart)); // Autostart event
-            if(!IsEmpty(FileData.events[i].autostart_condition))
-                out << PGEFile::value("AUC", PGEFile::WriteStr(FileData.events[i].autostart_condition)); // Autostart condition event
+            if(event.trigger_api_id != 0)
+                out << PGEFile::value("TAPI", PGEFile::WriteInt(event.trigger_api_id));
+
+            if(event.nosmoke)
+                out << PGEFile::value("DS", PGEFile::WriteBool(event.nosmoke)); // Disable Smoke
+
+            if(event.autostart > 0)
+                out << PGEFile::value("AU", PGEFile::WriteInt(event.autostart)); // Autostart event
+
+            if(!IsEmpty(event.autostart_condition))
+                out << PGEFile::value("AUC", PGEFile::WriteStr(event.autostart_condition)); // Autostart condition event
 
             PGELIST<bool > controls;
-            controls.push_back(FileData.events[i].ctrl_up);
-            controls.push_back(FileData.events[i].ctrl_down);
-            controls.push_back(FileData.events[i].ctrl_left);
-            controls.push_back(FileData.events[i].ctrl_right);
-            controls.push_back(FileData.events[i].ctrl_run);
-            controls.push_back(FileData.events[i].ctrl_jump);
-            controls.push_back(FileData.events[i].ctrl_drop);
-            controls.push_back(FileData.events[i].ctrl_start);
-            controls.push_back(FileData.events[i].ctrl_altrun);
-            controls.push_back(FileData.events[i].ctrl_altjump);
-            controls.push_back(FileData.events[i].ctrls_enable);
-            controls.push_back(FileData.events[i].ctrl_lock_keyboard);
+            controls.push_back(event.ctrl_up);
+            controls.push_back(event.ctrl_down);
+            controls.push_back(event.ctrl_left);
+            controls.push_back(event.ctrl_right);
+            controls.push_back(event.ctrl_run);
+            controls.push_back(event.ctrl_jump);
+            controls.push_back(event.ctrl_drop);
+            controls.push_back(event.ctrl_start);
+            controls.push_back(event.ctrl_altrun);
+            controls.push_back(event.ctrl_altjump);
+            controls.push_back(event.ctrls_enable);
+            controls.push_back(event.ctrl_lock_keyboard);
+            addArray = false;
 
-            addArray=false;
-            for(int tt=0; tt<(signed)controls.size(); tt++)
-            { if(controls[tt]) addArray=true; }
-            if(addArray) out << PGEFile::value("PC", PGEFile::WriteBoolArr(controls)); // Create boolean array
-
-            if(!IsEmpty(FileData.events[i].movelayer))
+            for(int tt = 0; tt < static_cast<int>(controls.size()); tt++)
             {
-                out << PGEFile::value("ML", PGEFile::WriteStr(FileData.events[i].movelayer)); // Move layer
-                out << PGEFile::value("MX", PGEFile::WriteFloat(FileData.events[i].layer_speed_x)); // Move layer X
-                out << PGEFile::value("MY", PGEFile::WriteFloat(FileData.events[i].layer_speed_y)); // Move layer Y
+                if(controls[tt]) addArray = true;
             }
 
-            if(!FileData.events[i].moving_layers.empty())
+            if(addArray) out << PGEFile::value("PC", PGEFile::WriteBoolArr(controls)); // Create boolean array
+
+            if(!IsEmpty(event.movelayer))
+            {
+                out << PGEFile::value("ML", PGEFile::WriteStr(event.movelayer)); // Move layer
+                out << PGEFile::value("MX", PGEFile::WriteFloat(event.layer_speed_x)); // Move layer X
+                out << PGEFile::value("MY", PGEFile::WriteFloat(event.layer_speed_y)); // Move layer Y
+            }
+
+            if(!event.moving_layers.empty())
             {
                 PGESTRINGList moveLayers;
-                for(int j=0; j<(signed)FileData.events[i].moving_layers.size(); j++)
+
+                for(int j = 0; j < static_cast<int>(event.moving_layers.size()); j++)
                 {
-                    LevelEvent_MoveLayer &mvl=FileData.events[i].moving_layers[j];
+                    LevelEvent_MoveLayer &mvl = event.moving_layers[j];
                     PGESTRING moveLayer;
+
                     if(IsEmpty(mvl.name))
                         continue;
+
                     moveLayer += PGEFile::value("LN", PGEFile::WriteStr(mvl.name));
 
-                    if(mvl.speed_x!=0.0)
+                    if(mvl.speed_x != 0.0)
                         moveLayer += PGEFile::value("SX", PGEFile::WriteFloat(mvl.speed_x));
 
                     if(!IsEmpty(mvl.expression_x) && (mvl.expression_x != "0"))
                         moveLayer += PGEFile::value("SXX", PGEFile::WriteStr(mvl.expression_x));
 
-                    if(mvl.speed_y!=0.0)
+                    if(mvl.speed_y != 0.0)
                         moveLayer += PGEFile::value("SY", PGEFile::WriteFloat(mvl.speed_y));
 
                     if(!IsEmpty(mvl.expression_y) && (mvl.expression_y != "0"))
                         moveLayer += PGEFile::value("SYX", PGEFile::WriteStr(mvl.expression_y));
 
-                    if( mvl.way != 0 )
+                    if(mvl.way != 0)
                         moveLayer += PGEFile::value("MW", PGEFile::WriteInt(mvl.way));
 
                     moveLayers.push_back(moveLayer);
                 }
+
                 out << PGEFile::value("MLA", PGEFile::WriteStrArr(moveLayers));
             }
 
             //NPC's to spawn
-            if(!FileData.events[i].spawn_npc.empty())
+            if(!event.spawn_npc.empty())
             {
                 PGESTRINGList spawnNPCs;
-                for(int j=0; j<(signed)FileData.events[i].spawn_npc.size(); j++)
+
+                for(int j = 0; j < static_cast<signed>(event.spawn_npc.size()); j++)
                 {
                     PGESTRING spawnNPC;
-                    LevelEvent_SpawnNPC &npc=FileData.events[i].spawn_npc[j];
-
+                    LevelEvent_SpawnNPC &npc = event.spawn_npc[j];
                     spawnNPC += PGEFile::value("ID", PGEFile::WriteInt(npc.id));
 
-                    if(npc.x != 0.0)
+                    if(npc.x != 0)
                         spawnNPC += PGEFile::value("SX", PGEFile::WriteInt(npc.x));
 
                     if(!IsEmpty(npc.expression_x) && (npc.expression_x != "0"))
                         spawnNPC += PGEFile::value("SXX", PGEFile::WriteStr(npc.expression_x));
 
-                    if(npc.y != 0.0)
+                    if(npc.y != 0)
                         spawnNPC += PGEFile::value("SY", PGEFile::WriteInt(npc.y));
 
                     if(!IsEmpty(npc.expression_y) && (npc.expression_y != "0"))
@@ -2168,47 +2302,49 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
                     spawnNPCs.push_back(spawnNPC);
                 }
+
                 out << PGEFile::value("SNPC", PGEFile::WriteStrArr(spawnNPCs));
             }
 
             //Effects to spawn
-            if(!FileData.events[i].spawn_effects.empty())
+            if(!event.spawn_effects.empty())
             {
                 PGESTRINGList spawnEffects;
-                for(int j=0; j<(signed)FileData.events[i].spawn_effects.size(); j++)
+
+                for(int j = 0; j < static_cast<signed>(event.spawn_effects.size()); j++)
                 {
                     PGESTRING spawnEffect;
-                    LevelEvent_SpawnEffect &effect=FileData.events[i].spawn_effects[j];
+                    LevelEvent_SpawnEffect &effect = event.spawn_effects[j];
                     spawnEffect += PGEFile::value("ID", PGEFile::WriteInt(effect.id));
 
-                    if(effect.x!=0.0)
+                    if(effect.x != 0)
                         spawnEffect += PGEFile::value("SX", PGEFile::WriteInt(effect.x));
 
                     if(!IsEmpty(effect.expression_x) && (effect.expression_x != "0"))
                         spawnEffect += PGEFile::value("SXX", PGEFile::WriteStr(effect.expression_x));
 
-                    if(effect.y!=0.0)
+                    if(effect.y != 0)
                         spawnEffect += PGEFile::value("SY", PGEFile::WriteInt(effect.y));
 
                     if(!IsEmpty(effect.expression_y) && (effect.expression_y != "0"))
                         spawnEffect += PGEFile::value("SYX", PGEFile::WriteStr(effect.expression_y));
 
-                    if(effect.speed_x!=0.0)
+                    if(effect.speed_x != 0.0)
                         spawnEffect += PGEFile::value("SSX", PGEFile::WriteFloat(effect.speed_x));
 
                     if(!IsEmpty(effect.expression_sx) && (effect.expression_sx != "0"))
                         spawnEffect += PGEFile::value("SSXX", PGEFile::WriteStr(effect.expression_sx));
 
-                    if(effect.speed_y!=0.0)
+                    if(effect.speed_y != 0.0)
                         spawnEffect += PGEFile::value("SSY", PGEFile::WriteFloat(effect.speed_y));
 
                     if(!IsEmpty(effect.expression_sy) && (effect.expression_sy != "0"))
                         spawnEffect += PGEFile::value("SSYX", PGEFile::WriteStr(effect.expression_sy));
 
-                    if(effect.fps!=0)
+                    if(effect.fps != 0)
                         spawnEffect += PGEFile::value("FP", PGEFile::WriteInt(effect.fps));
 
-                    if(effect.max_life_time!=0)
+                    if(effect.max_life_time != 0)
                         spawnEffect += PGEFile::value("TTL", PGEFile::WriteInt(effect.max_life_time));
 
                     if(effect.gravity)
@@ -2216,50 +2352,60 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
                     spawnEffects.push_back(spawnEffect);
                 }
+
                 out << PGEFile::value("SEF", PGEFile::WriteStrArr(spawnEffects));
             }
 
-            out << PGEFile::value("AS", PGEFile::WriteInt(FileData.events[i].scroll_section)); // Move camera
-            out << PGEFile::value("AX", PGEFile::WriteFloat(FileData.events[i].move_camera_x)); // Move camera x
-            out << PGEFile::value("AY", PGEFile::WriteFloat(FileData.events[i].move_camera_y)); // Move camera y
+            out << PGEFile::value("AS", PGEFile::WriteInt(event.scroll_section)); // Move camera
+            out << PGEFile::value("AX", PGEFile::WriteFloat(event.move_camera_x)); // Move camera x
+            out << PGEFile::value("AY", PGEFile::WriteFloat(event.move_camera_y)); // Move camera y
 
             //Variables to update
-            if(!FileData.events[i].update_variable.empty())
+            if(!event.update_variable.empty())
             {
                 PGESTRINGList updateVars;
-                for(int j=0; j<(signed)FileData.events[i].update_variable.size(); j++)
+
+                for(int j = 0; j < static_cast<int>(event.update_variable.size()); j++)
                 {
                     PGESTRING updateVar;
-                    LevelEvent_UpdateVariable &updVar = FileData.events[i].update_variable[j];
+                    LevelEvent_UpdateVariable &updVar = event.update_variable[j];
                     updateVar += PGEFile::value("N", PGEFile::WriteStr(updVar.name));
                     updateVar += PGEFile::value("V", PGEFile::WriteStr(updVar.newval));
                     updateVars.push_back(updateVar);
                 }
+
                 out << PGEFile::value("UV", PGEFile::WriteStrArr(updateVars));
             }
-            if(FileData.events[i].timer_def.enable)
+
+            if(event.timer_def.enable)
             {
-                out << PGEFile::value("TMR", PGEFile::WriteBool(FileData.events[i].timer_def.enable));     //Enable timer
-                out << PGEFile::value("TMC", PGEFile::WriteInt(FileData.events[i].timer_def.count));       //Time left (ticks)
-                out << PGEFile::value("TMI", PGEFile::WriteFloat(FileData.events[i].timer_def.interval));    //Tick Interval
-                out << PGEFile::value("TMD", PGEFile::WriteInt(FileData.events[i].timer_def.count_dir));   //Count direction
-                out << PGEFile::value("TMV", PGEFile::WriteBool(FileData.events[i].timer_def.show));       //Is timer vizible
+                out << PGEFile::value("TMR", PGEFile::WriteBool(event.timer_def.enable));     //Enable timer
+                out << PGEFile::value("TMC", PGEFile::WriteInt(event.timer_def.count));       //Time left (ticks)
+                out << PGEFile::value("TMI", PGEFile::WriteFloat(event.timer_def.interval));    //Tick Interval
+                out << PGEFile::value("TMD", PGEFile::WriteInt(event.timer_def.count_dir));   //Count direction
+                out << PGEFile::value("TMV", PGEFile::WriteBool(event.timer_def.show));       //Is timer vizible
             }
+
             out << "\n";
         }
+
         out << "EVENTS_CLASSIC_END\n";
 
         //VARIABLES section
         if(!FileData.variables.empty())
         {
             out << "VARIABLES\n";
-            for(i=0;i<(signed)FileData.variables.size();i++)
+
+            for(i = 0; i < static_cast<int>(FileData.variables.size()); i++)
             {
                 out << PGEFile::value("N", PGEFile::WriteStr(FileData.variables[i].name));  // Variable name
+
                 if(!IsEmpty(FileData.variables[i].value))
                     out << PGEFile::value("V", PGEFile::WriteStr(FileData.variables[i].value));  // Value
+
                 out << "\n";
             }
+
             out << "VARIABLES_END\n";
         }
 
@@ -2267,14 +2413,19 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         if(!FileData.scripts.empty())
         {
             out << "SCRIPTS\n";
-            for(i=0;i<(signed)FileData.scripts.size();i++)
+
+            for(i = 0; i < static_cast<int>(FileData.scripts.size()); i++)
             {
-                out << PGEFile::value("N", PGEFile::WriteStr(FileData.scripts[i].name));  // Variable name
-                out << PGEFile::value("L", PGEFile::WriteInt(FileData.scripts[i].language));// Code of language
+                LevelScript &script = FileData.scripts[i];
+                out << PGEFile::value("N", PGEFile::WriteStr(script.name));  // Variable name
+                out << PGEFile::value("L", PGEFile::WriteInt(script.language));// Code of language
+
                 if(!IsEmpty(FileData.scripts[i].script))
-                    out << PGEFile::value("S", PGEFile::WriteStr(FileData.scripts[i].script));  // Script text
+                    out << PGEFile::value("S", PGEFile::WriteStr(script.script));  // Script text
+
                 out << "\n";
             }
+
             out << "SCRIPTS_END\n";
         }
     }

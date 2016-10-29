@@ -79,7 +79,7 @@ struct ElementMeta
     //! Recent array index where element was saved (used to speed-up settings synchronization)
     unsigned int index;
     //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
-    void* userdata;
+    void *userdata;
 };
 
 /*!
@@ -98,41 +98,41 @@ struct Bookmark
  */
 class CrashData
 {
-public:
-    /*!
-     * \brief Constructor
-     */
-    explicit CrashData();
-    /*!
-     * \brief Copy constructor
-     * \param _cd another CrashData object
-     */
-    CrashData(const CrashData &_cd);
-    /*!
-     * \brief Copy constructor
-     * \param _cd another CrashData object
-     */
-    CrashData(CrashData &_cd);
-    /*!
-     * \brief Sets default preferences
-     */
-    void reset();
-    //! Is crash data was used by editor (if false, LVLX writer will not record crash data into file)
-    bool used;
-    //! Is this level was untitled since crash occopued?
-    bool untitled;
-    //! Is this level was modified before crash occouped?
-    bool modifyed;
-    //! Recent file format ID (specific enum in the format structure declaration)
-    int fmtID;
-    //! Recent file format version
-    int fmtVer;
-    //! Full original file path file which was opened before crash occouped
-    PGESTRING fullPath;
-    //! Full episode path of file which was opened before crash occouped
-    PGESTRING path;
-    //! Base file name of file which was opened before crash occouped
-    PGESTRING filename;
+    public:
+        /*!
+         * \brief Constructor
+         */
+        explicit CrashData();
+        /*!
+         * \brief Copy constructor
+         * \param _cd another CrashData object
+         */
+        CrashData(const CrashData &_cd);
+        /*!
+         * \brief Copy constructor
+         * \param _cd another CrashData object
+         */
+        CrashData(CrashData &_cd);
+        /*!
+         * \brief Sets default preferences
+         */
+        void reset();
+        //! Is crash data was used by editor (if false, LVLX writer will not record crash data into file)
+        bool used;
+        //! Is this level was untitled since crash occopued?
+        bool untitled;
+        //! Is this level was modified before crash occouped?
+        bool modifyed;
+        //! Recent file format ID (specific enum in the format structure declaration)
+        int fmtID;
+        //! Recent file format version
+        int fmtVer;
+        //! Full original file path file which was opened before crash occouped
+        PGESTRING fullPath;
+        //! Full episode path of file which was opened before crash occouped
+        PGESTRING path;
+        //! Base file name of file which was opened before crash occouped
+        PGESTRING filename;
 };
 #endif
 
@@ -145,10 +145,10 @@ struct MetaData
     PGEVECTOR<Bookmark> bookmarks;
 
     /* For Editor application only*/
-    #ifdef PGE_EDITOR
+#ifdef PGE_EDITOR
     //! Crash backup of Editor's special data
     CrashData crash;
-    #endif
+#endif
 
     //!Helper meta-data
     FileFormatMeta meta;

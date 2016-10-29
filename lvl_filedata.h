@@ -408,7 +408,7 @@ struct LevelDoor
     //! Cannon shoot warp exit
     bool  cannon_exit;
     //! Cannon shoot projectile speed (pixels per 1/65 seconds)
-    float cannon_exit_speed;
+    double cannon_exit_speed;
 
 /*
  * Editor-only parameters which are not saving into file

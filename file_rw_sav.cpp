@@ -204,7 +204,7 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
         #ifdef PGE_FILES_QT
         FileData.meta.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
         #else
-        FileData.ERROR_info += exception_to_pretty_string(err);
+        FileData.meta.ERROR_info += exception_to_pretty_string(err);
         #endif
         FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata=line;

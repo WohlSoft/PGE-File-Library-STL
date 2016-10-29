@@ -218,7 +218,7 @@ namespace SMBX64
         *out = qRound(input.toDouble(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
-        *out = (int)round(std::stod(input));
+        *out = static_cast<int>(round(std::stod(input)));
         #endif
     }
 
@@ -226,10 +226,10 @@ namespace SMBX64
     {
         #ifdef PGE_FILES_QT
         bool ok=true;
-        *out = (long)round(input.toDouble(&ok));
+        *out = static_cast<long>(round(input.toDouble(&ok)));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
-        *out = (long)round(std::stod(input));
+        *out = static_cast<long>(round(std::stod(input)));
         #endif
     }
     inline void ReadStr(PGESTRING*out, PGESTRING &input)
@@ -328,11 +328,21 @@ namespace SMBX64
     /******************Internal to RAW**********************/
     /*!
      * \brief Generate raw string from integer value
-     * \param input Source integer value
-     * \return ASCII encoded integer value
+     * \param input Source signed integer value
+     * \return ASCII encoded signed integer value
      */
-    inline PGESTRING WriteSInt(long input)
-    {  return fromNum(input)+"\n"; }
+    template<typename T>
+    inline PGESTRING WriteSInt(T input)
+    {  return fromNum(static_cast<long long>(input))+"\n"; }
+
+    /*!
+     * \brief Generate raw string from unsigned integer value
+     * \param input Source unsigned integer value
+     * \return ASCII encoded unsigned integer value
+     */
+    template<typename T>
+    inline PGESTRING WriteUInt(T input)
+    {  return fromNum(static_cast<unsigned long long>(input))+"\n"; }
 
     /*!
      * \brief Generate raw CVS-bool string from boolean value

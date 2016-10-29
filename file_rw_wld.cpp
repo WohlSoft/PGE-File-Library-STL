@@ -125,7 +125,7 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
         #ifdef PGE_FILES_QT
         FileData.meta.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
         #else
-        FileData.ERROR_info += exception_to_pretty_string(err);
+        FileData.meta.ERROR_info += exception_to_pretty_string(err);
         #endif
         FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata=line;
@@ -380,7 +380,7 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
         #ifdef PGE_FILES_QT
         FileData.meta.ERROR_info += QString::fromStdString( exception_to_pretty_string(err) );
         #else
-        FileData.ERROR_info += exception_to_pretty_string(err);
+        FileData.meta.ERROR_info += exception_to_pretty_string(err);
         #endif
         FileData.meta.ERROR_linenum  = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;

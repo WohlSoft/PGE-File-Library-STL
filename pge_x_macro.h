@@ -26,12 +26,12 @@
 /*! \def PGEX_FetchSection()
     \brief Prepare to fetch all data from specified section
 */
-#define PGEX_FetchSection() for(int section=0; section<(signed)pgeX_Data.dataTree.size(); section++)
+#define PGEX_FetchSection() for(int section=0; section<static_cast<signed>(pgeX_Data.dataTree.size()); section++)
 /*! \def PGEX_FetchSection_begin()
     \brief Prepare to detect separate data of different sections
 */
 #define PGEX_FetchSection_begin() PGEFile::PGEX_Entry &f_section = pgeX_Data.dataTree[section];\
-                                  if(f_section.name=="") continue;
+                                  if(IsEmpty(f_section.name)) continue;
 /*! \def PGEX_Section(sct)
     \brief Defines block of fields for section of specified name
 */
@@ -47,7 +47,7 @@
 /*! \def PGEX_Items()
     \brief Prepare to read items from this section
 */
-#define PGEX_Items() for(int sdata=0;sdata<(signed)f_section.data.size();sdata++)
+#define PGEX_Items() for(int sdata=0; sdata<static_cast<signed>(f_section.data.size()); sdata++)
 /*! \def PGEX_ItemBegin(stype)
     \brief Declares block with a list of values
 */
@@ -61,7 +61,7 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
 /*! \def PGEX_Values()
     \brief Declares block with a list of values
 */
-#define PGEX_Values() for(int sval=0;sval<(signed)x.values.size();sval++)
+#define PGEX_Values() for(int sval=0; sval<static_cast<signed>(x.values.size()); sval++)
 /*! \def PGEX_ValueBegin()
     \brief Initializes getting of the values
 */
@@ -69,7 +69,7 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
                            errorString=PGESTRING("Wrong value syntax\nSection ["+f_section.name+ \
                            "]\nData line "+fromNum(sdata) \
                            +"\nMarker "+v.marker+"\nValue "+v.value);\
-                           if(v.marker=="") continue;
+                           if(IsEmpty(v.marker)) continue;
 
 /*! \def PGEX_StrVal(Mark, targetValue)
     \brief Parse Plain text string value by requested Marker and write into target variable
@@ -88,7 +88,7 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
     \brief Parse boolean flag value by requested Marker and write into target variable
 */
 #define PGEX_BoolVal(Mark, targetValue)  if(v.marker==Mark) { if(PGEFile::IsBool(v.value)) \
-                                         targetValue = (bool)toInt(v.value);\
+                                         targetValue = static_cast<bool>(toInt(v.value));\
                                          else goto badfile; }
 
 /*! \def PGEX_BoolArrVal(Mark, targetValue)
@@ -101,8 +101,15 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
 /*! \def PGEX_UIntVal(Mark, targetValue)
     \brief Parse unsigned integer value by requested Marker and write into target variable
 */
-#define PGEX_UIntVal(Mark, targetValue)  if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
+#define PGEX_USIntVal(Mark, targetValue)  if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
                                          targetValue = toInt(v.value);\
+                                         else goto badfile; }
+
+/*! \def PGEX_UIntVal(Mark, targetValue)
+    \brief Parse unsigned integer value by requested Marker and write into target variable
+*/
+#define PGEX_UIntVal(Mark, targetValue)  if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
+                                         targetValue = toUInt(v.value);\
                                          else goto badfile; }
 
 /*! \def PGEX_SIntVal(Mark, targetValue)
@@ -111,6 +118,28 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
 #define PGEX_SIntVal(Mark, targetValue)  if(v.marker==Mark) { if(PGEFile::IsIntS(v.value)) \
                                          targetValue = toInt(v.value);\
                                          else goto badfile; }
+
+/*! \def PGEX_SLongVal(Mark, targetValue)
+    \brief Parse signed long integer value by requested Marker and write into target variable
+*/
+#define PGEX_SLongVal(Mark, targetValue) if(v.marker==Mark) { if(PGEFile::IsIntS(v.value)) \
+                                         targetValue = toLong(v.value);\
+                                         else goto badfile; }
+
+/*! \def PGEX_ULongVal(Mark, targetValue)
+    \brief Parse unsigned long integer value by requested Marker and write into target variable
+*/
+#define PGEX_ULongVal(Mark, targetValue) if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
+                                         targetValue = toULong(v.value);\
+                                         else goto badfile; }
+
+/*! \def PGEX_USLongVal(Mark, targetValue)
+    \brief Parse unsigned long integer value by requested Marker and write into target variable
+*/
+#define PGEX_USLongVal(Mark, targetValue) if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
+                                         targetValue = toLong(v.value);\
+                                         else goto badfile; }
+
 
 /*! \def PGEX_FloatVal(Mark, targetValue)
     \brief Parse floating point value by requested Marker and write into target variable
