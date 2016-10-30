@@ -24,41 +24,40 @@
 #define SMBX64_CNF_FILEDATA_H
 
 #include "pge_file_lib_globs.h"
+#include "meta_filedata.h"
 
 struct SMBX64_ConfigPlayer
 {
-      SMBX64_ConfigPlayer();
-      unsigned int id;
-      unsigned int controllerType;
-      unsigned int k_up;
-      unsigned int k_down;
-      unsigned int k_left;
-      unsigned int k_right;
-      unsigned int k_run;
-      unsigned int k_jump;
-      unsigned int k_drop;
-      unsigned int k_pause;
-      unsigned int k_altjump;//>=19
-      unsigned int k_altrun;//>=19
-      unsigned int j_run;
-      unsigned int j_jump;
-      unsigned int j_drop;
-      unsigned int j_pause;
-      unsigned int j_altjump;//>=19
-      unsigned int j_altrun;//>=19
+    SMBX64_ConfigPlayer();
+    unsigned int id;
+    unsigned int controllerType;
+    unsigned int k_up;
+    unsigned int k_down;
+    unsigned int k_left;
+    unsigned int k_right;
+    unsigned int k_run;
+    unsigned int k_jump;
+    unsigned int k_drop;
+    unsigned int k_pause;
+    unsigned int k_altjump;//>=19
+    unsigned int k_altrun;//>=19
+    unsigned int j_run;
+    unsigned int j_jump;
+    unsigned int j_drop;
+    unsigned int j_pause;
+    unsigned int j_altjump;//>=19
+    unsigned int j_altrun;//>=19
 };
 
 struct SMBX64_ConfigFile
 {
     SMBX64_ConfigFile();
+
+    //!Helper meta-data
+    FileFormatMeta meta;
+
     bool fullScreen;//>=16
     PGEVECTOR<SMBX64_ConfigPlayer> players;
-
-    bool ReadFileValid;
-    PGESTRING ERROR_info;
-    PGESTRING ERROR_linedata;
-    int       ERROR_linenum;
 };
 
 #endif // SMBX64_CNF_FILEDATA_H
-

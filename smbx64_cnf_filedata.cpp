@@ -20,29 +20,28 @@
 
 SMBX64_ConfigPlayer::SMBX64_ConfigPlayer()
 {
-    id=0;
-    controllerType=0;
-    k_up=0;
-    k_down=0;
-    k_left=0;
-    k_right=0;
-    k_run=0;
-    k_jump=0;
-    k_drop=0;
-    k_pause=0;
-    k_altjump=0;//>=19
-    k_altrun=0;//>=19
-    j_run=0;
-    j_jump=0;
-    j_drop=0;
-    j_pause=0;
-    j_altjump=0;//>=19
-    j_altrun=0;//>=19
+    id = 0;
+    controllerType = 0;
+    k_up = 0;
+    k_down = 0;
+    k_left = 0;
+    k_right = 0;
+    k_run = 0;
+    k_jump = 0;
+    k_drop = 0;
+    k_pause = 0;
+    k_altjump = 0; //>=19
+    k_altrun = 0; //>=19
+    j_run = 0;
+    j_jump = 0;
+    j_drop = 0;
+    j_pause = 0;
+    j_altjump = 0; //>=19
+    j_altrun = 0; //>=19
 }
 
 
 SMBX64_ConfigFile::SMBX64_ConfigFile()
 {
-    fullScreen=false;
-    ReadFileValid=false;
+    fullScreen = false;
 }
