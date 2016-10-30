@@ -67,30 +67,30 @@ namespace SMBX64
     {
         #ifdef PGE_FILES_QT
         bool ok=true;
-        *out = (int)input.toUInt(&ok);
+        *out = static_cast<int>(input.toUInt(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to unsigned int");
         #else
-        *out = (int)static_cast<unsigned int>(std::stoul(input));
+        *out = static_cast<int>(static_cast<unsigned int>(std::stoul(input)));
         #endif
     }
     inline void ReadUInt(long*out, PGESTRING &input)
     {
         #ifdef PGE_FILES_QT
         bool ok=true;
-        *out = (long)input.toULong(&ok);
+        *out = static_cast<long>(input.toULong(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to unsigned long");
         #else
-        *out = (long)std::stoul(input);
+        *out = static_cast<long>(std::stoul(input));
         #endif
     }
     inline void ReadUInt(long long*out, PGESTRING &input)
     {
         #ifdef PGE_FILES_QT
         bool ok=true;
-        *out = (long long)input.toULongLong(&ok);
+        *out = static_cast<long long>(input.toULongLong(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to unsigned long long");
         #else
-        *out = (long long)std::stoull(input);
+        *out = static_cast<long long>(std::stoull(input));
         #endif
     }
 
@@ -119,7 +119,7 @@ namespace SMBX64
     {
         #ifdef PGE_FILES_QT
         bool ok=true;
-        *out = input.toLong(&ok);
+        *out = input.toLongLong(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to long long");
         #else
         *out = std::stoll(input);
