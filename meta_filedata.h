@@ -50,7 +50,7 @@ struct FileFormatMeta
     //! Recently used (open or save) file format
     int RecentFormat;
     //! Recently used format version (for SMBX1...64 files only)
-    int RecentFormatVersion;
+    unsigned int RecentFormatVersion;
     //! Is file was modified since open?
     bool modified;
     //! Is this level made from scratch and was not saved into file?
@@ -126,7 +126,7 @@ class CrashData
         //! Recent file format ID (specific enum in the format structure declaration)
         int fmtID;
         //! Recent file format version
-        int fmtVer;
+        unsigned int fmtVer;
         //! Full original file path file which was opened before crash occouped
         PGESTRING fullPath;
         //! Full episode path of file which was opened before crash occouped
