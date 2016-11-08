@@ -28,15 +28,17 @@ bool FileFormats::ReadNonSMBX64MetaDataF(PGESTRING filePath, MetaData &FileData)
 {
     errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
+
     if(!file.open(filePath, true))
     {
-        errorString="Failed to open file for read";
+        errorString = "Failed to open file for read";
         FileData.meta.ERROR_info = errorString;
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
     }
+
     return ReadNonSMBX64MetaDataFile(file, FileData);
 }
 
@@ -44,112 +46,110 @@ bool FileFormats::ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, PGESTRING filePat
 {
     errorString.clear();
     PGE_FileFormats_misc::RawTextInput file;
+
     if(!file.open(&rawdata, filePath))
     {
-        errorString="Failed to open raw string for read";
+        errorString = "Failed to open raw string for read";
         FileData.meta.ERROR_info = errorString;
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
     }
+
     return ReadNonSMBX64MetaDataFile(file, FileData);
 }
 
 bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in, MetaData &FileData)
 {
     PGESTRING errorString;
-    int str_count=0;        //Line Counter
+    int str_count = 0;      //Line Counter
     PGESTRING line;           //Current Line data
-
     ///////////////////////////////////////Begin file///////////////////////////////////////
     PGEFile pgeX_Data(in.readAll());
-    if( !pgeX_Data.buildTreeFromRaw() )
+
+    if(!pgeX_Data.buildTreeFromRaw())
     {
         errorString = pgeX_Data.lastError();
         goto badfile;
     }
 
-    for(int section=0; section<(signed)pgeX_Data.dataTree.size(); section++) //look sections
+    for(int section = 0; section < static_cast<int>(pgeX_Data.dataTree.size()); section++) //look sections
     {
         PGEFile::PGEX_Entry &f_section = pgeX_Data.dataTree[section];
-        if(f_section.name=="META_BOOKMARKS")
+
+        if(f_section.name == "META_BOOKMARKS")
         {
-            if(f_section.type!=PGEFile::PGEX_Struct)
+            if(f_section.type != PGEFile::PGEX_Struct)
             {
-                errorString=PGESTRING("Wrong section data syntax:\nSection [")+f_section.name+"%1]";
+                errorString = PGESTRING("Wrong section data syntax:\nSection [") + f_section.name + "%1]";
                 goto badfile;
             }
 
-            for(int sdata=0;sdata<(signed)f_section.data.size();sdata++)
+            for(int sdata = 0; sdata < static_cast<int>(f_section.data.size()); sdata++)
             {
-                if(f_section.data[sdata].type!=PGEFile::PGEX_Struct)
+                if(f_section.data[sdata].type != PGEFile::PGEX_Struct)
                 {
-                    errorString=PGESTRING("Wrong data item syntax:\nSection [")+
-                            f_section.name+"]\nData line "+
-                            fromNum(sdata)+")";
+                    errorString = PGESTRING("Wrong data item syntax:\nSection [") +
+                                  f_section.name + "]\nData line " +
+                                  fromNum(sdata) + ")";
                     goto badfile;
                 }
 
                 PGEFile::PGEX_Item x = f_section.data[sdata];
-
                 Bookmark meta_bookmark;
                 meta_bookmark.bookmarkName = "";
                 meta_bookmark.x = 0;
                 meta_bookmark.y = 0;
 
-                for(int sval=0;sval<(signed)x.values.size();sval++) //Look markers and values
+                for(int sval = 0; sval < static_cast<int>(x.values.size()); sval++) //Look markers and values
                 {
                     PGEFile::PGEX_Val v = x.values[sval];
-                    errorString=PGESTRING("Wrong value syntax\nSection [")+
-                            f_section.name+"]\nData line "+
-                            fromNum(sdata)+"\nMarker "+
-                            v.marker+"\nValue "+
-                            v.value;
+                    errorString = PGESTRING("Wrong value syntax\nSection [") +
+                                  f_section.name + "]\nData line " +
+                                  fromNum(sdata) + "\nMarker " +
+                                  v.marker + "\nValue " +
+                                  v.value;
 
-                      if(v.marker=="BM") //Bookmark name
-                      {
-                          if(PGEFile::IsQoutedString(v.value))
-                              meta_bookmark.bookmarkName = PGEFile::X2STRING(v.value);
-                          else
-                              goto badfile;
-                      }
-                      else
-                      if(v.marker=="X") // Position X
-                      {
-                          if(PGEFile::IsIntS(v.value))
-                              meta_bookmark.x = toInt(v.value);
-                          else
-                              goto badfile;
-                      }
-                      else
-                      if(v.marker=="Y") //Position Y
-                      {
-                          if(PGEFile::IsIntS(v.value))
-                              meta_bookmark.y = toInt(v.value);
-                          else
-                              goto badfile;
-                      }
+                    if(v.marker == "BM") //Bookmark name
+                    {
+                        if(PGEFile::IsQoutedString(v.value))
+                            meta_bookmark.bookmarkName = PGEFile::X2STRING(v.value);
+                        else
+                            goto badfile;
+                    }
+                    else if(v.marker == "X") // Position X
+                    {
+                        if(PGEFile::IsIntS(v.value))
+                            meta_bookmark.x = toInt(v.value);
+                        else
+                            goto badfile;
+                    }
+                    else if(v.marker == "Y") //Position Y
+                    {
+                        if(PGEFile::IsIntS(v.value))
+                            meta_bookmark.y = toInt(v.value);
+                        else
+                            goto badfile;
+                    }
                 }
+
                 FileData.bookmarks.push_back(meta_bookmark);
             }
         }
     }
+
     ///////////////////////////////////////EndFile///////////////////////////////////////
-
     errorString.clear(); //If no errors, clear string;
-    FileData.meta.ReadFileValid=true;
+    FileData.meta.ReadFileValid = true;
     return true;
-
-    badfile:    //If file format is not correct
+badfile:    //If file format is not correct
     //BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
-    FileData.meta.ERROR_info=errorString;
-    FileData.meta.ERROR_linenum=str_count;
-    FileData.meta.ERROR_linedata=line;
-    FileData.meta.ReadFileValid=false;
-
+    FileData.meta.ERROR_info = errorString;
+    FileData.meta.ERROR_linenum = str_count;
+    FileData.meta.ERROR_linedata = line;
+    FileData.meta.ReadFileValid = false;
     FileData.bookmarks.clear();
-
     return false;
 }
 
@@ -166,11 +166,13 @@ bool FileFormats::WriteNonSMBX64MetaDataF(PGESTRING filePath, MetaData &metaData
 {
     errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
+
     if(!file.open(filePath, true, false, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString="Failed to open file for write";
+        errorString = "Failed to open file for write";
         return false;
     }
+
     return WriteNonSMBX64MetaData(file, metaData);
 }
 
@@ -178,32 +180,37 @@ bool FileFormats::WriteNonSMBX64MetaDataRaw(MetaData &metaData, PGESTRING &rawda
 {
     errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
+
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString="Failed to open raw string for write";
+        errorString = "Failed to open raw string for write";
         return false;
     }
+
     return WriteNonSMBX64MetaData(file, metaData);
 }
 
 bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, MetaData &metaData)
 {
-    long i;
+    int i;
 
     //Bookmarks
     if(!metaData.bookmarks.empty())
     {
         out << "META_BOOKMARKS\n";
-        for(i=0;i<(signed)metaData.bookmarks.size(); i++)
+
+        for(i = 0; i < static_cast<int>(metaData.bookmarks.size()); i++)
         {
+            Bookmark &bm = metaData.bookmarks[i];
             //Bookmark name
-            out << PGEFile::value("BM", PGEFile::WriteStr(metaData.bookmarks[i].bookmarkName));
-            out << PGEFile::value("X", PGEFile::WriteInt(metaData.bookmarks[i].x));
-            out << PGEFile::value("Y", PGEFile::WriteInt(metaData.bookmarks[i].y));
+            out << PGEFile::value("BM", PGEFile::WriteStr(bm.bookmarkName));
+            out << PGEFile::value("X", PGEFile::WriteRoundFloat(bm.x));
+            out << PGEFile::value("Y", PGEFile::WriteRoundFloat(bm.y));
             out << "\n";
         }
+
         out << "META_BOOKMARKS_END\n";
     }
+
     return true;
 }
-
