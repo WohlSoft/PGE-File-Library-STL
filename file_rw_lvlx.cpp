@@ -1496,8 +1496,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             Bookmark &bm = FileData.metaData.bookmarks[i];
             //Bookmark name
             out << PGEFile::value("BM", PGEFile::WriteStr(bm.bookmarkName));
-            out << PGEFile::value("X", PGEFile::WriteFloat(bm.x));
-            out << PGEFile::value("Y", PGEFile::WriteFloat(bm.y));
+            out << PGEFile::value("X", PGEFile::WriteRoundFloat(bm.x));
+            out << PGEFile::value("Y", PGEFile::WriteRoundFloat(bm.y));
             out << "\n";
         }
 
