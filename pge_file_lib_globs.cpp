@@ -726,11 +726,12 @@ namespace PGE_FileFormats_misc
         bool quoteIsOpen=false;
         std::string buffer;
         #ifdef PGE_FILES_QT
-        char cur;
+        char cur = 0;
         if(!file.isOpen()) return "";
-        do{
+        do
+        {
             file.getChar(&cur);
-            if(cur=='\"')
+            if(cur == '\"')
                 quoteIsOpen=!quoteIsOpen;
             else
             {
@@ -738,7 +739,8 @@ namespace PGE_FileFormats_misc
                     buffer.push_back(cur);
                 if(cur == '\n') _lineNumber++;
             }
-        } while( (((cur != '\n')&&(cur!=','))||quoteIsOpen) && !file.atEnd() );
+        }
+        while( (((cur != '\n') && (cur!=',')) || quoteIsOpen) && !file.atEnd() );
         return QString::fromStdString(buffer);
         #else
         if(!stream) return "";
