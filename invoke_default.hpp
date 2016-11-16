@@ -1,6 +1,7 @@
 #ifndef INVOKE_DEFAULT_HHHHH
 #define INVOKE_DEFAULT_HHHHH
 #include <type_traits>
+#include <cstddef>
 
 namespace idef {
     namespace detail {
@@ -18,9 +19,9 @@ namespace idef {
         };
 
         template<typename DefaultFunc>
-        struct default_if_nullptr_impl<nullptr_t, DefaultFunc> {
+        struct default_if_nullptr_impl<std::nullptr_t, DefaultFunc> {
             using func_type = DefaultFunc;
-            static const func_type& Get(nullptr_t pf, const DefaultFunc& df) {
+            static const func_type& Get(std::nullptr_t pf, const DefaultFunc& df) {
                 return df;
             }
         };
