@@ -1,3 +1,28 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 Kevin Waldock
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ */
+
 #ifndef CSVReader_H
 #define CSVReader_H
 
@@ -7,23 +32,14 @@
 #include <type_traits>
 #include <sstream>
 #include <array>
-#include <functional>
 #include <exception>
 #include <stdexcept>
 #include <utility>
 
-/*
-
-TODO:
-* TO-DO better base-classing
-* --> Remove Copy & Pasta
-*   --> Use base class for parser (HasNext, NextLine)?
-/
-*/
+#include "invoke_default.hpp"
 
 namespace CSVReader {
 
-#if !defined(_MSC_VER) || _MSC_VER > 1800
 
     // ========= Exceptions START ===========
     /*!
@@ -156,14 +172,13 @@ namespace CSVReader {
             return str;
         }
     };
-
-    template<class StrElementType, class StrElementTraits >
-    constexpr IfStreamReader<StrElementType, StrElementTraits > MakeIfStreamReader(std::basic_ifstream<StrElementType, StrElementTraits >* reader)
+    template<class StrElementType, class StrElementTraits>
+    constexpr IfStreamReader<StrElementType, StrElementTraits> MakeIfStreamReader(std::basic_ifstream<StrElementType, StrElementTraits>* reader)
     {
-        return IfStreamReader<StrElementType, StrElementTraits >(reader);
+        return IfStreamReader<StrElementType, StrElementTraits>(reader);
     }
 
-    template<class StrElementType, class StrElementTraits, class StrElementAlloc >
+    template<class StrElementType, class StrElementTraits, class StrElementAlloc>
     struct StringReader
     {
         using target_istringstream = std::basic_istringstream<StrElementType, StrElementTraits, StrElementAlloc>;
@@ -180,11 +195,10 @@ namespace CSVReader {
             return str;
         }
     };
-
-    template<class StrElementType, class StrElementTraits, class StrElementAlloc >
-    constexpr StringReader<StrElementType, StrElementTraits, StrElementAlloc > MakeStringReader(const std::basic_string<StrElementType, StrElementTraits, StrElementAlloc > &str)
+    template<class StrElementType, class StrElementTraits, class StrElementAlloc>
+    constexpr StringReader<StrElementType, StrElementTraits, StrElementAlloc> MakeStringReader(const std::basic_string<StrElementType, StrElementTraits, StrElementAlloc>& str)
     {
-        return StringReader<StrElementType, StrElementTraits, StrElementAlloc >(str);
+        return StringReader<StrElementType, StrElementTraits, StrElementAlloc>(str);
     }
 
     template<class StrT>
@@ -225,28 +239,28 @@ namespace CSVReader {
      * \brief Special CSVReader parameter value for validating a field.
      * \see MakeCSVValidator()
      */
-    template<typename T>
+    template<typename T, typename ValidatorFunc>
     struct CSVValidator {
         typedef T value_type;
-        CSVValidator(T* value, std::function<bool(const T&)> validatorFunction) : _value(value), _validatorFunction(validatorFunction) {}
+        CSVValidator(T* value, const ValidatorFunc& validatorFunction) : _value(value), _validatorFunction(validatorFunction) {}
 
         bool Validate() const {
-            return _validatorFunction(_value);
+            return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T*) { return true; }), _value);
         }
         T* Get() {
             return _value;
         }
     private:
         T* _value;
-        std::function<bool(const T&)> _validatorFunction;
+        ValidatorFunc _validatorFunction;
     };
     /*!
      * \brief Creates a new CSVValidator.
      * \see CSVValidator
      */
     template<typename T, typename ValidatorFunc>
-    constexpr CSVValidator<T> MakeCSVValidator(T* value, ValidatorFunc validatorFunction) {
-        return CSVValidator<T>(value, validatorFunction);
+    constexpr CSVValidator<T, ValidatorFunc> MakeCSVValidator(T* value, ValidatorFunc validatorFunction) {
+        return CSVValidator<T, ValidatorFunc>(value, validatorFunction);
     }
 
     // 3. Alternative Parameter - CSVPostProcessor
@@ -256,49 +270,47 @@ namespace CSVReader {
      *
      * The post processor will be called before the value will be writting into the pointer.
      */
-    template<typename T>
+    template<typename T, typename PostProcessorFunc, typename ValidatorFunc>
     struct CSVPostProcessor
     {
         typedef T value_type;
 
-        CSVPostProcessor(T* value, const std::function<void(T&)>& postProcessorFunction) : CSVPostProcessor(value, postProcessorFunction, nullptr) {}
-        CSVPostProcessor(T* value, const std::function<void(T&)>& postProcessorFunction, const std::function<bool(const T&)>& validatorFunction)
+        CSVPostProcessor(T* value, const PostProcessorFunc& postProcessorFunction) : CSVPostProcessor(value, postProcessorFunction, nullptr) {}
+        CSVPostProcessor(T* value, const PostProcessorFunc& postProcessorFunction, const ValidatorFunc& validatorFunction)
             : _value(value), _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
 
         bool Validate() const {
-            if (_validatorFunction)
-                return _validatorFunction(*_value);
-            return true;
+            return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T*) { return true; }), _value);
         }
         inline void PostProcess()
         {
-            _postProcessorFunction(*_value);
+            idef::invoke_or_noop<void>(_postProcessorFunction, *_value);
         }
         T* Get() {
             return _value;
         }
     private:
         T* _value;
-        std::function<bool(const T&)> _validatorFunction;
-        std::function<void(T&)> _postProcessorFunction;
+        ValidatorFunc _validatorFunction;
+        PostProcessorFunc _postProcessorFunction;
     };
     /*!
      * \brief Creates a new CSVPostProcessor.
      * \see CSVPostProcessor
      */
     template<typename T, typename PostProcessorFunc>
-    constexpr CSVPostProcessor<T> MakeCSVPostProcessor(T* value, PostProcessorFunc postProcessorFunction)
+    constexpr CSVPostProcessor<T, PostProcessorFunc, nullptr_t> MakeCSVPostProcessor(T* value, PostProcessorFunc postProcessorFunction)
     {
-        return CSVPostProcessor<T>(value, postProcessorFunction);
+        return CSVPostProcessor<T, PostProcessorFunc, nullptr_t>(value, postProcessorFunction);
     }
     /*!
      * \brief Creates a new CSVPostProcessor.
      * \see CSVPostProcessor
      */
     template<typename T, typename PostProcessorFunc, typename ValidatorFunc>
-    constexpr CSVPostProcessor<T> MakeCSVPostProcessor(T* value, PostProcessorFunc postProcessorFunction, ValidatorFunc validatorFunction)
+    constexpr CSVPostProcessor<T, PostProcessorFunc, ValidatorFunc> MakeCSVPostProcessor(T* value, PostProcessorFunc postProcessorFunction, ValidatorFunc validatorFunction)
     {
-        return CSVPostProcessor<T>(value, postProcessorFunction, validatorFunction);
+        return CSVPostProcessor<T, PostProcessorFunc, ValidatorFunc>(value, postProcessorFunction, validatorFunction);
     }
 
 
@@ -311,28 +323,24 @@ namespace CSVReader {
      * If the reader cannot read further, then the default value is used
      * instead of throwing an exception.
      */
-    template<typename T>
+    template<typename T, typename ValidatorFunc, typename PostProcessorFunc>
     struct CSVOptional
     {
         typedef T value_type;
 
         CSVOptional(T* value, const T defVal) : CSVOptional(value, defVal, nullptr) {}
-        CSVOptional(T* value, const T defVal, const std::function<bool(const T&)>& validatorFunction) :
+        CSVOptional(T* value, const T defVal, const ValidatorFunc& validatorFunction) :
             _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction) {}
-        CSVOptional(T* value, const T defVal, const std::function<bool(const T&)>& validatorFunction, const std::function<void(T&)>& postProcessorFunction) :
+        CSVOptional(T* value, const T defVal, const ValidatorFunc& validatorFunction, const PostProcessorFunc& postProcessorFunction) :
             _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
 
 
-        inline bool Validate() const
-        {
-            if (_validatorFunction)
-                return _validatorFunction(*_value);
-            return true;
+        bool Validate() const {
+            return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T*) { return true; }), _value);
         }
         inline void PostProcess()
         {
-            if (_postProcessorFunction)
-                _postProcessorFunction(*_value);
+            idef::invoke_or_noop<void>(_postProcessorFunction, *_value);
         }
         inline void AssignDefault()
         {
@@ -344,32 +352,32 @@ namespace CSVReader {
     private:
         T* _value;
         T _defaultValue;
-        std::function<bool(const T&)> _validatorFunction;
-        std::function<void(T&)> _postProcessorFunction;
+        ValidatorFunc _validatorFunction;
+        PostProcessorFunc _postProcessorFunction;
     };
     /*!
      * \brief Creates a new CSVOptional.
      * \see CSVOptional
      */
     template<typename T, typename OT>
-    constexpr CSVOptional<T> MakeCSVOptional(T* value, OT defVal) {
-        return CSVOptional<T>(value, defVal);
+    constexpr CSVOptional<T, nullptr_t, nullptr_t> MakeCSVOptional(T* value, OT defVal) {
+        return CSVOptional<T, nullptr_t, nullptr_t>(value, defVal, nullptr, nullptr);
     }
     /*!
      * \brief Creates a new CSVOptional.
      * \see CSVOptional
      */
     template<typename T, typename OT, typename ValidatorFunc>
-    constexpr CSVOptional<T> MakeCSVOptional(T* value, OT defVal, ValidatorFunc validatorFunction) {
-        return CSVOptional<T>(value, defVal, validatorFunction);
+    constexpr CSVOptional<T, ValidatorFunc, nullptr_t> MakeCSVOptional(T* value, OT defVal, ValidatorFunc validatorFunction) {
+        return CSVOptional<T, ValidatorFunc, nullptr_t>(value, defVal, validatorFunction, nullptr);
     }
     /*!
      * \brief Creates a new CSVOptional.
      * \see CSVOptional
      */
     template<typename T, typename OT, typename ValidatorFunc, typename PostProcessorFunc>
-    constexpr CSVOptional<T> MakeCSVOptional(T* value, OT defVal, ValidatorFunc validatorFunction, PostProcessorFunc postProcessorFunction) {
-        return CSVOptional<T>(value, defVal, validatorFunction, postProcessorFunction);
+    constexpr CSVOptional<T, ValidatorFunc, PostProcessorFunc> MakeCSVOptional(T* value, OT defVal, ValidatorFunc validatorFunction, PostProcessorFunc postProcessorFunction) {
+        return CSVOptional<T, ValidatorFunc, PostProcessorFunc>(value, defVal, validatorFunction, postProcessorFunction);
     }
 
     // 5. Reader in Reader - CSVOptional
@@ -392,14 +400,15 @@ namespace CSVReader {
              class StrT,
              class CharT,
              class StrTUtils,
-             class Converter>
+             class Converter,
+             class PostProcessorFunc>
     struct CSVBatchReader : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter> {
     private:
         Container* _container;
-        std::function<void(ContainerValueT&)> _postProcessorFunction;
+        PostProcessorFunc _postProcessorFunction;
     public:
 
-        CSVBatchReader(CharT sep, Container* container, const std::function<void(ContainerValueT&)>& postProcessorFunction) :
+        CSVBatchReader(CharT sep, Container* container, const PostProcessorFunc& postProcessorFunction) :
             detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _container(container), _postProcessorFunction(postProcessorFunction) {}
 
         inline void ReadDataLine(const StrT& val)
@@ -411,8 +420,7 @@ namespace CSVReader {
                     continue;
                 ContainerValueT to;
                 this->SafeConvert(&to, from);
-                if(_postProcessorFunction)
-                    _postProcessorFunction(to);
+                idef::invoke_or_noop<void>(_postProcessorFunction, to);
                 ContainerUtils::Add(_container, to);
             }
         }
@@ -426,13 +434,14 @@ namespace CSVReader {
     template<class StrT,
              class CharT,
              class StrTUtils,
-             class Converter>
+             class Converter,
+             class IteratorFunc>
     struct CSVIterator : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>
     {
     private:
-        std::function<void(const StrT&)> _iteratorFunc;
+        IteratorFunc _iteratorFunc;
     public:
-        CSVIterator(CharT sep, std::function<void(const StrT&)> iteratorFunc) :
+        CSVIterator(CharT sep, const IteratorFunc& iteratorFunc) :
             detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _iteratorFunc(iteratorFunc) {}
 
         inline void ReadDataLine(const StrT& val)
@@ -597,12 +606,12 @@ namespace CSVReader {
             ReadNext(std::forward<RestValues>(restVals)...);
         }
 
-        template<class ValidateT, class... RestValues>
-        void ReadNext(CSVValidator<ValidateT> nextVal, RestValues&&... restVals)
+        template<class ValidateT, class ValidatorFunc, class... RestValues>
+        void ReadNext(CSVValidator<ValidateT, ValidatorFunc> nextVal, RestValues&&... restVals)
         {
             ThrowIfOutOfBounds();
 
-            this->SafeConvert(nextVal, this->NextField());
+            this->SafeConvert(nextVal.Get(), this->NextField());
 
             if (!nextVal.Validate())
                 throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
@@ -611,8 +620,8 @@ namespace CSVReader {
             ReadNext(std::forward<RestValues>(restVals)...);
         }
 
-        template<class PostProcessorT, class... RestValues>
-        void ReadNext(CSVPostProcessor<PostProcessorT> nextVal, RestValues&&... restVals)
+        template<class PostProcessorT, class PostProcessorFunc, class ValidatorFunc, class... RestValues>
+        void ReadNext(CSVPostProcessor<PostProcessorT, PostProcessorFunc, ValidatorFunc> nextVal, RestValues&&... restVals)
         {
             ThrowIfOutOfBounds();
 
@@ -625,8 +634,8 @@ namespace CSVReader {
             ReadNext(std::forward<RestValues>(restVals)...);
         }
 
-        template<class OptionalT, class... RestValues>
-        void ReadNext(CSVOptional<OptionalT> optionalObj, RestValues&&... restVals)
+        template<class OptionalT, class ValidatorFunc, class PostProcessorFunc, class... RestValues>
+        void ReadNext(CSVOptional<OptionalT, ValidatorFunc, PostProcessorFunc> optionalObj, RestValues&&... restVals)
         {
             // If we already reached the end, then assign default
             if (this->_currentCharIndex >= StrTUtils::length(this->_currentLine)) {
@@ -663,8 +672,8 @@ namespace CSVReader {
         }
 
         template<class ReaderContainerValueT, class ReaderContainer, class ReaderContainerUtils, 
-            class ReaderStrT, class ReaderCharT, class ReaderStrTUtils, class ReaderConverter, class... RestValues>
-            void ReadNext(CSVBatchReader<ReaderContainerValueT, ReaderContainer, ReaderContainerUtils, ReaderStrT, ReaderCharT, ReaderStrTUtils, ReaderConverter> subBatchReaderObj, RestValues&&... restVals)
+            class ReaderStrT, class ReaderCharT, class ReaderStrTUtils, class ReaderConverter, class PostProcessorFunc, class... RestValues>
+            void ReadNext(CSVBatchReader<ReaderContainerValueT, ReaderContainer, ReaderContainerUtils, ReaderStrT, ReaderCharT, ReaderStrTUtils, ReaderConverter, PostProcessorFunc> subBatchReaderObj, RestValues&&... restVals)
         {
             ThrowIfOutOfBounds();
 
@@ -681,8 +690,8 @@ namespace CSVReader {
             ReadNext(std::forward<RestValues>(restVals)...);
         }
 
-        template<class IterStrT, class IterCharT, class IterStrTUtils, class IterConverter, class... RestValues>
-        void ReadNext(CSVIterator<IterStrT, IterCharT, IterStrTUtils, IterConverter> iteratorObj, RestValues&&... restVals)
+        template<class IterStrT, class IterCharT, class IterStrTUtils, class IterConverter, class IteratorFunc, class... RestValues>
+        void ReadNext(CSVIterator<IterStrT, IterCharT, IterStrTUtils, IterConverter, IteratorFunc> iteratorObj, RestValues&&... restVals)
         {
             ThrowIfOutOfBounds();
 
@@ -807,7 +816,7 @@ namespace CSVReader {
         typedef typename csv_reader_type::value_type value_type;
 
         static_assert(std::is_same<CharT, value_type>::value, "Value type of basic_string must be the same as the type of the seperator!");
-        return csv_reader_type::full_type(reader, sep);
+        return typename csv_reader_type::full_type(reader, sep);
     }
 
 
@@ -853,13 +862,14 @@ namespace CSVReader {
                  class StrT,                                                                // The string class
                  class CharT,                                                               // The char type
                  class StrTUtils,                                                           // The string util class
-                 class Converter>
+                 class Converter,
+                 class PostProcessorFunc>
         struct CSVBatchReaderFromContainer
         {
             typedef typename ContainerT::value_type ContainerValueT;
             typedef CommonContainerUtils<ContainerValueT, ContainerT> ContainerUtils;
 
-            typedef CSVBatchReader<ContainerValueT, ContainerT, ContainerUtils, StrT, CharT, StrTUtils, Converter> full_type;
+            typedef CSVBatchReader<ContainerValueT, ContainerT, ContainerUtils, StrT, CharT, StrTUtils, Converter, PostProcessorFunc> full_type;
         };
     }
 
@@ -875,10 +885,10 @@ namespace CSVReader {
              class CharT,                                                               // The char type
              class StrTUtils,                                                           // The string util class
              class Converter>                                                           // The value converter
-    constexpr typename detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter>::full_type
+    constexpr typename detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter, nullptr_t>::full_type
         MakeCSVBatchReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter>&, CharT sep, ContainerT* container)
     {
-        typedef detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter> csv_batch_reader_type;
+        typedef detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter, nullptr_t> csv_batch_reader_type;
 
         return typename csv_batch_reader_type::full_type(sep, container, nullptr);
     }
@@ -900,10 +910,10 @@ namespace CSVReader {
              class StrTUtils,                                                           // The string util class
              class Converter,                                                           // The value converter
              class PostProcessorFunc>
-    constexpr typename detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter>::full_type
+    constexpr typename detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter, PostProcessorFunc>::full_type
         MakeCSVBatchReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter>&, SubCharT sep, ContainerT* container, const PostProcessorFunc& postProcessorFunc)
     {
-        typedef detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter> csv_batch_reader_type;
+        typedef detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter, PostProcessorFunc> csv_batch_reader_type;
 
         return typename csv_batch_reader_type::full_type(sep, container, postProcessorFunc);
     }
@@ -914,13 +924,14 @@ namespace CSVReader {
      * \see CSVIterator
      */
     template<class Reader, class StrT, class CharT, class StrTUtils, class Converter, class SubChar, class IteratorFunc>
-    constexpr CSVIterator<StrT, CharT, StrTUtils, Converter>
+    constexpr CSVIterator<StrT, CharT, StrTUtils, Converter, IteratorFunc>
         MakeCSVIterator(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter>&, SubChar sep, const IteratorFunc& iteratorFunc)
     {
-        return CSVIterator<StrT, CharT, StrTUtils, Converter>(sep, iteratorFunc);
+        return CSVIterator<StrT, CharT, StrTUtils, Converter, IteratorFunc>(sep, iteratorFunc);
     }
-#endif
 }
+
+
 
 
 #endif
