@@ -38,7 +38,7 @@ namespace idef {
         template<>
         struct invoke_or_noop_impl<std::nullptr_t> {
             template<typename Ret, typename Func, typename... Args>
-            static Ret invoke(Func&& f, Args&&... /*args*/) {
+            static Ret invoke(Func&& /*f*/, Args&&... /*args*/) {
                 return Ret();
             }
         };
