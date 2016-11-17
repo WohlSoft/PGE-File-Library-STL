@@ -13,7 +13,7 @@ namespace idef {
         template<typename PossibleFunc, typename DefaultFunc>
         struct default_if_nullptr_impl {
             using func_type = PossibleFunc;
-            static const func_type& Get(const PossibleFunc& pf, const DefaultFunc& df) {
+            static const func_type& Get(const PossibleFunc& pf, const DefaultFunc& /*df*/) {
                 return pf;
             }
         };
@@ -21,7 +21,7 @@ namespace idef {
         template<typename DefaultFunc>
         struct default_if_nullptr_impl<std::nullptr_t, DefaultFunc> {
             using func_type = DefaultFunc;
-            static const func_type& Get(std::nullptr_t pf, const DefaultFunc& df) {
+            static const func_type& Get(std::nullptr_t /*pf*/, const DefaultFunc& df) {
                 return df;
             }
         };
@@ -38,7 +38,7 @@ namespace idef {
         template<>
         struct invoke_or_noop_impl<std::nullptr_t> {
             template<typename Ret, typename Func, typename... Args>
-            static Ret invoke(Func&& f, Args&&... args) {
+            static Ret invoke(Func&& f, Args&&... /*args*/) {
                 return Ret();
             }
         };
