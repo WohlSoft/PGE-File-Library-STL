@@ -218,7 +218,7 @@ namespace SMBX64
         *out = qRound(input.toDouble(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
-        *out = static_cast<int>(round(std::stod(input)));
+        *out = static_cast<int>(std::round(std::stod(input)));
         #endif
     }
 
@@ -226,10 +226,10 @@ namespace SMBX64
     {
         #ifdef PGE_FILES_QT
         bool ok=true;
-        *out = static_cast<long>(round(input.toDouble(&ok)));
+        *out = static_cast<long>(std::round(input.toDouble(&ok)));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
-        *out = static_cast<long>(round(std::stod(input)));
+        *out = static_cast<long>(std::round(std::stod(input)));
         #endif
     }
     inline void ReadStr(PGESTRING*out, PGESTRING &input)

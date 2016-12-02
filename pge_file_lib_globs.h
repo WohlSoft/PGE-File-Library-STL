@@ -57,9 +57,7 @@
 #include <QMap>
 #include <QObject>
 #include <QUrl>
-#ifndef _MSC_VER
-#include <tgmath.h>
-#endif
+#include <cmath>
 #if defined(PGE_ENGINE)||defined(PGE_EDITOR)
 #include <QSize>
 #endif
