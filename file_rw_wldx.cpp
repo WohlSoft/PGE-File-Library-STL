@@ -77,7 +77,8 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
         str_count++;
         line = inf.readLine();
 
-        if(line == "HEAD_END") closed = true;
+        if(line == "HEAD_END")
+            closed = true;
     }
 
     if(!closed)
@@ -143,9 +144,6 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
             }
         }
     }
-
-    if(!closed)
-        goto badfile;
 
 skipHeaderParse:
     FileData.CurSection = 0;

@@ -31,7 +31,7 @@ bool FileFormats::ReadNpcTXTFileF(PGESTRING filePath, NPCConfigFile &FileData, b
     PGE_FileFormats_misc::TextFileInput file;
     if(!file.open(filePath, false))
     {
-        errorString="Failed to open file for read";
+        errorString = "Failed to open file for read";
         FileData.ReadFileValid = false;
         return false;
     }
@@ -44,7 +44,7 @@ bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData,
     PGE_FileFormats_misc::RawTextInput file;
     if(!file.open(&rawdata))
     {
-        errorString="Failed to open raw string for read";
+        errorString = "Failed to open raw string for read";
         FileData.ReadFileValid = false;
         return false;
     }
@@ -81,41 +81,41 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
     bool doLog = !IgnoreBad;
 
     //Read NPC.TXT File config
-    #define NextLine(line) line = inf.readCVSLine();
+#define NextLine(line) line = inf.readCVSLine();
 
     do
     {
-       NextLine(line)
-       PGESTRING ln = line;
-       if(PGE_RemSubSTRING(line, " ")=="")
-       {
-           NextLine(line)
-           continue;
-       } //Skip empty strings
+        NextLine(line)
+        PGESTRING ln = line;
+        if(PGE_RemSubSTRING(line, " ") == "")
+        {
+            NextLine(line)
+            continue;
+        } //Skip empty strings
 
-       line=ln;
+        line = ln;
 
-       #ifdef PGE_FILES_QT
-       Params=line.split("=", QString::SkipEmptyParts); // split the Parameter and value (example: chicken=2)
-       #else
-       PGE_SPLITSTRING(Params, line, "=");
-       #endif
+        #ifdef PGE_FILES_QT
+        Params = line.split("=", QString::SkipEmptyParts); // split the Parameter and value (example: chicken=2)
+        #else
+        PGE_SPLITSTRING(Params, line, "=");
+        #endif
 
-       if(Params.size() != 2) // If string does not contain strings with "=" as separator
-       {
-           if(doLog) FileData.unknownLines += fromNum(inf.getCurrentLineNumber())+": "+line+" <wrong syntax!>\n";
+        if(Params.size() != 2) // If string does not contain strings with "=" as separator
+        {
+            if(doLog) FileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
 
-           if( doLog || (Params.size() < 2) )
-           {
-               NextLine(line);
-               continue;
-           }
-       }
+            if(doLog || (Params.size() < 2))
+            {
+                NextLine(line);
+                continue;
+            }
+        }
 
-       Params[0] = PGESTR_Simpl(Params[0]);
-       Params[0] = PGE_RemSubSTRING(Params[0], " "); //Delete spaces
+        Params[0] = PGESTR_Simpl(Params[0]);
+        Params[0] = PGE_RemSubSTRING(Params[0], " "); //Delete spaces
 
-        if(Params[0]=="gfxoffsetx")
+        if(Params[0] == "gfxoffsetx")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -125,12 +125,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.gfxoffsetx=toInt(Params[1]);
-                FileData.en_gfxoffsetx=true;
+                FileData.gfxoffsetx = toInt(Params[1]);
+                FileData.en_gfxoffsetx = true;
             }
         }
-        else
-        if(Params[0]=="gfxoffsety")
+        else if(Params[0] == "gfxoffsety")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -141,12 +140,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             else
             {
                 Params[1] = PGE_ReplSTRING(Params[1], PGESTRING(" "), PGESTRING("")); //Delete spaces
-                FileData.gfxoffsety=toInt(Params[1]);
-                FileData.en_gfxoffsety=true;
+                FileData.gfxoffsety = toInt(Params[1]);
+                FileData.en_gfxoffsety = true;
             }
         }
-        else
-        if(Params[0]=="width")
+        else if(Params[0] == "width")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -156,12 +154,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.width=toInt(Params[1]);
-                FileData.en_width=true;
+                FileData.width = toInt(Params[1]);
+                FileData.en_width = true;
             }
         }
-        else
-        if(Params[0]=="height")
+        else if(Params[0] == "height")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -172,12 +169,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             else
             {
                 Params[1] = PGE_ReplSTRING(Params[1], PGESTRING(" "), PGESTRING("")); //Delete spaces
-                FileData.height=toInt(Params[1]);
-                FileData.en_height=true;
+                FileData.height = toInt(Params[1]);
+                FileData.en_height = true;
             }
         }
-        else
-        if(Params[0]=="gfxwidth")
+        else if(Params[0] == "gfxwidth")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -187,12 +183,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.gfxwidth=toInt(Params[1]);
-                FileData.en_gfxwidth=true;
+                FileData.gfxwidth = toInt(Params[1]);
+                FileData.en_gfxwidth = true;
             }
         }
-        else
-        if(Params[0]=="gfxheight")
+        else if(Params[0] == "gfxheight")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -202,12 +197,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.gfxheight=toInt(Params[1]);
-                FileData.en_gfxheight=true;
+                FileData.gfxheight = toInt(Params[1]);
+                FileData.en_gfxheight = true;
             }
         }
-        else
-        if(Params[0]=="score")
+        else if(Params[0] == "score")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -217,12 +211,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.score=toInt(Params[1]);
-                FileData.en_score=true;
+                FileData.score = toInt(Params[1]);
+                FileData.en_score = true;
             }
         }
-        else
-        if(Params[0]=="health")
+        else if(Params[0] == "health")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -232,14 +225,13 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.health=toInt(Params[1]);
-                if(FileData.health<1)
-                    FileData.health=1;
-                FileData.en_health=true;
+                FileData.health = toInt(Params[1]);
+                if(FileData.health < 1)
+                    FileData.health = 1;
+                FileData.en_health = true;
             }
         }
-        else
-        if(Params[0]=="playerblock")
+        else if(Params[0] == "playerblock")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -249,12 +241,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.playerblock=(bool)toInt(Params[1]);
-                FileData.en_playerblock=true;
+                FileData.playerblock = (bool)toInt(Params[1]);
+                FileData.en_playerblock = true;
             }
         }
-        else
-        if(Params[0]=="playerblocktop")
+        else if(Params[0] == "playerblocktop")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -264,12 +255,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.playerblocktop=(bool)toInt(Params[1]);
-                FileData.en_playerblocktop=true;
+                FileData.playerblocktop = (bool)toInt(Params[1]);
+                FileData.en_playerblocktop = true;
             }
         }
-        else
-        if(Params[0]=="npcblock")
+        else if(Params[0] == "npcblock")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -279,12 +269,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.npcblock=(bool)toInt(Params[1]);
-                FileData.en_npcblock=true;
+                FileData.npcblock = (bool)toInt(Params[1]);
+                FileData.en_npcblock = true;
             }
         }
-        else
-        if(Params[0]=="npcblocktop")
+        else if(Params[0] == "npcblocktop")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -294,12 +283,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.npcblocktop=(bool)toInt(Params[1]);
-                FileData.en_npcblocktop=true;
+                FileData.npcblocktop = (bool)toInt(Params[1]);
+                FileData.en_npcblocktop = true;
             }
         }
-        else
-        if(Params[0]=="grabside")
+        else if(Params[0] == "grabside")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -309,12 +297,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.grabside=(bool)toInt(Params[1]);
-                FileData.en_grabside=true;
+                FileData.grabside = (bool)toInt(Params[1]);
+                FileData.en_grabside = true;
             }
         }
-        else
-        if(Params[0]=="grabtop")
+        else if(Params[0] == "grabtop")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -324,12 +311,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.grabtop=(bool)toInt(Params[1]);
-                FileData.en_grabtop=true;
+                FileData.grabtop = (bool)toInt(Params[1]);
+                FileData.en_grabtop = true;
             }
         }
-        else
-        if(Params[0]=="jumphurt")
+        else if(Params[0] == "jumphurt")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -339,12 +325,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.jumphurt=(bool)toInt(Params[1]);
-                FileData.en_jumphurt=true;
+                FileData.jumphurt = (bool)toInt(Params[1]);
+                FileData.en_jumphurt = true;
             }
         }
-        else
-        if(Params[0]=="nohurt")
+        else if(Params[0] == "nohurt")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -354,12 +339,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.nohurt=(bool)toInt(Params[1]);
-                FileData.en_nohurt=true;
+                FileData.nohurt = (bool)toInt(Params[1]);
+                FileData.en_nohurt = true;
             }
         }
-        else
-        if(Params[0]=="noblockcollision")
+        else if(Params[0] == "noblockcollision")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -369,12 +353,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.noblockcollision=(bool)toInt(Params[1]);
-                FileData.en_noblockcollision=true;
+                FileData.noblockcollision = (bool)toInt(Params[1]);
+                FileData.en_noblockcollision = true;
             }
         }
-        else
-        if(Params[0]=="cliffturn")
+        else if(Params[0] == "cliffturn")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -384,12 +367,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.cliffturn=(bool)toInt(Params[1]);
-                FileData.en_cliffturn=true;
+                FileData.cliffturn = (bool)toInt(Params[1]);
+                FileData.en_cliffturn = true;
             }
         }
-        else
-        if(Params[0]=="noyoshi")
+        else if(Params[0] == "noyoshi")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -399,12 +381,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.noyoshi=(bool)toInt(Params[1]);
-                FileData.en_noyoshi=true;
+                FileData.noyoshi = (bool)toInt(Params[1]);
+                FileData.en_noyoshi = true;
             }
         }
-        else
-        if(Params[0]=="foreground")
+        else if(Params[0] == "foreground")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -414,12 +395,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.foreground=(bool)toInt(Params[1]);
-                FileData.en_foreground=true;
+                FileData.foreground = (bool)toInt(Params[1]);
+                FileData.en_foreground = true;
             }
         }
-        else
-        if(Params[0]=="speed")
+        else if(Params[0] == "speed")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -429,12 +409,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.speed=toDouble(PGE_ReplSTRING(Params[1], PGESTRING(","), PGESTRING(".")));
-                FileData.en_speed=true;
+                FileData.speed = toDouble(PGE_ReplSTRING(Params[1], PGESTRING(","), PGESTRING(".")));
+                FileData.en_speed = true;
             }
         }
-        else
-        if(Params[0]=="nofireball")
+        else if(Params[0] == "nofireball")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -444,12 +423,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.nofireball=(bool)toInt(Params[1]);
-                FileData.en_nofireball=true;
+                FileData.nofireball = (bool)toInt(Params[1]);
+                FileData.en_nofireball = true;
             }
         }
-        else
-        if(Params[0]=="nogravity")
+        else if(Params[0] == "nogravity")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -459,12 +437,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.nogravity=(bool)toInt(Params[1]);
-                FileData.en_nogravity=true;
+                FileData.nogravity = (bool)toInt(Params[1]);
+                FileData.en_nogravity = true;
             }
         }
-        else
-        if(Params[0]=="frames")
+        else if(Params[0] == "frames")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -474,12 +451,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.frames=toInt(Params[1]);
-                FileData.en_frames=true;
+                FileData.frames = toInt(Params[1]);
+                FileData.en_frames = true;
             }
         }
-        else
-        if(Params[0]=="framespeed")
+        else if(Params[0] == "framespeed")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -489,27 +465,25 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.framespeed=toInt(Params[1]);
-                FileData.en_framespeed=true;
+                FileData.framespeed = toInt(Params[1]);
+                FileData.en_framespeed = true;
             }
         }
-        else
-        if(Params[0]=="framestyle")
+        else if(Params[0] == "framestyle")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
             if(!SMBX64::IsUInt(Params[1]))
             {
-                if(doLog) FileData.unknownLines += fromNum(inf.getCurrentLineNumber())+": "+line+" <Should be from 0 to 3!>\n";
+                if(doLog) FileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <Should be from 0 to 3!>\n";
             }
             else
             {
-                FileData.framestyle=toInt(Params[1]);
-                FileData.en_framestyle=true;
+                FileData.framestyle = toInt(Params[1]);
+                FileData.en_framestyle = true;
             }
         }
-        else
-        if(Params[0]=="noiceball")
+        else if(Params[0] == "noiceball")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -519,15 +493,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.noiceball=(bool)toInt(Params[1]);
-                FileData.en_noiceball=true;
+                FileData.noiceball = (bool)toInt(Params[1]);
+                FileData.en_noiceball = true;
             }
         }
-        else
-
-
-        // Non-SMBX64 parameters (not working in SMBX <=1.3)
-        if(Params[0]=="nohammer")
+        else if(Params[0] == "nohammer") // Non-SMBX64 parameters (not working in SMBX <=1.3)
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -537,12 +507,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.nohammer=(bool)toInt(Params[1]);
-                FileData.en_nohammer=true;
+                FileData.nohammer = (bool)toInt(Params[1]);
+                FileData.en_nohammer = true;
             }
         }
-        else
-        if(Params[0]=="noshell")
+        else if(Params[0] == "noshell")
         {
             Params[1] = PGESTR_Simpl(Params[1]);
             Params[1] = PGE_RemSubSTRING(Params[1], " ");//Delete spaces
@@ -552,106 +521,103 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
             }
             else
             {
-                FileData.noshell=(bool)toInt(Params[1]);
-                FileData.en_noshell=true;
+                FileData.noshell = (bool)toInt(Params[1]);
+                FileData.en_noshell = true;
             }
         }
-        else
-        if(Params[0]=="name")
+        else if(Params[0] == "name")
         {
-            if(SMBX64::IsQuotedString(Params[1]))
-                FileData.name = removeQuotes(Params[1]);
-            else
-                FileData.name = Params[1];
-                FileData.en_name=!IsEmpty(FileData.name);
+            FileData.name = removeQuotes(Params[1]);
+            FileData.en_name = !IsEmpty(FileData.name);
         }
-        else
-        if(Params[0]=="image")
+        else if(Params[0] == "image")
         {
-            if(SMBX64::IsQuotedString(Params[1]))
-                FileData.image = removeQuotes(Params[1]);
-            else
-                FileData.image= Params[1];
-                FileData.en_image=!IsEmpty(FileData.image);
+            FileData.image = removeQuotes(Params[1]);
+            FileData.en_image = !IsEmpty(FileData.image);
         }
-        else
-        if(Params[0]=="script")
+        else if(Params[0] == "script")
         {
-            if(SMBX64::IsQuotedString(Params[1]))
-                FileData.script = removeQuotes(Params[1]);
-            else
-                FileData.script= Params[1];
-                FileData.en_script=!IsEmpty(FileData.script);
+            FileData.script = removeQuotes(Params[1]);
+            FileData.en_script = !IsEmpty(FileData.script);
         }
-        else
-        if(Params[0]=="grid")
+        else if(Params[0] == "grid")
         {
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
-            } else {
-                if(Params[1].size()>7)
-                    FileData.grid=32;
-                else {
+            }
+            else
+            {
+                if(Params[1].size() > 7)
+                    FileData.grid = 32;
+                else
+                {
                     FileData.grid = toInt(Params[1]);
-                    FileData.en_grid=true;
+                    FileData.en_grid = true;
                 }
             }
         }
-        else
-        if(Params[0]=="gridoffsetx")
+        else if(Params[0] == "gridoffsetx")
         {
             if(!SMBX64::IsSInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
-            } else {
-                if(Params[1].size()>7)
-                    FileData.grid_offset_x=0;
-                else {
-                   FileData.grid_offset_x = toInt(Params[1]);
-                   FileData.en_grid_offset_x=true;
+            }
+            else
+            {
+                if(Params[1].size() > 7)
+                    FileData.grid_offset_x = 0;
+                else
+                {
+                    FileData.grid_offset_x = toInt(Params[1]);
+                    FileData.en_grid_offset_x = true;
                 }
             }
         }
-        else
-        if(Params[0]=="gridoffsety")
+        else if(Params[0] == "gridoffsety")
         {
             if(!SMBX64::IsSInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
-            } else {
-                if(Params[1].size()>7)
-                    FileData.grid_offset_y=0;
-                else {
+            }
+            else
+            {
+                if(Params[1].size() > 7)
+                    FileData.grid_offset_y = 0;
+                else
+                {
                     FileData.grid_offset_y = toInt(Params[1]);
-                    FileData.en_grid_offset_y=true;
+                    FileData.en_grid_offset_y = true;
                 }
             }
         }
-        else
-        if(Params[0]=="gridalign")
+        else if(Params[0] == "gridalign")
         {
             if(!SMBX64::IsUInt(Params[1]))
             {
                 if(doLog) FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
-            } else {
-                if(Params[1].size()>7)
-                    FileData.grid_offset_y=0;
-                else {
+            }
+            else
+            {
+                if(Params[1].size() > 7)
+                    FileData.grid_offset_y = 0;
+                else
+                {
                     FileData.grid_align = toInt(Params[1]);
-                    FileData.en_grid_align=true;
+                    FileData.en_grid_align = true;
                 }
             }
         }
         else
         {
             //Store unknown value into warnings list
-            if(doLog) FileData.unknownLines += fromNum(inf.getCurrentLineNumber())+": "+line+"\n";
+            if(doLog) FileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + "\n";
         }
 
-    } while(!inf.eof());
+    }
+    while(!inf.eof());
 
-    FileData.ReadFileValid=true;
+    FileData.ReadFileValid = true;
     return true;
 }
 
@@ -666,7 +632,7 @@ bool FileFormats::WriteNPCTxtFileF(PGESTRING filePath, NPCConfigFile &FileData)
     PGE_FileFormats_misc::TextFileOutput file;
     if(!file.open(filePath, false, true, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString="Failed to open file for write";
+        errorString = "Failed to open file for write";
         return false;
     }
     return WriteNPCTxtFile(file, FileData);
@@ -677,7 +643,7 @@ bool FileFormats::WriteNPCTxtFileRaw(NPCConfigFile &FileData, PGESTRING &rawdata
     PGE_FileFormats_misc::RawTextOutput file;
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString="Failed to open target raw string for write";
+        errorString = "Failed to open target raw string for write";
         return false;
     }
     return WriteNPCTxtFile(file, FileData);
@@ -687,157 +653,84 @@ bool FileFormats::WriteNPCTxtFileRaw(NPCConfigFile &FileData, PGESTRING &rawdata
 bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConfigFile &FileData)
 {
     if(FileData.en_gfxoffsetx)
-    {
-        out << "gfxoffsetx=" + fromNum(FileData.gfxoffsetx) +"\n";
-    }
+        out << "gfxoffsetx=" + fromNum(FileData.gfxoffsetx) + "\n";
     if(FileData.en_gfxoffsety)
-    {
-        out << "gfxoffsety=" + fromNum(FileData.gfxoffsety) +"\n";
-    }
+        out << "gfxoffsety=" + fromNum(FileData.gfxoffsety) + "\n";
     if(FileData.en_gfxwidth)
-    {
-        out << "gfxwidth=" + fromNum(FileData.gfxwidth) +"\n";
-    }
+        out << "gfxwidth=" + fromNum(FileData.gfxwidth) + "\n";
     if(FileData.en_gfxheight)
-    {
-        out << "gfxheight=" + fromNum(FileData.gfxheight) +"\n";
-    }
+        out << "gfxheight=" + fromNum(FileData.gfxheight) + "\n";
     if(FileData.en_foreground)
-    {
-        out << "foreground=" + fromNum((int)FileData.foreground) +"\n";
-    }
+        out << "foreground=" + fromNum((int)FileData.foreground) + "\n";
     if(FileData.en_width)
-    {
-        out << "width=" + fromNum(FileData.width) +"\n";
-    }
+        out << "width=" + fromNum(FileData.width) + "\n";
     if(FileData.en_height)
-    {
-        out << "height=" + fromNum(FileData.height) +"\n";
-    }
+        out << "height=" + fromNum(FileData.height) + "\n";
 
     if(FileData.en_score)
-    {
-        out << "score=" + fromNum(FileData.score) +"\n";
-    }
+        out << "score=" + fromNum(FileData.score) + "\n";
     if(FileData.en_health)
-    {
-        out << "health=" + fromNum(FileData.health) +"\n";
-    }
+        out << "health=" + fromNum(FileData.health) + "\n";
 
     if(FileData.en_playerblock)
-    {
-        out << "playerblock=" + fromNum((int)FileData.playerblock) +"\n";
-    }
+        out << "playerblock=" + fromNum((int)FileData.playerblock) + "\n";
 
     if(FileData.en_playerblocktop)
-    {
-        out << "playerblocktop=" + fromNum((int)FileData.playerblocktop) +"\n";
-    }
+        out << "playerblocktop=" + fromNum((int)FileData.playerblocktop) + "\n";
 
     if(FileData.en_npcblock)
-    {
-        out << "npcblock=" + fromNum((int)FileData.npcblock) +"\n";
-    }
+        out << "npcblock=" + fromNum((int)FileData.npcblock) + "\n";
 
     if(FileData.en_npcblocktop)
-    {
-        out << "npcblocktop=" + fromNum((int)FileData.npcblocktop) +"\n";
-    }
+        out << "npcblocktop=" + fromNum((int)FileData.npcblocktop) + "\n";
     if(FileData.en_grabside)
-    {
-        out << "grabside=" + fromNum((int)FileData.grabside) +"\n";
-    }
+        out << "grabside=" + fromNum((int)FileData.grabside) + "\n";
     if(FileData.en_grabtop)
-    {
-        out << "grabtop=" + fromNum((int)FileData.grabtop) +"\n";
-    }
+        out << "grabtop=" + fromNum((int)FileData.grabtop) + "\n";
     if(FileData.en_jumphurt)
-    {
-        out << "jumphurt=" + fromNum((int)FileData.jumphurt) +"\n";
-    }
+        out << "jumphurt=" + fromNum((int)FileData.jumphurt) + "\n";
     if(FileData.en_nohurt)
-    {
-        out << "nohurt=" + fromNum((int)FileData.nohurt) +"\n";
-    }
+        out << "nohurt=" + fromNum((int)FileData.nohurt) + "\n";
     if(FileData.en_speed)
-    {
-        out << "speed=" + fromNum(FileData.speed) +"\n";
-    }
+        out << "speed=" + fromNum(FileData.speed) + "\n";
     if(FileData.en_noblockcollision)
-    {
-        out << "noblockcollision=" + fromNum((int)FileData.noblockcollision) +"\n";
-    }
+        out << "noblockcollision=" + fromNum((int)FileData.noblockcollision) + "\n";
     if(FileData.en_cliffturn)
-    {
-        out << "cliffturn=" + fromNum((int)FileData.cliffturn) +"\n";
-    }
+        out << "cliffturn=" + fromNum((int)FileData.cliffturn) + "\n";
     if(FileData.en_noyoshi)
-    {
-        out << "noyoshi=" + fromNum((int)FileData.noyoshi) +"\n";
-    }
+        out << "noyoshi=" + fromNum((int)FileData.noyoshi) + "\n";
     if(FileData.en_nofireball)
-    {
-        out << "nofireball=" + fromNum((int)FileData.nofireball) +"\n";
-    }
+        out << "nofireball=" + fromNum((int)FileData.nofireball) + "\n";
     if(FileData.en_nogravity)
-    {
-        out << "nogravity=" + fromNum((int)FileData.nogravity) +"\n";
-    }
+        out << "nogravity=" + fromNum((int)FileData.nogravity) + "\n";
     if(FileData.en_noiceball)
-    {
-        out << "noiceball=" + fromNum((int)FileData.noiceball) +"\n";
-    }
+        out << "noiceball=" + fromNum((int)FileData.noiceball) + "\n";
     if(FileData.en_frames)
-    {
-        out << "frames=" + fromNum(FileData.frames) +"\n";
-    }
+        out << "frames=" + fromNum(FileData.frames) + "\n";
     if(FileData.en_framespeed)
-    {
-        out << "framespeed=" + fromNum(FileData.framespeed) +"\n";
-    }
+        out << "framespeed=" + fromNum(FileData.framespeed) + "\n";
     if(FileData.en_framestyle)
-    {
-        out << "framestyle=" + fromNum(FileData.framestyle) +"\n";
-    }
+        out << "framestyle=" + fromNum(FileData.framestyle) + "\n";
 
-//Extended
+    //Extended
     if(FileData.en_nohammer)
-    {
-        out << "nohammer=" + fromNum((int)FileData.nohammer) +"\n";
-    }
+        out << "nohammer=" + fromNum((int)FileData.nohammer) + "\n";
     if(FileData.en_noshell)
-    {
-        out << "noshell=" + fromNum((int)FileData.noshell) +"\n";
-    }
+        out << "noshell=" + fromNum((int)FileData.noshell) + "\n";
     if(FileData.en_name && !IsEmpty(FileData.name))
-    {
         out << "name=" + SMBX64::WriteStr(FileData.name);
-    }
     if(FileData.en_image && !IsEmpty(FileData.image))
-    {
         out << "image=" + SMBX64::WriteStr(FileData.image);
-    }
     if(FileData.en_script && !IsEmpty(FileData.script))
-    {
         out << "script=" + SMBX64::WriteStr(FileData.script);
-    }
     if(FileData.en_grid)
-    {
-        out << "grid=" + fromNum(FileData.grid) +"\n";
-    }
+        out << "grid=" + fromNum(FileData.grid) + "\n";
     if(FileData.en_grid_offset_x)
-    {
-        out << "gridoffsetx=" + fromNum(FileData.grid_offset_x) +"\n";
-    }
+        out << "gridoffsetx=" + fromNum(FileData.grid_offset_x) + "\n";
     if(FileData.en_grid_offset_y)
-    {
-        out << "gridoffsety=" + fromNum(FileData.grid_offset_y) +"\n";
-    }
+        out << "gridoffsety=" + fromNum(FileData.grid_offset_y) + "\n";
     if(FileData.en_grid_align)
-    {
-        out << "gridalign=" + fromNum(FileData.grid_align) +"\n";
-    }
+        out << "gridalign=" + fromNum(FileData.grid_align) + "\n";
 
     return true;
 }
-

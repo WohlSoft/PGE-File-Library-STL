@@ -268,7 +268,6 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
     {   //Read PGE WLDX File
         return ReadExtendedWldFileHeader( filePath, data);
     }
-    return data.meta.ReadFileValid;
 }
 
 bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFormats::WorldFileFormat format, unsigned int FormatVersion)
