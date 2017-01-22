@@ -594,7 +594,7 @@ namespace PGE_FileFormats_misc
             QTextStream stream;
 #else
             //! File input stream used in STL version of PGE file Library
-            std::fstream stream;
+            FILE *stream;
 #endif
     };
 
@@ -658,7 +658,7 @@ namespace PGE_FileFormats_misc
             QTextStream stream;
 #else
             //! File input stream used in STL version of PGE file Library
-            std::fstream stream;
+            FILE *stream;
 #endif
     };
 
