@@ -6,6 +6,7 @@
 #include <limits.h> /* PATH_MAX */
 #include <sstream>
 #include <algorithm>
+#include <memory>
 #include <string>
 #include "charsetconvert.h"
 #else
@@ -91,8 +92,8 @@ namespace PGE_FileFormats_misc
         const unsigned char *pSrc = (const unsigned char *)ssSrc.c_str();
         #endif
         const int SRC_LEN = sSrc.length();
-        unsigned char *const pStart = new unsigned char[SRC_LEN * 3];
-        unsigned char *pEnd = pStart;
+        std::unique_ptr<unsigned char[]> pStart(new unsigned char[SRC_LEN * 3]);
+        unsigned char *pEnd = pStart.get();
         const unsigned char *const SRC_END = pSrc + SRC_LEN;
 
         for(; pSrc < SRC_END; ++pSrc)
@@ -103,11 +104,10 @@ namespace PGE_FileFormats_misc
             *pEnd++ = DEC2HEX[*pSrc & 0x0F];
         }
         #ifndef PGE_FILES_QT
-        PGESTRING sResult((char *)pStart, (char *)pEnd);
+        PGESTRING sResult((char *)pStart.get(), (char *)pEnd);
         #else
         PGESTRING sResult = QString::fromUtf8((char *)pStart, (int)(pEnd - pStart));
         #endif
-        delete [] pStart;
         return sResult;
     }
 
@@ -148,8 +148,8 @@ namespace PGE_FileFormats_misc
         // last decodable '%'
         const unsigned char *const SRC_LAST_DEC = SRC_END - 2;
 
-        char *const pStart = new char[SRC_LEN];
-        char *pEnd = pStart;
+        std::unique_ptr<char[]> pStart(new char[SRC_LEN]);
+        char *pEnd = pStart.get();
 
         while(pSrc < SRC_LAST_DEC)
         {
@@ -172,8 +172,7 @@ namespace PGE_FileFormats_misc
         while(pSrc < SRC_END)
             *pEnd++ = *pSrc++;
 
-        std::string sResult(pStart, pEnd);
-        delete [] pStart;
+        std::string sResult(pStart.get(), pEnd);
         return sResult;
     }
     #endif
@@ -589,11 +588,14 @@ namespace PGE_FileFormats_misc
         {
         case current:
             _pos += pos;
+            break;
         case end:
             _pos = _data->size() + pos;
+            break;
         case begin:
         default:
             _pos = pos;
+            break;
         }
         if(_pos < 0) _pos = 0;
         if(_pos >= (signed)_data->size())
@@ -674,11 +676,14 @@ fillEnd:
         {
         case current:
             _pos += pos;
+            break;
         case end:
             _pos = _data->size() + pos;
+            break;
         case begin:
         default:
             _pos = pos;
+            break;
         }
         if(_pos < 0) _pos = 0;
         if(_pos >= (signed)_data->size())
