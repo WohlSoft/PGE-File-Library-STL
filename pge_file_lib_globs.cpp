@@ -716,15 +716,7 @@ fillEnd:
 
     TextFileInput::~TextFileInput()
     {
-        #ifdef PGE_FILES_QT
-        file.close();
-        #else
-        if(stream)
-        {
-            fclose(stream);
-            stream = NULL;
-        }
-        #endif
+        close();
     }
 
     bool TextFileInput::open(PGESTRING filePath, bool utf8)
@@ -946,15 +938,7 @@ fillEnd:
 
     TextFileOutput::~TextFileOutput()
     {
-        #ifdef PGE_FILES_QT
-        file.close();
-        #else
-        if(stream)
-        {
-            fclose(stream);
-            stream = NULL;
-        }
-        #endif
+        close();
     }
 
     bool TextFileOutput::open(PGESTRING filePath, bool utf8, bool forceCRLF, TextOutput::outputMode mode)
