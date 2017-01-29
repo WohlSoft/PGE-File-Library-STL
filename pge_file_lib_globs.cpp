@@ -6,13 +6,12 @@
 #include <limits.h> /* PATH_MAX */
 #include <sstream>
 #include <algorithm>
-#include <memory>
 #include <string>
 #include "charsetconvert.h"
 #else
 #include <QFileInfo>
 #endif
-
+#include <memory>
 
 namespace PGE_FileFormats_misc
 {
@@ -106,7 +105,7 @@ namespace PGE_FileFormats_misc
         #ifndef PGE_FILES_QT
         PGESTRING sResult((char *)pStart.get(), (char *)pEnd);
         #else
-        PGESTRING sResult = QString::fromUtf8((char *)pStart, (int)(pEnd - pStart));
+        PGESTRING sResult = QString::fromUtf8(reinterpret_cast<char *>(pStart.get()), static_cast<int>(pEnd - pStart.get()));
         #endif
         return sResult;
     }
@@ -708,13 +707,17 @@ fillEnd:
     /*****************FILE TEXT I/O CLASS***************************/
 
     TextFileInput::TextFileInput() :
-        TextInput(),
-        stream(NULL)
+        TextInput()
+        #ifndef PGE_FILES_QT
+        , stream(NULL)
+        #endif
     {}
 
     TextFileInput::TextFileInput(PGESTRING filePath, bool utf8) :
-        TextInput(),
-        stream(NULL)
+        TextInput()
+        #ifndef PGE_FILES_QT
+        , stream(NULL)
+        #endif
     {
         open(filePath, utf8);
     }
@@ -800,7 +803,8 @@ fillEnd:
             C = fgetc(stream);
             if((C != '\n') && (C != '\r') && (C != EOF))
                 out.push_back(static_cast<char>(C));
-        } while((C != '\n') && (C != EOF));
+        }
+        while((C != '\n') && (C != EOF));
 
         if(out.size() == 0)
             return "";
@@ -866,7 +870,8 @@ fillEnd:
             x = static_cast<char>(fgetc(stream));
             if(x != '\r')
                 out.push_back(x);
-        } while(!feof(stream));
+        }
+        while(!feof(stream));
         return out;
         #endif
     }
@@ -934,7 +939,12 @@ fillEnd:
 
 
 
-    TextFileOutput::TextFileOutput() : TextOutput(), m_forceCRLF(false) {}
+    TextFileOutput::TextFileOutput() : TextOutput(), m_forceCRLF(false)
+    {
+        #ifndef PGE_FILES_QT
+        stream = NULL;
+        #endif
+    }
 
     TextFileOutput::TextFileOutput(PGESTRING filePath, bool utf8, bool forceCRLF, TextOutput::outputMode mode) : TextOutput()
     {
@@ -978,12 +988,12 @@ fillEnd:
         (void)utf8;
         #ifndef _WIN32
         typedef const char FMODE;
-        #define FMD(x) x
+#define FMD(x) x
         #else
         typedef const wchar_t FMODE;
-        #define FMD(x) L##x
+#define FMD(x) L##x
         #endif
-        FMODE* tmode = NULL;
+        FMODE *tmode = NULL;
         if(mode == truncate)
             tmode = FMD("wb");
         else if(mode == append)
