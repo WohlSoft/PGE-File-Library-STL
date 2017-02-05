@@ -426,9 +426,9 @@ struct LevelDoor
     //! Required special state of playable character allowed to enter this warp
     bool special_state_required = false;
     //! Length of entrance zone: How wide will be entrance point
-    unsigned int length_i = 0;
+    unsigned int length_i = 32u;
     //! Length of exit zone: How wide will be exit point
-    unsigned int length_o = 0;
+    unsigned int length_o = 32u;
     //! Trigger event on enter
     PGESTRING event_enter;
     //! Is this warp a two-way (possible to enter from both sides)
