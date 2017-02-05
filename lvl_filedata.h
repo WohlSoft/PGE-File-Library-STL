@@ -524,7 +524,6 @@ struct LevelLayer
  */
 struct LevelEvent_Sets
 {
-    LevelEvent_Sets();
     enum SetActions
     {
         LESet_Nothing = -1,
@@ -532,23 +531,23 @@ struct LevelEvent_Sets
     };
 
     //!ID of section
-    long id;
+    long id = -1;
 
     //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
-    long music_id;
+    long music_id = LESet_Nothing;
     //! Set new Custom Music File path
     PGESTRING music_file;
     //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
-    long background_id;
+    long background_id = LESet_Nothing;
 
     //! Change section borders if not (-1 - do nothing, -2 set default, any other values - set X position of left section boundary)
-    long position_left;
+    long position_left = LESet_Nothing;
     //! Change Y position of top section boundary
-    long position_top;
+    long position_top = 0;
     //! Change Y position of bottom section boundary
-    long position_bottom;
+    long position_bottom = 0;
     //! Change X position of right section boundary
-    long position_right;
+    long position_right = 0;
 
     //! Ariphmetical expression calculates position X
     PGESTRING expression_pos_x;
@@ -560,11 +559,11 @@ struct LevelEvent_Sets
     PGESTRING expression_pos_h;
 
     //! Enable autoscroll for this section
-    bool  autoscrol;
+    bool  autoscrol = false;
     //! X speed of autoscrool
-    float autoscrol_x;
+    float autoscrol_x = 0.0;
     //! Y speed of autoscrool
-    float autoscrol_y;
+    float autoscrol_y = 0.0;
 
     //! Ariphmetical expression calculates autoscrool X
     PGESTRING expression_autoscrool_x;
@@ -577,13 +576,12 @@ struct LevelEvent_Sets
  */
 struct LevelEvent_MoveLayer
 {
-    LevelEvent_MoveLayer();
     //! Name of moving layer
-    PGESTRING name;
+    PGESTRING name = "";
     //! Speed X of layer
-    double speed_x;
+    double speed_x = 0.0;
     //! Speed Y of layer
-    double speed_y;
+    double speed_y = 0.0;
 
     //! Expression for X speed/coordinate
     PGESTRING expression_x;
@@ -600,7 +598,7 @@ struct LevelEvent_MoveLayer
         LM_Coordinate = 1
     };
     //! Way to do layer motion
-    int way;
+    int way = LM_Speed;
 };
 
 /*!
@@ -608,31 +606,30 @@ struct LevelEvent_MoveLayer
  */
 struct LevelEvent_SpawnEffect
 {
-    LevelEvent_SpawnEffect();
     //! Effect ID to spawn
-    long id;
+    long id = 0;
     //! Spawn effect at X
-    long x;
+    long x = 0;
     //! Spawn effect at Y
-    long y;
+    long y = 0;
     //! Expression for X position
     PGESTRING expression_x;
     //! Expression for Y position
     PGESTRING expression_y;
     //! Initial speed X (pixels per 1/65 second)
-    double speed_x;
+    double speed_x = 0.0;
     //! Initial speed Y (pixels per 1/65 second)
-    double speed_y;
+    double speed_y = 0.0;
     //! Expression for X speed
     PGESTRING expression_sx;
     //! Expression for Y speed
     PGESTRING expression_sy;
     //! Spawn effect with gravity (to decide whether the effects are affected by gravity)
-    bool gravity;
+    bool gravity = false;
     //! Frame speed of spawned effect
-    int fps;
+    int fps = -1;//Default FPS
     //! Life time of effect (1/65 seconds) (effect existed over this time will be destroyed.)
-    int max_life_time;
+    int max_life_time = -1;//Default life time
 };
 
 /*!
@@ -640,17 +637,16 @@ struct LevelEvent_SpawnEffect
  */
 struct LevelEvent_SpawnNPC
 {
-    LevelEvent_SpawnNPC();
     //! Spawn NPC-ID
-    long id;
+    long id = 0;
     //! Spawn NPC at X position
-    long x;
+    long x = 0;
     //! Spawn NPC at Y position
-    long y;
+    long y = 0;
     //! Spawn NPC with initial keenetic speed X
-    double speed_x;
+    double speed_x = 0.0;
     //! Spawn NPC with initial keenetic speed Y
-    double speed_y;
+    double speed_y = 0.0;
     //! Expression for X position
     PGESTRING expression_x;
     //! Expression for Y position
@@ -660,7 +656,7 @@ struct LevelEvent_SpawnNPC
     //! Expression for Y speed
     PGESTRING expression_sy;
     //! Additional special parameter: advanced settings of generated npc
-    long special;
+    long special = 0;
 };
 
 /*!
@@ -676,22 +672,21 @@ struct LevelEvent_UpdateVariable
 
 struct LevelEvent_SetTimer
 {
-    LevelEvent_SetTimer();
     //! Enable timer
-    bool  enable;
+    bool  enable = false;
     //! Time left (ticks)
-    long  count;
+    long  count = 0;
     //! Lenght of every tick (miliseconds per every tick)
-    double interval;
+    double interval = 1000.0;
     enum CountDirection
     {
         DIR_REVERSE = 0,
         DIR_FORWARD = 1
     };
     //! Count direction
-    int count_dir;
+    int count_dir = DIR_REVERSE;
     //! Show timer
-    bool show;
+    bool show = false;
 };
 
 /*!

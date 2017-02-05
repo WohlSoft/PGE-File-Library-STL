@@ -549,9 +549,9 @@ LevelData FileFormats::CreateLevelData()
 
 bool LevelData::eventIsExist(PGESTRING title)
 {
-    for(int i = 0; i < (signed)events.size(); i++)
+    for(auto &e : events)
     {
-        if(events[i].name == title)
+        if(e.name == title)
             return true;
     }
     return false;
@@ -559,9 +559,9 @@ bool LevelData::eventIsExist(PGESTRING title)
 
 bool LevelData::layerIsExist(PGESTRING title)
 {
-    for(int i = 0; i < (signed)layers.size(); i++)
+    for(auto &l : layers)
     {
-        if(layers[i].name == title)
+        if(l.name == title)
             return true;
     }
     return false;
@@ -579,57 +579,4 @@ bool LevelSMBX64Event::ctrlKeyPressed()
            ctrl_altrun ||
            ctrl_drop ||
            ctrl_start;
-}
-
-LevelEvent_Sets::LevelEvent_Sets()
-{
-    id            = -1;
-    music_id =       LESet_Nothing;
-    background_id =  LESet_Nothing;
-    position_left =  LESet_Nothing;
-    position_top =   0;
-    position_bottom = 0;
-    position_right = 0;
-    autoscrol     = false;
-    autoscrol_x   = 0.f;
-    autoscrol_y   = 0.f;
-}
-
-LevelEvent_MoveLayer::LevelEvent_MoveLayer()
-{
-    name = "";
-    speed_x = 0.0f;
-    speed_y = 0.0f;
-    way = LM_Speed;
-}
-
-LevelEvent_SpawnEffect::LevelEvent_SpawnEffect()
-{
-    id = 0;
-    x = 0;
-    y = 0;
-    speed_x = 0.0f;
-    speed_y = 0.0f;
-    gravity = false;
-    fps = -1; //Default FPS
-    max_life_time = -1; //Default life time
-}
-
-LevelEvent_SpawnNPC::LevelEvent_SpawnNPC()
-{
-    id = 0;
-    x = 0;
-    y = 0;
-    speed_x = 0.0;
-    speed_y = 0.0;
-    special = 0;
-}
-
-LevelEvent_SetTimer::LevelEvent_SetTimer()
-{
-    enable = false;
-    count = 0;
-    interval = 1000.0f;
-    count_dir = DIR_REVERSE;
-    show = false;
 }
