@@ -41,7 +41,8 @@ SOURCES +=  $$PWD/file_formats.cpp \
             $$PWD/smbx64_cnf_filedata.cpp \
             $$PWD/wld_filedata.cpp \
             $$PWD/pge_file_lib_globs.cpp \
-            $$PWD/file_rw_savx.cpp
+            $$PWD/file_rw_savx.cpp \
+            $$PWD/file_rw_lvl_38a_old.cpp
 
 HEADERS +=  $$PWD/file_formats.h \
             $$PWD/file_strlist.h \
@@ -60,4 +61,5 @@ HEADERS +=  $$PWD/file_formats.h \
             $$PWD/CSVReader.h \
             $$PWD/CSVReaderPGE.h \
             $$PWD/CSVUtils.h \
-            $$PWD/pge_ff_units.h
+            $$PWD/pge_ff_units.h \
+            $$PWD/smbx38a_private.h
