@@ -62,7 +62,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
         {
             PGESTRING identifier = dataReader.ReadField<PGESTRING>(1);
 
-            if(identifier == "ws1")
+            if(identifier == "WS1")
             {
                 dataReader.ReadDataLine(CSVDiscard(), // Skip the first field (this is already "identifier")
                                         //  wn=episode name[***urlencode!***]
@@ -79,7 +79,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
                                                         //  asn=auto start level file name[***urlencode!***]
                                                         MakeCSVPostProcessor(&FileData.IntroLevel_file, PGEUrlDecodeFunc),
                                                         //  gon=game over level file name[***urlencode!***]
-                                                        MakeCSVPostProcessor(&FileData.GameOverLevel_file, PGEUrlDecodeFunc)
+                                                        MakeCSVOptional(&FileData.GameOverLevel_file, "", nullptr, PGEUrlDecodeFunc)
                                                         ),
                                         MakeCSVSubReader(dataReader, ',',
                                                         //  dtp=disable two player[0=false !0=true]
@@ -112,7 +112,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
                                         );
                 FileData.charactersFromS64();
             }
-            else if(identifier == "ws2")
+            else if(identifier == "WS2")
             {
                 dataReader.ReadDataLine(CSVDiscard(),
                                         //  credits=[1]
@@ -130,7 +130,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
                                         })
                                         );
             }
-            else if(identifier == "ws3")
+            else if(identifier == "WS3")
             {
                 PGESTRING cheatsList;
                 dataReader.ReadDataLine(CSVDiscard(),
@@ -143,7 +143,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
                                         })
                                         );
             }
-            else if(identifier == "ws4")
+            else if(identifier == "WS4")
             {
                 dataReader.ReadDataLine(CSVDiscard(),
                                         //    se=save locker syntax[***urlencode!***][syntax]
