@@ -201,7 +201,7 @@ struct WorldData
     };
 
     //! Title of the episode
-    PGESTRING EpisodeTitle;
+    PGESTRING EpisodeTitle = "";
     //! Disable SMBX64 Character 1
     bool nocharacter1 = false;
     //! Disable SMBX64 Character 2
@@ -235,8 +235,8 @@ struct WorldData
         nocharacter5 = nocharacter.size() > 4 ? nocharacter[4] : false;
     }
 
-    PGESTRING IntroLevel_file;
-    PGESTRING GameOverLevel_file;
+    PGESTRING IntroLevel_file = "";
+    PGESTRING GameOverLevel_file = "";
     bool HubStyledWorld = false;
     bool restartlevel = false;
 
@@ -269,9 +269,9 @@ struct WorldData
     //! Enable save locker
     bool    saveLocker = false;
     //! Save locker expression
-    PGESTRING saveLockerEx;
+    PGESTRING saveLockerEx = "";
     //! Message box shown on save locking
-    PGESTRING saveLockerMsg;
+    PGESTRING saveLockerMsg = "";
     //! Always show any closed cells (overwise closed cells are will be hidden until player will open them)
     bool    showEverything = false;
     //! Cached total number of available stars on this episode
@@ -280,17 +280,17 @@ struct WorldData
     unsigned long   inventoryLimit = 0;
 
     //! Episode credits (full text area)
-    PGESTRING authors;
+    PGESTRING authors = "";
     //! Episode credits (SMBX64 single-line field 1)
-    PGESTRING author1;
+    PGESTRING author1 = "";
     //! Episode credits (SMBX64 single-line field 2)
-    PGESTRING author2;
+    PGESTRING author2 = "";
     //! Episode credits (SMBX64 single-line field 3)
-    PGESTRING author3;
+    PGESTRING author3 = "";
     //! Episode credits (SMBX64 single-line field 4)
-    PGESTRING author4;
+    PGESTRING author4 = "";
     //! Episode credits (SMBX64 single-line field 5)
-    PGESTRING author5;
+    PGESTRING author5 = "";
 
     //! List of available terrain tiles
     PGELIST<WorldTerrainTile > tiles;

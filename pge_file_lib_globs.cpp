@@ -97,6 +97,8 @@ namespace PGE_FileFormats_misc
 
     PGESTRING url_encode(const PGESTRING &sSrc)
     {
+        if(sSrc.empty())
+            return sSrc;
         const char DEC2HEX[16 + 1] = "0123456789ABCDEF";
         #ifndef PGE_FILES_QT
         const unsigned char *pSrc = (const unsigned char *)sSrc.c_str();
@@ -151,18 +153,22 @@ namespace PGE_FileFormats_misc
 
     PGESTRING url_decode(const std::string &sSrc)
     {
+        if(sSrc.empty())
+            return sSrc;
         // Note from RFC1630: "Sequences which start with a percent
         // sign but are not followed by two hexadecimal characters
         // (0-9, A-F) are reserved for future extension"
-
         const unsigned char *pSrc = (const unsigned char *)sSrc.c_str();
         const int SRC_LEN = sSrc.length();
         const unsigned char *const SRC_END = pSrc + SRC_LEN;
         // last decodable '%'
         const unsigned char *const SRC_LAST_DEC = SRC_END - 2;
 
-        std::unique_ptr<char[]> pStart(new char[SRC_LEN]);
-        char *pEnd = pStart.get();
+        char *pStart = (char*)malloc(SRC_LEN + 1);
+        if(!pStart)
+            return "";
+        memset(pStart, 0, SRC_LEN + 1);
+        char *pEnd = pStart;
 
         while(pSrc < SRC_LAST_DEC)
         {
@@ -185,7 +191,9 @@ namespace PGE_FileFormats_misc
         while(pSrc < SRC_END)
             *pEnd++ = *pSrc++;
 
-        std::string sResult(pStart.get(), pEnd);
+        std::string::size_type pLen = pEnd - pStart;
+        std::string sResult(pStart, pLen);
+        free(pStart);
         return sResult;
     }
     #endif
