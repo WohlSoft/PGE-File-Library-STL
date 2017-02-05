@@ -28,7 +28,9 @@
 #include "meta_filedata.h"
 #include "pge_ff_units.h"
 
+#ifndef DEFAULT_LAYER_NAME
 #define DEFAULT_LAYER_NAME "Default"
+#endif
 
 //////////////////////Level file Data//////////////////////
 /*!

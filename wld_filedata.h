@@ -27,6 +27,10 @@
 #include "pge_file_lib_globs.h"
 #include "meta_filedata.h"
 
+#ifndef DEFAULT_LAYER_NAME
+#define DEFAULT_LAYER_NAME "Default"
+#endif
+
 //////////////////////World file Data//////////////////////
 /**
  * @brief Terrain tile
@@ -34,11 +38,17 @@
 struct WorldTerrainTile
 {
     //! Position X
-    long x;
+    long x = 0;
     //! Position Y
-    long y;
+    long y = 0;
     //! ID of terrain tile
-    unsigned long id;
+    unsigned long id = 0;
+    //! 38A: Graphics extend x
+    long gfx_dx = 0;
+    //! 38A: Graphics extend y
+    long gfx_dy = 0;
+    //! Name of a parent layer. Default value is "Default"
+    PGESTRING layer = DEFAULT_LAYER_NAME;
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -49,11 +59,17 @@ struct WorldTerrainTile
 struct WorldScenery
 {
     //! Position X
-    long x;
+    long x = 0;
     //! Position Y
-    long y;
+    long y = 0;
     //! ID of scenery object
-    unsigned long id;
+    unsigned long id = 0;
+    //! 38A: Graphics extend x
+    long gfx_dx = 0;
+    //! 38A: Graphics extend y
+    long gfx_dy = 0;
+    //! Name of a parent layer. Default value is "Default"
+    PGESTRING layer = DEFAULT_LAYER_NAME;
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -64,11 +80,17 @@ struct WorldScenery
 struct WorldPathTile
 {
     //! Position X
-    long x;
+    long x = 0;
     //! Position Y
-    long y;
+    long y = 0;
     //! ID of path tile
-    unsigned long id;
+    unsigned long id = 0;
+    //! 38A: Graphics extend x
+    long gfx_dx = 0;
+    //! 38A: Graphics extend y
+    long gfx_dy = 0;
+    //! Name of a parent layer. Default value is "Default"
+    PGESTRING layer = DEFAULT_LAYER_NAME;
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -79,37 +101,43 @@ struct WorldPathTile
 struct WorldLevelTile
 {
     //! Position X
-    long x;
+    long x = 0;
     //! PositionY
-    long y;
+    long y = 0;
+    //! 38A: Graphics extend x
+    long gfx_dx = 0;
+    //! 38A: Graphics extend y
+    long gfx_dy = 0;
     //! ID of level entrance object
-    unsigned long id;
+    unsigned long id = 0;
     //! Target level file to enter
     PGESTRING lvlfile;
     //! Visible title of the level
     PGESTRING title;
     //! Open top path on exit code
-    int top_exit;
+    int top_exit = -1;
     //! Open left path on exit code
-    int left_exit;
+    int left_exit = -1;
     //! Open bottom path on exit code
-    int bottom_exit;
+    int bottom_exit = -1;
     //! Open right path on exit code
-    int right_exit;
+    int right_exit = -1;
     //! Target Warp-ID to enter level
-    unsigned long entertowarp;
+    unsigned long entertowarp = 0;
     //! Level is always shown on map even not opened
-    bool alwaysVisible;
+    bool alwaysVisible = false;
     //! Show path background image under main sprite
-    bool pathbg;
+    bool pathbg = false;
     //! Is this level entrance point is initial position of player on game start
-    bool gamestart;
+    bool gamestart = false;
     //! Teleport to X coordinate of the world map (-1 don't teleport)
-    long gotox;
+    long gotox = -1;
     //! Teleport to Y coordinate of the world map (-1 don't teleport)
-    long gotoy;
+    long gotoy = -1;
     //! Show big path background image under main sprite
-    bool bigpathbg;
+    bool bigpathbg = false;
+    //! Name of a parent layer. Default value is "Default"
+    PGESTRING layer = DEFAULT_LAYER_NAME;
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -120,16 +148,37 @@ struct WorldLevelTile
 struct WorldMusicBox
 {
     //! Position X
-    long x;
+    long x = 0;
     //! Position Y
-    long y;
+    long y = 0;
     //! ID of starnard music box
-    unsigned long id;
+    unsigned long id = 0;
     //! Custom music file to play on touch
     PGESTRING music_file;
+    //! Name of a parent layer. Default value is "Default"
+    PGESTRING layer = DEFAULT_LAYER_NAME;
     //! Helper meta-data
     ElementMeta meta;
 };
+
+/*!
+ * \brief World map specific Layer entry structure
+ */
+struct WorldLayer
+{
+    //! Name of layer
+    PGESTRING name;
+    //! Is this layer hidden?
+    bool hidden = false;
+    //! Are all members of this layer are locked for modifying?
+    bool locked = false;
+    /*
+     * Editor-only parameters which are not saving into file
+     */
+    //! Helper meta-data
+    ElementMeta meta;
+};
+
 
 /**
  * @brief World map data structure
@@ -259,10 +308,17 @@ struct WorldData
     PGELIST<WorldMusicBox > music;
     unsigned int musicbox_array_id = 1;
 
-    //meta:
+    //! Array of all presented layers in this world map
+    PGELIST<WorldLayer > layers;
+    //! Last used Layer's array ID
+    unsigned int layers_array_id = 1;
+
+    //! Meta-data: Position bookmarks, Auto-Script configuration, etc., Crash meta-data, etc.
     MetaData metaData;
 
-    //editing:
+    /*
+     * Editor-only parameters which are not saving into file
+     */
     int     CurSection = 0;
     bool    playmusic = false;
     int     currentMusic = 0;

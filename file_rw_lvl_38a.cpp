@@ -107,7 +107,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     catch(const std::exception &err)
     {
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + "format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
@@ -1005,7 +1005,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + "format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
 
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
