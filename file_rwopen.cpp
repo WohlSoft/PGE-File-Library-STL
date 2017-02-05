@@ -216,7 +216,16 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
     firstLine = file.read(8);
     file.close();
 
-    if( PGE_DetectSMBXFile(firstLine) )
+    if( PGE_StartsWith( firstLine, "SMBXFile" ) )
+    {
+        //Read SMBX-38A WLD File
+        if(!ReadSMBX38AWldFileF( filePath, data ))
+        {
+            errorString = data.meta.ERROR_info;
+            return false;
+        }
+    }
+    else if( PGE_DetectSMBXFile(firstLine) )
     {
         //Read SMBX WLD File
         if(!ReadSMBX64WldFileF( filePath, data ))
@@ -250,9 +259,9 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
     PGE_FileFormats_misc::TextFileInput file;
     if(!file.open(filePath))
     {
-        data.meta.ERROR_info="Can't open file";
-        data.meta.ERROR_linedata="";
-        data.meta.ERROR_linenum=-1;
+        data.meta.ERROR_info = "Can't open file";
+        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linenum = -1;
         data.meta.ReadFileValid = false;
         return false;
     }
@@ -260,7 +269,12 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
     firstLine = file.readLine();
     file.close();
 
-    if( PGE_DetectSMBXFile(firstLine) )
+    if( PGE_StartsWith(firstLine, "SMBXFile") )
+    {
+        //Read SMBX-38A WLD File
+        return ReadSMBX38AWldFileHeader( filePath, data );
+    }
+    else if( PGE_DetectSMBXFile(firstLine) )
     {   //Read SMBX WLD File
         return ReadSMBX64WldFileHeader( filePath, data );
     }
@@ -306,6 +320,14 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFor
         }
         break;
     case WLD_SMBX38A:
+        {
+            if(!FileFormats::WriteSMBX38AWldFileF(filePath, FileData))
+            {
+                errorString = "Cannot save file " + filePath + ".";
+                return false;
+            }
+            return true;
+        }
         break;
     }
     errorString = "Unsupported file type";
@@ -330,6 +352,10 @@ bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFor
         }
         break;
     case WLD_SMBX38A:
+        {
+            WriteSMBX38AWldFileRaw(FileData, RawData);
+            return true;
+        }
         break;
     }
     errorString = "Unsupported file type";

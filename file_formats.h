@@ -530,6 +530,58 @@ public:
      */
     static bool WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, WorldData /*output*/ &FileData, int file_format=64);
 
+// SMBX-38A WLD File
+    /*!
+     * \brief Parses SMBX-38A world map file header and skips other part of a file
+     * \param [__in] filePath Full path to world map file
+     * \param [__out] FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX-38A world map file data from file
+     * \param [__in] filePath Full path to flie
+     * \param [__out] FileData
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileF(PGESTRING  filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX-38A world map file data from raw data string
+     * \param [__in] rawdata Raw-data string contains SMBX-38A Level file data
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param [__out] FileData Level data structure
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX-38A world map file data from raw data string
+     * \param [__in] in File input descriptor
+     * \param [__out] FileData FileData Level data structure
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput &in, WorldData /*output*/ &FileData);
+    /*!
+     * \brief Generates SMBX-38A Level file data and saves into file
+     * \param [__in] filePath Target file path
+     * \param [__in] FileData Level data structure
+     * \return true if file successfully saved, false if error occouped
+     */
+    static bool WriteSMBX38AWldFileF(PGESTRING  filePath, WorldData &FileData);
+    /*!
+     * \brief Generates SMBX-38A Level file data and saves into raw string
+     * \param [__in] FileData Target file path
+     * \param [__out] rawdata Raw data string in the SMBX-38A world map format
+     * \return true if file successfully saved, false if error occouped
+     */
+    static bool WriteSMBX38AWldFileRaw(WorldData &FileData, PGESTRING &rawdata);
+    /*!
+     * \brief Generates SMBX-38A Level file data and saves it through file output descriptor
+     * \param [__inout] out Output file descriptor
+     * \param [__in] FileData Target file path
+     * \return true if file successfully saved, false if error occouped
+     */
+    static bool WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData);
+
 // PGE Extended World map File
     /*!
      * \brief Parsed PGE-X World map file header only

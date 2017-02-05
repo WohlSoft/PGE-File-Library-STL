@@ -52,21 +52,19 @@ namespace PGE_FileFormats_misc
 #define utf8_fopen fopen
     #endif
 
-
-    void split(std::vector<std::string> &dest, const std::string &str, const std::string separator)
+    void split(std::vector<std::string> &dest, const std::string &str, const std::string &separator)
     {
-        #ifdef _MSC_VER
-        char *pTempStr = _strdup(str.c_str());  //Microsoft Visual Studio on Windows
-        #else
-        char *pTempStr = strdup(str.c_str());  //GCC, CLang on Linux and on Mac OS X, or MinGW on Windows
-        #endif
-        char *pWord = std::strtok(pTempStr, separator.c_str());
-        while(pWord != NULL)
-        {
-            dest.push_back(pWord);
-            pWord = std::strtok(NULL, separator.c_str());
-        }
-        free(pTempStr);
+        dest.clear();
+        std::string::size_type begin = 0;
+        std::string::size_type end   = 0;
+        std::string::size_type sepLen = separator.size();
+        do{
+            end = str.find(separator, begin);
+            std::string s = str.substr(begin, end - begin);
+            if(!s.empty())
+                dest.push_back(s);
+            begin = end + sepLen;
+        } while(end != std::string::npos);
     }
 
     void replaceAll(std::string &str, const std::string &from, const std::string &to)

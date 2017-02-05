@@ -92,6 +92,10 @@ inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
     return str.remove(pos, len);
 }
+inline PGESTRING PGE_SubStr(PGESTRING &str, int pos, int len = -1)
+{
+    return str.mid(pos, len);
+}
 inline bool      IsNULL(const PGESTRING str)
 {
     return str.isNull();
@@ -191,7 +195,7 @@ typedef std::vector<std::string> PGESTRINGList;
 typedef std::fstream PGEFILE;
 namespace PGE_FileFormats_misc
 {
-    void split(std::vector<std::string> &dest, const std::string &str, const std::string separator);
+    void split(std::vector<std::string> &dest, const std::string &str, const std::string& separator);
     void replaceAll(std::string &str, const std::string &from, const std::string &to);
     void RemoveSub(std::string &sInput, const std::string &sub);
     bool hasEnding(std::string const &fullString, std::string const &ending);
@@ -205,7 +209,7 @@ namespace PGE_FileFormats_misc
     std::string base64_encodeA(std::string &source);
     std::string base64_decodeA(std::string &source);
 }
-inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGESTRING sep)
+inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGESTRING &sep)
 {
     dst.clear();
     PGE_FileFormats_misc::split(dst, src, sep);
@@ -223,7 +227,12 @@ inline PGESTRING PGE_RemSubSTRING(PGESTRING src, PGESTRING substr)
 }
 inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
-    return str.erase(pos, len);
+    str.erase(pos, len);
+    return str;
+}
+inline PGESTRING PGE_SubStr(PGESTRING &str, std::string::size_type pos, std::string::size_type len = std::string::npos)
+{
+    return str.substr(pos, len);
 }
 inline bool IsNULL(const PGESTRING str)
 {

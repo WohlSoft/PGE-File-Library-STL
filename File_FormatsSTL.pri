@@ -42,7 +42,8 @@ SOURCES +=  $$PWD/file_formats.cpp \
             $$PWD/wld_filedata.cpp \
             $$PWD/pge_file_lib_globs.cpp \
             $$PWD/file_rw_savx.cpp \
-            $$PWD/file_rw_lvl_38a_old.cpp
+            $$PWD/file_rw_lvl_38a_old.cpp \
+            $$PWD/file_rw_wld_38a.cpp
 
 HEADERS +=  $$PWD/file_formats.h \
             $$PWD/file_strlist.h \
