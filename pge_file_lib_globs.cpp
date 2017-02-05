@@ -97,7 +97,7 @@ namespace PGE_FileFormats_misc
 
     PGESTRING url_encode(const PGESTRING &sSrc)
     {
-        if(sSrc.empty())
+        if(IsEmpty(sSrc))
             return sSrc;
         const char DEC2HEX[16 + 1] = "0123456789ABCDEF";
         #ifndef PGE_FILES_QT
