@@ -416,11 +416,11 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 long w = 0;
                 long h = 0;
                 long flags = 0;
-                PGESTRING eventTouch = 0;
+                PGESTRING eventTouch = "";
                 long eflag = 0;
-                PGESTRING eventHammer = 0;
-                PGESTRING eventWarpWhistle = 0;
-                PGESTRING eventAnchor = 0;
+                PGESTRING eventHammer = "";
+                PGESTRING eventWarpWhistle = "";
+                PGESTRING eventAnchor = "";
                 //M|10|416|1312|    |     |32|32|1   |,0
                 //M|id|x  |y   |name|layer|w |h |flag|te,eflag|ie1,ie2,ie3
                 dataReader.ReadDataLine(CSVDiscard(),
