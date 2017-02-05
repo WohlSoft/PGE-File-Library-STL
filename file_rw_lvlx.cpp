@@ -197,6 +197,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
     LevelSMBX64Event event;
     LevelVariable variable;
     LevelScript script;
+    LevelItemSetup38A customcfg38A;
     ///////////////////////////////////////Begin file///////////////////////////////////////
     PGEX_FileParseTree(in.readAll());
     PGEX_FetchSection() //look sections
@@ -383,6 +384,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_SLongVal("Y", block.y) //Position Y
                     PGEX_USLongVal("W", block.w) //Width
                     PGEX_USLongVal("H", block.h) //Height
+                    PGEX_BoolVal("AS", block.autoscale)//Enable auto-Scaling
+                    PGEX_StrVal("GXN", block.gfx_name) //38A GFX-Name
+                    PGEX_SLongVal("GXX", block.gfx_dx) //38A graphics extend x
+                    PGEX_SLongVal("GXY", block.gfx_dy) //38A graphics extend y
                     PGEX_SLongVal("CN", block.npc_id) //Contains (coins/NPC)
                     PGEX_BoolVal("IV", block.invisible) //Invisible
                     PGEX_BoolVal("SL", block.slippery) //Slippery
@@ -410,6 +415,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_ULongVal("ID", bgodata.id)  //BGO ID
                     PGEX_SLongVal("X",  bgodata.x)  //X Position
                     PGEX_SLongVal("Y",  bgodata.y)  //Y Position
+                    PGEX_SLongVal("GXX", bgodata.gfx_dx) //38A graphics extend x
+                    PGEX_SLongVal("GXY", bgodata.gfx_dy) //38A graphics extend y
                     PGEX_FloatVal("ZO", bgodata.z_offset) //Z Offset
                     PGEX_SIntVal("ZP", bgodata.z_mode)  //Z Position
                     PGEX_SLongVal("SP", bgodata.smbx64_sp)  //SMBX64 Sorting priority
@@ -434,6 +441,9 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_ULongVal("ID", npcdata.id) //NPC ID
                     PGEX_SLongVal("X", npcdata.x) //X position
                     PGEX_SLongVal("Y", npcdata.y) //Y position
+                    PGEX_StrVal("GXN", npcdata.gfx_name) //38A GFX-Name
+                    PGEX_SLongVal("GXX", npcdata.gfx_dx) //38A graphics extend x
+                    PGEX_SLongVal("GXY", npcdata.gfx_dy) //38A graphics extend y
                     PGEX_SIntVal("D", npcdata.direct) //Direction
                     PGEX_SLongVal("CN", npcdata.contents) //Contents of container-NPC
                     PGEX_SLongVal("S1", npcdata.special_data) //Special value 1
@@ -1304,31 +1314,19 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //Convert boolean array into control flags
                 // SMBX64-only
                 if(controls.size() >= 1)  event.ctrl_up = controls[0];
-
                 if(controls.size() >= 2)  event.ctrl_down = controls[1];
-
                 if(controls.size() >= 3)  event.ctrl_left = controls[2];
-
                 if(controls.size() >= 4)  event.ctrl_right = controls[3]; //-V112
-
                 if(controls.size() >= 5)  event.ctrl_run = controls[4];
-
                 if(controls.size() >= 6)  event.ctrl_jump = controls[5];
-
                 if(controls.size() >= 7)  event.ctrl_drop = controls[6];
-
                 if(controls.size() >= 8)  event.ctrl_start = controls[7];
-
                 if(controls.size() >= 9)  event.ctrl_altrun = controls[8];
-
                 if(controls.size() >= 10) event.ctrl_altjump = controls[9];
-
                 // SMBX64-only end
                 // SMBX-38A begin
                 if(controls.size() >= 11) event.ctrls_enable = controls[10];
-
                 if(controls.size() >= 12) event.ctrl_lock_keyboard = controls[11];
-
                 // SMBX-38A end
                 //add captured value into array
                 bool found = false;
@@ -1402,6 +1400,46 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 FileData.variables.push_back(variable);
             }
         }//SCRIPTS
+        ///////////////////CUSTOM ITEM CONFIGS (38A)//////////////////////
+        PGEX_Section("CUSTOM_ITEMS_38A")
+        {
+            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_Items()
+            {
+                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                customcfg38A = LevelItemSetup38A();
+                PGESTRINGList data;
+                int type = 0;
+                PGEX_Values() //Look markers and values
+                {
+                    PGEX_ValueBegin()
+                    PGEX_UIntVal("T",  type) //Type of item
+                    PGEX_UIntVal("ID", customcfg38A.id)
+                    PGEX_StrArrVal("D", data) //Variable value
+                }
+                errorString = "Wrong pair syntax";
+                for(PGESTRING &s : data)
+                {
+                    LevelItemSetup38A::Entry e;
+                    PGESTRINGList pair;
+                    PGE_SPLITSTRING(pair, s, "=");
+                    if(pair.size() < 2)
+                        goto badfile;
+
+                    if(PGEFile::IsIntU(pair[0]))
+                        e.key = toUInt(pair[0]);
+                    else goto badfile;
+
+                    if(PGEFile::IsIntS(pair[1]))
+                        e.value = toLong(pair[1]);
+                    else goto badfile;
+
+                    customcfg38A.data.push_back(e);
+                }
+                customcfg38A.type = (LevelItemSetup38A::ItemType)type;
+                FileData.custom38A_configs.push_back(customcfg38A);
+            }
+        }//CUSTOM_ITEMS_38A
     }
     ///////////////////////////////////////EndFile///////////////////////////////////////
     errorString.clear(); //If no errors, clear string;
@@ -1653,6 +1691,15 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             //Size
             out << PGEFile::value("W", PGEFile::WriteInt(blk.w));  // Block Width (sizable only)
             out << PGEFile::value("H", PGEFile::WriteInt(blk.h));  // Block Height (sizable only)
+            if(blk.autoscale != defBlock.autoscale)
+                out << PGEFile::value("AS", PGEFile::WriteBool(blk.autoscale));// AutoScale
+
+            if(!IsEmpty(blk.gfx_name))
+                out << PGEFile::value("GXN", PGEFile::WriteStr(blk.gfx_name));// 38A GFX-Name
+            if(blk.gfx_dx > 0) //38A graphics extend x
+                out << PGEFile::value("GXX", PGEFile::WriteInt(blk.gfx_dx));  // 38A graphics extend x
+            if(blk.gfx_dy > 0) //38A graphics extend y
+                out << PGEFile::value("GXX", PGEFile::WriteInt(blk.gfx_dy));  // 38A graphics extend y
 
             //Included NPC
             if(blk.npc_id != 0) //Write only if not zero
@@ -1661,21 +1708,16 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             //Boolean flags
             if(blk.invisible)
                 out << PGEFile::value("IV", PGEFile::WriteBool(blk.invisible));  // Invisible
-
             if(blk.slippery)
                 out << PGEFile::value("SL", PGEFile::WriteBool(blk.slippery));  // Slippery flag
-
             //Layer
             if(blk.layer != defBlock.layer) //Write only if not default
                 out << PGEFile::value("LR", PGEFile::WriteStr(blk.layer));  // Layer
-
             //Event Slots
             if(!IsEmpty(blk.event_destroy))
                 out << PGEFile::value("ED", PGEFile::WriteStr(blk.event_destroy));
-
             if(!IsEmpty(blk.event_hit))
                 out << PGEFile::value("EH", PGEFile::WriteStr(blk.event_hit));
-
             if(!IsEmpty(blk.event_emptylayer))
                 out << PGEFile::value("EE", PGEFile::WriteStr(blk.event_emptylayer));
 
@@ -1698,19 +1740,18 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             //Position
             out << PGEFile::value("X", PGEFile::WriteInt(bgo.x));  // BGO X
             out << PGEFile::value("Y", PGEFile::WriteInt(bgo.y));  // BGO Y
-
+            if(bgo.gfx_dx > 0) //38A graphics extend x
+                out << PGEFile::value("GXX", PGEFile::WriteInt(bgo.gfx_dx));  // 38A graphics extend x
+            if(bgo.gfx_dy > 0) //38A graphics extend y
+                out << PGEFile::value("GXX", PGEFile::WriteInt(bgo.gfx_dy));  // 38A graphics extend y
             if(fabs(bgo.z_offset - defBGO.z_offset) > DBL_EPSILON)
                 out << PGEFile::value("ZO", PGEFile::WriteFloat(bgo.z_offset));  // BGO Z-Offset
-
             if(bgo.z_mode != defBGO.z_mode)
                 out << PGEFile::value("ZP", PGEFile::WriteInt(bgo.z_mode));  // BGO Z-Mode
-
             if(bgo.smbx64_sp != -1)
                 out << PGEFile::value("SP", PGEFile::WriteInt(bgo.smbx64_sp));  // BGO SMBX64 Sort Priority
-
             if(bgo.layer != defBGO.layer) //Write only if not default
                 out << PGEFile::value("LR", PGEFile::WriteStr(bgo.layer));  // Layer
-
             out << "\n";
         }
 
@@ -1730,14 +1771,20 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             //Position
             out << PGEFile::value("X", PGEFile::WriteInt(npc.x));  // NPC X
             out << PGEFile::value("Y", PGEFile::WriteInt(npc.y));  // NPC Y
+
+            if(!IsEmpty(npc.gfx_name))
+                out << PGEFile::value("GXN", PGEFile::WriteStr(npc.gfx_name));// 38A GFX-Name
+            if(npc.gfx_dx > 0) //38A graphics extend x
+                out << PGEFile::value("GXX", PGEFile::WriteInt(npc.gfx_dx));  // 38A graphics extend x
+            if(npc.gfx_dy > 0) //38A graphics extend y
+                out << PGEFile::value("GXX", PGEFile::WriteInt(npc.gfx_dy));  // 38A graphics extend y
+
             out << PGEFile::value("D", PGEFile::WriteInt(npc.direct));  // NPC Direction
 
             if(npc.contents != 0)
                 out << PGEFile::value("CN", PGEFile::WriteInt(npc.contents));  // Contents of container
-
             if(npc.special_data != defNPC.special_data)
                 out << PGEFile::value("S1", PGEFile::WriteInt(npc.special_data));  // Special value 1
-
             if(npc.special_data2 != defNPC.special_data2)
                 out << PGEFile::value("S2", PGEFile::WriteInt(npc.special_data2));  // Special value 2
 
@@ -1759,44 +1806,32 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             if(!IsEmpty(npc.msg))
                 out << PGEFile::value("MG", PGEFile::WriteStr(npc.msg));  // Message
-
             if(npc.friendly)
                 out << PGEFile::value("FD", PGEFile::WriteBool(npc.friendly));  // Friendly
-
             if(npc.nomove)
                 out << PGEFile::value("NM", PGEFile::WriteBool(npc.nomove));  // Idle
-
             if(npc.is_boss)
                 out << PGEFile::value("BS", PGEFile::WriteBool(npc.is_boss));  // Set as boss
-
             if(npc.layer != defNPC.layer) //Write only if not default
                 out << PGEFile::value("LR", PGEFile::WriteStr(npc.layer));  // Layer
-
             if(!IsEmpty(npc.attach_layer))
                 out << PGEFile::value("LA", PGEFile::WriteStr(npc.attach_layer));  // Attach layer
-
             if(!IsEmpty(npc.send_id_to_variable))
                 out << PGEFile::value("SV", PGEFile::WriteStr(npc.send_id_to_variable)); //Send ID to variable
 
             //Event slots
             if(!IsEmpty(npc.event_activate))
                 out << PGEFile::value("EA", PGEFile::WriteStr(npc.event_activate));
-
             if(!IsEmpty(npc.event_die))
                 out << PGEFile::value("ED", PGEFile::WriteStr(npc.event_die));
-
             if(!IsEmpty(npc.event_talk))
                 out << PGEFile::value("ET", PGEFile::WriteStr(npc.event_talk));
-
             if(!IsEmpty(npc.event_emptylayer))
                 out << PGEFile::value("EE", PGEFile::WriteStr(npc.event_emptylayer));
-
             if(!IsEmpty(npc.event_grab))
                 out << PGEFile::value("EG", PGEFile::WriteStr(npc.event_grab));
-
             if(!IsEmpty(npc.event_touch))
                 out << PGEFile::value("EO", PGEFile::WriteStr(npc.event_touch));
-
             if(!IsEmpty(npc.event_touch))
                 out << PGEFile::value("EF", PGEFile::WriteStr(npc.event_nextframe));
 
@@ -2319,37 +2354,26 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
                     if(effect.x != 0)
                         spawnEffect += PGEFile::value("SX", PGEFile::WriteInt(effect.x));
-
                     if(!IsEmpty(effect.expression_x) && (effect.expression_x != "0"))
                         spawnEffect += PGEFile::value("SXX", PGEFile::WriteStr(effect.expression_x));
-
                     if(effect.y != 0)
                         spawnEffect += PGEFile::value("SY", PGEFile::WriteInt(effect.y));
-
                     if(!IsEmpty(effect.expression_y) && (effect.expression_y != "0"))
                         spawnEffect += PGEFile::value("SYX", PGEFile::WriteStr(effect.expression_y));
-
                     if(effect.speed_x != 0.0)
                         spawnEffect += PGEFile::value("SSX", PGEFile::WriteFloat(effect.speed_x));
-
                     if(!IsEmpty(effect.expression_sx) && (effect.expression_sx != "0"))
                         spawnEffect += PGEFile::value("SSXX", PGEFile::WriteStr(effect.expression_sx));
-
                     if(effect.speed_y != 0.0)
                         spawnEffect += PGEFile::value("SSY", PGEFile::WriteFloat(effect.speed_y));
-
                     if(!IsEmpty(effect.expression_sy) && (effect.expression_sy != "0"))
                         spawnEffect += PGEFile::value("SSYX", PGEFile::WriteStr(effect.expression_sy));
-
                     if(effect.fps != 0)
                         spawnEffect += PGEFile::value("FP", PGEFile::WriteInt(effect.fps));
-
                     if(effect.max_life_time != 0)
                         spawnEffect += PGEFile::value("TTL", PGEFile::WriteInt(effect.max_life_time));
-
                     if(effect.gravity)
                         spawnEffect += PGEFile::value("GT", PGEFile::WriteBool(effect.gravity));
-
                     spawnEffects.push_back(spawnEffect);
                 }
 
@@ -2396,13 +2420,11 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         {
             out << "VARIABLES\n";
 
-            for(i = 0; i < static_cast<int>(FileData.variables.size()); i++)
+            for(auto &var : FileData.variables)
             {
-                out << PGEFile::value("N", PGEFile::WriteStr(FileData.variables[i].name));  // Variable name
-
-                if(!IsEmpty(FileData.variables[i].value))
-                    out << PGEFile::value("V", PGEFile::WriteStr(FileData.variables[i].value));  // Value
-
+                out << PGEFile::value("N", PGEFile::WriteStr(var.name));  // Variable name
+                if(!IsEmpty(var.value))
+                    out << PGEFile::value("V", PGEFile::WriteStr(var.value));  // Value
                 out << "\n";
             }
 
@@ -2414,19 +2436,33 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         {
             out << "SCRIPTS\n";
 
-            for(i = 0; i < static_cast<int>(FileData.scripts.size()); i++)
+            for(auto &script : FileData.scripts)
             {
-                LevelScript &script = FileData.scripts[i];
                 out << PGEFile::value("N", PGEFile::WriteStr(script.name));  // Variable name
                 out << PGEFile::value("L", PGEFile::WriteInt(script.language));// Code of language
-
-                if(!IsEmpty(FileData.scripts[i].script))
+                if(!IsEmpty(script.script))
                     out << PGEFile::value("S", PGEFile::WriteStr(script.script));  // Script text
-
                 out << "\n";
             }
 
             out << "SCRIPTS_END\n";
+        }
+
+        //CUSTOM_ITEMS_38A section
+        if(!FileData.custom38A_configs.empty())
+        {
+            out << "CUSTOM_ITEMS_38A\n";
+            for(auto &cfg : FileData.custom38A_configs)
+            {
+                out << PGEFile::value("T", PGEFile::WriteInt(cfg.type));
+                out << PGEFile::value("ID", PGEFile::WriteInt(cfg.id));
+                PGESTRINGList data;
+                for(auto &e : cfg.data)
+                    data.push_back( PGEFile::WriteInt(e.key) + "=" + PGEFile::WriteInt(e.value));
+                out << PGEFile::value("D", PGEFile::WriteStrArr(data));
+                out << "\n";
+            }
+            out << "CUSTOM_ITEMS_38A_END\n";
         }
     }
 

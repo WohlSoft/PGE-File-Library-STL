@@ -34,10 +34,26 @@ namespace PGE_FileFormats_misc
         dest.resize(newlen);
         return dest;
     }
+
+    FILE *utf8_fopen(const char *file, const char *mode)
+    {
+        wchar_t wfile[MAX_PATH + 1];
+        wchar_t wmode[21];
+        int wfile_len = strlen(file);
+        int wmode_len = strlen(mode);
+        wfile_len = MultiByteToWideChar(CP_UTF8, 0, file, wfile_len, wfile, MAX_PATH);
+        wmode_len = MultiByteToWideChar(CP_UTF8, 0, mode, wmode_len, wmode, 20);
+        wfile[wfile_len] = L'\0';
+        wmode[wmode_len] = L'\0';
+        return _wfopen(wfile, wmode);
+    }
+
+    #else
+#define utf8_fopen fopen
     #endif
 
 
-    void split(std::vector<std::string> &dest, const std::string &str, std::string separator)
+    void split(std::vector<std::string> &dest, const std::string &str, const std::string separator)
     {
         #ifdef _MSC_VER
         char *pTempStr = _strdup(str.c_str());  //Microsoft Visual Studio on Windows
@@ -253,13 +269,15 @@ namespace PGE_FileFormats_misc
     std::string base64_decodeW(std::string &source)
     {
         std::string out = base64_decode(source);
-        FILE *x = fopen("test.txt", "ab");
+        #ifdef DEBUG_BUILD
+        FILE *x = utf8_fopen("test.txt", "ab");
         //        for(size_t i=0; i<out.size(); i++)
         //             printf("%i ", (int)out[i]);
         //        printf("%s", out.c_str());
         fwrite((void *)out.c_str(), sizeof(char), out.size(), x);
         fflush(x);
         fclose(x);
+        #endif
         std::wstring outw((wchar_t *)out.c_str());
         SI_ConvertW<wchar_t> utf8(true);
         size_t new_len = outw.length() * 2; //utf8.SizeToStore(outw.c_str());
@@ -386,7 +404,7 @@ namespace PGE_FileFormats_misc
         #ifdef PGE_FILES_QT
         return QFile::exists(filePath);
         #else
-        FILE *x = fopen(filePath.c_str(), "rb");
+        FILE *x = utf8_fopen(filePath.c_str(), "rb");
         if(x)
         {
             fclose(x);
@@ -748,7 +766,7 @@ fillEnd:
         return true;
         #else
         (void)utf8;
-        stream = fopen(filePath.c_str(), "rb");
+        stream = utf8_fopen(filePath.c_str(), "rb");
         return (bool)stream;
         #endif
     }
@@ -760,7 +778,8 @@ fillEnd:
         #ifdef PGE_FILES_QT
         file.close();
         #else
-        fclose(stream);
+        if(stream)
+            fclose(stream);
         stream = NULL;
         #endif
     }
@@ -864,12 +883,12 @@ fillEnd:
         std::string out;
         out.reserve(10240);
         fseek(stream, 0, SEEK_SET);
-        char x = 0;
+        int x = 0;
         do
         {
-            x = static_cast<char>(fgetc(stream));
-            if(x != '\r')
-                out.push_back(x);
+            x = fgetc(stream);
+            if((x != '\r') && (x != EOF))
+                out.push_back(static_cast<char>(x));
         }
         while(!feof(stream));
         return out;
@@ -986,26 +1005,14 @@ fillEnd:
         return true;
         #else
         (void)utf8;
-        #ifndef _WIN32
-        typedef const char FMODE;
-#define FMD(x) x
-        #else
-        typedef const wchar_t FMODE;
-#define FMD(x) L##x
-        #endif
-        FMODE *tmode = NULL;
+        const char *tmode = NULL;
         if(mode == truncate)
-            tmode = FMD("wb");
+            tmode = "wb";
         else if(mode == append)
-            tmode = FMD("ab");
+            tmode = "ab";
         else
-            tmode = FMD("wb");
-        #ifndef _WIN32
-        stream = fopen(filePath.c_str(), tmode);
-        #else
-        std::wstring filePathW = Str2WStr(filePath);
-        stream = _wfopen(filePathW.c_str(), tmode);
-        #endif
+            tmode = "wb";
+        stream = utf8_fopen(filePath.c_str(), tmode);
         return (stream != NULL);
         #endif
     }
@@ -1017,7 +1024,8 @@ fillEnd:
         #ifdef PGE_FILES_QT
         file.close();
         #else
-        fclose(stream);
+        if(stream)
+            fclose(stream);
         stream = NULL;
         #endif
     }

@@ -34,7 +34,7 @@ FileStringList::~FileStringList()
     buffer.clear();
 }
 
-void FileStringList::addData(PGESTRING fileData)
+void FileStringList::addData(const PGESTRING &fileData)
 {
     buffer.clear();
     #ifdef PGE_FILES_QT
@@ -42,7 +42,7 @@ void FileStringList::addData(PGESTRING fileData)
     #else
     PGE_SPLITSTRING(buffer, fileData, "\n");
     #endif
-    lineID=0;
+    lineID = 0;
 }
 
 PGESTRING FileStringList::readLine()

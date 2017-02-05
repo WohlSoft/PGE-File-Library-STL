@@ -45,6 +45,7 @@
            and equal to QVector if PGE File Library built in the Qt mode
 */
 
+#include <cstdint>
 
 #ifdef PGE_FILES_QT
 #include <QString>
@@ -91,15 +92,15 @@ inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
     return str.remove(pos, len);
 }
-inline bool      IsNULL(PGESTRING str)
+inline bool      IsNULL(const PGESTRING str)
 {
     return str.isNull();
 }
-inline bool      IsEmpty(PGESTRING &str)
+inline bool      IsEmpty(const PGESTRING &str)
 {
     return str.isEmpty();
 }
-inline bool      IsEmpty(PGESTRINGList &str)
+inline bool      IsEmpty(const PGESTRINGList &str)
 {
     return str.isEmpty();
 }
@@ -190,7 +191,7 @@ typedef std::vector<std::string> PGESTRINGList;
 typedef std::fstream PGEFILE;
 namespace PGE_FileFormats_misc
 {
-    void split(std::vector<std::string> &dest, const std::string &str, std::string separator);
+    void split(std::vector<std::string> &dest, const std::string &str, const std::string separator);
     void replaceAll(std::string &str, const std::string &from, const std::string &to);
     void RemoveSub(std::string &sInput, const std::string &sub);
     bool hasEnding(std::string const &fullString, std::string const &ending);
@@ -204,7 +205,7 @@ namespace PGE_FileFormats_misc
     std::string base64_encodeA(std::string &source);
     std::string base64_decodeA(std::string &source);
 }
-inline void PGE_SPLITSTRING(PGESTRINGList &dst, PGESTRING &src, PGESTRING sep)
+inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGESTRING sep)
 {
     dst.clear();
     PGE_FileFormats_misc::split(dst, src, sep);
@@ -224,15 +225,15 @@ inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
     return str.erase(pos, len);
 }
-inline bool IsNULL(PGESTRING str)
+inline bool IsNULL(const PGESTRING str)
 {
-    return (str.empty() != 0);
+    return (!str.empty());
 }
-inline bool IsEmpty(PGESTRING &str)
+inline bool IsEmpty(const PGESTRING &str)
 {
     return str.empty();
 }
-inline bool IsEmpty(PGESTRINGList &str)
+inline bool IsEmpty(const PGESTRINGList &str)
 {
     return str.empty();
 }

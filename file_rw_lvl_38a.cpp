@@ -42,7 +42,7 @@ using namespace CSVReader;
 #define nextLine() line = in.readLine();
 
 // Settings
-constexpr int newest_file_format = 65;
+static constexpr int newest_file_format = 67;
 
 // Common functions
 static auto PGEUrlDecodeFunc = [](PGESTRING &data)
@@ -91,7 +91,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     errorString.clear();
     CreateLevelHeader(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
-#if !defined(_MSC_VER) || _MSC_VER > 1800
+    #if !defined(_MSC_VER) || _MSC_VER > 1800
     PGE_FileFormats_misc::TextFileInput inf;
 
     if(!inf.open(filePath, false))
@@ -144,11 +144,11 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     FileData.CurSection = 0;
     FileData.playmusic = 0;
     return true;
-#else
+    #else
     FileData.meta.ReadFileValid = false;
     FileData.meta.ERROR_info = "Unsupported on MSVC2013";
     return false;
-#endif
+    #endif
 }
 
 bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
@@ -300,6 +300,15 @@ inline void SMBX65_Num2Exp(T source, PGESTRING &expression)
 }
 
 template<typename T>
+inline void SMBX65_Num2Exp_URLEN(T source, PGESTRING &expression)
+{
+    if(IsEmpty(expression))
+        expression = fromNum(source);
+    else
+        expression = PGE_URLENC(expression);
+}
+
+template<typename T>
 inline void SMBX65_mapBGID_From(T &bgID)
 {
     if(bgID == 2)
@@ -340,16 +349,63 @@ FIELD to Types/Directions conversion table
 
 */
 
-constexpr int SMBX65_NpcGeneratorTypes[29] =
+static constexpr int SMBX65_NpcGeneratorTypes[29] =
     //0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28
 { 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4 };
 
-constexpr int SMBX65_NpcGeneratorDirections[29] =
+static constexpr int SMBX65_NpcGeneratorDirections[29] =
     //0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28
 { 0, 1, 2, 3, 4, 1, 2, 3, 4, 9, 10, 11, 12, 1, 2, 3, 4, 1, 2, 3, 4, 9, 10, 11, 12, 9, 10, 11, 12};
 
-/**********************************************************************************************/
 
+template<typename NumT>
+inline void SMBX65_RestoreOrigTime(NumT &orig, const NumT &cur, PGE_FileLibrary::TimeUnit unit)
+{
+    NumT value = PGE_FileLibrary::TimeUnitsCVT(orig,
+                 PGE_FileLibrary::TimeUnit::FrameOneOf65sec,
+                 unit);
+    if(value != cur)
+        orig = PGE_FileLibrary::TimeUnitsCVT(cur,
+                                             unit,
+                                             PGE_FileLibrary::TimeUnit::FrameOneOf65sec);
+}
+
+static inline void SMBX65_CC_decode(int32_t &destKey, int64_t &destValue, const PGESTRING &key)
+{
+    if(IsEmpty(key) || (key.size() < 4))
+    {
+        destKey = 0;
+        destValue = 0;
+    }
+    #ifdef PGE_FILES_QT
+    std::string skey = key.toStdString();
+    #else
+    const std::string &skey = key;
+    #endif
+    std::string k = skey.substr(0, 4);
+    destKey = std::strtol(k.c_str(), NULL, 16);
+
+    std::string v = skey.substr(4);
+    if(!v.empty())
+        destValue = std::strtol(v.c_str(), NULL, 16);
+}
+
+static inline PGESTRING SMBX65_CC_encode(const int32_t &srcKey, const int64_t &srcValue)
+{
+    char keyBuf[6] = {0};
+    char valueBuf[52] = {0};
+    int kb_l = std::snprintf(keyBuf, 5, "%04X", (const unsigned int)srcKey);
+    keyBuf[kb_l] = '\0';
+    int kv_l = std::snprintf(valueBuf, 51, "%X", (const unsigned int)srcValue);
+    valueBuf[kv_l] = '\0';
+    #ifdef PGE_FILES_QT
+    return QString::fromUtf8(keyBuf, 4) + QString::fromUtf8(valueBuf, kv_l);
+    #else
+    return PGESTRING(keyBuf, 4) + PGESTRING(valueBuf, kv_l);
+    #endif
+}
+
+/**********************************************************************************************/
 
 //LevelData FileFormats::ReadSMBX65by38ALvlFile(PGESTRING RawData, PGESTRING filePath)
 bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)
@@ -359,7 +415,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     errorString.clear();
     CreateLevelData(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
-#if !defined(_MSC_VER) || _MSC_VER > 1800
+    #if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.LevelName = "" ;
     FileData.stars = 0;
     FileData.CurSection = 0;
@@ -388,6 +444,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     //LevelEvent_Sets event_sets;
     LevelVariable vardata;
     LevelScript scriptdata;
+    LevelItemSetup38A customcfg;
 
     //Add path data
     if(!IsEmpty(filePath))
@@ -450,7 +507,6 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         MakeCSVPostProcessor(&section.id, [](int &sectionID)
                 {
                     sectionID--;
-
                     if(sectionID < 0) sectionID = 0;
                 }),
                 //x=Left size[-left/+right]
@@ -507,8 +563,15 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 // B|layer|id|x|y|contain|b1|b2|e1,e2,e3|w|h
                 blockdata = CreateLvlBlock();
                 dataReader.ReadDataLine(CSVDiscard(),
-                                        MakeCSVPostProcessor(&blockdata.layer, PGELayerOrDefault),
-                                        &blockdata.id,
+                                        MakeCSVSubReader(dataReader, ',',
+                                                MakeCSVPostProcessor(&blockdata.layer, PGELayerOrDefault),
+                                                MakeCSVOptional(&blockdata.gfx_name, "")
+                                                        ),
+                                        MakeCSVSubReader(dataReader, ',',
+                                                &blockdata.id,
+                                                MakeCSVOptional(&blockdata.gfx_dx, 0),
+                                                MakeCSVOptional(&blockdata.gfx_dy, 0)
+                                                        ),
                                         &blockdata.x, //FIXME rounding error?
                                         &blockdata.y,
                                         MakeCSVPostProcessor(&blockdata.npc_id, [](long & npcValue)
@@ -524,6 +587,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                 ),
                 &blockdata.w,
                 &blockdata.h);
+                blockdata.autoscale = (blockdata.w < 0);
                 blockdata.meta.array_id = FileData.blocks_array_id++;
                 FileData.blocks.push_back(blockdata);
             }
@@ -533,7 +597,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 bgodata = CreateLvlBgo();
                 dataReader.ReadDataLine(CSVDiscard(),
                                         MakeCSVPostProcessor(&bgodata.layer, PGELayerOrDefault),
-                                        &bgodata.id,
+                                        MakeCSVSubReader(dataReader, ',',
+                                                &bgodata.id,
+                                                MakeCSVOptional(&bgodata.gfx_dx, 0),
+                                                MakeCSVOptional(&bgodata.gfx_dy, 0)
+                                                        ),
                                         &bgodata.x,
                                         &bgodata.y);
                 bgodata.meta.array_id = FileData.bgo_array_id++;
@@ -543,11 +611,19 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             {
                 // N|layer|id|x|y|b1,b2,b3,b4|sp|e1,e2,e3,e4,e5,e6,e7|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
                 npcdata = CreateLvlNpc();
+                npcdata.generator_period_orig_unit = PGE_FileLibrary::TimeUnit::FrameOneOf65sec;
                 double specialData;
                 int genType; // We have to handle that later :(
                 dataReader.ReadDataLine(CSVDiscard(),
-                                        MakeCSVPostProcessor(&npcdata.layer, PGELayerOrDefault),
-                                        &npcdata.id,
+                                        MakeCSVSubReader(dataReader, ',',
+                                                MakeCSVPostProcessor(&npcdata.layer, PGELayerOrDefault),
+                                                MakeCSVOptional(&npcdata.gfx_name, "")
+                                                        ),
+                                        MakeCSVSubReader(dataReader, ',',
+                                                &npcdata.id,
+                                                MakeCSVOptional(&npcdata.gfx_dx, 0),
+                                                MakeCSVOptional(&npcdata.gfx_dy, 0)
+                                                        ),
                                         &npcdata.x,
                                         &npcdata.y,
                                         MakeCSVSubReader(dataReader, ',',
@@ -574,15 +650,12 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                 ),
                 MakeCSVSubReader(dataReader, ',',
                                  &npcdata.generator,
-                                 MakeCSVOptional(&npcdata.generator_period, 65, nullptr, [](int &value)
-                {
-                    value = static_cast<int>(round((static_cast<double>(value) * 10.0) / 65.0));
-                }),
-                MakeCSVOptional(&genType, 0),
-                MakeCSVOptional(&npcdata.generator_custom_angle, 0.0),
-                MakeCSVOptional(&npcdata.generator_branches, 1),
-                MakeCSVOptional(&npcdata.generator_angle_range, 360.0),
-                MakeCSVOptional(&npcdata.generator_initial_speed, 10.0)
+                                 MakeCSVOptional(&npcdata.generator_period_orig, 65),
+                                 MakeCSVOptional(&genType, 0),
+                                 MakeCSVOptional(&npcdata.generator_custom_angle, 0.0),
+                                 MakeCSVOptional(&npcdata.generator_branches, 1),
+                                 MakeCSVOptional(&npcdata.generator_angle_range, 360.0),
+                                 MakeCSVOptional(&npcdata.generator_initial_speed, 10.0)
                                 ),
                 MakeCSVPostProcessor(&npcdata.msg, PGEUrlDecodeFunc)
                                        );
@@ -591,32 +664,16 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 {
                     long contID = npcdata.contents;
                     npcdata.contents = static_cast<long>(npcdata.id);
-
-                    switch(contID)
+                    //b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300][6=npc347]
+                    static const long ContNPCID[] =
                     {
-                    case 1:
-                        npcdata.id = 91;
-                        break;
-
-                    case 2:
-                        npcdata.id = 96;
-                        break;
-
-                    case 3:
-                        npcdata.id = 283;
-                        break;
-
-                    case 4:
-                        npcdata.id = 284;
-                        break;
-
-                    case 5:
-                        npcdata.id = 300;
-                        break;
-
-                    default:
+                        //  1  2    3    4    5    6
+                        0, 91, 96, 283, 284, 300, 347, 0
+                    };
+                    if((contID > 0) && (contID <= 6))
+                        npcdata.id = ContNPCID[contID];
+                    else
                         npcdata.contents = 0; //Invalid container type
-                    }
                 }
 
                 npcdata.special_data = static_cast<long>(round(specialData));
@@ -629,7 +686,6 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     npcdata.is_boss = static_cast<bool>(npcdata.special_data);
                     npcdata.special_data = 0;
                     break;
-
                 default:
                     break;
                 }
@@ -640,7 +696,6 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     npcdata.generator_type   = LevelNPC::NPC_GENERATOR_APPEAR;
                     npcdata.generator_direct = LevelNPC::NPC_GEN_CENTER;
                     break;
-
                 default:
                     if(genType < 29)
                     {
@@ -660,16 +715,17 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 case 0:
                     npcdata.generator_type = LevelNPC::NPC_GENERATPR_PROJECTILE;
                     break;
-
                 case 1:
                     npcdata.generator_type = LevelNPC::NPC_GENERATOR_WARP;
                     break;
-
                 case 4:
                     npcdata.generator_type = LevelNPC::NPC_GENERATOR_APPEAR;
                     break;
                 }
 
+                npcdata.generator_period = PGE_FileLibrary::TimeUnitsCVT(npcdata.generator_period_orig,
+                                           PGE_FileLibrary::TimeUnit::FrameOneOf65sec,
+                                           PGE_FileLibrary::TimeUnit::Decisecond);
                 npcdata.meta.array_id = FileData.npc_array_id++;
                 FileData.npc.push_back(npcdata);
             }
@@ -724,15 +780,12 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     case 1:
                         value = LevelDoor::EXIT_UP;
                         break;
-
                     case 2:
                         value = LevelDoor::EXIT_LEFT;
                         break;
-
                     case 3:
                         value = LevelDoor::EXIT_DOWN;
                         break;
-
                     case 4:
                         value = LevelDoor::EXIT_RIGHT;
                         break;
@@ -761,7 +814,10 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  //mini=Mini-Only
                                  MakeCSVOptional(&doordata.special_state_required, false),
                                  //size=Warp Size(pixel)
-                                 MakeCSVOptional(&doordata.length_i, 32u)),
+                                 MakeCSVOptional(&doordata.length_i, 32u),
+                                 MakeCSVOptional(&doordata.two_way, false),
+                                 MakeCSVOptional(&doordata.cannon_exit_speed, 0.0)
+                                ),
                 //lik=warp to level[***urlencode!***]
                 MakeCSVPostProcessor(&doordata.lname, PGEUrlDecodeFunc),
                 //liid=normal enterance / to warp[0-WARPMAX]
@@ -780,6 +836,9 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 doordata.length_o = doordata.length_i;
                 doordata.isSetIn = (doordata.lvl_i ? false : true);
                 doordata.isSetOut = (doordata.lvl_o ? false : true) || doordata.lvl_i;
+                doordata.cannon_exit = (doordata.cannon_exit_speed > 0.0);
+                if(doordata.cannon_exit_speed <= 0)
+                    doordata.cannon_exit_speed = 10.0;
                 doordata.meta.array_id = FileData.doors_array_id++;
                 FileData.doors.push_back(doordata);
             }
@@ -810,7 +869,6 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 }
 
                 // Temp Field 11
-                double trigger_time_raw;
                 double timer_def_interval_raw;
                 // This variable is used for the spawn npc section.
                 // The first two values are static ones, after that they come in packages (see below)
@@ -1079,7 +1137,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 MakeCSVSubReader(dataReader, '/',
                                  MakeCSVSubReader(dataReader, ',',
                                                   MakeCSVPostProcessor(&eventdata.trigger, PGEUrlDecodeFunc),
-                                                  &trigger_time_raw
+                                                  &eventdata.trigger_timer_orig
                                                  ),
                                  MakeCSVSubReader(dataReader, ',',
                                                   &eventdata.timer_def.enable,
@@ -1091,8 +1149,13 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  MakeCSVPostProcessor(&eventdata.trigger_script, PGEUrlDecodeFunc)
                                 )
                                        );
-                eventdata.trigger_timer = static_cast<long>(round(SMBX64::t65_to_ms(trigger_time_raw) / 100.0));
-                eventdata.timer_def.interval = SMBX64::t65_to_ms(timer_def_interval_raw);
+                eventdata.trigger_timer_unit = PGE_FileLibrary::TimeUnit::FrameOneOf65sec;
+                eventdata.trigger_timer = PGE_FileLibrary::TimeUnitsCVT(eventdata.trigger_timer_orig,
+                                          PGE_FileLibrary::TimeUnit::FrameOneOf65sec,
+                                          PGE_FileLibrary::TimeUnit::Decisecond);
+                eventdata.timer_def.interval = PGE_FileLibrary::TimeUnitsCVT(timer_def_interval_raw,
+                                               PGE_FileLibrary::TimeUnit::FrameOneOf65sec,
+                                               PGE_FileLibrary::TimeUnit::Millisecond);
                 eventdata.meta.array_id = FileData.events_array_id++;
                 FileData.events.push_back(eventdata);
             }
@@ -1129,6 +1192,28 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 //Convert to LF
                 PGE_ReplSTRING(scriptdata.script, "\r\n", "\n");
                 FileData.scripts.push_back(scriptdata);
+            }
+            else if((identifier == "CB") || (identifier == "CT") || (identifier == "CE") )
+            {
+                // CB|id|data   :custom block/background/effect
+                customcfg = LevelItemSetup38A();
+                if(identifier == "CB")
+                    customcfg.type = LevelItemSetup38A::BLOCK;
+                else if(identifier == "CT")
+                    customcfg.type = LevelItemSetup38A::BGO;
+                else
+                    customcfg.type = LevelItemSetup38A::EFFECT;
+
+                dataReader.ReadDataLine(CSVDiscard(),
+                                        &customcfg.id,
+                                        MakeCSVIterator(dataReader, ',', [&customcfg](const PGESTRING & nextFieldStr)
+                {
+                    LevelItemSetup38A::Entry e;
+                    SMBX65_CC_decode(e.key, e.value, nextFieldStr);
+                    customcfg.data.push_back(e);
+                })
+                                       );
+                FileData.custom38A_configs.push_back(customcfg);
             }
             else
                 dataReader.ReadDataLine();
@@ -1174,11 +1259,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     FileData.playmusic = 0;
     FileData.meta.ReadFileValid = true;
     return true;
-#else
+    #else
     FileData.meta.ReadFileValid = false;
     FileData.meta.ERROR_info = "Unsupported on MSVC2013";
     return false;
-#endif
+    #endif
 }
 
 
@@ -3470,8 +3555,8 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         goto badfile;
                     else vardata.value = cLine; /*save variable value as string
 
-                                                  because in PGE is planned to have
-                                                  variables to be universal*/
+                          because in PGE is planned to have
+                          variables to be universal*/
                 }
                 break;
                 }
@@ -3612,7 +3697,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //line 1:
     //    SMBXFile??
     //    ??=Version number
-    out << "SMBXFile66\n";
+    out << "SMBXFile67\n";
     //next line: level settings
     //    A|param1|param2[|param3|param4]
     //    []=optional
@@ -3706,8 +3791,19 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "B";
         //    layer=layer name["" == "Default"][***urlencode!***]
         out << "|" << layerNotDef(blk.layer);
+        //  only if name != ""
+        //  name=block's name
+        if(!IsEmpty(blk.gfx_name))
+            out << "," << PGE_URLENC(blk.gfx_name);
         //    id=block id
         out << "|" << fromNum(blk.id);
+        if((blk.gfx_dx) > 0 || (blk.gfx_dy > 0))
+        {
+            //  dx=graphics extend x
+            out << "," << fromNum(blk.gfx_dx);
+            //  dy=graphics extend y
+            out << "," << fromNum(blk.gfx_dy);
+        }
         //    x=block position x
         out << "|" << fromNum(blk.x);
         //    y=block position y
@@ -3728,7 +3824,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    e3=no more object in layer event name[***urlencode!***]4
         out << "," << PGE_URLENC(blk.event_emptylayer);
         //    w=width
-        out << "|" << fromNum(blk.w);
+        out << "|" << fromNum(blk.autoscale ? -1 : blk.w);
         //    h=height
         out << "|" << fromNum(blk.h);
         out << "\n";
@@ -3744,6 +3840,13 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|" << layerNotDef(bgo.layer);
         //    id=background id
         out << "|" << fromNum(bgo.id);
+        if((bgo.gfx_dx) > 0 || (bgo.gfx_dy > 0))
+        {
+            //  dx=graphics extend x
+            out << "," << fromNum(bgo.gfx_dx);
+            //  dy=graphics extend y
+            out << "," << fromNum(bgo.gfx_dy);
+        }
         //    x=background position x
         out << "|" << fromNum(bgo.x);
         //    y=background position y
@@ -3756,37 +3859,33 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     {
         LevelNPC &npc = FileData.npc[i];
         //Pre-convert some data into SMBX-38A compatible format
-        int npcID = npc.id;
-        int containerType = 0;
-        int specialData = npc.special_data;
-
+        long npcID = npc.id;
+        long containerType = 0;
+        long specialData = npc.special_data;
         switch(npcID)//Convert npcID and contents ID into container type
         {
         case 91:
             containerType = 1;
             break;
-
         case 96:
             containerType = 2;
             break;
-
         case 283:
             containerType = 3;
             break;
-
         case 284:
             containerType = 4;
             break;
-
         case 300:
             containerType = 5;
             break;
-
+        case 347:
+            containerType = 6;
+            break;
         default:
             containerType = 0;
             break;
         }
-
         if(containerType != 0)
         {
             //Set NPC-ID of contents as main NPC-ID for this NPC
@@ -3800,14 +3899,13 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         case 39:
         case 86:
             if(npc.is_boss)
-                specialData = (int)npc.is_boss;
-
+                specialData = (long)npc.is_boss;
         default:
             break;
         }
 
         //Convert generator type and direction into SMBX-38A Compatible format
-        int genType_1 = npc.generator_type;
+        long genType_1 = npc.generator_type;
 
         //Swap "Appear" and "Projectile" types
         switch(genType_1)
@@ -3815,20 +3913,30 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         case 0:
             genType_1 = 2;
             break;
-
         case 2:
             genType_1 = 0;
             break;
         }
 
-        int genType_2 = npc.generator_direct;
-        int genType = (genType_2 != 0) ? ((4 * genType_1) + genType_2) : 0 ;
+        long genType_2 = npc.generator_direct;
+        long genType = (genType_2 != 0) ? ((4 * genType_1) + genType_2) : 0 ;
         //    N|layer|id|x|y|b1,b2,b3,b4|sp|e1,e2,e3,e4,e5,e6,e7|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
         out << "N";
         //    layer=layer name["" == "Default"][***urlencode!***]
         out << "|" << layerNotDef(npc.layer);
+        //only if name != ""
+        //name=npc's name
+        if(!IsEmpty(npc.gfx_name))
+            out << "," << PGE_URLENC(npc.gfx_name);
         //    id=npc id
         out << "|" << fromNum(npcID);
+        if((npc.gfx_dx) > 0 || (npc.gfx_dy > 0))
+        {
+            //  dx=graphics extend x
+            out << "," << fromNum(npc.gfx_dx);
+            //  dy=graphics extend y
+            out << "," << fromNum(npc.gfx_dy);
+        }
         //    x=npc position x
         out << "|" << fromNum(npc.x);
         //    y=npc position y
@@ -3870,7 +3978,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         {
             //        c2=generator period[1 frame]
             //Convert deciseconds into frames with rounding
-            out << "," << fromNum((int)round(((double)npc.generator_period * 65.0) / 10.0));
+            SMBX65_RestoreOrigTime(npc.generator_period_orig, (long)npc.generator_period, PGE_FileLibrary::TimeUnit::Decisecond);
+            out << "," << fromNum(npc.generator_period_orig);
             //        c3=generator effect
             //            c3-1 [1=warp][0=projective][4=no effect]
             //            c3-2 [0=center][1=up][2=left][3=down][4=right][9=up+left][10=left+down][11=down+right][12=right+up]
@@ -3966,6 +4075,13 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "," << fromNum((int)door.special_state_required);
         //    size=Warp Size(pixel)
         out << "," << fromNum(door.length_i);
+        if(door.two_way || door.cannon_exit)
+        {
+            //    ts = two-way
+            out << "," << fromNum((int)door.two_way);
+            //    cannon = Pipe Cannon Force
+            out << "," << fromNum(door.cannon_exit ? door.cannon_exit_speed : 0.0);
+        }
         //    lik=warp to level[***urlencode!***]
         out << "|" << PGE_URLENC(door.lname);
         //    liid=normal enterance / to warp[0-WARPMAX]
@@ -4103,12 +4219,12 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             //Convert all floats into strings if expression fields are empty
             PGESTRING expression_x = mvl.expression_x;
             PGESTRING expression_y = mvl.expression_y;
-            SMBX65_Num2Exp(mvl.speed_x, expression_x);
-            SMBX65_Num2Exp(mvl.speed_y, expression_y);
+            SMBX65_Num2Exp_URLEN(mvl.speed_x, expression_x);
+            SMBX65_Num2Exp_URLEN(mvl.speed_y, expression_y);
             out << PGE_URLENC(mvl.name);
             //        horizontal syntax,vertical syntax[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_x);
-            out << "," << PGE_URLENC(expression_y);
+            out << "," << expression_x;
+            out << "," << expression_y;
             //        way=[0=by speed][1=by Coordinate]
             out << "," << fromNum(mvl.way);
         }
@@ -4176,16 +4292,21 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
             if(section_pos >= 2)
             {
-                SMBX65_Num2Exp(evt.sets[j].position_left,   expression_x);
-                SMBX65_Num2Exp(evt.sets[j].position_bottom, expression_y);
-                SMBX65_Num2Exp(evt.sets[j].position_right - evt.sets[j].position_left, expression_w);
-                SMBX65_Num2Exp(evt.sets[j].position_bottom - evt.sets[j].position_top, expression_h);
+                SMBX65_Num2Exp_URLEN(evt.sets[j].position_left,   expression_x);
+                SMBX65_Num2Exp_URLEN(evt.sets[j].position_top,    expression_y);
+                SMBX65_Num2Exp_URLEN(evt.sets[j].position_right - evt.sets[j].position_left, expression_w);
+                SMBX65_Num2Exp_URLEN(evt.sets[j].position_bottom - evt.sets[j].position_top, expression_h);
             }
 
             if(evt.sets[j].autoscrol)
             {
-                SMBX65_Num2Exp(evt.sets[j].autoscrol_x, expression_as_x);
-                SMBX65_Num2Exp(evt.sets[j].autoscrol_y, expression_as_y);
+                SMBX65_Num2Exp_URLEN(evt.sets[j].autoscrol_x, expression_as_x);
+                SMBX65_Num2Exp_URLEN(evt.sets[j].autoscrol_y, expression_as_y);
+            }
+            else
+            {
+                expression_as_x = PGE_URLENC(expression_as_x);
+                expression_as_y = PGE_URLENC(expression_as_y);
             }
 
             //            es=id,x,y,w,h,auto,sx,sy
@@ -4193,23 +4314,23 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
             size_set_added = true;
             //                id=section id
-            out        << fromNum(evt.sets[j].id);
+            out        << fromNum(evt.sets[j].id + 1);
             //                stype=[0=don't change][1=default][2=custom]
             out << "," << fromNum(section_pos);
             //                x=left x coordinates for section [id][***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_x);
+            out << "," << expression_x;
             //                y=top y coordinates for section [id][***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_y);
+            out << "," << expression_y;
             //                w=width for section [id][***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_w);
+            out << "," << expression_w;
             //                h=height for section [id][***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_h);
+            out << "," << expression_h;
             //                auto=enable autoscroll controls[0=false !0=tru
             out << "," << fromNum((int)evt.sets[j].autoscrol);
             //                sx=move screen horizontal syntax[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_as_x);
+            out << "," << expression_as_x;
             //                sy=move screen vertical syntax[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_as_y);
+            out << "," << expression_as_y;
         }
 
         out << "/";
@@ -4240,7 +4361,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
             bg_set_added = true;
             //                id=section id
-            out        << fromNum(evt.sets[j].id);
+            out        << fromNum(evt.sets[j].id + 1);
             //                btype=[0=don't change][1=default][2=custom]
             out << "," << fromNum(section_bg);
             //                backgroundid=[when btype=2]custom background id
@@ -4275,7 +4396,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
             muz_set_added = true;
             //                id=section id
-            out       << fromNum(evt.sets[j].id);
+            out        << fromNum(evt.sets[j].id + 1);
             //                mtype=[0=don't change][1=default][2=custom]
             out << "," << fromNum(section_muz);
             //                musicid=[when mtype=2]custom music id
@@ -4301,21 +4422,21 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             PGESTRING expression_y = eff.expression_y;
             PGESTRING expression_sx = eff.expression_sx;
             PGESTRING expression_sy = eff.expression_sy;
-            SMBX65_Num2Exp(eff.x, expression_x);
-            SMBX65_Num2Exp(eff.y, expression_y);
-            SMBX65_Num2Exp(eff.speed_x, expression_sx);
-            SMBX65_Num2Exp(eff.speed_y, expression_sy);
+            SMBX65_Num2Exp_URLEN(eff.x, expression_x);
+            SMBX65_Num2Exp_URLEN(eff.y, expression_y);
+            SMBX65_Num2Exp_URLEN(eff.speed_x, expression_sx);
+            SMBX65_Num2Exp_URLEN(eff.speed_y, expression_sy);
             //        ce(n)=id,x,y,sx,sy,grv,fsp,life
             //            id=effect id
             out        << fromNum(eff.id);
             //            x=effect position x[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_x);
+            out << "," << expression_x;
             //            y=effect position y[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_y);
+            out << "," << expression_y;
             //            sx=effect horizontal speed[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_sx);
+            out << "," << expression_sx;
             //            sy=effect vertical speed[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_sy);
+            out << "," << expression_sy;
             //            grv=to decide whether the effects are affected by gravity[0=false !0=true]
             out << "," << fromNum((int)eff.gravity);
             //            fsp=frame speed of effect generated
@@ -4335,25 +4456,22 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             PGESTRING expression_y = snpc.expression_y;
             PGESTRING expression_sx = snpc.expression_sx;
             PGESTRING expression_sy = snpc.expression_sy;
-            SMBX65_Num2Exp(snpc.x, expression_x);
-            SMBX65_Num2Exp(snpc.y, expression_y);
-            SMBX65_Num2Exp(snpc.speed_x, expression_sx);
-            SMBX65_Num2Exp(snpc.speed_y, expression_sy);
-
+            SMBX65_Num2Exp_URLEN(snpc.x, expression_x);
+            SMBX65_Num2Exp_URLEN(snpc.y, expression_y);
+            SMBX65_Num2Exp_URLEN(snpc.speed_x, expression_sx);
+            SMBX65_Num2Exp_URLEN(snpc.speed_y, expression_sy);
             //        cn(n)=id,x,y,sx,sy,sp
-            if(j > 0)
-                out << "/";
-
+            if(j > 0) out << "/";
             //            id=npc id
             out        << fromNum(snpc.id);
             //            x=npc position x[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_x);
+            out << "," << expression_x;
             //            y=npc position y[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_y);
+            out << "," << expression_y;
             //            sx=npc horizontal speed[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_sx);
+            out << "," << expression_sx;
             //            sy=npc vertical speed[***urlencode!***][syntax]
-            out << "," << PGE_URLENC(expression_sy);
+            out << "," << expression_sy;
             //            sp=advanced settings of generated npc
             out << "," << fromNum(snpc.special);
         }
@@ -4381,14 +4499,17 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //            name=trigger event name[***urlencode!***]
         out        << PGE_URLENC(evt.trigger);
         //            delay=trigger delay[1 frame]
-        out << "," << fromNum((int)round(((double)evt.trigger_timer * 65.0) / 10.0));
+        SMBX65_RestoreOrigTime(evt.trigger_timer_orig, evt.trigger_timer, PGE_FileLibrary::TimeUnit::Decisecond);
+        out << "," << fromNum(evt.trigger_timer_orig);
         //        timer=enable,count,interval,type,show
         //            enable=enable the game timer controlling[0=false !0=true]
         out << "/" << fromNum((int)evt.timer_def.enable);
         //            count=set the time left of the game timer
         out << "," << fromNum(evt.timer_def.count);
         //            interval=set the time count interval of the game timer
-        out << "," << fromNum((int)round(SMBX64::ms_to_65(evt.timer_def.interval)));
+        out << "," << fromNum(PGE_FileLibrary::TimeUnitsCVT(evt.timer_def.interval,
+                              PGE_FileLibrary::TimeUnit::Millisecond,
+                              PGE_FileLibrary::TimeUnit::FrameOneOf65sec));
         //            type=to choose the way timer counts[0=counting down][1=counting up]
         out << "," << fromNum(evt.timer_def.count_dir);
         //            show=to choose whether the game timer is showed in hud[0=false !0=true]
@@ -4401,9 +4522,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: variables
-    for(i = 0; i < (signed)FileData.variables.size(); i++)
+    for(LevelVariable &var : FileData.variables)
     {
-        LevelVariable &var = FileData.variables[i];
         //    V|name|value
         out << "V";
         //    name=variable name[***urlencode!***]
@@ -4419,9 +4539,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: scripts
-    for(i = 0; i < (signed)FileData.scripts.size(); i++)
+    for(LevelScript &script : FileData.scripts)
     {
-        LevelScript &script = FileData.scripts[i];
         //    S|name|script
         out << "S";
         //    Su|name|scriptu
@@ -4440,7 +4559,37 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "\n";
     }
 
+    //next line: Custom block
+    for(LevelItemSetup38A &is : FileData.custom38A_configs)
+    {
+        //    V|name|value
+        switch(is.type)
+        {
+        case LevelItemSetup38A::BLOCK:
+            out << "CB";
+            break;
+        case LevelItemSetup38A::BGO:
+            out << "CT";
+            break;
+        case LevelItemSetup38A::EFFECT:
+            out << "CE";
+            break;
+        case LevelItemSetup38A::UNKNOWN:
+        default:
+            out << "CUnk";
+            break;
+        }
+        //    id = object id
+        out << "|" << fromNum(is.id);
+
+        for(int j = 0; j < (signed)is.data.size(); j++)
+        {
+            LevelItemSetup38A::Entry &e = is.data[j];
+            out << ((j == 0) ? "|" : ",");
+            out << SMBX65_CC_encode(e.key, e.value);
+        }
+        out << "\n";
+    }
+
     return true;
 }
-
-

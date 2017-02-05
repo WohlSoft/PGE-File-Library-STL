@@ -19,6 +19,8 @@
 
 CONFIG  += C++11
 
+!contains(DEFINES, PGE_FILES_QT): SOURCES +=  $$PWD/ConvertUTF_PGEFF.c
+
 SOURCES +=  $$PWD/file_formats.cpp \
             $$PWD/file_rw_lvl.cpp \
             $$PWD/file_rw_lvl_38a.cpp \
@@ -57,4 +59,5 @@ HEADERS +=  $$PWD/file_formats.h \
             $$PWD/smbx64_cnf_filedata.h \
             $$PWD/CSVReader.h \
             $$PWD/CSVReaderPGE.h \
-            $$PWD/CSVUtils.h
+            $$PWD/CSVUtils.h \
+            $$PWD/pge_ff_units.h

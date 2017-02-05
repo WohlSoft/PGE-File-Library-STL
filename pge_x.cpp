@@ -65,10 +65,10 @@ PGEFile::PGEFile()
 }
 
 #ifdef PGE_FILES_QT
-PGEFile::PGEFile(PGEFile &pgeFile, QObject *parent)
+PGEFile::PGEFile(const PGEFile &pgeFile, QObject *parent)
     : QObject(parent)
 #else
-PGEFile::PGEFile(PGEFile &pgeFile)
+PGEFile::PGEFile(const PGEFile &pgeFile)
 #endif
 {
     m_rawData = pgeFile.m_rawData;
@@ -76,7 +76,7 @@ PGEFile::PGEFile(PGEFile &pgeFile)
     m_lastError = pgeFile.m_lastError;
 }
 
-PGEFile::PGEFile(PGESTRING _rawData)
+PGEFile::PGEFile(const PGESTRING &_rawData)
 {
     m_rawData = _rawData;
     m_lastError = "";
@@ -89,7 +89,7 @@ PGESTRING PGEFile::removeQuotes(PGESTRING str)
     return target;
 }
 
-void PGEFile::setRawData(PGESTRING _rawData)
+void PGEFile::setRawData(const PGESTRING &_rawData)
 {
     m_rawData = _rawData;
 }

@@ -104,7 +104,7 @@ class PGEFile
          * \param pgeFile Another PGEFile object
          * \param parent Parent QObject
          */
-        PGEFile(PGEFile &pgeFile, QObject *parent = NULL);
+        PGEFile(const PGEFile &pgeFile, QObject *parent = NULL);
 #else
         /*!
          * \brief Constructor
@@ -114,18 +114,18 @@ class PGEFile
          * \brief Copy Constructor
          * \param pgeFile Another PGEFile object
          */
-        PGEFile(PGEFile &pgeFile);
+        PGEFile(const PGEFile& pgeFile);
 #endif
         /*!
          * \brief Constructor with pre-storing of raw data
          * \param _rawData
          */
-        PGEFile(PGESTRING _rawData);
+        PGEFile(const PGESTRING &_rawData);
         /*!
          * \brief Stores raw data string
          * \param _rawData String contains raw data of entire file
          */
-        void setRawData(PGESTRING _rawData);
+        void setRawData(const PGESTRING& _rawData);
         /*!
          * \brief Parses stored raw data into the data tree
          * \return
