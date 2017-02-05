@@ -66,32 +66,7 @@ WorldMusicBox FileFormats::CreateWldMusicbox()
 
 void FileFormats::CreateWorldHeader(WorldData &NewFileData)
 {
-    //Meta-data
-    NewFileData.CurSection = 0;
-    NewFileData.playmusic = 0;
-    NewFileData.currentMusic = 0;
-
-    NewFileData.EpisodeTitle = "";
-
-    NewFileData.nocharacter1 = false;
-    NewFileData.nocharacter2 = false;
-    NewFileData.nocharacter3 = false;
-    NewFileData.nocharacter4 = false;
-    NewFileData.nocharacter5 = false;
-
-    NewFileData.authors = "";
-    NewFileData.author1 = "";
-    NewFileData.author2 = "";
-    NewFileData.author3 = "";
-    NewFileData.author4 = "";
-    NewFileData.author5 = "";
-
-    NewFileData.IntroLevel_file = "";
-
-    NewFileData.HubStyledWorld = false;
-    NewFileData.restartlevel = false;
-
-    NewFileData.stars = 0;
+    NewFileData = WorldData();
 }
 
 
@@ -109,6 +84,8 @@ void FileFormats::CreateWorldData(WorldData &NewFileData)
     NewFileData.level_array_id = 0;
     NewFileData.music.clear();
     NewFileData.musicbox_array_id = 0;
+    NewFileData.arearects.clear();
+    NewFileData.arearect_array_id = 0;
     NewFileData.layers.clear();
     NewFileData.layers_array_id = 0;
 }

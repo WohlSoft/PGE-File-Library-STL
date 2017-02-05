@@ -49,6 +49,10 @@ struct WorldTerrainTile
     long gfx_dy = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
+
+    /*
+     * Editor-only parameters which are not saving into file
+     */
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -70,6 +74,10 @@ struct WorldScenery
     long gfx_dy = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
+
+    /*
+     * Editor-only parameters which are not saving into file
+     */
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -91,6 +99,10 @@ struct WorldPathTile
     long gfx_dy = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
+
+    /*
+     * Editor-only parameters which are not saving into file
+     */
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -138,6 +150,10 @@ struct WorldLevelTile
     bool bigpathbg = false;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
+
+    /*
+     * Editor-only parameters which are not saving into file
+     */
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -157,6 +173,70 @@ struct WorldMusicBox
     PGESTRING music_file;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
+
+    /*
+     * Editor-only parameters which are not saving into file
+     */
+    //! Helper meta-data
+    ElementMeta meta;
+};
+
+/**
+ * @brief Rectangular zone to catch events
+ */
+struct WorldAreaRect
+{
+    //! Position X
+    long x = 0;
+    //! Position Y
+    long y = 0;
+    //! Width size
+    long w = 32;
+    //! Height size
+    long h = 32;
+    //! ID of music to toggle on touch
+    unsigned long   music_id = 0;
+    //! Custom music file to play on touch
+    PGESTRING       music_file;
+    //! Name of a parent layer. Default value is "Default"
+    PGESTRING layer = DEFAULT_LAYER_NAME;
+
+    enum Flags
+    {
+        //! Area takes no settings
+        SETUP_NOTHING = 0x00,
+        //! Toggle music on touch
+        SETUP_CHANGE_MUSIC = 0x01,
+        //! Changes size of viewport
+        SETUP_SET_VIEWPORT = 0x02,
+        //! Set route area for self-moving object
+        SETUP_OBJECTS_ROUTE= 0x04,
+        //! Autowalking area by current direction
+        SETUP_AUTOWALKING  = 0x08,
+        //! Item-triggered events
+        SETUP_ITEM_EVENTS  = 0x0F
+    };
+    //! Special markers of this area functionality
+    uint32_t flags = SETUP_NOTHING;
+    //! Touch event slot
+    PGESTRING eventTouch;
+
+    enum TouchPolicy{
+        TOUCH_TRIGGER_EVERY_ENTER = 0,
+        TOUCH_TRIGGER_ENTER_AND_LEVEL_COMPLETION = 1,
+        TOUCH_TRIGGER_ONCE = 2
+    };
+    uint32_t  eventTouchPolicy = TOUCH_TRIGGER_EVERY_ENTER;
+    //! Break action event slot
+    PGESTRING eventBreak;
+    //! Warp action item use event slot
+    PGESTRING eventWarp;
+    //! Anchor event slot
+    PGESTRING eventAnchor;
+
+    /*
+     * Editor-only parameters which are not saving into file
+     */
     //! Helper meta-data
     ElementMeta meta;
 };
@@ -263,7 +343,7 @@ struct WorldData
         SAVE_RESUME_AT_RECENT_LEVEL = 1,
     };
     //! Policy where resume game on save load
-    int     saveResumePolicy = 0;
+    int     saveResumePolicy = SAVE_RESUME_AT_WORLD_MAP;
     //! Automatically save game on level completing
     bool    saveAuto = false;
     //! Enable save locker
@@ -307,6 +387,9 @@ struct WorldData
     //! List of available music boxes
     PGELIST<WorldMusicBox > music;
     unsigned int musicbox_array_id = 1;
+    //! List of avaiable special area rectangles
+    PGELIST<WorldAreaRect>  arearects;
+    unsigned int arearect_array_id = 1;
 
     //! Array of all presented layers in this world map
     PGELIST<WorldLayer > layers;

@@ -246,6 +246,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     WorldPathTile       pathitem;
     WorldLevelTile      lvlitem;
     WorldMusicBox       musicbox;
+    WorldAreaRect       arearect;
     WorldLayer          layer;
 
     //Add path data
@@ -413,31 +414,26 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
             else if(identifier == "M")
             {
                 musicbox = WorldMusicBox();
-                long w = 0;
-                long h = 0;
-                long flags = 0;
-                PGESTRING eventTouch = "";
-                long eflag = 0;
-                PGESTRING eventHammer = "";
-                PGESTRING eventWarpWhistle = "";
-                PGESTRING eventAnchor = "";
+                arearect = WorldAreaRect();
+                arearect.flags = WorldAreaRect::SETUP_CHANGE_MUSIC;
                 //M|10|416|1312|    |     |32|32|1   |,0
-                //M|id|x  |y   |name|layer|w |h |flag|te,eflag|ie1,ie2,ie3
+                //M|1 |384|384 |    |     |32|32|1   |%66%61%72%74,1
+                //M|id|x  |y   |name|layer|w |h |flag|te,eflag      |ie1,ie2,ie3
                 dataReader.ReadDataLine(CSVDiscard(),
                                         //id=music id
-                                        &musicbox.id,
+                                        &arearect.music_id,
                                         //x=Area position x
-                                        &musicbox.x,
+                                        &arearect.x,
                                         //y=Area position y
-                                        &musicbox.y,
+                                        &arearect.y,
                                         //name=custom music name[***urlencode!***]
-                                        MakeCSVPostProcessor(&musicbox.music_file, PGEUrlDecodeFunc),
+                                        MakeCSVPostProcessor(&arearect.music_file, PGEUrlDecodeFunc),
                                         //layer=layer name["" == "Default"][***urlencode!***]
-                                        MakeCSVOptional(&musicbox.layer, "Default", nullptr, PGELayerOrDefault),
+                                        MakeCSVOptional(&arearect.layer, "Default", nullptr, PGELayerOrDefault),
                                         //w=width
-                                        MakeCSVOptional(&w, 0),
+                                        MakeCSVOptional(&arearect.w, 32),
                                         //h=height
-                                        MakeCSVOptional(&h, 0),
+                                        MakeCSVOptional(&arearect.h, 32),
                                         //flag=area settings[***Bitwise operation***]
                                         //    0=False !0=True
                                         //    b1=(flag & 1) World Music
@@ -445,29 +441,43 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         //    b3=(flag & 4) Ship Route
                                         //    b4=(flag & 8) Forced Walking
                                         //    b5=(flag & 16) Item-triggered events
-                                        MakeCSVOptional(&flags, 0),
+                                        MakeCSVOptional(&arearect.flags, WorldAreaRect::SETUP_CHANGE_MUSIC),
                                         //FIXME: both subreaders must be optional!
                                         MakeCSVSubReader(dataReader, ',',
                                                          //te:Touch Event[***urlencode!***]
-                                                         MakeCSVOptional(&eventTouch, "", nullptr, PGELayerOrDefault),
+                                                         MakeCSVOptional(&arearect.eventTouch, "", nullptr, PGELayerOrDefault),
                                                          //eflag:    0=Triggered every time entering
                                                          //          1=Triggered on entrance and level completion
                                                          //          2=Triggered only once
-                                                         MakeCSVOptional(&eflag, 0)
+                                                         MakeCSVOptional(&arearect.eventTouchPolicy, 0)
                                                          ),
                                         MakeCSVSubReader(dataReader, ',',
                                                          //ie1=Hammer Event[***urlencode!***]
-                                                         MakeCSVOptional(&eventHammer, "", nullptr, PGELayerOrDefault),
+                                                         MakeCSVOptional(&arearect.eventBreak, "", nullptr, PGELayerOrDefault),
                                                          //ie2=Warp Whistle Event[***urlencode!***]
-                                                         MakeCSVOptional(&eventWarpWhistle, "", nullptr, PGELayerOrDefault),
+                                                         MakeCSVOptional(&arearect.eventWarp, "", nullptr, PGELayerOrDefault),
                                                          //ie3=Anchor Event[***urlencode!***]
-                                                         MakeCSVOptional(&eventAnchor, "", nullptr, PGELayerOrDefault)
+                                                         MakeCSVOptional(&arearect.eventAnchor, "", nullptr, PGELayerOrDefault)
                                                          )
                                         );
-                //TODO: Implement the structure of separated "AREA" type
-                //to let special areas be independent from music boxes item types
-                musicbox.meta.array_id = FileData.musicbox_array_id++;
-                FileData.music.push_back(musicbox);
+                if((arearect.flags == WorldAreaRect::SETUP_CHANGE_MUSIC) &&
+                   (arearect.w == 32) && (arearect.h == 32))
+                {
+                    //Store as generic music-box point
+                    musicbox.id         = arearect.music_id;
+                    musicbox.music_file = arearect.music_file;
+                    musicbox.x          = arearect.x;
+                    musicbox.y          = arearect.y;
+                    musicbox.layer      = arearect.layer;
+                    musicbox.meta.array_id = FileData.musicbox_array_id++;
+                    FileData.music.push_back(musicbox);
+                }
+                else
+                {
+                    //Store as separated "Area-rect" type
+                    arearect.meta.array_id = FileData.arearect_array_id++;
+                    FileData.arearects.push_back(arearect);
+                }
             }
             else if(identifier == "L")
             {
