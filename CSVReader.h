@@ -46,21 +46,21 @@ namespace CSVReader
      */
     class parse_error : public std::logic_error
     {
-        private:
-            int _line;
-            int _field;
-        public:
-            explicit parse_error(const char *msg, int line, int field) : std::logic_error(msg), _line(line), _field(field) {}
-            explicit parse_error(std::string msg, int line, int field) : parse_error(msg.c_str(), line, field) {}
+    private:
+        int _line;
+        int _field;
+    public:
+        explicit parse_error(const char *msg, int line, int field) : std::logic_error(msg), _line(line), _field(field) {}
+        explicit parse_error(std::string msg, int line, int field) : parse_error(msg.c_str(), line, field) {}
 
-            inline int get_line_number() const
-            {
-                return _line;
-            }
-            inline int get_field_number() const
-            {
-                return _field;
-            }
+        inline int get_line_number() const
+        {
+            return _line;
+        }
+        inline int get_field_number() const
+        {
+            return _field;
+        }
     };
     // ========= Exceptions END ===========
 
@@ -100,60 +100,57 @@ namespace CSVReader
                  class Converter>
         class CSVReaderBase
         {
-            protected:
-                size_t _currentCharIndex;
-                CharT _sep;
-                StrT _currentLine; // Will be written by the derived class
-                int _fieldTracker; // Will be written by the derived class
-                int _lineTracker;  // Will be written by the derived class
+        protected:
+            size_t _currentCharIndex;
+            CharT _sep;
+            StrT _currentLine; // Will be written by the derived class
+            int _fieldTracker; // Will be written by the derived class
+            int _lineTracker;  // Will be written by the derived class
 
-                CSVReaderBase(CharT sep) : _currentCharIndex(0u), _sep(sep),
-                    _currentLine(""), _fieldTracker(0), _lineTracker(0) {}
+            CSVReaderBase(CharT sep) : _currentCharIndex(0u), _sep(sep),
+                _currentLine(""), _fieldTracker(0), _lineTracker(0) {}
 
-                inline StrT NextField()
+            inline StrT NextField()
+            {
+                size_t newCharIndex = _currentCharIndex;
+                if(!StrTUtils::find(_currentLine, _sep, newCharIndex))
+                    newCharIndex = StrTUtils::length(_currentLine);
+
+                StrT next = StrTUtils::substring(_currentLine, _currentCharIndex, newCharIndex - _currentCharIndex);
+                _currentCharIndex = newCharIndex + 1;
+                return next;
+            }
+
+            inline void SkipField()
+            {
+                size_t newCharIndex = _currentCharIndex;
+                if(!StrTUtils::find(_currentLine, _sep, newCharIndex))
+                    newCharIndex = StrTUtils::length(_currentLine);
+                _currentCharIndex = newCharIndex + 1;
+            }
+
+            inline bool HasNext()
+            {
+                return _currentCharIndex <= StrTUtils::length(_currentLine);
+            }
+
+            template<typename ToType>
+            inline void SafeConvert(ToType *to, const StrT &from)
+            {
+                try
                 {
-                    size_t newCharIndex = _currentCharIndex;
-
-                    if(!StrTUtils::find(_currentLine, _sep, newCharIndex))
-                        newCharIndex = StrTUtils::length(_currentLine);
-
-                    StrT next = StrTUtils::substring(_currentLine, _currentCharIndex, newCharIndex - _currentCharIndex);
-                    _currentCharIndex = newCharIndex + 1;
-                    return next;
+                    Converter::Convert(to, from);
                 }
-
-                inline void SkipField()
+                catch(...)
                 {
-                    size_t newCharIndex = _currentCharIndex;
-
-                    if(!StrTUtils::find(_currentLine, _sep, newCharIndex))
-                        newCharIndex = StrTUtils::length(_currentLine);
-
-                    _currentCharIndex = newCharIndex + 1;
+                    ThrowParseErrorInCatchContext();
                 }
+            }
 
-                inline bool HasNext()
-                {
-                    return _currentCharIndex <= StrTUtils::length(_currentLine);
-                }
-
-                template<typename ToType>
-                inline void SafeConvert(ToType *to, const StrT &from)
-                {
-                    try
-                    {
-                        Converter::Convert(to, from);
-                    }
-                    catch(...)
-                    {
-                        ThrowParseErrorInCatchContext();
-                    }
-                }
-
-                inline void ThrowParseErrorInCatchContext()
-                {
-                    std::throw_with_nested(parse_error(std::string("Failed to parse field ") + std::to_string(_fieldTracker) + " at line " + std::to_string(_lineTracker), _lineTracker, _fieldTracker));
-                }
+            inline void ThrowParseErrorInCatchContext()
+            {
+                std::throw_with_nested(parse_error(std::string("Failed to parse field ") + std::to_string(_fieldTracker) + " at line " + std::to_string(_lineTracker), _lineTracker, _fieldTracker));
+            }
         };
     }
     // ========= Utils END ===========
@@ -210,15 +207,15 @@ namespace CSVReader
     template<class StrT>
     struct DirectReader
     {
-            typedef StrT string_type;
+        typedef StrT string_type;
 
-            DirectReader(const StrT &data) : _data(data) {}
-            StrT read_line()
-            {
-                return _data;
-            }
-        private:
-            StrT _data;
+        DirectReader(const StrT &data) : _data(data) {}
+        StrT read_line()
+        {
+            return _data;
+        }
+    private:
+        StrT _data;
     };
     template<class StrT>
     constexpr DirectReader<StrT> MakeDirectReader(const StrT &data)
@@ -249,23 +246,23 @@ namespace CSVReader
     template<typename T, typename ValidatorFunc>
     struct CSVValidator
     {
-            typedef T value_type;
-            CSVValidator(T *value, const ValidatorFunc &validatorFunction) : _value(value), _validatorFunction(validatorFunction) {}
+        typedef T value_type;
+        CSVValidator(T *value, const ValidatorFunc &validatorFunction) : _value(value), _validatorFunction(validatorFunction) {}
 
-            bool Validate() const
+        bool Validate() const
+        {
+            return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T *)
             {
-                return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T *)
-                {
-                    return true;
-                }), _value);
-            }
-            T *Get()
-            {
-                return _value;
-            }
-        private:
-            T *_value;
-            ValidatorFunc _validatorFunction;
+                return true;
+            }), _value);
+        }
+        T *Get()
+        {
+            return _value;
+        }
+    private:
+        T *_value;
+        ValidatorFunc _validatorFunction;
     };
     /*!
      * \brief Creates a new CSVValidator.
@@ -287,31 +284,31 @@ namespace CSVReader
     template<typename T, typename PostProcessorFunc, typename ValidatorFunc>
     struct CSVPostProcessor
     {
-            typedef T value_type;
+        typedef T value_type;
 
-            CSVPostProcessor(T *value, const PostProcessorFunc &postProcessorFunction) : CSVPostProcessor(value, postProcessorFunction, nullptr) {}
-            CSVPostProcessor(T *value, const PostProcessorFunc &postProcessorFunction, const ValidatorFunc &validatorFunction)
-                : _value(value), _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
+        CSVPostProcessor(T *value, const PostProcessorFunc &postProcessorFunction) : CSVPostProcessor(value, postProcessorFunction, nullptr) {}
+        CSVPostProcessor(T *value, const PostProcessorFunc &postProcessorFunction, const ValidatorFunc &validatorFunction)
+            : _value(value), _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
 
-            bool Validate() const
+        bool Validate() const
+        {
+            return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T *)
             {
-                return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T *)
-                {
-                    return true;
-                }), _value);
-            }
-            inline void PostProcess()
-            {
-                idef::invoke_or_noop<void>(_postProcessorFunction, *_value);
-            }
-            T *Get()
-            {
-                return _value;
-            }
-        private:
-            T *_value;
-            ValidatorFunc _validatorFunction;
-            PostProcessorFunc _postProcessorFunction;
+                return true;
+            }), _value);
+        }
+        inline void PostProcess()
+        {
+            idef::invoke_or_noop<void>(_postProcessorFunction, *_value);
+        }
+        T *Get()
+        {
+            return _value;
+        }
+    private:
+        T *_value;
+        ValidatorFunc _validatorFunction;
+        PostProcessorFunc _postProcessorFunction;
     };
     /*!
      * \brief Creates a new CSVPostProcessor.
@@ -345,39 +342,39 @@ namespace CSVReader
     template<typename T, typename ValidatorFunc, typename PostProcessorFunc>
     struct CSVOptional
     {
-            typedef T value_type;
+        typedef T value_type;
 
-            CSVOptional(T *value, const T defVal) : CSVOptional(value, defVal, nullptr) {}
-            CSVOptional(T *value, const T defVal, const ValidatorFunc &validatorFunction) :
-                _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction) {}
-            CSVOptional(T *value, const T defVal, const ValidatorFunc &validatorFunction, const PostProcessorFunc &postProcessorFunction) :
-                _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
+        CSVOptional(T *value, const T defVal) : CSVOptional(value, defVal, nullptr) {}
+        CSVOptional(T *value, const T defVal, const ValidatorFunc &validatorFunction) :
+            _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction) {}
+        CSVOptional(T *value, const T defVal, const ValidatorFunc &validatorFunction, const PostProcessorFunc &postProcessorFunction) :
+            _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
 
 
-            bool Validate() const
+        bool Validate() const
+        {
+            return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T *)
             {
-                return idef::invoke_or_noop<bool>(idef::default_if_nullptr(_validatorFunction, [](T *)
-                {
-                    return true;
-                }), _value);
-            }
-            inline void PostProcess()
-            {
-                idef::invoke_or_noop<void>(_postProcessorFunction, *_value);
-            }
-            inline void AssignDefault()
-            {
-                *_value = _defaultValue;
-            }
-            inline T *Get()
-            {
-                return _value;
-            }
-        private:
-            T *_value;
-            T _defaultValue;
-            ValidatorFunc _validatorFunction;
-            PostProcessorFunc _postProcessorFunction;
+                return true;
+            }), _value);
+        }
+        inline void PostProcess()
+        {
+            idef::invoke_or_noop<void>(_postProcessorFunction, *_value);
+        }
+        inline void AssignDefault()
+        {
+            *_value = _defaultValue;
+        }
+        inline T *Get()
+        {
+            return _value;
+        }
+    private:
+        T *_value;
+        T _defaultValue;
+        ValidatorFunc _validatorFunction;
+        PostProcessorFunc _postProcessorFunction;
     };
     /*!
      * \brief Creates a new CSVOptional.
@@ -431,31 +428,28 @@ namespace CSVReader
              class PostProcessorFunc>
     struct CSVBatchReader : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>
     {
-        private:
-            Container *_container;
-            PostProcessorFunc _postProcessorFunction;
-        public:
+    private:
+        Container *_container;
+        PostProcessorFunc _postProcessorFunction;
+    public:
 
-            CSVBatchReader(CharT sep, Container *container, const PostProcessorFunc &postProcessorFunction) :
-                detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _container(container), _postProcessorFunction(postProcessorFunction) {}
+        CSVBatchReader(CharT sep, Container *container, const PostProcessorFunc &postProcessorFunction) :
+            detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _container(container), _postProcessorFunction(postProcessorFunction) {}
 
-            inline void ReadDataLine(const StrT &val)
+        inline void ReadDataLine(const StrT &val)
+        {
+            this->_currentLine = val;
+            while(this->HasNext())
             {
-                this->_currentLine = val;
-
-                while(this->HasNext())
-                {
-                    StrT from = this->NextField();
-
-                    if(from == "")
-                        continue;
-
-                    ContainerValueT to;
-                    this->SafeConvert(&to, from);
-                    idef::invoke_or_noop<void>(_postProcessorFunction, to);
-                    ContainerUtils::Add(_container, to);
-                }
+                StrT from = this->NextField();
+                if(from == "")
+                    continue;
+                ContainerValueT to;
+                this->SafeConvert(&to, from);
+                idef::invoke_or_noop<void>(_postProcessorFunction, to);
+                ContainerUtils::Add(_container, to);
             }
+        }
     };
 
     // 7. Reading with iteration
@@ -470,24 +464,22 @@ namespace CSVReader
              class IteratorFunc>
     struct CSVIterator : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>
     {
-        private:
-            IteratorFunc _iteratorFunc;
-        public:
-            CSVIterator(CharT sep, const IteratorFunc &iteratorFunc) :
-                detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _iteratorFunc(iteratorFunc) {}
+    private:
+        IteratorFunc _iteratorFunc;
+    public:
+        CSVIterator(CharT sep, const IteratorFunc &iteratorFunc) :
+            detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _iteratorFunc(iteratorFunc) {}
 
-            inline void ReadDataLine(const StrT &val)
+        inline void ReadDataLine(const StrT &val)
+        {
+            this->_currentLine = val;
+            while(this->HasNext())
             {
-                this->_currentLine = val;
-
-                while(this->HasNext())
-                {
-                    StrT next = this->NextField();
-
-                    if(!(next == ""))
-                        _iteratorFunc(next);
-                }
+                StrT next = this->NextField();
+                if(!(next == ""))
+                    _iteratorFunc(next);
             }
+        }
     };
 
 
@@ -568,10 +560,8 @@ namespace CSVReader
         static bool find(const target_string &str, StrElementType sep, size_t &findIndex)
         {
             size_t pos = str.find(sep, findIndex);
-
             if(pos == target_string::npos)
                 return false;
-
             findIndex = pos;
             return true;
         }
@@ -603,207 +593,207 @@ namespace CSVReader
     template<class Reader, class StrT, class CharT, class StrTUtils, class Converter>
     class CSVReader : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>
     {
-        private:
-            Reader *_reader;
-            int _currentTotalFields;
-            bool _requireReadLine;
-        public:
-            CSVReader(Reader *reader, CharT sep) : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _reader(reader),
-                _currentTotalFields(0), _requireReadLine(true) {}
-            CSVReader(const CSVReader &other) = delete;
-            CSVReader(CSVReader &&other) = default;
-            ~CSVReader() = default;
+    private:
+        Reader *_reader;
+        int _currentTotalFields;
+        bool _requireReadLine;
+    public:
+        CSVReader(Reader *reader, CharT sep) : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _reader(reader),
+            _currentTotalFields(0), _requireReadLine(true) {}
+        CSVReader(const CSVReader &other) = delete;
+        CSVReader(CSVReader &&other) = default;
+        ~CSVReader() = default;
 
-        private:
-            inline void ThrowIfOutOfBounds()
-            {
-                if(this->_currentCharIndex > StrTUtils::length(this->_currentLine))
-                    throw parse_error("Expected " + std::to_string(this->_currentTotalFields) + " CSV-Fields, got "
-                                      + std::to_string(this->_fieldTracker) + " at line "
-                                      + std::to_string(this->_lineTracker) + "!", this->_fieldTracker, this->_lineTracker);
-            }
-            template<class T, class... RestValues>
-            void ReadNext(T nextVal, RestValues &&... restVals)
-            {
-                static_assert(std::is_pointer<T>::value, "All values which are unpacked must be pointers (except CSVDiscard, CSVVaildate, CSVDiscard, CSVOptional, CSVSubReader)!");
-                ThrowIfOutOfBounds();
-                //Here do conversion code
-                this->SafeConvert(nextVal, this->NextField());
-                this->_fieldTracker++;
-                ReadNext(std::forward<RestValues>(restVals)...);
-            }
+    private:
+        inline void ThrowIfOutOfBounds()
+        {
+            if(this->_currentCharIndex > StrTUtils::length(this->_currentLine))
+                throw parse_error("Expected " + std::to_string(this->_currentTotalFields) + " CSV-Fields, got "
+                                  + std::to_string(this->_fieldTracker) + " at line "
+                                  + std::to_string(this->_lineTracker) + "!", this->_fieldTracker, this->_lineTracker);
+        }
+        template<class T, class... RestValues>
+        void ReadNext(T nextVal, RestValues &&... restVals)
+        {
+            static_assert(std::is_pointer<T>::value, "All values which are unpacked must be pointers (except CSVDiscard, CSVVaildate, CSVDiscard, CSVOptional, CSVSubReader)!");
+            ThrowIfOutOfBounds();
 
-            template<class... RestValues>
-            void ReadNext(CSVDiscard, RestValues &&... restVals)
-            {
-                this->_fieldTracker++;
-                this->SkipField();
-                ReadNext(std::forward<RestValues>(restVals)...);
-            }
+            //Here do conversion code
+            this->SafeConvert(nextVal, this->NextField());
 
-            template<class ValidateT, class ValidatorFunc, class... RestValues>
-            void ReadNext(CSVValidator<ValidateT, ValidatorFunc> nextVal, RestValues &&... restVals)
-            {
-                ThrowIfOutOfBounds();
-                this->SafeConvert(nextVal.Get(), this->NextField());
+            this->_fieldTracker++;
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
 
-                if(!nextVal.Validate())
+        template<class... RestValues>
+        void ReadNext(CSVDiscard, RestValues &&... restVals)
+        {
+            this->_fieldTracker++;
+            this->SkipField();
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
+
+        template<class ValidateT, class ValidatorFunc, class... RestValues>
+        void ReadNext(CSVValidator<ValidateT, ValidatorFunc> nextVal, RestValues &&... restVals)
+        {
+            ThrowIfOutOfBounds();
+
+            this->SafeConvert(nextVal.Get(), this->NextField());
+
+            if(!nextVal.Validate())
+                throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
+
+            this->_fieldTracker++;
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
+
+        template<class PostProcessorT, class PostProcessorFunc, class ValidatorFunc, class... RestValues>
+        void ReadNext(CSVPostProcessor<PostProcessorT, PostProcessorFunc, ValidatorFunc> nextVal, RestValues &&... restVals)
+        {
+            ThrowIfOutOfBounds();
+
+            this->SafeConvert(nextVal.Get(), this->NextField());
+            if(!nextVal.Validate())
+                throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
+            nextVal.PostProcess();
+
+            this->_fieldTracker++;
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
+
+        template<class OptionalT, class ValidatorFunc, class PostProcessorFunc, class... RestValues>
+        void ReadNext(CSVOptional<OptionalT, ValidatorFunc, PostProcessorFunc> optionalObj, RestValues &&... restVals)
+        {
+            // If we already reached the end, then assign default
+            if(this->_currentCharIndex >= StrTUtils::length(this->_currentLine))
+                optionalObj.AssignDefault();
+            else
+            {
+                this->SafeConvert(optionalObj.Get(), this->NextField());
+                if(!optionalObj.Validate())
                     throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
-
-                this->_fieldTracker++;
-                ReadNext(std::forward<RestValues>(restVals)...);
+                optionalObj.PostProcess();
             }
 
-            template<class PostProcessorT, class PostProcessorFunc, class ValidatorFunc, class... RestValues>
-            void ReadNext(CSVPostProcessor<PostProcessorT, PostProcessorFunc, ValidatorFunc> nextVal, RestValues &&... restVals)
+            this->_fieldTracker++;
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
+
+        template<class SubReader, class SubStrT, class SubCharT, class SubStrTUtils, class SubConverter, class... SubValues, class... RestValues>
+        void ReadNext(CSVSubReader<SubReader, SubStrT, SubCharT, SubStrTUtils, SubConverter, SubValues...> subReaderObj, RestValues &&... restVals)
+        {
+            ThrowIfOutOfBounds();
+
+            try
             {
-                ThrowIfOutOfBounds();
-                this->SafeConvert(nextVal.Get(), this->NextField());
-
-                if(!nextVal.Validate())
-                    throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
-
-                nextVal.PostProcess();
-                this->_fieldTracker++;
-                ReadNext(std::forward<RestValues>(restVals)...);
+                subReaderObj.ReadDataLine(this->NextField());
+            }
+            catch(...)
+            {
+                this->ThrowParseErrorInCatchContext();
             }
 
-            template<class OptionalT, class ValidatorFunc, class PostProcessorFunc, class... RestValues>
-            void ReadNext(CSVOptional<OptionalT, ValidatorFunc, PostProcessorFunc> optionalObj, RestValues &&... restVals)
+            this->_fieldTracker++;
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
+
+        template<class ReaderContainerValueT, class ReaderContainer, class ReaderContainerUtils,
+                 class ReaderStrT, class ReaderCharT, class ReaderStrTUtils, class ReaderConverter, class PostProcessorFunc, class... RestValues>
+        void ReadNext(CSVBatchReader<ReaderContainerValueT, ReaderContainer, ReaderContainerUtils, ReaderStrT, ReaderCharT, ReaderStrTUtils, ReaderConverter, PostProcessorFunc> subBatchReaderObj, RestValues &&... restVals)
+        {
+            ThrowIfOutOfBounds();
+
+            try
             {
-                // If we already reached the end, then assign default
+                subBatchReaderObj.ReadDataLine(this->NextField());
+            }
+            catch(...)
+            {
+                this->ThrowParseErrorInCatchContext();
+            }
+
+            this->_fieldTracker++;
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
+
+        template<class IterStrT, class IterCharT, class IterStrTUtils, class IterConverter, class IteratorFunc, class... RestValues>
+        void ReadNext(CSVIterator<IterStrT, IterCharT, IterStrTUtils, IterConverter, IteratorFunc> iteratorObj, RestValues &&... restVals)
+        {
+            ThrowIfOutOfBounds();
+
+            try
+            {
+                iteratorObj.ReadDataLine(this->NextField());
+            }
+            catch(...)
+            {
+                this->ThrowParseErrorInCatchContext();
+            }
+
+            this->_fieldTracker++;
+            ReadNext(std::forward<RestValues>(restVals)...);
+        }
+
+        void ReadNext() {}
+    public:
+        /*!
+         * \brief Read the next data line and pushes the result directly to the parameter.
+         *
+         * allValues must be pointer with the exception of:
+         *      * CSVDiscard
+         *      * CSVValidator
+         *      * CSVPostProcessor
+         *      * CSVOptional
+         *      * CSVSubReader
+         *      * CSVBatchReader
+         *      * CSVIterator
+         *
+         * \throws std::nested_exception When a parsing or conversion error happens.
+         *
+         */
+        template<typename... Values>
+        CSVReader &ReadDataLine(Values &&... allValues)
+        {
+            this->_lineTracker++;
+            this->_currentCharIndex = 0;
+            _currentTotalFields = sizeof...(allValues);
+            this->_fieldTracker = 0; // We need the tracker at 0 (because of out of range exception)
+            if(_requireReadLine)
+                this->_currentLine = _reader->read_line();
+            ReadNext(std::forward<Values>(allValues)...);
+            _requireReadLine = true;
+
+
+            return *this;
+        }
+
+
+        // Begins with 1
+        /*!
+         * \brief Read out (peeking) a field without going to the next line.
+         */
+        template<typename T>
+        T ReadField(int fieldNum)
+        {
+            if(_requireReadLine)
+                this->_currentLine = _reader->read_line();
+            _requireReadLine = false;
+            this->_currentCharIndex = 0;
+
+            StrT field;
+            for(int i = 1; i < fieldNum; i++)
+            {
                 if(this->_currentCharIndex >= StrTUtils::length(this->_currentLine))
-                    optionalObj.AssignDefault();
-                else
-                {
-                    this->SafeConvert(optionalObj.Get(), this->NextField());
+                    throw std::logic_error("Expected " + std::to_string(fieldNum) + " CSV-Fields, got " + std::to_string(i - 1) + " @ line " + std::to_string(this->_lineTracker) + "!");
 
-                    if(!optionalObj.Validate())
-                        throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
-
-                    optionalObj.PostProcess();
-                }
-
-                this->_fieldTracker++;
-                ReadNext(std::forward<RestValues>(restVals)...);
+                this->SkipField();
             }
+            field = this->NextField();
 
-            template<class SubReader, class SubStrT, class SubCharT, class SubStrTUtils, class SubConverter, class... SubValues, class... RestValues>
-            void ReadNext(CSVSubReader<SubReader, SubStrT, SubCharT, SubStrTUtils, SubConverter, SubValues...> subReaderObj, RestValues &&... restVals)
-            {
-                ThrowIfOutOfBounds();
-
-                try
-                {
-                    subReaderObj.ReadDataLine(this->NextField());
-                }
-                catch(...)
-                {
-                    this->ThrowParseErrorInCatchContext();
-                }
-
-                this->_fieldTracker++;
-                ReadNext(std::forward<RestValues>(restVals)...);
-            }
-
-            template<class ReaderContainerValueT, class ReaderContainer, class ReaderContainerUtils,
-                     class ReaderStrT, class ReaderCharT, class ReaderStrTUtils, class ReaderConverter, class PostProcessorFunc, class... RestValues>
-            void ReadNext(CSVBatchReader<ReaderContainerValueT, ReaderContainer, ReaderContainerUtils, ReaderStrT, ReaderCharT, ReaderStrTUtils, ReaderConverter, PostProcessorFunc> subBatchReaderObj, RestValues &&... restVals)
-            {
-                ThrowIfOutOfBounds();
-
-                try
-                {
-                    subBatchReaderObj.ReadDataLine(this->NextField());
-                }
-                catch(...)
-                {
-                    this->ThrowParseErrorInCatchContext();
-                }
-
-                this->_fieldTracker++;
-                ReadNext(std::forward<RestValues>(restVals)...);
-            }
-
-            template<class IterStrT, class IterCharT, class IterStrTUtils, class IterConverter, class IteratorFunc, class... RestValues>
-            void ReadNext(CSVIterator<IterStrT, IterCharT, IterStrTUtils, IterConverter, IteratorFunc> iteratorObj, RestValues &&... restVals)
-            {
-                ThrowIfOutOfBounds();
-
-                try
-                {
-                    iteratorObj.ReadDataLine(this->NextField());
-                }
-                catch(...)
-                {
-                    this->ThrowParseErrorInCatchContext();
-                }
-
-                this->_fieldTracker++;
-                ReadNext(std::forward<RestValues>(restVals)...);
-            }
-
-            void ReadNext() {}
-        public:
-            /*!
-             * \brief Read the next data line and pushes the result directly to the parameter.
-             *
-             * allValues must be pointer with the exception of:
-             *      * CSVDiscard
-             *      * CSVValidator
-             *      * CSVPostProcessor
-             *      * CSVOptional
-             *      * CSVSubReader
-             *      * CSVBatchReader
-             *      * CSVIterator
-             *
-             * \throws std::nested_exception When a parsing or conversion error happens.
-             *
-             */
-            template<typename... Values>
-            CSVReader &ReadDataLine(Values &&... allValues)
-            {
-                this->_lineTracker++;
-                this->_currentCharIndex = 0;
-                _currentTotalFields = sizeof...(allValues);
-                this->_fieldTracker = 0; // We need the tracker at 0 (because of out of range exception)
-
-                if(_requireReadLine)
-                    this->_currentLine = _reader->read_line();
-
-                ReadNext(std::forward<Values>(allValues)...);
-                _requireReadLine = true;
-                return *this;
-            }
-
-
-            // Begins with 1
-            /*!
-             * \brief Read out (peeking) a field without going to the next line.
-             */
-            template<typename T>
-            T ReadField(int fieldNum)
-            {
-                if(_requireReadLine)
-                    this->_currentLine = _reader->read_line();
-
-                _requireReadLine = false;
-                this->_currentCharIndex = 0;
-                StrT field;
-
-                for(int i = 1; i < fieldNum; i++)
-                {
-                    if(this->_currentCharIndex >= StrTUtils::length(this->_currentLine))
-                        throw std::logic_error("Expected " + std::to_string(fieldNum) + " CSV-Fields, got " + std::to_string(i - 1) + " @ line " + std::to_string(this->_lineTracker) + "!");
-
-                    this->SkipField();
-                }
-
-                field = this->NextField();
-                T value;
-                Converter::Convert(&value, field);
-                return value;
-            }
+            T value;
+            Converter::Convert(&value, field);
+            return value;
+        }
 
     };
 
@@ -852,6 +842,7 @@ namespace CSVReader
     {
         typedef detail::CSVReaderFromReaderType<Reader> csv_reader_type;
         typedef typename csv_reader_type::value_type value_type;
+
         static_assert(std::is_same<CharT, value_type>::value, "Value type of basic_string must be the same as the type of the seperator!");
         return typename csv_reader_type::full_type(reader, sep);
     }
@@ -860,26 +851,26 @@ namespace CSVReader
     template<class Reader, class StrT, class CharT, class StrTUtils, class Converter, class... Values>
     struct CSVSubReader
     {
-        public:
-            CSVSubReader(CharT sep, Values &&... allValues) : _sep(sep), _val(allValues...)
-            {}
+    public:
+        CSVSubReader(CharT sep, Values &&... allValues) : _sep(sep), _val(allValues...)
+        {}
 
-            void ReadDataLine(const StrT &val)
-            {
-                ReadDataLineImpl(val, detail::make_index_sequence<sizeof...(Values)> {});
-            }
+        void ReadDataLine(const StrT &val)
+        {
+            ReadDataLineImpl(val, detail::make_index_sequence<sizeof...(Values)> {});
+        }
 
-        private:
-            template<std::size_t ...I>
-            void ReadDataLineImpl(const StrT &val, detail::index_sequence<I...>)
-            {
-                DirectReader<StrT> subReader(val);
-                CSVReader<decltype(subReader), StrT, CharT, StrTUtils, Converter> subCSVReader(&subReader, _sep);
-                subCSVReader.ReadDataLine(std::get<I>(_val)...);
-            }
+    private:
+        template<std::size_t ...I>
+        void ReadDataLineImpl(const StrT &val, detail::index_sequence<I...>)
+        {
+            DirectReader<StrT> subReader(val);
+            CSVReader<decltype(subReader), StrT, CharT, StrTUtils, Converter> subCSVReader(&subReader, _sep);
+            subCSVReader.ReadDataLine(std::get<I>(_val)...);
+        }
 
-            CharT _sep;
-            std::tuple<Values...> _val;
+        CharT _sep;
+        std::tuple<Values...> _val;
     };
 
     /*!
@@ -926,6 +917,7 @@ namespace CSVReader
     MakeCSVBatchReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, CharT sep, ContainerT *container)
     {
         typedef detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter, std::nullptr_t> csv_batch_reader_type;
+
         return typename csv_batch_reader_type::full_type(sep, container, nullptr);
     }
 
@@ -950,6 +942,7 @@ namespace CSVReader
     MakeCSVBatchReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubCharT sep, ContainerT *container, const PostProcessorFunc &postProcessorFunc)
     {
         typedef detail::CSVBatchReaderFromContainer<ContainerT, StrT, CharT, StrTUtils, Converter, PostProcessorFunc> csv_batch_reader_type;
+
         return typename csv_batch_reader_type::full_type(sep, container, postProcessorFunc);
     }
 
