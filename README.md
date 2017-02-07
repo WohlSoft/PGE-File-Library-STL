@@ -18,7 +18,7 @@ SMBX-64 Family:
 *.txt   SMBX64 NPC Custom text config  -  Read/Write
 SMBX-38A Family:
 *.lvl   SMBX-38A Level File         -  Read/Write
-*.wld   SMBX-38A World File         -  (planned)Read/Write
+*.wld   SMBX-38A World File         -  Read/(planned)Write
 *.wls   SMBX-38A World settings     -  (planned)Read/Write
 *.sav   SMBX-38A Game save File     -  (planned)Read/Write
 ```

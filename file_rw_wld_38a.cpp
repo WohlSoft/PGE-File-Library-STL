@@ -248,6 +248,8 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     WorldMusicBox       musicbox;
     WorldAreaRect       arearect;
     WorldLayer          layer;
+    WorldEvent38A       event;
+    WorldItemSetup38A   customcfg;
 
     //Add path data
     if(!IsEmpty(filePath))
@@ -442,23 +444,22 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         //    b4=(flag & 8) Forced Walking
                                         //    b5=(flag & 16) Item-triggered events
                                         MakeCSVOptional(&arearect.flags, WorldAreaRect::SETUP_CHANGE_MUSIC),
-                                        //FIXME: both subreaders must be optional!
-                                        MakeCSVSubReader(dataReader, ',',
-                                                         //te:Touch Event[***urlencode!***]
-                                                         MakeCSVOptional(&arearect.eventTouch, "", nullptr, PGELayerOrDefault),
-                                                         //eflag:    0=Triggered every time entering
-                                                         //          1=Triggered on entrance and level completion
-                                                         //          2=Triggered only once
-                                                         MakeCSVOptional(&arearect.eventTouchPolicy, 0)
-                                                         ),
-                                        MakeCSVSubReader(dataReader, ',',
-                                                         //ie1=Hammer Event[***urlencode!***]
-                                                         MakeCSVOptional(&arearect.eventBreak, "", nullptr, PGELayerOrDefault),
-                                                         //ie2=Warp Whistle Event[***urlencode!***]
-                                                         MakeCSVOptional(&arearect.eventWarp, "", nullptr, PGELayerOrDefault),
-                                                         //ie3=Anchor Event[***urlencode!***]
-                                                         MakeCSVOptional(&arearect.eventAnchor, "", nullptr, PGELayerOrDefault)
-                                                         )
+                                        MakeCSVOptionalSubReader(dataReader, ',',
+                                                                 //te:Touch Event[***urlencode!***]
+                                                                 MakeCSVOptional(&arearect.eventTouch, "", nullptr, PGELayerOrDefault),
+                                                                 //eflag:    0=Triggered every time entering
+                                                                 //          1=Triggered on entrance and level completion
+                                                                 //          2=Triggered only once
+                                                                 MakeCSVOptional(&arearect.eventTouchPolicy, 0)
+                                                                 ),
+                                        MakeCSVOptionalSubReader(dataReader, ',',
+                                                                 //ie1=Hammer Event[***urlencode!***]
+                                                                 MakeCSVOptional(&arearect.eventBreak, "", nullptr, PGELayerOrDefault),
+                                                                 //ie2=Warp Whistle Event[***urlencode!***]
+                                                                 MakeCSVOptional(&arearect.eventWarp, "", nullptr, PGELayerOrDefault),
+                                                                 //ie3=Anchor Event[***urlencode!***]
+                                                                 MakeCSVOptional(&arearect.eventAnchor, "", nullptr, PGELayerOrDefault)
+                                                                 )
                                         );
                 if((arearect.flags == WorldAreaRect::SETUP_CHANGE_MUSIC) &&
                    (arearect.w == 32) && (arearect.h == 32))
@@ -521,18 +522,18 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                                          MakeCSVOptional(&lvlitem.alwaysVisible, false),
                                                          //ls=is game start point
                                                          MakeCSVOptional(&lvlitem.gamestart, false),
-                                                         //TODO: Implement missing fields and handle them!
                                                          //f=forced
-                                                         CSVDiscard(),
+                                                         MakeCSVOptional(&lvlitem.forceStart, false),
                                                          //nsc=no star coin count
-                                                         CSVDiscard(),
+                                                         MakeCSVOptional(&lvlitem.disableStarCoinsCount, false),
                                                          //otl=destory after clear
-                                                         CSVDiscard(),
+                                                         MakeCSVOptional(&lvlitem.destroyOnCompleting, false),
                                                          //li=level ID
-                                                         &lvlitem.id,
+                                                         MakeCSVOptional(&lvlitem.levelID, 0),
                                                          //lcm=Affected by Music Box
-                                                         CSVDiscard()
+                                                         MakeCSVOptional(&lvlitem.controlledByAreaRects, false)
                                                          ),
+                                        //TODO: Implement this
                                         //s=entrance syntax
                                         //        s=ds1/ds2...dsn
                                         //        ds=ds1,ds2[***urlencode!***][syntax]
@@ -541,6 +542,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         CSVDiscard(),
                                         //layer=layer name["" == "Default"][***urlencode!***]
                                         MakeCSVOptional(&lvlitem.layer, "Default", nullptr, PGELayerOrDefault)
+                                        //TODO: Implement this
                                         //Lmt=Level Movement Command
                                         //    lmt=NodeInfo\PathInfo
                                         //        NodeInfo=Node1:Node2:...:NodeN
@@ -563,57 +565,83 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
             }
             else if(identifier == "WE")
             {
-            //next line: events
-            //    WE|name|layer|layerm|world|other
-            //    name=event name[***urlencode!***]
-            //    layer=way/hidelist/showlist/togglelist
-            //        list=name1,name2,name3...namen
-            //            name[***urlencode!***]
-            //        if (way % 10 == 1) nosmoke = true;
-            //        if (way > 10) object_state = true; else layer_state = true;
-            //    layerm=movementcommand1\movementcommand2\...\movementcommandn
-            //        movementcommand=way,layer,hp,vp,ap
-            //            way:0=speed,1=coordinate,2=moveto,4=spin
-            //            layer=layer name[***urlencode!***]
-            //            hp=Horizontal Parameter[***urlencode!***]
-            //            vp=Vertical Parameter[***urlencode!***]
-            //            ap=Additional Parameter[***urlencode!***]
-            //    world=aw/cs,le,inpc,msgc,syntax,msg
-            //        aw=AutoStart Settings
-            //            0=Not Auto Start
-            //            1=Triggered on loading the world the first time.
-            //            2=Triggered every time loading the world.
-            //            3=Triggered on level exit.
-            //        cs=Start when match all condition[0=false !0=true]
-            //        le:0=This is a Normal Event.
-            //           1=This is a Level Enter/Exit Event.
-            //        inpc=Interrupt the process if 'false' returned
-            //        msgc=Show a message if 'false' returned
-            //        syntax=Condition expression[***urlencode!***]
-            //        msg=message[***urlencode!***]
-            //    other=sd/ld/event,delay/script/msg/wwx,wwy,lockl
-            //        sd=play sound number
-            //        ld=lock keyboard (frames)
-            //        event=trigger event name[***urlencode!***]
-            //        delay=trigger delay[1 frame]
-            //        script=script name[***urlencode!***]
-            //        msg=show message after start event[***urlencode!***]
-            //        wwx=Warp Whistle: Map Warp Location x
-            //        wwy=Warp Whistle: Map Warp Location y
-            //            if (wwx == -1 && wwy == -1) [means not moving]
-            //        lockl=[Level ID]Affected by Anchor
-                dataReader.ReadDataLine();//TODO! Implement world map events handling
+                event = WorldEvent38A();
+                //TODO: Implement world map events support
+                //next line: events
+                //    WE|name|layer|layerm|world|other
+                dataReader.ReadDataLine(CSVDiscard(),
+                                        //    name=event name[***urlencode!***]
+                                        MakeCSVPostProcessor(&event.name, PGELayerOrDefault)
+                                        //    layer=way/hidelist/showlist/togglelist
+                                        //        list=name1,name2,name3...namen
+                                        //            name[***urlencode!***]
+                                        //        if (way % 10 == 1) nosmoke = true;
+                                        //        if (way > 10) object_state = true; else layer_state = true;
+                                        //    layerm=movementcommand1\movementcommand2\...\movementcommandn
+                                        //        movementcommand=way,layer,hp,vp,ap
+                                        //            way:0=speed,1=coordinate,2=moveto,4=spin
+                                        //            layer=layer name[***urlencode!***]
+                                        //            hp=Horizontal Parameter[***urlencode!***]
+                                        //            vp=Vertical Parameter[***urlencode!***]
+                                        //            ap=Additional Parameter[***urlencode!***]
+                                        //    world=aw/cs,le,inpc,msgc,syntax,msg
+                                        //        aw=AutoStart Settings
+                                        //            0=Not Auto Start
+                                        //            1=Triggered on loading the world the first time.
+                                        //            2=Triggered every time loading the world.
+                                        //            3=Triggered on level exit.
+                                        //        cs=Start when match all condition[0=false !0=true]
+                                        //        le:0=This is a Normal Event.
+                                        //           1=This is a Level Enter/Exit Event.
+                                        //        inpc=Interrupt the process if 'false' returned
+                                        //        msgc=Show a message if 'false' returned
+                                        //        syntax=Condition expression[***urlencode!***]
+                                        //        msg=message[***urlencode!***]
+                                        //    other=sd/ld/event,delay/script/msg/wwx,wwy,lockl
+                                        //        sd=play sound number
+                                        //        ld=lock keyboard (frames)
+                                        //        event=trigger event name[***urlencode!***]
+                                        //        delay=trigger delay[1 frame]
+                                        //        script=script name[***urlencode!***]
+                                        //        msg=show message after start event[***urlencode!***]
+                                        //        wwx=Warp Whistle: Map Warp Location x
+                                        //        wwy=Warp Whistle: Map Warp Location y
+                                        //            if (wwx == -1 && wwy == -1) [means not moving]
+                                        //        lockl=[Level ID]Affected by Anchor
+                                                            );
+                event.meta.array_id = FileData.events38A_array_id++;
+                FileData.events38A.push_back(event);
             }
-            //TODO: Implement custom configs storage and hanlde the custom configs too!
-            //custom object data:
-            //    WCT|id|data	:custom tile
-            //    WCS|id|data	:custom scene
-            //    WCL|id|data	:custom level
-            //    id=object id
-            //    data=[HEX]value|[HEX]value...
-            //    [HEX]=0001	:gfxwidth
-            //    [HEX]=0002	:gfxheight
-            //    [HEX]=0003	:frames
+            else if((identifier == "WCT") || (identifier == "WCS") || (identifier == "WCL") )
+            {
+                //custom object data:
+                //    WCT|id|data	:custom tile
+                //    WCS|id|data	:custom scene
+                //    WCL|id|data	:custom level
+                //    id=object id
+                //    data=[HEX]value|[HEX]value...
+                //    [HEX]=0001	:gfxwidth
+                //    [HEX]=0002	:gfxheight
+                //    [HEX]=0003	:frames
+                customcfg = WorldItemSetup38A();
+                if(identifier == "WCT")
+                    customcfg.type = WorldItemSetup38A::TERRAIN;
+                else if(identifier == "WCS")
+                    customcfg.type = WorldItemSetup38A::SCENERY;
+                else
+                    customcfg.type = WorldItemSetup38A::LEVEL;
+
+                dataReader.ReadDataLine(CSVDiscard(),
+                                        &customcfg.id,
+                                        MakeCSVIterator(dataReader, ',', [&customcfg](const PGESTRING & nextFieldStr)
+                                                        {
+                                                            WorldItemSetup38A::Entry e;
+                                                            SMBX38A_CC_decode(e.key, e.value, nextFieldStr);
+                                                            customcfg.data.push_back(e);
+                                                        })
+                                       );
+                FileData.custom38A_configs.push_back(customcfg);
+            }
             else
                 dataReader.ReadDataLine();
         }//while is not EOF

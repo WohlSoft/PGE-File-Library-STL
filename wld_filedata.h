@@ -148,6 +148,16 @@ struct WorldLevelTile
     long gotoy = -1;
     //! Show big path background image under main sprite
     bool bigpathbg = false;
+    //! Forcedly start level on player touches the level entrance cell
+    bool forceStart = false;
+    //! Ignore star coins while counting stars
+    bool disableStarCoinsCount = false;
+    //! Close level entrance when it has been completed
+    bool destroyOnCompleting = false;
+    //! Level movement will be affected by touching of rectangular areas
+    bool controlledByAreaRects = false;
+    //! 38A: Level-ID
+    long levelID = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
 
@@ -259,6 +269,41 @@ struct WorldLayer
     ElementMeta meta;
 };
 
+struct WorldEvent38A
+{
+    //! Name of the event
+    PGESTRING name;
+
+    //TODO: Implement other fields!!!
+
+    /*
+     * Editor-only parameters which are not saving into file
+     */
+    //! Helper meta-data
+    ElementMeta meta;
+};
+
+/**
+ * @brief Custom element settings (used by 38A)
+ */
+struct WorldItemSetup38A
+{
+    enum ItemType
+    {
+        UNKNOWN = -1,
+        TERRAIN = 0,
+        SCENERY = 1,
+        LEVEL   = 2,
+    } type = UNKNOWN;
+
+    int64_t id = 0;
+    struct Entry
+    {
+        int32_t key = 0;
+        int64_t value = 0;
+    };
+    PGELIST<Entry> data;
+};
 
 /**
  * @brief World map data structure
@@ -395,6 +440,14 @@ struct WorldData
     PGELIST<WorldLayer > layers;
     //! Last used Layer's array ID
     unsigned int layers_array_id = 1;
+
+    //! Array of all 38A-formatted events in this world map
+    PGELIST<WorldEvent38A> events38A;
+    //! Last used Event's array ID
+    unsigned int events38A_array_id = 1;
+
+    //! SMBX-38A specific custom configs
+    PGELIST<WorldItemSetup38A> custom38A_configs;
 
     //! Meta-data: Position bookmarks, Auto-Script configuration, etc., Crash meta-data, etc.
     MetaData metaData;

@@ -827,6 +827,9 @@ struct LevelScript
     int       language = LANG_LUA;
 };
 
+/**
+ * @brief Custom element settings (used by 38A)
+ */
 struct LevelItemSetup38A
 {
     enum ItemType
