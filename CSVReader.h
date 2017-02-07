@@ -682,15 +682,21 @@ namespace CSVReader
         template<class SubReader, class SubStrT, class SubCharT, class SubStrTUtils, class SubConverter, class... SubValues, class... RestValues>
         void ReadNext(CSVSubReader<SubReader, SubStrT, SubCharT, SubStrTUtils, SubConverter, SubValues...> subReaderObj, RestValues &&... restVals)
         {
-            ThrowIfOutOfBounds();
+            if(!subReaderObj.IsOptional())
+                ThrowIfOutOfBounds();
 
-            try
+            // We don't have to check for subReaderObj.IsOptional again, because
+            // ThrowIfOutOfBounds() would have thrown already
+            if(!(this->_currentCharIndex >= StrTUtils::length(this->_currentLine)))
             {
-                subReaderObj.ReadDataLine(this->NextField());
-            }
-            catch(...)
-            {
-                this->ThrowParseErrorInCatchContext();
+                try
+                {
+                    subReaderObj.ReadDataLine(this->NextField());
+                }
+                catch(...)
+                {
+                    this->ThrowParseErrorInCatchContext();
+                }
             }
 
             this->_fieldTracker++;
@@ -852,12 +858,17 @@ namespace CSVReader
     struct CSVSubReader
     {
     public:
-        CSVSubReader(CharT sep, Values &&... allValues) : _sep(sep), _val(allValues...)
+        CSVSubReader(CharT sep, bool isOptional, Values &&... allValues) : _sep(sep), _val(allValues...), _isOptional(isOptional)
         {}
 
         void ReadDataLine(const StrT &val)
         {
             ReadDataLineImpl(val, detail::make_index_sequence<sizeof...(Values)> {});
+        }
+
+        bool IsOptional() const
+        {
+            return _isOptional;
         }
 
     private:
@@ -871,6 +882,7 @@ namespace CSVReader
 
         CharT _sep;
         std::tuple<Values...> _val;
+        bool _isOptional;
     };
 
     /*!
@@ -880,8 +892,20 @@ namespace CSVReader
     template<class Reader, class StrT, class CharT, class StrTUtils, class Converter, class SubChar, class... RestValues>
     constexpr CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...> MakeCSVSubReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, RestValues &&... values)
     {
-        return CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...>(sep, std::forward<RestValues>(values)...);
+        return CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...>(sep, false, std::forward<RestValues>(values)...);
     }
+
+    /*!
+     * \brief Creates a new CSVSubReader, which is optional. It acts the same as CSVOptional
+     * \see CSVSubReader
+     * \see CSVOptional
+     */
+    template<class Reader, class StrT, class CharT, class StrTUtils, class Converter, class SubChar, class... RestValues>
+    constexpr CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...> MakeCSVOptionalSubReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, RestValues &&... values)
+    {
+        return CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...>(sep, true, std::forward<RestValues>(values)...);
+    }
+
 
 
     namespace detail
