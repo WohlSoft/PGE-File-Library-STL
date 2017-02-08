@@ -484,6 +484,10 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
             {
                 //L|id[,dx,dy]|x|y|fn|n|eu\el\ed\er|wx|wy|wlz|bg,pb,av,ls,f,nsc,otl,li,lcm|s|Layer|Lmt
                 lvlitem = WorldLevelTile();
+                lvlitem.left_exit_extra.exit_codes = {0, 0};
+                lvlitem.top_exit_extra.exit_codes = {0, 0};
+                lvlitem.right_exit_extra.exit_codes = {0, 0};
+                lvlitem.bottom_exit_extra.exit_codes = {0, 0};
                 dataReader.ReadDataLine(CSVDiscard(),
                                         MakeCSVSubReader(dataReader, ',',
                                                          //id=level id
@@ -501,12 +505,37 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         MakeCSVPostProcessor(&lvlitem.lvlfile,  PGEUrlDecodeFunc),
                                         //n=level name[***urlencode!***]
                                         MakeCSVPostProcessor(&lvlitem.title,    PGEUrlDecodeFunc),
-                                        //eu,el,ed,er=e[up,left,down,right]
+                                        //eu\el\ed\er=e[up\left\down\right]
                                         //        e=c1,c2,c3,c4
                                         //        c1,c2,c3=level exit type
                                         //        c4=condidtion expression[***urlencode!***][syntax]
                                         //        exit = (c1 || c2 || c3) && c4
-                                        MakeCSVSubReader(dataReader, '\\'),
+                                        MakeCSVSubReader(dataReader, '\\',
+                                                        MakeCSVSubReader(dataReader, ','
+                                                                         &lvlitem.top_exit,
+                                                                         &lvlitem.top_exit_extra.exit_codes[0],
+                                                                         &lvlitem.top_exit_extra.exit_codes[1],
+                                                                         MakeCSVPostProcessor(&lvlitem.top_exit_extra.expression, PGEUrlDecodeFunc)
+                                                                         ),
+                                                        MakeCSVSubReader(dataReader, ','
+                                                                         &lvlitem.left_exit,
+                                                                         &lvlitem.left_exit_extra.exit_codes[0],
+                                                                         &lvlitem.left_exit_extra.exit_codes[1],
+                                                                         MakeCSVPostProcessor(&lvlitem.left_exit_extra.expression, PGEUrlDecodeFunc)
+                                                                         ),
+                                                        MakeCSVSubReader(dataReader, ','
+                                                                         &lvlitem.bottom_exit,
+                                                                         &lvlitem.bottom_exit_extra.exit_codes[0],
+                                                                         &lvlitem.bottom_exit_extra.exit_codes[1],
+                                                                         MakeCSVPostProcessor(&lvlitem.bottom_exit_extra.expression, PGEUrlDecodeFunc)
+                                                                         ),
+                                                        MakeCSVSubReader(dataReader, ','
+                                                                         &lvlitem.right_exit,
+                                                                         &lvlitem.right_exit_extra.exit_codes[0],
+                                                                         &lvlitem.right_exit_extra.exit_codes[1],
+                                                                         MakeCSVPostProcessor(&lvlitem.right_exit_extra.expression, PGEUrlDecodeFunc)
+                                                                         )
+                                                         ),
                                         //wx=go to world map position x
                                         &lvlitem.gotox,
                                         //wx=go to world map position y
@@ -539,9 +568,19 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         //        ds=ds1,ds2[***urlencode!***][syntax]
                                         //        ds1=condidtion expression
                                         //        ds2=index
-                                        CSVDiscard(),
+                                        MakeCSVOptionalIterator(dataReader, '/', [&lvlitem](const PGESTRING & nextFieldStr)
+                                        {
+                                            WorldLevelTile::EnterCondition e;
+                                            auto fieldReader = MakeDirectReader(nextFieldStr);
+                                            auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                                            fullReader.ReadDataLine(
+                                                        MakeCSVPostProcessor(&e.condition,  PGEUrlDecodeFunc),
+                                                        MakeCSVPostProcessor(&e.levelIndex, PGEUrlDecodeFunc)
+                                                        );
+                                            lvlitem.enter_cond.push_back(e);
+                                        }),
                                         //layer=layer name["" == "Default"][***urlencode!***]
-                                        MakeCSVOptional(&lvlitem.layer, "Default", nullptr, PGELayerOrDefault)
+                                        MakeCSVOptional(&lvlitem.layer, "Default", nullptr, PGELayerOrDefault),
                                         //TODO: Implement this
                                         //Lmt=Level Movement Command
                                         //    lmt=NodeInfo\PathInfo
@@ -549,6 +588,31 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         //            Node=x,y,chance
                                         //        PathInfo=Path1:Path2:...:PathN
                                         //            Path=NodeID1,NodeID2
+                                        MakeCSVOptionalSubReader(dataReader, '\\',
+                                                                 MakeCSVOptionalIterator(dataReader, ':', [&lvlitem](const PGESTRING & nextFieldStr)
+                                                                 {
+                                                                     WorldLevelTile::Movement::Node node;
+                                                                     auto fieldReader = MakeDirectReader(nextFieldStr);
+                                                                     auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                                                                     fullReader.ReadDataLine(
+                                                                                 &node.x,
+                                                                                 &node.y,
+                                                                                 &node.chance
+                                                                                 );
+                                                                     lvlitem.movement.nodes.push_back(node);
+                                                                 }),
+                                                                 MakeCSVOptionalIterator(dataReader, ':', [&lvlitem](const PGESTRING & nextFieldStr)
+                                                                 {
+                                                                     WorldLevelTile::Movement::Line line;
+                                                                     auto fieldReader = MakeDirectReader(nextFieldStr);
+                                                                     auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                                                                     fullReader.ReadDataLine(
+                                                                                 &line.node1,
+                                                                                 &line.node2
+                                                                                 );
+                                                                     lvlitem.movement.paths.push_back(line);
+                                                                 })
+                                                                 )
                                         );
                 lvlitem.meta.array_id = FileData.level_array_id++;
                 FileData.levels.push_back(lvlitem);

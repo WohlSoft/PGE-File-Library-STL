@@ -134,6 +134,30 @@ struct WorldLevelTile
     int bottom_exit = -1;
     //! Open right path on exit code
     int right_exit = -1;
+
+    struct OpenCondition
+    {
+        //! List of additional exit codes to open this path
+        PGELIST<int>    exit_codes;
+        //! Expression required to open paths on any direction
+        PGESTRING       expression;
+    };
+    //! Additional conditions to open top path
+    OpenCondition top_exit_extra;
+    //! Additional conditions to open left path
+    OpenCondition left_exit_extra;
+    //! Additional conditions to open bottom path
+    OpenCondition bottom_exit_extra;
+    //! Additional conditions to open right path
+    OpenCondition right_exit_extra;
+
+    struct EnterCondition
+    {
+        PGESTRING condition;
+        PGESTRING levelIndex;
+    };
+    //! Conditions to enter the level
+    PGELIST<EnterCondition> enter_cond;
     //! Target Warp-ID to enter level
     unsigned long entertowarp = 0;
     //! Level is always shown on map even not opened
@@ -160,6 +184,27 @@ struct WorldLevelTile
     long levelID = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
+    /**
+     * @brief Move entrance point to another position every failed attempt to complete this level
+     */
+    struct Movement
+    {
+        struct Node
+        {
+            long x = 0;
+            long y = 0;
+            long chance = 100;
+        };
+        struct Line
+        {
+            long node1 = 0;
+            long node2 = 0;
+        };
+        //! Nodes
+        PGELIST<Node> nodes;
+        //! Path that connects nodes
+        PGELIST<Line> paths;
+    } movement;
 
     /*
      * Editor-only parameters which are not saving into file

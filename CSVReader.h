@@ -465,10 +465,11 @@ namespace CSVReader
     struct CSVIterator : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>
     {
     private:
+        bool _isOptional;
         IteratorFunc _iteratorFunc;
     public:
-        CSVIterator(CharT sep, const IteratorFunc &iteratorFunc) :
-            detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _iteratorFunc(iteratorFunc) {}
+        CSVIterator(CharT sep, bool isOptional, const IteratorFunc &iteratorFunc) :
+            detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _isOptional(isOptional), _iteratorFunc(iteratorFunc) {}
 
         inline void ReadDataLine(const StrT &val)
         {
@@ -479,6 +480,11 @@ namespace CSVReader
                 if(!(next == ""))
                     _iteratorFunc(next);
             }
+        }
+
+        bool IsOptional() const
+        {
+            return _isOptional;
         }
     };
 
@@ -725,15 +731,21 @@ namespace CSVReader
         template<class IterStrT, class IterCharT, class IterStrTUtils, class IterConverter, class IteratorFunc, class... RestValues>
         void ReadNext(CSVIterator<IterStrT, IterCharT, IterStrTUtils, IterConverter, IteratorFunc> iteratorObj, RestValues &&... restVals)
         {
-            ThrowIfOutOfBounds();
+            if(!iteratorObj.IsOptional())
+                ThrowIfOutOfBounds();
 
-            try
+            // We don't have to check for iteratorObj.IsOptional again, because
+            // ThrowIfOutOfBounds() would have thrown already
+            if(!(this->_currentCharIndex >= StrTUtils::length(this->_currentLine)))
             {
-                iteratorObj.ReadDataLine(this->NextField());
-            }
-            catch(...)
-            {
-                this->ThrowParseErrorInCatchContext();
+                try
+                {
+                    iteratorObj.ReadDataLine(this->NextField());
+                }
+                catch(...)
+                {
+                    this->ThrowParseErrorInCatchContext();
+                }
             }
 
             this->_fieldTracker++;
@@ -979,7 +991,14 @@ namespace CSVReader
     constexpr CSVIterator<StrT, CharT, StrTUtils, Converter, IteratorFunc>
     MakeCSVIterator(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, const IteratorFunc &iteratorFunc)
     {
-        return CSVIterator<StrT, CharT, StrTUtils, Converter, IteratorFunc>(sep, iteratorFunc);
+        return CSVIterator<StrT, CharT, StrTUtils, Converter, IteratorFunc>(sep, false, iteratorFunc);
+    }
+
+    template<class Reader, class StrT, class CharT, class StrTUtils, class Converter, class SubChar, class IteratorFunc>
+    constexpr CSVIterator<StrT, CharT, StrTUtils, Converter, IteratorFunc>
+    MakeCSVOptionalIterator(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, const IteratorFunc &iteratorFunc)
+    {
+        return CSVIterator<StrT, CharT, StrTUtils, Converter, IteratorFunc>(sep, true, iteratorFunc);
     }
 }
 
