@@ -1659,14 +1659,10 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             switch(section_pos)
             {
             case -1:
-                section_pos = 0;
                 continue;
-                break;
-
             case -2:
                 section_pos = 1;
                 break;
-
             default:
                 section_pos = 2;
                 break;
@@ -1733,14 +1729,10 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             switch(section_bg)
             {
             case -1:
-                section_bg = 0;
                 continue;
-                break;
-
             case -2:
                 section_bg = 1;
                 break;
-
             default:
                 section_bg = 2;
                 break;
@@ -1768,14 +1760,10 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             switch(section_muz)
             {
             case -1:
-                section_muz = 0;
                 continue;
-                break;
-
             case -2:
                 section_muz = 1;
                 break;
-
             default:
                 section_muz = 2;
                 break;
