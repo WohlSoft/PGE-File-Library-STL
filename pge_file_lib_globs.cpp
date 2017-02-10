@@ -801,7 +801,7 @@ fillEnd:
             buf[gotten] = '\0';
         QString out(buf);
         delete[] buf;
-        return std::move(out);//stream.read(len);
+        return out;//stream.read(len);
         #else
         if(!stream)
             return "";
