@@ -128,10 +128,12 @@ struct LevelBlock
     bool invisible = false;
     //! Block has a splippery surface
     bool slippery = false;
+    //! Use the special AI to make block be movable
+    uint32_t    motion_ai_id = 0;
     //! Name of a parent layer. Default value is "Default"
-    PGESTRING layer = DEFAULT_LAYER_NAME;
+    PGESTRING   layer = DEFAULT_LAYER_NAME;
     //! 38A: Custom graphic file base name (default is empty)
-    PGESTRING gfx_name;
+    PGESTRING   gfx_name;
     //! 38A: Graphics extend x
     long gfx_dx = 0;
     //! 38A: Graphics extend y
@@ -142,6 +144,8 @@ struct LevelBlock
     PGESTRING event_hit;
     //! Trigger event on destroying of this block and at sametime parent layer has no more other objects
     PGESTRING event_emptylayer;
+    //! Trigger eveny when block entering into vizible screen area
+    PGESTRING event_on_screen;
 
     /*
      * Editor-only parameters which are not saving into file
@@ -229,7 +233,7 @@ struct LevelNPC
     //! Initial direction of NPC (-1 left, 1 right, 0 left or right randomly)
     int direct = -1;
     //! ID of NPC type defined in the lvl_npc.ini
-    unsigned long id = 0;
+    uint64_t  id = 0;
     //! 38A: Custom graphic file base name (default is empty)
     PGESTRING gfx_name;
     //! 38A: Graphics extend x
@@ -389,6 +393,15 @@ struct LevelDoor
     };
     //! Warp type: [1] pipe, [2] door, [0] instant (zero velocity-X after exit), [3] portal (instant with Keeping of velocities)
     int type = WARP_INSTANT;
+    enum WarpTransitEffect
+    {
+        TRANSIT_NONE,
+        TRANSIT_SCROLL,
+        TRANSIT_FADE,
+        TRANSIT_CIRCLE_FADE
+    };
+    //! Transition effect
+    int transition_effect = TRANSIT_NONE;
     //! Target level filename (Exit from this leven and enter to target level)
     PGESTRING lname;
     //! Warp Array-ID in the target level (if 0 - enter into target level at spawn point)
@@ -479,7 +492,10 @@ struct LevelPhysEnv
         ENV_COLLISION_SCRIPT        = 9,
         ENV_CLICK_SCRIPT            = 10,
         ENV_COLLISION_EVENT         = 11,
-        ENV_AIR                     = 12
+        ENV_AIR                     = 12,
+        ENV_TOUCH_EVENT_ONCE_NPC1   = 13,
+        ENV_TOUCH_EVENT_NPC1        = 14,
+        ENV_NPC_HURTING_FIELD       = 15
     };
     //! Enable quicksand physical environment, overwise water physical environment
     int env_type = ENV_WATER;
@@ -882,6 +898,22 @@ struct LevelData
     PGESTRING open_level_on_fail;
     //! Target WarpID (0 - regular entrance, >=1 - WarpID of entrance)
     unsigned int open_level_on_fail_warpID = 0;
+
+    struct MusicOverrider
+    {
+        enum Type {
+            LEVEL   = 0,
+            SPECIAL = 1
+        };
+        Type        type = Type::LEVEL;
+        uint32_t    id = 0;
+        PGESTRING   fileName;
+    };
+
+    //! Override default musics
+    PGELIST<MusicOverrider > music_overrides;
+    //! Override default sound effects
+    PGELIST<MusicOverrider > sound_overrides;
 
     /*
      * Level data

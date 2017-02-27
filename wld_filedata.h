@@ -416,6 +416,8 @@ struct WorldData
     bool restrictCharacterSwitch = false;
     //! Use stronger securty on the game save files
     bool restrictSecureGameSave = false;
+    //! Don't show entreance screen on each entering into the level
+    bool disableEnterScreen = false;
 
     enum CheatsPolicy
     {

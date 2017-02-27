@@ -56,6 +56,7 @@
 #include <QVector>
 #include <QPair>
 #include <QMap>
+#include <QHash>
 #include <QObject>
 #include <QUrl>
 #include <cmath>
@@ -73,8 +74,10 @@ typedef QChar PGEChar;
 typedef QStringList PGESTRINGList;
 #define PGEVECTOR QVector
 #define PGELIST QList
+typedef int pge_size_t;
 #define PGEPAIR QPair
-#define PGEMAP QMap
+#define PGEMAP  QMap
+#define PGEHASH QHash
 typedef QFile PGEFILE;
 inline void PGE_SPLITSTRING(PGESTRINGList &dst, PGESTRING &src, PGESTRING sep)
 {
@@ -178,6 +181,7 @@ inline PGESTRING PGE_URLDEC(PGESTRING &src)
 #include <cstring>
 #include <algorithm>
 #include <map>
+#include <unordered_map>
 #define PGE_FILES_INGERED
 typedef std::string PGESTRING;
 inline PGESTRING PGESTR_Simpl(PGESTRING str)
@@ -190,8 +194,10 @@ typedef char PGEChar;
 typedef std::vector<std::string> PGESTRINGList;
 #define PGEVECTOR std::vector
 #define PGELIST std::vector
+typedef size_t pge_size_t;
 #define PGEPAIR std::pair
-#define PGEMAP std::map
+#define PGEMAP  std::map
+#define PGEHASH std::unordered_map
 typedef std::fstream PGEFILE;
 namespace PGE_FileFormats_misc
 {

@@ -23,7 +23,7 @@
 #include "smbx38a_private.h"
 
 // Settings
-static constexpr int newest_file_format = 67;
+static constexpr int newest_file_format = 68;
 
 /***********  Pre-defined values dependent to NPC Generator Effect field value  **************/
 
@@ -208,6 +208,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     LevelScript scriptdata;
     LevelItemSetup38A customcfg;
 
+    PGESTRING identifier;
+
     //Add path data
     if(!IsEmpty(filePath))
     {
@@ -230,17 +232,36 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
         while(!in.eof())
         {
-            PGESTRING identifier = dataReader.ReadField<PGESTRING>(1);
+            identifier = dataReader.ReadField<PGESTRING>(1);
 
             if(identifier == "A")
             {
                 // FIXME: Remove copy from line 77
-                // A|param1|param2[|param3|param4]
+                // A|param1|param2[|param3|param4]|
+                // A|param1|param2|param3|param4|s1,s2,s3,s4
+                PGESTRING s[4];
                 dataReader.ReadDataLine(CSVDiscard(), // Skip the first field (this is already "identifier")
                                         &FileData.stars,
                                         MakeCSVPostProcessor(&FileData.LevelName, PGEUrlDecodeFunc),
                                         MakeCSVOptional(&FileData.open_level_on_fail, PGESTRING(""), nullptr, PGEUrlDecodeFunc),
-                                        MakeCSVOptional(&FileData.open_level_on_fail_warpID, 0u));
+                                        MakeCSVOptional(&FileData.open_level_on_fail_warpID, 0u),
+                                        MakeCSVOptionalSubReader(dataReader, ',',
+                                            MakeCSVOptional(&s[0], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
+                                            MakeCSVOptional(&s[1], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
+                                            MakeCSVOptional(&s[2], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
+                                            MakeCSVOptional(&s[3], PGESTRING(""), nullptr, PGEUrlDecodeFunc)
+                                        ));
+                for(uint32_t i = 0; i < 4; i++)
+                {
+                    if(!IsEmpty(s[i]))
+                    {
+                        LevelData::MusicOverrider mo;
+                        mo.type = LevelData::MusicOverrider::SPECIAL;
+                        mo.id = (i + 1);
+                        mo.fileName = s[i];
+                        FileData.music_overrides.push_back(mo);
+                    }
+                }
             }
             else if(identifier == "P1")
             {
@@ -298,10 +319,10 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 //musicfile=custom music file[***urlencode!***]
                 MakeCSVPostProcessor(&section.music_file, PGEUrlDecodeFunc));
                 SMBX38A_mapBGID_From(section.background);//Convert into SMBX64 ID set
-                section.lock_left_scroll = (scroll_lock_x == "1");
+                section.lock_left_scroll =  (scroll_lock_x == "1");
                 section.lock_right_scroll = (scroll_lock_x == "2");
-                section.lock_up_scroll = (scroll_lock_y == "1");
-                section.lock_down_scroll = (scroll_lock_y == "2");
+                section.lock_up_scroll =    (scroll_lock_y == "1");
+                section.lock_down_scroll =  (scroll_lock_y == "2");
 
                 if((x != 0.0) || (y != 0.0) || (w != 0.0) || (h != 0.0))
                 {
@@ -322,32 +343,52 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             }
             else if(identifier == "B")
             {
-                // B|layer|id|x|y|contain|b1|b2|e1,e2,e3|w|h
+                // B|layer[,name]|id[,dx,dy]|x|y|contain|b11[,b12]|b2|[e1,e2,e3,e4]|w|h
                 blockdata = CreateLvlBlock();
                 dataReader.ReadDataLine(CSVDiscard(),
-                                        MakeCSVSubReader(dataReader, ',',
-                                                MakeCSVPostProcessor(&blockdata.layer, PGELayerOrDefault),
-                                                MakeCSVOptional(&blockdata.gfx_name, "")
-                                                        ),
-                                        MakeCSVSubReader(dataReader, ',',
-                                                &blockdata.id,
-                                                MakeCSVOptional(&blockdata.gfx_dx, 0),
-                                                MakeCSVOptional(&blockdata.gfx_dy, 0)
-                                                        ),
-                                        &blockdata.x, //FIXME rounding error?
-                                        &blockdata.y,
-                                        MakeCSVPostProcessor(&blockdata.npc_id, [](long & npcValue)
+                MakeCSVSubReader(dataReader, ',',
+                        //layer=layer name["" == "Default"][***urlencode!***]
+                        MakeCSVPostProcessor(&blockdata.layer, PGELayerOrDefault),
+                        //name=block's name[***urlencode!***]
+                        MakeCSVOptional(&blockdata.gfx_name, "")
+                                ),
+                MakeCSVSubReader(dataReader, ',',
+                        //id=block id
+                        &blockdata.id,
+                        //dx=graphics extend x
+                        MakeCSVOptional(&blockdata.gfx_dx, 0),
+                        //dy=graphics extend y
+                        MakeCSVOptional(&blockdata.gfx_dy, 0)
+                                ),
+                //x=block position x
+                &blockdata.x, //FIXME rounding error?
+                //y=block position y
+                &blockdata.y,
+                MakeCSVOptional(&blockdata.npc_id, 0, nullptr, [](long & npcValue)
                 {
                     npcValue = (npcValue < 1000 ? -1 * npcValue : npcValue - 1000);
                 }),
-                &blockdata.slippery,
+                MakeCSVSubReader(dataReader, ',',
+                        //b11=slippery[0=false !0=true]
+                        &blockdata.slippery,
+                        //b12=wing type
+                        MakeCSVOptional(&blockdata.motion_ai_id, 0)
+                        ),
+                //b2=invisible[0=false !0=true]
                 &blockdata.invisible,
                 MakeCSVSubReader(dataReader, ',',
+                                 //e1=block destory event name[***urlencode!***]
                                  MakeCSVPostProcessor(&blockdata.event_destroy, PGEUrlDecodeFunc),
+                                 //e2=block hit event name[***urlencode!***]
                                  MakeCSVPostProcessor(&blockdata.event_hit, PGEUrlDecodeFunc),
-                                 MakeCSVPostProcessor(&blockdata.event_emptylayer, PGEUrlDecodeFunc)
+                                 //e3=no more object in layer event name[***urlencode!***]
+                                 MakeCSVPostProcessor(&blockdata.event_emptylayer, PGEUrlDecodeFunc),
+                                 //e4=block onscreen event name[***urlencode!***]
+                                 MakeCSVOptional(&blockdata.event_on_screen, "", nullptr, PGEUrlDecodeFunc)
                                 ),
+                //w=width, if w < 0 then block's autoscale = true
                 &blockdata.w,
+                //h=height
                 &blockdata.h);
                 blockdata.autoscale = (blockdata.w < 0);
                 blockdata.meta.array_id = FileData.blocks_array_id++;
@@ -355,7 +396,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             }
             else if(identifier == "T")
             {
-                // T|layer|id|x|y
+                // T|layer|id[,dx,dy]|x|y
                 bgodata = CreateLvlBgo();
                 dataReader.ReadDataLine(CSVDiscard(),
                                         MakeCSVPostProcessor(&bgodata.layer, PGELayerOrDefault),
@@ -371,7 +412,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             }
             else if(identifier == "N")
             {
-                // N|layer|id|x|y|b1,b2,b3,b4|sp|e1,e2,e3,e4,e5,e6,e7|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
+                // N|layer[,name]|id[,dx,dy]|x|y|b1,b2,b3,b4|sp|[e1,e2,e3,e4,e5,e6,e7]|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
+                // N|layer[,name]|id[,dx,dy]|x|y|b1,b2,b3,b4|sp|[e1,e2,e3,e4,e5,e6,e7]|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
                 npcdata = CreateLvlNpc();
                 npcdata.generator_period_orig_unit = PGE_FileLibrary::TimeUnit::FrameOneOf65sec;
                 double specialData;
@@ -398,12 +440,12 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 &npcdata.contents),
                 &specialData,
                 MakeCSVSubReader(dataReader, ',',
-                                 MakeCSVPostProcessor(&npcdata.event_die, PGEUrlDecodeFunc),
-                                 MakeCSVPostProcessor(&npcdata.event_talk, PGEUrlDecodeFunc),
-                                 MakeCSVPostProcessor(&npcdata.event_activate, PGEUrlDecodeFunc),
-                                 MakeCSVPostProcessor(&npcdata.event_emptylayer, PGEUrlDecodeFunc),
-                                 MakeCSVPostProcessor(&npcdata.event_grab, PGEUrlDecodeFunc),
-                                 MakeCSVPostProcessor(&npcdata.event_nextframe, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&npcdata.event_die, "", nullptr, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&npcdata.event_talk, "", nullptr, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&npcdata.event_activate, "", nullptr, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&npcdata.event_emptylayer, "", nullptr, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&npcdata.event_grab, "", nullptr, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&npcdata.event_nextframe, "", nullptr, PGEUrlDecodeFunc),
                                  MakeCSVOptional(&npcdata.event_touch, "", nullptr, PGEUrlDecodeFunc)
                                 ),
                 MakeCSVSubReader(dataReader, ',',
@@ -427,7 +469,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     long contID = npcdata.contents;
                     npcdata.contents = static_cast<long>(npcdata.id);
                     //b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300][6=npc347]
-                    static const long ContNPCID[] =
+                    static const uint64_t ContNPCID[] =
                     {
                         //  1  2    3    4    5    6
                         0, 91, 96, 283, 284, 300, 347, 0
@@ -436,6 +478,9 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                         npcdata.id = ContNPCID[contID];
                     else
                         npcdata.contents = 0; //Invalid container type
+
+                    if((contID > 101) && (contID <= 107))
+                        npcdata.meta.custom_params += "\"wings:\"" + fromNum(contID) + ",";
                 }
 
                 npcdata.special_data = static_cast<long>(round(specialData));
@@ -519,6 +564,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             {
                 // W|layer|x|y|ex|ey|type|enterd|exitd|sn,msg,hide|locked,noyoshi,canpick,bomb,hidef,anpc,mini,size|lik|liid|noexit|wx|wy|le|we
                 doordata = CreateLvlWarp();
+                int type = 0;
                 dataReader.ReadDataLine(CSVDiscard(),
                                         //layer=layer name["" == "Default"][***urlencode!***]
                                         MakeCSVPostProcessor(&doordata.layer, PGELayerOrDefault),
@@ -531,7 +577,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         //ey=exit position y
                                         &doordata.oy,
                                         //type=[1=pipe][2=door][0=instant][3=portal/loop]
-                                        &doordata.type,
+                                        &type,
                                         //enterd=entrance direction[1=up 2=left 3=down 4=right]
                                         &doordata.idirect,
                                         //exitd=exit direction[1=up 2=left 3=down 4=right]
@@ -580,21 +626,25 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  MakeCSVOptional(&doordata.two_way, false),
                                  MakeCSVOptional(&doordata.cannon_exit_speed, 0.0)
                                 ),
-                //lik=warp to level[***urlencode!***]
-                MakeCSVPostProcessor(&doordata.lname, PGEUrlDecodeFunc),
-                //liid=normal enterance / to warp[0-WARPMAX]
-                &doordata.warpto,
-                //noexit=level entrance
-                &doordata.lvl_i,
-                //wx=warp to x on world map
-                &doordata.world_x,
-                //wy=warp to y on world map
-                &doordata.world_y,
-                //le=level exit
-                MakeCSVOptional(&doordata.lvl_o, false),
-                //we=warp event[***urlencode!***]
-                MakeCSVOptional(&doordata.event_enter, "", nullptr, PGEUrlDecodeFunc)
-                                       );
+                                //lik=warp to level[***urlencode!***]
+                                MakeCSVPostProcessor(&doordata.lname, PGEUrlDecodeFunc),
+                                //liid=normal enterance / to warp[0-WARPMAX]
+                                &doordata.warpto,
+                                //noexit=level entrance
+                                &doordata.lvl_i,
+                                //wx=warp to x on world map
+                                &doordata.world_x,
+                                //wy=warp to y on world map
+                                &doordata.world_y,
+                                //le=level exit
+                                MakeCSVOptional(&doordata.lvl_o, false),
+                                //we=warp event[***urlencode!***]
+                                MakeCSVOptional(&doordata.event_enter, "", nullptr, PGEUrlDecodeFunc)
+                            );
+                // type%100=[0=instant][1=pipe][2=door][3=loop]
+                doordata.type = type % 100;
+                // type/100=[0=none][1=Scroll][2=Fade]
+                doordata.transition_effect = type / 100;
                 doordata.length_o = doordata.length_i;
                 doordata.isSetIn = (doordata.lvl_i ? false : true);
                 doordata.isSetOut = (doordata.lvl_o ? false : true) || doordata.lvl_i;
@@ -968,7 +1018,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
                 dataReader.ReadDataLine(CSVDiscard(),
                                         &customcfg.id,
-                                        MakeCSVIterator(dataReader, ',', [&customcfg](const PGESTRING & nextFieldStr)
+                                        MakeCSVIterator(dataReader, ',',
+                                                        [&customcfg](const PGESTRING & nextFieldStr)
                 {
                     LevelItemSetup38A::Entry e;
                     SMBX38A_CC_decode(e.key, e.value, nextFieldStr);
@@ -976,6 +1027,23 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 })
                                        );
                 FileData.custom38A_configs.push_back(customcfg);
+            }
+            else if(identifier == "CW")
+            {
+                // CW|cdata1|cdata2|...|cdatan	:custom sound:	same as wls file format
+                dataReader.IterateDataLine([&FileData](const PGESTRING & nextFieldStr)
+                    {
+                        if(nextFieldStr == "CW")
+                            return;
+
+                        auto fieldReader = MakeDirectReader(nextFieldStr);
+                        auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                        LevelData::MusicOverrider mo;
+                        fullReader.ReadDataLine(&mo.id,
+                                                MakeCSVPostProcessor(&mo.fileName, PGEUrlDecodeFunc)
+                                               );
+                        FileData.sound_overrides.push_back(mo);
+                    });
             }
             else
                 dataReader.ReadDataLine();
@@ -1007,6 +1075,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
         FileData.meta.ReadFileValid = false;
         FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
+        if(!IsEmpty(identifier))
+            FileData.meta.ERROR_info += "\n Field type " + identifier;
 
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
         if(FileData.meta.ERROR_linenum == 0)
@@ -1063,7 +1133,7 @@ bool FileFormats::WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata
 
 bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData)
 {
-    long i = 0;
+    pge_size_t i = 0;
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     //Count placed stars on this level
     FileData.stars = smbx64CountStars(FileData);
@@ -1103,12 +1173,38 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|" << PGE_URLENC(FileData.open_level_on_fail);
         //    param4=normal entrance / to warp [0-WARPMAX]
         out << "|" << fromNum(FileData.open_level_on_fail_warpID);
+    } else {
+        out << "||";
+    }
+    //Custom special musics
+    {
+        //s1=P-Switch Music Filename[***urlencode!***]
+        //s2=Stopwatch Music Filename[***urlencode!***]
+        //s3=Starman Music Filename[***urlencode!***]
+        //s4=MegaMushroom Music Filename[***urlencode!***]
+        PGESTRING s[4];
+        for(pge_size_t i = 0; i < FileData.music_overrides.size(); i++)
+        {
+            LevelData::MusicOverrider &mo = FileData.music_overrides[i];
+            if(mo.type == LevelData::MusicOverrider::SPECIAL)
+            {
+                if(mo.id < 4)
+                    s[i] = mo.fileName;
+            }
+        }
+
+        for(int i = 0; i < 4; i++)
+        {
+            if(i > 0)
+                out << ",";
+            out << PGE_URLENC(s[i]);
+        }
     }
 
     out << "\n";
 
     //next line: player start points
-    for(i = 0; i < (signed)FileData.players.size(); i++)
+    for(i = 0; i < FileData.players.size(); i++)
     {
         //    P1|x1|y1
         //    P2|x2|y2
@@ -1124,7 +1220,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: section properties
-    for(i = 0; i < (signed)FileData.sections.size(); i++)
+    for(i = 0; i < FileData.sections.size(); i++)
     {
         //    M|id|x|y|w|h|b1|b2|b3|b4|b5|b6|music|background|musicfile
         LevelSection &sct = FileData.sections[i];
@@ -1174,9 +1270,9 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: blocks
-    for(i = 0; i < (signed)FileData.blocks.size(); i++)
+    for(i = 0; i < FileData.blocks.size(); i++)
     {
-        //    B|layer|id|x|y|contain|b1|b2|e1,e2,e3|w|h
+        // B|layer[,name]|id[,dx,dy]|x|y|contain|b11[,b12]|b2|[e1,e2,e3,e4]|w|h
         LevelBlock &blk = FileData.blocks[i];
         out << "B";
         //    layer=layer name["" == "Default"][***urlencode!***]
@@ -1202,17 +1298,21 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        [1001-1000+NPCMAX] npc-id
         //        [1-999] coin number
         //        [0] nothing
-        out << "|" << fromNum(blk.npc_id <= 0 ? (-1 * blk.npc_id) : (blk.npc_id + 1000));
+        out << "|" << ((blk.npc_id == 0) ? ""
+                        : fromNum(blk.npc_id <= 0 ? (-1 * blk.npc_id) : (blk.npc_id + 1000)) );
         //    b1=slippery[0=false !0=true]
         out << "|" << fromNum((int)blk.slippery);
         //    b2=invisible[0=false !0=true]
         out << "|" << fromNum((int)blk.invisible);
+        out << "," << fromNum(blk.motion_ai_id);
         //    e1=block destory event name[***urlencode!***]
         out << "|" << PGE_URLENC(blk.event_destroy);
         //    e2=block hit event name[***urlencode!***]
         out << "," << PGE_URLENC(blk.event_hit);
         //    e3=no more object in layer event name[***urlencode!***]4
         out << "," << PGE_URLENC(blk.event_emptylayer);
+        //    e4=block onscreen event name[***urlencode!***]
+        out << "," << PGE_URLENC(blk.event_on_screen);
         //    w=width
         out << "|" << fromNum(blk.autoscale ? -1 : blk.w);
         //    h=height
@@ -1221,7 +1321,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: backgrounds
-    for(i = 0; i < (signed)FileData.bgo.size(); i++)
+    for(i = 0; i < FileData.bgo.size(); i++)
     {
         //    T|layer|id|x|y
         LevelBGO &bgo = FileData.bgo[i];
@@ -1245,11 +1345,11 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: npcs
-    for(i = 0; i < (signed)FileData.npc.size(); i++)
+    for(i = 0; i < FileData.npc.size(); i++)
     {
         LevelNPC &npc = FileData.npc[i];
         //Pre-convert some data into SMBX-38A compatible format
-        long npcID = npc.id;
+        long npcID = (long)npc.id;
         long containerType = 0;
         long specialData = npc.special_data;
         switch(npcID)//Convert npcID and contents ID into container type
@@ -1290,6 +1390,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         case 86:
             if(npc.is_boss)
                 specialData = (long)npc.is_boss;
+            break;
         default:
             break;
         }
@@ -1394,7 +1495,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: warps
-    for(i = 0; i < (signed)FileData.doors.size(); i++)
+    for(i = 0; i < FileData.doors.size(); i++)
     {
         LevelDoor &door = FileData.doors[i];
 
@@ -1438,7 +1539,13 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    ey=exit position y
         out << "|" << fromNum(door.oy);
         //    type=[1=pipe][2=door][0=instant]
-        out << "|" << fromNum(door.type);
+        {
+            //type%100=[0=instant][1=pipe][2=door]
+            int type = door.type;
+                //type/100=[0=none][1=Scroll][2=Fade]
+                type += door.transition_effect * 100;
+            out << "|" << fromNum(type);
+        }
         //    enterd=entrance direction[1=up 2=left 3=down 4=right]
         out << "|" << fromNum(door.idirect);
         //    exitd=exit direction[1=up 2=left 3=down 4=right]
@@ -1490,7 +1597,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: waters
-    for(i = 0; i < (signed)FileData.physez.size(); i++)
+    for(i = 0; i < FileData.physez.size(); i++)
     {
         LevelPhysEnv &pez = FileData.physez[i];
         /*TRIVIA: It is NOT a PEZ candy brand, just "Physical Environment Zone" :-P*/
@@ -1534,7 +1641,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "\n";
     }
 
-    for(i = 0; i < (signed)FileData.layers.size(); i++)
+    for(i = 0; i < FileData.layers.size(); i++)
     {
         LevelLayer &lyr = FileData.layers[i];
         //next line: layers
@@ -1548,7 +1655,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: events
-    for(i = 0; i < (signed)FileData.events.size(); i++)
+    for(i = 0; i < FileData.events.size(); i++)
     {
         LevelSMBX64Event &evt = FileData.events[i];
         //    E|name|msg|ea|el|elm|epy|eps|eef|ecn|evc|ene
@@ -1569,7 +1676,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "/";
 
         //        s(n)=show layer
-        for(int j = 0; j < (signed)evt.layers_show.size(); j++)
+        for(pge_size_t j = 0; j < evt.layers_show.size(); j++)
         {
             if(j > 0) out << ",";
 
@@ -1579,7 +1686,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "/";
 
         //        l(n)=hide layer
-        for(int j = 0; j < (signed)evt.layers_hide.size(); j++)
+        for(pge_size_t j = 0; j < evt.layers_hide.size(); j++)
         {
             if(j > 0) out << ",";
 
@@ -1589,7 +1696,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "/";
 
         //        t(n)=toggle layer
-        for(int j = 0; j < (signed)evt.layers_toggle.size(); j++)
+        for(pge_size_t j = 0; j < evt.layers_toggle.size(); j++)
         {
             if(j > 0) out << ",";
 
@@ -1599,7 +1706,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|";
 
         //    elm=elm1/elm2...elmn
-        for(int j = 0; j < (signed)evt.moving_layers.size(); j++)
+        for(pge_size_t j = 0; j < evt.moving_layers.size(); j++)
         {
             if(j > 0) out << "/";
 
@@ -1652,10 +1759,9 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        emusic=em1:em2...emn
         bool size_set_added = false;
 
-        for(int j = 0; j < (signed)evt.sets.size(); j++)
+        for(pge_size_t j = 0; j < evt.sets.size(); j++)
         {
-            int section_pos = evt.sets[j].position_left;
-
+            long section_pos = evt.sets[j].position_left;
             switch(section_pos)
             {
             case -1:
@@ -1667,7 +1773,6 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
                 section_pos = 2;
                 break;
             }
-
             //Convert floats into expressions if there are empty
             PGESTRING expression_x = evt.sets[j].expression_pos_x;
             PGESTRING expression_y = evt.sets[j].expression_pos_y;
@@ -1722,10 +1827,9 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "/";
         bool bg_set_added = false;
 
-        for(int j = 0; j < (signed)evt.sets.size(); j++)
+        for(pge_size_t j = 0; j < evt.sets.size(); j++)
         {
-            int section_bg = evt.sets[j].background_id;
-
+            long section_bg = evt.sets[j].background_id;
             switch(section_bg)
             {
             case -1:
@@ -1737,7 +1841,6 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
                 section_bg = 2;
                 break;
             }
-
             //            eb=id,btype,backgroundid
             if(bg_set_added) out << ":";
 
@@ -1752,11 +1855,9 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
         out << "/";
         bool muz_set_added = false;
-
-        for(int j = 0; j < (signed)evt.sets.size(); j++)
+        for(pge_size_t j = 0; j < evt.sets.size(); j++)
         {
-            int section_muz = evt.sets[j].music_id;
-
+            long section_muz = evt.sets[j].music_id;
             switch(section_muz)
             {
             case -1:
@@ -1768,10 +1869,9 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
                 section_muz = 2;
                 break;
             }
-
             //            em=id,mtype,musicid,customfile
-            if(muz_set_added) out << ":";
-
+            if(muz_set_added)
+                out << ":";
             muz_set_added = true;
             //                id=section id
             out        << fromNum(evt.sets[j].id + 1);
@@ -1790,7 +1890,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        endgame=[0=none][1=bowser defeat]
         out << "/" << fromNum(evt.end_game);
 
-        for(int j = 0; j < (signed)evt.spawn_effects.size(); j++)
+        for(pge_size_t j = 0; j < evt.spawn_effects.size(); j++)
         {
             LevelEvent_SpawnEffect &eff = evt.spawn_effects[j];
             //if(j<(evt.spawn_effects.size()-1))
@@ -1826,7 +1926,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|";
 
         //    ecn=cn1/cn2...cnn
-        for(int j = 0; j < (signed)evt.spawn_npc.size(); j++)
+        for(pge_size_t j = 0; j < evt.spawn_npc.size(); j++)
         {
             LevelEvent_SpawnNPC &snpc = evt.spawn_npc[j];
             //Convert floats into expressions if there are empty
@@ -1857,7 +1957,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|";
 
         //    evc=vc1/vc2...vcn
-        for(int j = 0; j < (signed)evt.update_variable.size(); j++)
+        for(pge_size_t j = 0; j < evt.update_variable.size(); j++)
         {
             LevelEvent_UpdateVariable &uvar = evt.update_variable[j];
 
@@ -1960,11 +2060,21 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    id = object id
         out << "|" << fromNum(is.id);
 
-        for(int j = 0; j < (signed)is.data.size(); j++)
+        for(pge_size_t j = 0; j < is.data.size(); j++)
         {
             LevelItemSetup38A::Entry &e = is.data[j];
             out << ((j == 0) ? "|" : ",");
             out << SMBX38A_CC_encode(e.key, e.value);
+        }
+        out << "\n";
+    }
+
+    if(FileData.sound_overrides.size() > 0)
+    {
+        out << "CW";
+        for(LevelData::MusicOverrider &mo : FileData.sound_overrides)
+        {
+            out << "|" << fromNum(mo.id) << "," << PGE_URLENC(mo.fileName);
         }
         out << "\n";
     }

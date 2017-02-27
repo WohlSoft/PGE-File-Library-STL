@@ -675,10 +675,16 @@ namespace CSVReader
                 optionalObj.AssignDefault();
             else
             {
-                this->SafeConvert(optionalObj.Get(), this->NextField());
-                if(!optionalObj.Validate())
-                    throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
-                optionalObj.PostProcess();
+                StrT s = this->NextField();
+                if(s.size() > 0)
+                {
+                    this->SafeConvert(optionalObj.Get(), s);
+                    if(!optionalObj.Validate())
+                        throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
+                    optionalObj.PostProcess();
+                } else {
+                    optionalObj.AssignDefault();
+                }
             }
 
             this->_fieldTracker++;
@@ -785,6 +791,31 @@ namespace CSVReader
             return *this;
         }
 
+        /*!
+         * \brief Read the next data line and calls iteration function with passing every field.
+         *
+         * \throws std::nested_exception When a parsing or conversion error happens.
+         */
+        template<class IteratorFunc>
+        CSVReader &IterateDataLine(const IteratorFunc &iteratorFunc)
+        {
+            this->_lineTracker++;
+            this->_currentCharIndex = 0;
+            this->_fieldTracker = 0; // We need the tracker at 0 (because of out of range exception)
+            _currentTotalFields = 0;
+
+            if(_requireReadLine)
+                this->_currentLine = _reader->read_line();
+            while(this->HasNext())
+            {
+                StrT next = this->NextField();
+                if(!(next == ""))
+                    iteratorFunc(next);
+            }
+            _requireReadLine = true;
+
+            return *this;
+        }
 
         // Begins with 1
         /*!

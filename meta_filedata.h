@@ -78,6 +78,8 @@ struct ElementMeta
     unsigned int array_id;
     //! Recent array index where element was saved (used to speed-up settings synchronization)
     unsigned int index;
+    //! JSON-like string with a custom properties (without master brackets, like "param":"value,["subparam":value])
+    PGESTRING custom_params;
     //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
     void *userdata;
 };

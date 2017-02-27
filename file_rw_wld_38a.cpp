@@ -23,7 +23,7 @@
 #include "smbx38a_private.h"
 
 // Settings
-static constexpr int newest_file_format = 67;
+static constexpr int newest_file_format = 68;
 
 //*********************************************************
 //****************READ FILE FORMAT*************************
@@ -97,7 +97,9 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
                                                         //  asg=auto save game[0=false !0=true]
                                                         MakeCSVOptional(&FileData.saveAuto, false),
                                                         //  smb3=smb3 style world map[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.showEverything, false)
+                                                        MakeCSVOptional(&FileData.showEverything, false),
+                                                        //  dss=No Entry Scene
+                                                        MakeCSVOptional(&FileData.disableEnterScreen, false)
                                                     ),
                                         MakeCSVSubReader(dataReader, ',',
                                                         //  sn=star number
@@ -310,7 +312,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                                         //  asg=auto save game[0=false !0=true]
                                                         MakeCSVOptional(&FileData.saveAuto, false),
                                                         //  smb3=smb3 style world map[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.showEverything, false)
+                                                        MakeCSVOptional(&FileData.showEverything, false),
+                                                        //  dss=No Entry Scene
+                                                        MakeCSVOptional(&FileData.disableEnterScreen, false)
                                                     ),
                                         MakeCSVSubReader(dataReader, ',',
                                                         //  sn=star number
