@@ -344,12 +344,12 @@ namespace CSVReader
     {
         typedef T value_type;
 
-        CSVOptional(T *value, const T defVal) : CSVOptional(value, defVal, nullptr) {}
-        CSVOptional(T *value, const T defVal, const ValidatorFunc &validatorFunction) :
-            _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction) {}
-        CSVOptional(T *value, const T defVal, const ValidatorFunc &validatorFunction, const PostProcessorFunc &postProcessorFunction) :
-            _value(value), _defaultValue(defVal), _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
-
+        CSVOptional(T* value, const T defVal, bool shouldAssignDefaultOnEmpty) : CSVOptional(value, defVal, shouldAssignDefaultOnEmpty, nullptr) {}
+        CSVOptional(T* value, const T defVal, bool shouldAssignDefaultOnEmpty, const ValidatorFunc& validatorFunction) :
+            CSVOptional(value, defVal, shouldAssignDefaultOnEmpty, validatorFunction, nullptr) {}
+        CSVOptional(T* value, const T defVal, bool shouldAssignDefaultOnEmpty, const ValidatorFunc& validatorFunction, const PostProcessorFunc& postProcessorFunction) :
+            _value(value), _defaultValue(defVal), _shouldAssignDefaultOnEmpty(shouldAssignDefaultOnEmpty),
+            _validatorFunction(validatorFunction), _postProcessorFunction(postProcessorFunction) {}
 
         bool Validate() const
         {
@@ -370,9 +370,13 @@ namespace CSVReader
         {
             return _value;
         }
+        inline bool ShouldAssingDefaultOnEmpty() const {
+            return _shouldAssignDefaultOnEmpty;
+        }
     private:
         T *_value;
         T _defaultValue;
+        bool _shouldAssignDefaultOnEmpty;
         ValidatorFunc _validatorFunction;
         PostProcessorFunc _postProcessorFunction;
     };
@@ -381,27 +385,49 @@ namespace CSVReader
      * \see CSVOptional
      */
     template<typename T, typename OT>
-    constexpr CSVOptional<T, std::nullptr_t, std::nullptr_t> MakeCSVOptional(T *value, OT defVal)
-    {
-        return CSVOptional<T, std::nullptr_t, std::nullptr_t>(value, defVal, nullptr, nullptr);
+    constexpr CSVOptional<T, std::nullptr_t, std::nullptr_t> MakeCSVOptional(T* value, OT defVal) {
+        return CSVOptional<T, std::nullptr_t, std::nullptr_t>(value, defVal, false, nullptr, nullptr);
     }
     /*!
      * \brief Creates a new CSVOptional.
      * \see CSVOptional
      */
     template<typename T, typename OT, typename ValidatorFunc>
-    constexpr CSVOptional<T, ValidatorFunc, std::nullptr_t> MakeCSVOptional(T *value, OT defVal, ValidatorFunc validatorFunction)
-    {
-        return CSVOptional<T, ValidatorFunc, std::nullptr_t>(value, defVal, validatorFunction, nullptr);
+    constexpr CSVOptional<T, ValidatorFunc, std::nullptr_t> MakeCSVOptional(T* value, OT defVal, ValidatorFunc validatorFunction) {
+        return CSVOptional<T, ValidatorFunc, std::nullptr_t>(value, defVal, false, validatorFunction, nullptr);
     }
     /*!
      * \brief Creates a new CSVOptional.
      * \see CSVOptional
      */
     template<typename T, typename OT, typename ValidatorFunc, typename PostProcessorFunc>
-    constexpr CSVOptional<T, ValidatorFunc, PostProcessorFunc> MakeCSVOptional(T *value, OT defVal, ValidatorFunc validatorFunction, PostProcessorFunc postProcessorFunction)
-    {
-        return CSVOptional<T, ValidatorFunc, PostProcessorFunc>(value, defVal, validatorFunction, postProcessorFunction);
+    constexpr CSVOptional<T, ValidatorFunc, PostProcessorFunc> MakeCSVOptional(T* value, OT defVal, ValidatorFunc validatorFunction, PostProcessorFunc postProcessorFunction) {
+        return CSVOptional<T, ValidatorFunc, PostProcessorFunc>(value, defVal, false, validatorFunction, postProcessorFunction);
+    }
+
+    /*!
+     * \brief Creates a new CSVOptional.
+     * \see CSVOptional
+     */
+    template<typename T, typename OT>
+    constexpr CSVOptional<T, std::nullptr_t, std::nullptr_t> MakeCSVOptionalEmpty(T* value, OT defVal) {
+        return CSVOptional<T, std::nullptr_t, std::nullptr_t>(value, defVal, true, nullptr, nullptr);
+    }
+    /*!
+     * \brief Creates a new CSVOptional.
+     * \see CSVOptional
+     */
+    template<typename T, typename OT, typename ValidatorFunc>
+    constexpr CSVOptional<T, ValidatorFunc, std::nullptr_t> MakeCSVOptionalEmpty(T* value, OT defVal, ValidatorFunc validatorFunction) {
+        return CSVOptional<T, ValidatorFunc, std::nullptr_t>(value, defVal, true, validatorFunction, nullptr);
+    }
+    /*!
+     * \brief Creates a new CSVOptional.
+     * \see CSVOptional
+     */
+    template<typename T, typename OT, typename ValidatorFunc, typename PostProcessorFunc>
+    constexpr CSVOptional<T, ValidatorFunc, PostProcessorFunc> MakeCSVOptionalEmpty(T* value, OT defVal, ValidatorFunc validatorFunction, PostProcessorFunc postProcessorFunction) {
+        return CSVOptional<T, ValidatorFunc, PostProcessorFunc>(value, defVal, true, validatorFunction, postProcessorFunction);
     }
 
     // 5. Reader in Reader - CSVOptional
@@ -429,11 +455,11 @@ namespace CSVReader
     struct CSVBatchReader : detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>
     {
     private:
-        Container *_container;
+        Container* _container;
         PostProcessorFunc _postProcessorFunction;
     public:
 
-        CSVBatchReader(CharT sep, Container *container, const PostProcessorFunc &postProcessorFunction) :
+        CSVBatchReader(CharT sep, Container* container, const PostProcessorFunc &postProcessorFunction) :
             detail::CSVReaderBase<StrT, CharT, StrTUtils, Converter>(sep), _container(container), _postProcessorFunction(postProcessorFunction) {}
 
         inline void ReadDataLine(const StrT &val)
@@ -487,7 +513,6 @@ namespace CSVReader
             return _isOptional;
         }
     };
-
 
 
     // ========= Special Attributes END ===========
@@ -675,11 +700,10 @@ namespace CSVReader
                 optionalObj.AssignDefault();
             else
             {
-                StrT s = this->NextField();
-                if(s.size() > 0)
-                {
-                    this->SafeConvert(optionalObj.Get(), s);
-                    if(!optionalObj.Validate())
+                StrT nextField = this->NextField();
+                if(!optionalObj.ShouldAssingDefaultOnEmpty() || StrTUtils::length(nextField) > 0) {
+                    this->SafeConvert(optionalObj.Get(), nextField);
+                    if (!optionalObj.Validate())
                         throw std::logic_error("Validation failed at field " + std::to_string(this->_fieldTracker) + " at line " + std::to_string(this->_lineTracker) + "!");
                     optionalObj.PostProcess();
                 } else {
@@ -791,13 +815,14 @@ namespace CSVReader
             return *this;
         }
 
+
         /*!
          * \brief Read the next data line and calls iteration function with passing every field.
          *
          * \throws std::nested_exception When a parsing or conversion error happens.
          */
         template<class IteratorFunc>
-        CSVReader &IterateDataLine(const IteratorFunc &iteratorFunc)
+        CSVReader& IterateDataLine(const IteratorFunc &iteratorFunc)
         {
             this->_lineTracker++;
             this->_currentCharIndex = 0;
@@ -816,6 +841,7 @@ namespace CSVReader
 
             return *this;
         }
+
 
         // Begins with 1
         /*!

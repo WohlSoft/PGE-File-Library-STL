@@ -244,7 +244,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         &FileData.stars,
                                         MakeCSVPostProcessor(&FileData.LevelName, PGEUrlDecodeFunc),
                                         MakeCSVOptional(&FileData.open_level_on_fail, PGESTRING(""), nullptr, PGEUrlDecodeFunc),
-                                        MakeCSVOptional(&FileData.open_level_on_fail_warpID, 0u),
+                                        MakeCSVOptionalEmpty(&FileData.open_level_on_fail_warpID, 0u),
                                         MakeCSVOptionalSubReader(dataReader, ',',
                                             MakeCSVOptional(&s[0], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
                                             MakeCSVOptional(&s[1], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
@@ -364,7 +364,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 &blockdata.x, //FIXME rounding error?
                 //y=block position y
                 &blockdata.y,
-                MakeCSVOptional(&blockdata.npc_id, 0, nullptr, [](long & npcValue)
+                MakeCSVOptionalEmpty(&blockdata.npc_id, 0, nullptr, [](long & npcValue)
                 {
                     npcValue = (npcValue < 1000 ? -1 * npcValue : npcValue - 1000);
                 }),
