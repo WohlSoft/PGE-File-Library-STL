@@ -325,7 +325,7 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
  * Exported function to return whether a UTF-8 sequence is legal or not.
  * This is not used here; it's just exported.
  */
-Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
+Boolean PGEFF_isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd) {
     int length = trailingBytesForUTF8[*source]+1;
     if (source+length > sourceEnd) {
 	return false;

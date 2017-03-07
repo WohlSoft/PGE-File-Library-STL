@@ -140,7 +140,7 @@ ConversionResult PGEFF_ConvertUTF32toUTF16 (
 		const UTF32** sourceStart, const UTF32* sourceEnd, 
 		UTF16** targetStart, UTF16* targetEnd, ConversionFlags flags);
 
-Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
+Boolean PGEFF_isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 
 #ifdef __cplusplus
 }
