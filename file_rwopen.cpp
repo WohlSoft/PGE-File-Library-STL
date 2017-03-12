@@ -108,7 +108,6 @@ bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData& data)
     {   //Read PGE LVLX File
         return ReadExtendedLvlFileHeader( filePath, data );
     }
-    return false;
 }
 
 
