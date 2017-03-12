@@ -1180,20 +1180,20 @@ fillEnd:
         #ifdef PGE_FILES_QT
         filePath = QFileInfo(filePath).absoluteFilePath();
         #else
-        char *rez = NULL;
-        #ifndef _WIN32
-        char buf[PATH_MAXLEN + 1];
-        rez = realpath(filePath.c_str(), buf);
-        if(rez)
-            filePath = buf;
-        #else
-        wchar_t bufW[MAX_PATH + 1];
-        int ret = 0;
-        ret = GetFullPathNameW(Str2WStr(filePath).c_str(), MAX_PATH, bufW, NULL);
-        if(ret != 0)
-            filePath = WStr2Str(bufW);
-        std::replace(filePath.begin(), filePath.end(), '\\', '/');
-        #endif
+            #ifndef _WIN32
+            char *rez = NULL;
+            char buf[PATH_MAXLEN + 1];
+            rez = realpath(filePath.c_str(), buf);
+            if(rez)
+                filePath = buf;
+            #else
+            wchar_t bufW[MAX_PATH + 1];
+            int ret = 0;
+            ret = GetFullPathNameW(Str2WStr(filePath).c_str(), MAX_PATH, bufW, NULL);
+            if(ret != 0)
+                filePath = WStr2Str(bufW);
+            std::replace(filePath.begin(), filePath.end(), '\\', '/');
+            #endif
         #endif
 
         //Read directory path
