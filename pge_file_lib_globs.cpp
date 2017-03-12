@@ -424,7 +424,7 @@ namespace PGE_FileFormats_misc
     /*****************BASE TEXT I/O CLASS***************************/
     TextInput::TextInput() : _lineNumber(0) {}
     TextInput::~TextInput() {}
-    PGESTRING TextInput::read(long)
+    PGESTRING TextInput::read(int64_t)
     {
         return "";
     }
@@ -444,11 +444,11 @@ namespace PGE_FileFormats_misc
     {
         return true;
     }
-    long long TextInput::tell()
+    int64_t TextInput::tell()
     {
         return 0;
     }
-    void TextInput::seek(long long, TextInput::positions) {}
+    void TextInput::seek(int64_t, TextInput::positions) {}
     PGESTRING TextInput::getFilePath()
     {
         return _filePath;
@@ -469,11 +469,11 @@ namespace PGE_FileFormats_misc
     {
         return 0;
     }
-    long long TextOutput::tell()
+    int64_t TextOutput::tell()
     {
         return 0;
     }
-    void TextOutput::seek(long long, TextOutput::positions) {}
+    void TextOutput::seek(int64_t, TextOutput::positions) {}
     PGESTRING TextOutput::getFilePath()
     {
         return _filePath;
@@ -519,20 +519,23 @@ namespace PGE_FileFormats_misc
         _lineNumber = 0;
     }
 
-    PGESTRING RawTextInput::read(long len)
+    PGESTRING RawTextInput::read(int64_t len)
     {
-        if(!_data) return "";
-        if(_isEOF) return "";
-        if((_pos + len) >= (signed)_data->size())
+        if(!_data)
+            return "";
+        if(_isEOF)
+            return "";
+
+        if((_pos + len) >= static_cast<int64_t>(_data->size()))
         {
-            len = _data->size() - _pos;
+            len = static_cast<int64_t>(_data->size()) - _pos;
             _isEOF = true;
         }
         PGESTRING buf(len + 1, '\0');
         #ifdef PGE_FILES_QT
-        buf = _data->mid(_pos, len);
+        buf = _data->mid(static_cast<int>(_pos), static_cast<int>(len));
         #else
-        buf = _data->substr(_pos, len);
+        buf = _data->substr(static_cast<size_t>(_pos), static_cast<size_t>(len));
         #endif
         _pos += len;
         return buf;
@@ -540,16 +543,18 @@ namespace PGE_FileFormats_misc
 
     PGESTRING RawTextInput::readLine()
     {
-        if(!_data) return "";
-        if(_isEOF) return "";
+        if(!_data)
+            return "";
+        if(_isEOF)
+            return "";
         PGESTRING buffer;
         PGEChar cur;
         do
         {
-            cur = (*_data)[(int)_pos++];
-            if(_pos >= (signed)_data->size())
+            cur = (*_data)[static_cast<size_t>(_pos++)];
+            if(_pos >= static_cast<int64_t>(_data->size()))
             {
-                _pos = _data->size();
+                _pos = static_cast<int64_t>(_data->size());
                 _isEOF = true;
             }
             if((cur != '\r') && (cur != '\n'))
@@ -569,10 +574,10 @@ namespace PGE_FileFormats_misc
         PGEChar cur;
         do
         {
-            cur = (*_data)[(int)_pos++];
-            if(_pos >= (signed)_data->size())
+            cur = (*_data)[static_cast<size_t>(_pos++)];
+            if(_pos >= static_cast<int64_t>(_data->size()))
             {
-                _pos = _data->size();
+                _pos = static_cast<int64_t>(_data->size());
                 _isEOF = true;
             }
             if(cur == '\"')
@@ -599,21 +604,23 @@ namespace PGE_FileFormats_misc
         return _isEOF;
     }
 
-    long long RawTextInput::tell()
+    int64_t RawTextInput::tell()
     {
         return _pos;
     }
 
-    void RawTextInput::seek(long long pos, TextInput::positions relativeTo)
+    void RawTextInput::seek(int64_t pos, TextInput::positions relativeTo)
     {
-        if(!_data) return;
+        if(!_data)
+            return;
+
         switch(relativeTo)
         {
         case current:
             _pos += pos;
             break;
         case end:
-            _pos = _data->size() + pos;
+            _pos = static_cast<int64_t>(_data->size()) + pos;
             break;
         case begin:
         default:
@@ -621,9 +628,9 @@ namespace PGE_FileFormats_misc
             break;
         }
         if(_pos < 0) _pos = 0;
-        if(_pos >= (signed)_data->size())
+        if(_pos >= static_cast<int64_t>(_data->size()))
         {
-            _pos = _data->size();
+            _pos = static_cast<int64_t>(_data->size());
             _isEOF = true;
         }
         else
@@ -666,16 +673,16 @@ namespace PGE_FileFormats_misc
         if(!_data) return -1;
         int written = 0;
 fillEnd:
-        if(_pos >= (signed)_data->size())
+        if(_pos >= static_cast<int64_t>(_data->size()))
         {
-            int oldSize = _data->size();
+            int64_t oldSize = static_cast<int64_t>(_data->size());
             _data->append(buffer);
-            _pos = _data->size();
-            written += (_data->size() - oldSize);
+            _pos = static_cast<int64_t>(_data->size());
+            written += (static_cast<int64_t>(_data->size()) - oldSize);
         }
         else
         {
-            while((_pos < (signed)_data->size()) && (!IsEmpty(buffer)))
+            while((_pos < static_cast<int64_t>(_data->size())) && (!IsEmpty(buffer)))
             {
                 _data[_pos++] = buffer[0];
                 written++;
@@ -687,12 +694,12 @@ fillEnd:
         return written;
     }
 
-    long long RawTextOutput::tell()
+    int64_t RawTextOutput::tell()
     {
         return _pos;
     }
 
-    void RawTextOutput::seek(long long pos, TextOutput::positions relativeTo)
+    void RawTextOutput::seek(int64_t pos, TextOutput::positions relativeTo)
     {
         if(!_data) return;
         switch(relativeTo)
@@ -701,7 +708,7 @@ fillEnd:
             _pos += pos;
             break;
         case end:
-            _pos = _data->size() + pos;
+            _pos = static_cast<int64_t>(_data->size()) + pos;
             break;
         case begin:
         default:
@@ -790,7 +797,7 @@ fillEnd:
         #endif
     }
 
-    PGESTRING TextFileInput::read(long len)
+    PGESTRING TextFileInput::read(int64_t len)
     {
         #ifdef PGE_FILES_QT
         if(!file.isOpen()) return "";
@@ -834,6 +841,8 @@ fillEnd:
         if(out.size() == 0)
             return "";
 
+        out.shrink_to_fit();
+
         _lineNumber++;
         return out;
         #endif
@@ -845,7 +854,9 @@ fillEnd:
         std::string buffer;
         #ifdef PGE_FILES_QT
         char cur = 0;
-        if(!file.isOpen()) return "";
+        if(!file.isOpen())
+            return "";
+
         do
         {
             file.getChar(&cur);
@@ -858,24 +869,35 @@ fillEnd:
                 if(cur == '\n') _lineNumber++;
             }
         }
-        while((((cur != '\n') && (cur != ',')) || quoteIsOpen) && !file.atEnd());
+        while( (((cur != '\n') && (cur != ',')) || quoteIsOpen)
+               && !file.atEnd());
         return QString::fromStdString(buffer);
         #else
-        if(!stream) return "";
+        buffer.reserve(1024);
+        if(!stream)
+            return "";
+
+        int  gc;
         char cur;
+        if(!feof(stream))
         do
         {
-            cur = static_cast<char>(fgetc(stream));
+            gc = fgetc(stream);
+            if(gc == EOF)
+                break;
+            cur = static_cast<char>(gc);
             if(cur == '\"')
                 quoteIsOpen = !quoteIsOpen;
             else
             {
                 if((cur != '\r') && (((cur != '\n') && (cur != ',')) || (quoteIsOpen)))
                     buffer.push_back(cur);
-                if(cur == '\n') _lineNumber++;
+                if(cur == '\n')
+                    _lineNumber++;
             }
         }
-        while((((cur != '\n') && (cur != ',')) || quoteIsOpen) && (!feof(stream)));
+        while( (((cur != '\n') && (cur != ',')) || quoteIsOpen) );
+        buffer.shrink_to_fit();
         return buffer;
         #endif
     }
@@ -910,16 +932,16 @@ fillEnd:
         #endif
     }
 
-    long long TextFileInput::tell()
+    int64_t TextFileInput::tell()
     {
         #ifdef PGE_FILES_QT
-        return static_cast<long long>(file.pos());
+        return static_cast<int64_t>(file.pos());
         #else
-        return static_cast<long long>(ftell(stream));
+        return static_cast<int64_t>(ftell(stream));
         #endif
     }
 
-    void TextFileInput::seek(long long pos, TextFileInput::positions relativeTo)
+    void TextFileInput::seek(int64_t pos, TextFileInput::positions relativeTo)
     {
         #ifdef PGE_FILES_QT
         (void)relativeTo;
@@ -1045,14 +1067,14 @@ fillEnd:
             buffer.replace("\n", "\r\n");
             writtenBytes = file.write(buffer.toLocal8Bit());
             #else
-            for(int i = 0; i < (signed)buffer.size(); i++)
+            for(PGESTRINGSizeT i = 0; i < buffer.size(); i++)
             {
                 if(buffer[i] == '\n')
                 {
                     //Force writing CRLF to prevent fakse damage of file on SMBX in Windows
                     static const char bytes[2] = {0x0D, 0x0A};
                     int bytesNum = 2;
-                    fwrite((const char *)(&bytes), 1, 2, stream);
+                    fwrite(&bytes, 1, 2, stream);
                     if(bytesNum < 0)
                         return -1;
                     writtenBytes += bytesNum;
@@ -1068,23 +1090,23 @@ fillEnd:
         }
         else
         {
-            writtenBytes = buffer.size();
+            writtenBytes = static_cast<int>(buffer.size());
             #ifdef PGE_FILES_QT
             stream << buffer;
             #else
-            fwrite((const char *)(buffer.c_str()), 1, buffer.size(), stream);
+            fwrite(buffer.c_str(), 1, buffer.size(), stream);
             #endif
         }
         return writtenBytes;
     }
 
-    long long TextFileOutput::tell()
+    int64_t TextFileOutput::tell()
     {
         #ifdef PGE_FILES_QT
         if(!m_forceCRLF)
-            return stream.pos();
+            return static_cast<int64_t>(stream.pos());
         else
-            return file.pos();
+            return static_cast<int64_t>(file.pos());
         #else
         return ftell(stream);
         #endif
@@ -1214,7 +1236,7 @@ fillEnd:
         }
 
         //Take file suffix
-        i = filePath.size() - 1;
+        i = static_cast<int>(filePath.size()) - 1;
         for(; i > 0; i--)
         {
             if(filePath[i] == '.')
@@ -1223,14 +1245,14 @@ fillEnd:
 
         if(i > 0)
             i++;
-        if(i == ((signed)filePath.size() - 1))
+        if(i == (static_cast<int>(filePath.size()) - 1))
             goto skipSuffix;
-        for(; i < (signed)filePath.size(); i++)
-            _suffix.push_back(tolower(PGEGetChar(filePath[i])));
+        for(; i < static_cast<int>(filePath.size()); i++)
+            _suffix.push_back(static_cast<char>(tolower(PGEGetChar(filePath[i]))));
 skipSuffix:
 
         //Take file name without path
-        i = filePath.size() - 1;
+        i = static_cast<int>(filePath.size()) - 1;
         for(; i >= 0; i--)
         {
             if((filePath[i] == '/') || (filePath[i] == '\\')) break;
@@ -1238,20 +1260,19 @@ skipSuffix:
         if(i > 0)
             i++;
 
-        if(i >= ((signed)filePath.size() - 1))
+        if(i >= (static_cast<int>(filePath.size()) - 1))
             goto skipFilename;
-        for(; i < (signed)filePath.size(); i++)
+        for(; i < static_cast<int>(filePath.size()); i++)
             _filename.push_back(filePath[i]);
 
 skipFilename:
-
         //Take base file name
         _basename = _filename;
-        for(i = _basename.size() - 1; i > 0; i--)
+        for(i = static_cast<int>(_basename.size()) - 1; i > 0; i--)
         {
-            if(_basename[i] == '.')
+            if(_basename[static_cast<PGESTRINGSizeT>(i)] == '.')
             {
-                _basename.resize(i);
+                _basename.resize(static_cast<PGESTRINGSizeT>(i));
                 break;
             }
         }

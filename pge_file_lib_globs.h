@@ -65,6 +65,7 @@
 #endif
 #define PGE_FILES_INHERED public QObject
 typedef QString PGESTRING;
+typedef int     PGESTRINGSizeT;
 inline PGESTRING PGESTR_Simpl(PGESTRING &str)
 {
     return str.simplified();
@@ -144,6 +145,10 @@ PGESTRING fromNum(T num)
 {
     return QString::number(num);
 }
+inline PGESTRING fromBoolToNum(bool num)
+{
+    return QString::number(static_cast<int>(num));
+}
 namespace PGE_FileFormats_misc
 {
     PGESTRING    url_encode(const PGESTRING &sSrc);
@@ -184,6 +189,7 @@ inline PGESTRING PGE_URLDEC(PGESTRING &src)
 #include <unordered_map>
 #define PGE_FILES_INGERED
 typedef std::string PGESTRING;
+typedef std::string::size_type PGESTRINGSizeT;
 inline PGESTRING PGESTR_Simpl(PGESTRING str)
 {
     str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
@@ -233,7 +239,7 @@ inline PGESTRING PGE_RemSubSTRING(PGESTRING src, PGESTRING substr)
 }
 inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
-    str.erase(pos, len);
+    str.erase(static_cast<size_t>(pos), static_cast<size_t>(len));
     return str;
 }
 inline PGESTRING PGE_SubStr(PGESTRING &str, std::string::size_type pos, std::string::size_type len = std::string::npos)
@@ -285,6 +291,13 @@ PGESTRING fromNum(T num)
 {
     std::ostringstream n;
     n << num;
+    return n.str();
+}
+
+inline PGESTRING fromBoolToNum(bool num)
+{
+    std::ostringstream n;
+    n << static_cast<int>(num);
     return n.str();
 }
 #define PGE_URLENC(src) PGE_FileFormats_misc::url_encode(src)
@@ -437,13 +450,13 @@ namespace PGE_FileFormats_misc
 
             TextInput();
             virtual ~TextInput();
-            virtual PGESTRING read(long len);
+            virtual PGESTRING read(int64_t len);
             virtual PGESTRING readLine();
             virtual PGESTRING readCVSLine();
             virtual PGESTRING readAll();
             virtual bool eof();
-            virtual long long tell();
-            virtual void seek(long long pos, positions relativeTo);
+            virtual int64_t tell();
+            virtual void seek(int64_t pos, positions relativeTo);
             virtual PGESTRING getFilePath();
             virtual void setFilePath(PGESTRING path);
             virtual long getCurrentLineNumber();
@@ -477,8 +490,8 @@ namespace PGE_FileFormats_misc
             TextOutput();
             virtual ~TextOutput();
             virtual int write(PGESTRING buffer);
-            virtual long long tell();
-            virtual void seek(long long pos, positions relativeTo);
+            virtual int64_t tell();
+            virtual void seek(int64_t pos, positions relativeTo);
             virtual PGESTRING getFilePath();
             virtual void setFilePath(PGESTRING path);
             virtual long getCurrentLineNumber();
@@ -498,15 +511,15 @@ namespace PGE_FileFormats_misc
             virtual ~RawTextInput();
             bool open(PGESTRING *rawString, PGESTRING filepath = "");
             void close();
-            virtual PGESTRING read(long len);
+            virtual PGESTRING read(int64_t len);
             virtual PGESTRING readLine();
             virtual PGESTRING readCVSLine();
             virtual PGESTRING readAll();
             virtual bool eof();
-            virtual long long tell();
-            virtual void seek(long long _pos, positions relativeTo);
+            virtual int64_t tell();
+            virtual void seek(int64_t _pos, positions relativeTo);
         private:
-            long long _pos;
+            int64_t _pos;
             PGESTRING *_data;
             bool _isEOF;
     };
@@ -520,8 +533,8 @@ namespace PGE_FileFormats_misc
             bool open(PGESTRING *rawString, outputMode mode = truncate);
             void close();
             virtual int write(PGESTRING buffer);
-            virtual long long tell();
-            virtual void seek(long long _pos, positions relativeTo);
+            virtual int64_t tell();
+            virtual void seek(int64_t _pos, positions relativeTo);
         private:
             long long _pos;
             PGESTRING *_data;
@@ -570,7 +583,7 @@ namespace PGE_FileFormats_misc
              * \param Maximal lenght of characters to read from file
              * \return string contains requested line of characters
              */
-            PGESTRING read(long len);
+            PGESTRING read(int64_t len);
             /*!
              * \brief Reads whole line before line feed character
              * \return string contains gotten line
@@ -595,13 +608,13 @@ namespace PGE_FileFormats_misc
              * \brief Returns current position of carriage relative to begin of file
              * \return current position of carriage relative to begin of file
              */
-            long long tell();
+            int64_t tell();
             /*!
              * \brief Changes position of carriage to specific file position
              * \param pos Target position of carriage
              * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
              */
-            void seek(long long pos, positions relativeTo);
+            void seek(int64_t pos, positions relativeTo);
         private:
 #ifdef PGE_FILES_QT
             //! File handler used in Qt version of PGE file Library
@@ -658,7 +671,7 @@ namespace PGE_FileFormats_misc
              * \brief Returns current position of carriage relative to begin of file
              * \return current position of carriage relative to begin of file
              */
-            long long tell();
+            int64_t tell();
             /*!
              * \brief Changes position of carriage to specific file position
              * \param pos Target position of carriage

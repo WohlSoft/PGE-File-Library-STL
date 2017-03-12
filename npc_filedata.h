@@ -40,37 +40,37 @@ struct NPCConfigFile
     //! Is GFX-Offset X field using?
     bool en_gfxoffsetx;
     //! GFX-Offset X field
-    int gfxoffsetx;
+    int32_t gfxoffsetx;
 
     //! Is GFX-Offset Y field using?
     bool en_gfxoffsety;
     //! GFX-Offset Y field
-    int gfxoffsety;
+    int32_t gfxoffsety;
 
     //! Is Width field using?
     bool en_width;
     //! Width field
-    unsigned int width;
+    uint32_t width;
 
     //! Is height field using?
     bool en_height;
     //! Height field
-    unsigned int height;
+    uint32_t height;
 
     //! Is GFX-Width field using?
     bool en_gfxwidth;
     //! GFX-Width field
-    unsigned int gfxwidth;
+    uint32_t gfxwidth;
 
     //! Is GFX-Height field using?
     bool en_gfxheight;
     //! GFX-Height field
-    unsigned int gfxheight;
+    uint32_t gfxheight;
 
     //! Is Score field using?
     bool en_score;
     //! Score rewards field (from 0 to 13)
-    unsigned int score;
+    uint32_t score;
 
     //! Is "Block player at side" flag using?
     bool en_playerblock;
@@ -150,17 +150,17 @@ struct NPCConfigFile
     //! Is Frames number field using?
     bool en_frames;
     //! Frames number field
-    unsigned int frames;
+    uint32_t frames;
 
     //! Is Frame speed modifier field using?
     bool en_framespeed;
     //! Frame speed modifier field
-    unsigned int framespeed;
+    uint32_t framespeed;
 
     //! Is frame style field using?
     bool en_framestyle;
     //! Frame style field
-    unsigned int framestyle;
+    uint32_t framestyle;
 
     //! Is "Immune to ice" flag using?
     bool en_noiceball;
@@ -189,7 +189,7 @@ struct NPCConfigFile
     //! Is custom health level field using?
     bool en_health;
     //! Custom health level field
-    unsigned int health;
+    uint32_t health;
 
     //! Is custom image file name field using?
     bool en_image;
@@ -204,22 +204,22 @@ struct NPCConfigFile
     //! Is custom aligning grid size field using?
     bool en_grid;
     //! Custom aligning grid size field
-    unsigned int grid;
+    uint32_t grid;
 
     //! Is custom grid offset X field using?
-    bool en_grid_offset_x;
+    bool en_gridoffsetx;
     //! Custom grid offset X field
-    int grid_offset_x;
+    int32_t gridoffsetx;
 
     //! Is custom grid offset Y field using?
-    bool en_grid_offset_y;
+    bool en_gridoffsety;
     //! Custom grid offset Y field
-    int grid_offset_y;
+    int32_t gridoffsety;
 
     //! Is custom grid align style field using?
-    bool en_grid_align;
+    bool en_gridalign;
     //! Custom grid align style field
-    unsigned int grid_align;
+    uint32_t gridalign;
 
 };
 

@@ -60,9 +60,9 @@ NPCConfigFile FileFormats::CreateEmpytNpcTXT()
     FileData.en_image=false;
     FileData.en_script=false;
     FileData.en_grid=false;
-    FileData.en_grid_offset_x=false;
-    FileData.en_grid_offset_y=false;
-    FileData.en_grid_align=false;
+    FileData.en_gridoffsetx=false;
+    FileData.en_gridoffsety=false;
+    FileData.en_gridalign=false;
     return FileData;
 }
 
