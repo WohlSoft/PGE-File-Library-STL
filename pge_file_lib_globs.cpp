@@ -551,7 +551,11 @@ namespace PGE_FileFormats_misc
         PGEChar cur;
         do
         {
+            #ifdef PGE_FILES_QT
+            cur = (*_data)[static_cast<int>(_pos++)];
+            #else
             cur = (*_data)[static_cast<size_t>(_pos++)];
+            #endif
             if(_pos >= static_cast<int64_t>(_data->size()))
             {
                 _pos = static_cast<int64_t>(_data->size());
@@ -574,7 +578,11 @@ namespace PGE_FileFormats_misc
         PGEChar cur;
         do
         {
+            #ifdef PGE_FILES_QT
+            cur = (*_data)[static_cast<int>(_pos++)];
+            #else
             cur = (*_data)[static_cast<size_t>(_pos++)];
+            #endif
             if(_pos >= static_cast<int64_t>(_data->size()))
             {
                 _pos = static_cast<int64_t>(_data->size());
