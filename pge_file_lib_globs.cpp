@@ -835,13 +835,14 @@ fillEnd:
         #else
         if(!stream)
             return "";
+
         std::string out;
         out.reserve(1024);
         int C = 0;
         do
         {
             C = fgetc(stream);
-            if((C != '\n') && (C != '\r') && (C != EOF))
+            if( (C != '\n') && (C != '\r') && (C != EOF) )
                 out.push_back(static_cast<char>(C));
         }
         while((C != '\n') && (C != EOF));
@@ -1075,7 +1076,7 @@ fillEnd:
             buffer.replace("\n", "\r\n");
             writtenBytes = file.write(buffer.toLocal8Bit());
             #else
-            for(PGESTRINGSizeT i = 0; i < buffer.size(); i++)
+            for(pge_size_t i = 0; i < buffer.size(); i++)
             {
                 if(buffer[i] == '\n')
                 {
@@ -1278,9 +1279,9 @@ skipFilename:
         _basename = _filename;
         for(i = static_cast<int>(_basename.size()) - 1; i > 0; i--)
         {
-            if(_basename[static_cast<PGESTRINGSizeT>(i)] == '.')
+            if(_basename[static_cast<pge_size_t>(i)] == '.')
             {
-                _basename.resize(static_cast<PGESTRINGSizeT>(i));
+                _basename.resize(static_cast<pge_size_t>(i));
                 break;
             }
         }

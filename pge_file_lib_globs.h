@@ -65,7 +65,7 @@
 #endif
 #define PGE_FILES_INHERED public QObject
 typedef QString PGESTRING;
-typedef int     PGESTRINGSizeT;
+typedef int     pge_size_t;
 inline PGESTRING PGESTR_Simpl(PGESTRING &str)
 {
     return str.simplified();
@@ -189,7 +189,7 @@ inline PGESTRING PGE_URLDEC(PGESTRING &src)
 #include <unordered_map>
 #define PGE_FILES_INGERED
 typedef std::string PGESTRING;
-typedef std::string::size_type PGESTRINGSizeT;
+typedef std::string::size_type pge_size_t;
 inline PGESTRING PGESTR_Simpl(PGESTRING str)
 {
     str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
@@ -248,7 +248,7 @@ inline PGESTRING PGE_SubStr(PGESTRING &str, std::string::size_type pos, std::str
 }
 inline bool IsNULL(const PGESTRING str)
 {
-    return (!str.empty());
+    return (str.empty());
 }
 inline bool IsEmpty(const PGESTRING &str)
 {
