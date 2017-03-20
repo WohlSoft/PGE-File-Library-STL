@@ -449,8 +449,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  MakeCSVOptional(&npcdata.event_touch, "", nullptr, PGEUrlDecodeFunc)
                                 ),
                 MakeCSVSubReader(dataReader, ',',
-                                 MakeCSVPostProcessor(&npcdata.attach_layer, PGEUrlDecodeFunc),
-                                 MakeCSVPostProcessor(&npcdata.send_id_to_variable, PGEUrlDecodeFunc)
+                                 MakeCSVOptionalEmpty(&npcdata.attach_layer, "", nullptr, PGEUrlDecodeFunc),
+                                 MakeCSVOptionalEmpty(&npcdata.send_id_to_variable, "", nullptr, PGEUrlDecodeFunc)
                                 ),
                 MakeCSVSubReader(dataReader, ',',
                                  &npcdata.generator,
