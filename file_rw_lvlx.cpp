@@ -61,26 +61,27 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
         goto skipHeaderParse;
 
     NextLine(line);
-
     while((line != "HEAD_END") && (!IsNULL(line)))
     {
         header.push_back(line);
         str_count++;
         NextLine(line);
-
-        if(line == "HEAD_END") closed = true;
+        if(line == "HEAD_END")
+            closed = true;
     }
 
-    if(!closed) goto badfile;
+    if(!closed)
+        goto badfile;
 
-    for(int qq = 0; qq < static_cast<signed>(header.size()); qq++)
+    for(pge_size_t qq = 0; qq < header.size(); qq++)
     {
         PGESTRING &header_line = header[qq];
         PGELIST<PGESTRINGList >data = PGEFile::splitDataLine(header_line, &valid);
 
-        for(int i = 0; i < static_cast<signed>(data.size()); i++)
+        for(pge_size_t i = 0; i < data.size(); i++)
         {
-            if(data[i].size() != 2) goto badfile;
+            if(data[i].size() != 2)
+                goto badfile;
 
             if(data[i][0] == "TL") //Level Title
             {
