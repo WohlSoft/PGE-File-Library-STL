@@ -207,6 +207,8 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         STR_ENTRY(name),
         STR_ENTRY(image),
         STR_ENTRY(script),
+        STR_ENTRY(group),
+        STR_ENTRY(category),
         UINT_ENTRY(grid),
         SINT_ENTRY(gridoffsetx),
         SINT_ENTRY(gridoffsety),
@@ -359,6 +361,10 @@ bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConf
         out << "image=" + SMBX64::WriteStr(FileData.image);
     if(FileData.en_script && !IsEmpty(FileData.script))
         out << "script=" + SMBX64::WriteStr(FileData.script);
+    if(FileData.en_group && !IsEmpty(FileData.group))
+        out << "group=" + SMBX64::WriteStr(FileData.group);
+    if(FileData.en_category && !IsEmpty(FileData.category))
+        out << "category=" + SMBX64::WriteStr(FileData.category);
     if(FileData.en_grid)
         out << "grid=" + fromNum(FileData.grid) + "\n";
     if(FileData.en_gridoffsetx)
