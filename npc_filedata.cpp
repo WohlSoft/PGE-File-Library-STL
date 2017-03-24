@@ -25,44 +25,5 @@
 
 NPCConfigFile FileFormats::CreateEmpytNpcTXT()
 {
-    NPCConfigFile FileData;
-    FileData.en_gfxoffsetx=false;
-    FileData.en_gfxoffsety=false;
-    FileData.en_width=false;
-    FileData.en_height=false;
-    FileData.en_gfxwidth=false;
-    FileData.en_gfxheight=false;
-    FileData.en_score=false;
-    FileData.en_health=false;
-    FileData.en_playerblock=false;
-    FileData.en_playerblocktop=false;
-    FileData.en_npcblock=false;
-    FileData.en_npcblocktop=false;
-    FileData.en_grabside=false;
-    FileData.en_grabtop=false;
-    FileData.en_jumphurt=false;
-    FileData.en_nohurt=false;
-    FileData.en_noblockcollision=false;
-    FileData.en_cliffturn=false;
-    FileData.en_noyoshi=false;
-    FileData.en_foreground=false;
-    FileData.en_speed=false;
-    FileData.en_nofireball=false;
-    FileData.en_nogravity=false;
-    FileData.en_frames=false;
-    FileData.en_framespeed=false;
-    FileData.en_framestyle=false;
-    FileData.en_noiceball=false;
-
-    FileData.en_nohammer=false;
-    FileData.en_noshell=false;
-    FileData.en_name=false;
-    FileData.en_image=false;
-    FileData.en_script=false;
-    FileData.en_grid=false;
-    FileData.en_gridoffsetx=false;
-    FileData.en_gridoffsety=false;
-    FileData.en_gridalign=false;
-    return FileData;
+    return NPCConfigFile();
 }
-
