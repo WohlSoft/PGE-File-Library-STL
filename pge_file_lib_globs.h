@@ -186,6 +186,7 @@ inline PGESTRING PGE_URLDEC(PGESTRING &src)
 #include <cstring>
 #include <algorithm>
 #include <map>
+#include <cmath>
 #include <unordered_map>
 #define PGE_FILES_INGERED
 typedef std::string PGESTRING;
