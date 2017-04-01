@@ -396,6 +396,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("ED", block.event_destroy) //Destroy event slot
                     PGEX_StrVal("EH", block.event_hit) //Hit event slot
                     PGEX_StrVal("EE", block.event_emptylayer) //Hit event slot
+                    PGEX_StrVal("XTRA", block.meta.custom_params)//Custom JSON data tree
                 }
                 block.meta.array_id = FileData.blocks_array_id++;
                 block.meta.index = static_cast<unsigned int>(FileData.blocks.size());
@@ -422,6 +423,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_SIntVal("ZP", bgodata.z_mode)  //Z Position
                     PGEX_SLongVal("SP", bgodata.smbx64_sp)  //SMBX64 Sorting priority
                     PGEX_StrVal("LR", bgodata.layer)   //Layer name
+                    PGEX_StrVal("XTRA", bgodata.meta.custom_params)//Custom JSON data tree
                 }
                 bgodata.meta.array_id = FileData.bgo_array_id++;
                 bgodata.meta.index = static_cast<unsigned int>(FileData.bgo.size());
@@ -471,6 +473,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("EG", npcdata.event_grab)//Event slot "On grab"
                     PGEX_StrVal("EO", npcdata.event_touch)//Event slot "On touch"
                     PGEX_StrVal("EF", npcdata.event_nextframe)//Evemt slot "Trigger every frame"
+                    PGEX_StrVal("XTRA", npcdata.meta.custom_params)//Custom JSON data tree
                 }
                 npcdata.meta.array_id = FileData.npc_array_id++;
                 npcdata.meta.index = static_cast<unsigned int>(FileData.npc.size());
@@ -499,6 +502,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_FloatVal("AC", physiczone.accel) //Custom acceleration
                     PGEX_FloatVal("MV", physiczone.max_velocity) //Maximal velocity
                     PGEX_StrVal("EO",  physiczone.touch_event) //Touch event/script
+                    PGEX_StrVal("XTRA", physiczone.meta.custom_params)//Custom JSON data tree
                 }
                 physiczone.meta.array_id = FileData.physenv_array_id++;
                 physiczone.meta.index = static_cast<unsigned int>(FileData.physez.size());
@@ -546,6 +550,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("LR", door.layer)  //Layer
                     PGEX_StrVal("EE", door.event_enter)  //On-Enter event slot
                     PGEX_BoolVal("TW", door.two_way) //Two-way warp
+                    PGEX_StrVal("XTRA", door.meta.custom_params)//Custom JSON data tree
                 }
                 door.isSetIn = (!door.lvl_i);
                 door.isSetOut = (!door.lvl_o || (door.lvl_i));
@@ -1721,6 +1726,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("EH", PGEFile::WriteStr(blk.event_hit));
             if(!IsEmpty(blk.event_emptylayer))
                 out << PGEFile::value("EE", PGEFile::WriteStr(blk.event_emptylayer));
+            if(!IsEmpty(blk.meta.custom_params))
+                out << PGEFile::value("XTRA", PGEFile::WriteStr(blk.meta.custom_params));
 
             out << "\n";
         }
@@ -1753,6 +1760,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("SP", PGEFile::WriteInt(bgo.smbx64_sp));  // BGO SMBX64 Sort Priority
             if(bgo.layer != defBGO.layer) //Write only if not default
                 out << PGEFile::value("LR", PGEFile::WriteStr(bgo.layer));  // Layer
+            if(!IsEmpty(bgo.meta.custom_params))
+                out << PGEFile::value("XTRA", PGEFile::WriteStr(bgo.meta.custom_params));
             out << "\n";
         }
 
@@ -1835,6 +1844,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("EO", PGEFile::WriteStr(npc.event_touch));
             if(!IsEmpty(npc.event_touch))
                 out << PGEFile::value("EF", PGEFile::WriteStr(npc.event_nextframe));
+            if(!IsEmpty(npc.meta.custom_params))
+                out << PGEFile::value("XTRA", PGEFile::WriteStr(npc.meta.custom_params));
 
             out << "\n";
         }
@@ -1861,21 +1872,18 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             if(physEnv.env_type == LevelPhysEnv::ENV_CUSTOM_LIQUID)
                 out << PGEFile::value("FR", PGEFile::WriteFloat(physEnv.friction)); //Friction
-
             if(physEnv.accel_direct >= 0.0)
                 out << PGEFile::value("AD", PGEFile::WriteFloat(physEnv.accel_direct)); //Acceleration direction
-
             if(physEnv.accel != 0.0)
                 out << PGEFile::value("AC", PGEFile::WriteFloat(physEnv.accel)); //Acceleration
-
             if(physEnv.max_velocity != 0.0)
                 out << PGEFile::value("MV", PGEFile::WriteFloat(physEnv.max_velocity)); //Max-velocity
-
             if(physEnv.layer != defPhys.layer) //Write only if not default
                 out << PGEFile::value("LR", PGEFile::WriteStr(physEnv.layer));  // Layer
-
             if(!IsEmpty(physEnv.touch_event))
                 out << PGEFile::value("EO", PGEFile::WriteStr(physEnv.touch_event));  // Touch event slot
+            if(!IsEmpty(physEnv.meta.custom_params))
+                out << PGEFile::value("XTRA", PGEFile::WriteStr(physEnv.meta.custom_params));
 
             out << "\n";
         }
@@ -1936,54 +1944,41 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             if(warp.lvl_i)
                 out << PGEFile::value("ET", PGEFile::WriteBool(warp.lvl_i));  // Level Entance
-
             if(warp.lvl_o)
                 out << PGEFile::value("EX", PGEFile::WriteBool(warp.lvl_o));  // Level Exit
-
             if(warp.stars > 0)
                 out << PGEFile::value("SL", PGEFile::WriteInt(warp.stars));  // Need a stars
-
             if(!IsEmpty(warp.stars_msg))
                 out << PGEFile::value("SM", PGEFile::WriteStr(warp.stars_msg));  // Message for start requirement
-
             if(warp.star_num_hide)
                 out << PGEFile::value("SH", PGEFile::WriteBool(warp.star_num_hide));  // Don't show number of stars
-
             if(warp.novehicles)
                 out << PGEFile::value("NV", PGEFile::WriteBool(warp.novehicles));  // Deny Vehicles
-
             if(warp.allownpc)
                 out << PGEFile::value("AI", PGEFile::WriteBool(warp.allownpc));  // Allow Items
-
             if(warp.locked)
                 out << PGEFile::value("LC", PGEFile::WriteBool(warp.locked));  // Locked door
-
             if(warp.need_a_bomb)
                 out << PGEFile::value("LB", PGEFile::WriteBool(warp.need_a_bomb));  //Need a bomb to open door
-
             if(warp.hide_entering_scene)
                 out << PGEFile::value("HS", PGEFile::WriteBool(warp.hide_entering_scene));   //Hide entrance scene
-
             if(warp.allownpc_interlevel)
                 out << PGEFile::value("AL", PGEFile::WriteBool(warp.allownpc_interlevel));   //Allow Items inter-level
-
             if(warp.special_state_required)
                 out << PGEFile::value("SR", PGEFile::WriteBool(warp.special_state_required));//Special state required
-
             if(warp.cannon_exit)
             {
                 out << PGEFile::value("PT", PGEFile::WriteBool(warp.cannon_exit));//cannon exit
                 out << PGEFile::value("PS", PGEFile::WriteFloat(warp.cannon_exit_speed));//cannon exit projectile speed
             }
-
             if(warp.layer != defDoor.layer) //Write only if not default
                 out << PGEFile::value("LR", PGEFile::WriteStr(warp.layer));  // Layer
-
             if(!IsEmpty(warp.event_enter)) //Write only if not default
                 out << PGEFile::value("EE", PGEFile::WriteStr(warp.event_enter));  // On-Enter event
-
             if(warp.two_way)
                 out << PGEFile::value("TW", PGEFile::WriteBool(warp.two_way)); //Two-way warp
+            if(!IsEmpty(warp.meta.custom_params))
+                out << PGEFile::value("XTRA", PGEFile::WriteStr(warp.meta.custom_params));
 
             out << "\n";
         }
