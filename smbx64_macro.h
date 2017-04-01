@@ -10,7 +10,7 @@
 */
 
 //(you must create and open PGE_FileFormats_misc::TextInput &in; !!!)
-#define SMBX64_FileBegin() int file_format=0;   /*File format number*/\
+#define SMBX64_FileBegin() unsigned int file_format = 0;   /*File format number*/\
                            PGESTRING line;      /*Current Line data*/
 
 //Jump to next line
