@@ -201,6 +201,11 @@ struct NPCConfigFile
     //! Is custom image file name field using?
     PGESTRING image;
 
+    //! Is custom in-editor icon image file name field using?
+    bool en_icon = false;
+    //! Is custom in-editor icon image file name field using?
+    PGESTRING icon;
+
     //! Is custom AI script filename field using?
     bool en_script = false;
     //! Custom AI Script filename field
