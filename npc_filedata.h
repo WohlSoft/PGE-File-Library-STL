@@ -186,6 +186,11 @@ struct NPCConfigFile
     //! NPC's Custom name
     PGESTRING name;
 
+    //! Is NPC's Custom description field using?
+    bool en_description = false;
+    //! NPC's Custom description
+    PGESTRING description;
+
     //! Is custom health level field using?
     bool en_health = false;
     //! Custom health level field

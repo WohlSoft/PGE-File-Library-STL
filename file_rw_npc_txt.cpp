@@ -205,6 +205,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         BOOL_ENTRY(nohammer),
         BOOL_ENTRY(noshell),
         STR_ENTRY(name),
+        STR_ENTRY(description),
         STR_ENTRY(image),
         STR_ENTRY(script),
         STR_ENTRY(group),
@@ -357,6 +358,8 @@ bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConf
         out << "noshell=" + fromBoolToNum(FileData.noshell) + "\n";
     if(FileData.en_name && !IsEmpty(FileData.name))
         out << "name=" + SMBX64::WriteStr(FileData.name);
+    if(FileData.en_description && !IsEmpty(FileData.description))
+        out << "description=" + SMBX64::WriteStr(FileData.description);
     if(FileData.en_image && !IsEmpty(FileData.image))
         out << "image=" + SMBX64::WriteStr(FileData.image);
     if(FileData.en_script && !IsEmpty(FileData.script))
