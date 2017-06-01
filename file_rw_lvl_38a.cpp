@@ -391,6 +391,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 //h=height
                 &blockdata.h);
                 blockdata.autoscale = (blockdata.w < 0);
+                if(blockdata.w < 0)
+                    blockdata.w *= -1;
                 blockdata.meta.array_id = FileData.blocks_array_id++;
                 FileData.blocks.push_back(blockdata);
             }
@@ -1314,7 +1316,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    e4=block onscreen event name[***urlencode!***]
         out << "," << PGE_URLENC(blk.event_on_screen);
         //    w=width
-        out << "|" << fromNum(blk.autoscale ? -1 : blk.w);
+        out << "|" << fromNum(blk.autoscale ? (-1 * blk.w) : blk.w);
         //    h=height
         out << "|" << fromNum(blk.h);
         out << "\n";
