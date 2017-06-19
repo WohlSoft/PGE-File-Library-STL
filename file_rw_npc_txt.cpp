@@ -242,6 +242,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
 
         Params[0] = PGESTR_Simpl(Params[0]);
         Params[0] = PGE_RemSubSTRING(Params[0], " "); //Delete spaces
+        Params[0] = PGESTR_toLower(Params[0]);//To lower case
 
         NpcCfgHandlerMap::iterator hand = paramsHandler.find(Params[0]);
         if(hand != paramsHandler.end())

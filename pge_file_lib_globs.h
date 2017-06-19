@@ -66,9 +66,13 @@
 #define PGE_FILES_INHERED public QObject
 typedef QString PGESTRING;
 typedef int     pge_size_t;
-inline PGESTRING PGESTR_Simpl(PGESTRING &str)
+inline PGESTRING PGESTR_Simpl(const PGESTRING &str)
 {
     return str.simplified();
+}
+inline PGESTRING PGESTR_toLower(const PGESTRING &str)
+{
+    return str.toLower();
 }
 #define PGEGetChar(chr) chr.toLatin1()
 typedef QChar PGEChar;
@@ -194,6 +198,11 @@ typedef std::string::size_type pge_size_t;
 inline PGESTRING PGESTR_Simpl(PGESTRING str)
 {
     str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
+    return str;
+}
+inline PGESTRING PGESTR_toLower(PGESTRING str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     return str;
 }
 #define PGEGetChar(chr) chr
