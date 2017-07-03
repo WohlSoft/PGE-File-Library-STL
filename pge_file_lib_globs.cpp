@@ -664,7 +664,8 @@ namespace PGE_FileFormats_misc
 
     RawTextOutput::RawTextOutput(PGESTRING *rawString, outputMode mode) : TextOutput(), _pos(0), _data(0)
     {
-        open(rawString, mode);
+        if(!open(rawString, mode))
+            _data = nullptr;
     }
 
     RawTextOutput::~RawTextOutput() {}
