@@ -114,9 +114,6 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
         }
     }
 
-    if(!closed)
-        goto badfile;
-
 skipHeaderParse:
     FileData.CurSection = 0;
     FileData.playmusic = 0;
@@ -298,17 +295,16 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 lvl_section.PositionY = lvl_section.size_top - 10;
                 //add captured value into array
                 bool found = false;
-                int q = 0;
-                int sections_count = static_cast<int>(FileData.sections.size());
+                pge_size_t q = 0;
+                pge_size_t sections_count = FileData.sections.size();
 
-                if(lvl_section.id >= sections_count)
+                if(lvl_section.id >= (int)sections_count)
                 {
-                    int needToAdd = (FileData.sections.size() - 1) - lvl_section.id;
-
+                    pge_size_t needToAdd = (FileData.sections.size() - 1) - static_cast<pge_size_t>(lvl_section.id);
                     while(needToAdd > 0)
                     {
                         LevelSection dummySct = CreateLvlSection();
-                        dummySct.id = FileData.sections.size();
+                        dummySct.id = (int)FileData.sections.size();
                         FileData.sections.push_back(dummySct);
                         needToAdd--;
                     }
@@ -347,9 +343,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
                 //add captured value into array
                 bool found = false;
-                int q = 0;
-                int playersCount = static_cast<int>(FileData.players.size());
-
+                pge_size_t q = 0;
+                pge_size_t playersCount = FileData.players.size();
                 for(q = 0; q < playersCount; q++)
                 {
                     if(FileData.players[q].id == player.id)
@@ -589,9 +584,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
                 //add captured value into array
                 bool found = false;
-                int q = 0;
-
-                for(q = 0; q < static_cast<signed>(FileData.layers.size()); q++)
+                pge_size_t q = 0;
+                for(q = 0; q < FileData.layers.size(); q++)
                 {
                     if(FileData.layers[q].name == layer.name)
                     {
@@ -700,7 +694,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //Parse new-style parameters
                 if(!newSectionSettingsSets.empty())
                 {
-                    for(int q = 0; q < static_cast<signed>(newSectionSettingsSets.size()); q++)
+                    for(pge_size_t q = 0; q < newSectionSettingsSets.size(); q++)
                     {
                         LevelEvent_Sets sectionSet;
                         bool valid = false;
@@ -712,7 +706,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             goto badfile;
                         }
 
-                        for(int ssi = 0; ssi < static_cast<signed>(sssData.size()); ssi++)
+                        for(pge_size_t ssi = 0; ssi < sssData.size(); ssi++)
                         {
                             PGESTRINGList &param = sssData[ssi];
 
@@ -892,36 +886,32 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             }
                         }
 
-                        event.sets[static_cast<int>(sectionSet.id)] = sectionSet;
+                        event.sets[static_cast<pge_size_t>(sectionSet.id)] = sectionSet;
                     }//for section settings entries
                 }//If new-styled section settings are gotten
                 //Parse odl-style parameters
                 else
                 {
                     //Apply MusicSets
-                    int q = 0;
+                    pge_size_t q = 0;
 
-                    for(q = 0; q < static_cast<signed>(event.sets.size()) && q < static_cast<signed>(musicSets.size()); q++)
+                    for(q = 0; q < event.sets.size() && q < musicSets.size(); q++)
                     {
                         event.sets[q].id = static_cast<long>(q);
-
                         if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
-
                         event.sets[q].music_id = toLong(musicSets[q]);
                     }
 
                     //Apply Background sets
-                    for(q = 0; q < static_cast<signed>(event.sets.size()) && q < static_cast<signed>(bgSets.size()); q++)
+                    for(q = 0; q < event.sets.size() && q < bgSets.size(); q++)
                     {
                         event.sets[q].id = static_cast<long>(q);
-
                         if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
-
                         event.sets[q].background_id = toLong(bgSets[q]);
                     }
 
                     //Apply section sets
-                    for(q = 0; q < static_cast<signed>(event.sets.size()) && q < static_cast<signed>(ssSets.size()); q++)
+                    for(q = 0; q < event.sets.size() && q < ssSets.size(); q++)
                     {
                         event.sets[q].id = static_cast<long>(q);
                         PGESTRINGList sizes;
@@ -930,19 +920,15 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                         if(sizes.size() != 4) goto badfile; //-V112
 
                         if(!PGEFile::IsIntS(sizes[0])) goto badfile;
-
                         event.sets[q].position_left = toLong(sizes[0]);
 
                         if(!PGEFile::IsIntS(sizes[1])) goto badfile;
-
                         event.sets[q].position_top = toLong(sizes[1]);
 
                         if(!PGEFile::IsIntS(sizes[2])) goto badfile;
-
                         event.sets[q].position_bottom = toLong(sizes[2]);
 
                         if(!PGEFile::IsIntS(sizes[3])) goto badfile;
-
                         event.sets[q].position_right = toLong(sizes[3]);
                     }
                 }
@@ -950,7 +936,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //Parse Moving layers
                 if(!movingLayers.empty())
                 {
-                    for(int q = 0; q < static_cast<signed>(movingLayers.size()); q++)
+                    for(pge_size_t q = 0; q < movingLayers.size(); q++)
                     {
                         LevelEvent_MoveLayer moveLayer;
                         bool valid = false;
@@ -962,7 +948,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             goto badfile;
                         }
 
-                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
+                        for(pge_size_t ssi = 0; ssi < mlaData.size(); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
 
@@ -1029,7 +1015,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //Parse NPCs to spawn
                 if(!spawnNPCs.empty())
                 {
-                    for(int q = 0; q < static_cast<signed>(spawnNPCs.size()); q++)
+                    for(pge_size_t q = 0; q < spawnNPCs.size(); q++)
                     {
                         LevelEvent_SpawnNPC spawnNPC;
                         bool valid = false;
@@ -1041,7 +1027,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             goto badfile;
                         }
 
-                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
+                        for(pge_size_t ssi = 0; ssi < mlaData.size(); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
 
@@ -1144,7 +1130,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //Parse Effects to spawn
                 if(!spawnEffectss.empty())
                 {
-                    for(int q = 0; q < static_cast<signed>(spawnEffectss.size()); q++)
+                    for(pge_size_t q = 0; q < spawnEffectss.size(); q++)
                     {
                         LevelEvent_SpawnEffect spawnEffect;
                         bool valid = false;
@@ -1156,7 +1142,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             goto badfile;
                         }
 
-                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
+                        for(pge_size_t ssi = 0; ssi < mlaData.size(); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
 
@@ -1277,7 +1263,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //Parse Variables to update
                 if(!variablesToUpdate.empty())
                 {
-                    for(int q = 0; q < static_cast<signed>(variablesToUpdate.size()); q++)
+                    for(pge_size_t q = 0; q < variablesToUpdate.size(); q++)
                     {
                         LevelEvent_UpdateVariable variableToUpdate;
                         bool valid = false;
@@ -1289,7 +1275,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             goto badfile;
                         }
 
-                        for(int ssi = 0; ssi < static_cast<signed>(mlaData.size()); ssi++)
+                        for(pge_size_t ssi = 0; ssi < mlaData.size(); ssi++)
                         {
                             PGESTRINGList &param = mlaData[ssi];
 
@@ -1336,9 +1322,9 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 // SMBX-38A end
                 //add captured value into array
                 bool found = false;
-                int q = 0;
+                pge_size_t q = 0;
 
-                for(q = 0; q < static_cast<signed>(FileData.events.size()); q++)
+                for(q = 0; q < FileData.events.size(); q++)
                 {
                     if(FileData.events[q].name == event.name)
                     {
@@ -1415,7 +1401,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 customcfg38A = LevelItemSetup38A();
                 PGESTRINGList data;
-                int type = 0;
+                unsigned int type = 0;
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
@@ -1433,7 +1419,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                         goto badfile;
 
                     if(PGEFile::IsIntU(pair[0]))
-                        e.key = toUInt(pair[0]);
+                        e.key = (int32_t)toUInt(pair[0]);
                     else goto badfile;
 
                     if(PGEFile::IsIntS(pair[1]))
@@ -1495,12 +1481,12 @@ bool FileFormats::WriteExtendedLvlFileRaw(LevelData &FileData, PGESTRING &rawdat
 
 bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData)
 {
-    int i;
+    pge_size_t i;
     FileData.meta.RecentFormat = LevelData::PGEX;
     //Count placed stars on this level
     FileData.stars = 0;
 
-    for(i = 0; i < static_cast<int>(FileData.npc.size()); i++)
+    for(i = 0; i < FileData.npc.size(); i++)
     {
         if(FileData.npc[i].is_star)
             FileData.stars++;
@@ -1535,7 +1521,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     {
         out << "META_BOOKMARKS\n";
 
-        for(i = 0; i < static_cast<int>(FileData.metaData.bookmarks.size()); i++)
+        for(i = 0; i < FileData.metaData.bookmarks.size(); i++)
         {
             Bookmark &bm = FileData.metaData.bookmarks[i];
             //Bookmark name
@@ -1569,9 +1555,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     //////////////////////////////////////MetaData///END//////////////////////////////////////////
     //SECTION section
     //Count available level sections
-    int totalSections = 0;
+    pge_size_t totalSections = 0;
 
-    for(i = 0; i < static_cast<int>(FileData.sections.size()); i++)
+    for(i = 0; i < FileData.sections.size(); i++)
     {
         LevelSection &section = FileData.sections[i];
 
@@ -1591,7 +1577,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     {
         out << "SECTION\n";
 
-        for(i = 0; i < static_cast<int>(FileData.sections.size()); i++)
+        for(i = 0; i < FileData.sections.size(); i++)
         {
             LevelSection &section = FileData.sections[i];
 
@@ -1647,7 +1633,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     //STARTPOINT section
     int totalPlayerPoints = 0;
 
-    for(i = 0; i < static_cast<int>(FileData.players.size()); i++)
+    for(i = 0; i < FileData.players.size(); i++)
     {
         PlayerPoint &pp = FileData.players[i];
 
@@ -1662,7 +1648,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     {
         out << "STARTPOINT\n";
 
-        for(i = 0; i < static_cast<int>(FileData.players.size()); i++)
+        for(i = 0; i < FileData.players.size(); i++)
         {
             PlayerPoint &pp = FileData.players[i];
 
@@ -1686,7 +1672,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "BLOCK\n";
         LevelBlock defBlock = CreateLvlBlock();
 
-        for(i = 0; i < static_cast<int>(FileData.blocks.size()); i++)
+        for(i = 0; i < FileData.blocks.size(); i++)
         {
             LevelBlock &blk = FileData.blocks[i];
             //Type ID
@@ -1741,7 +1727,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "BGO\n";
         LevelBGO defBGO = CreateLvlBgo();
 
-        for(i = 0; i < static_cast<int>(FileData.bgo.size()); i++)
+        for(i = 0; i < FileData.bgo.size(); i++)
         {
             LevelBGO &bgo = FileData.bgo[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(bgo.id));  // BGO ID
@@ -1774,7 +1760,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "NPC\n";
         LevelNPC defNPC = CreateLvlNpc();
 
-        for(i = 0; i < static_cast<int>(FileData.npc.size()); i++)
+        for(i = 0; i < FileData.npc.size(); i++)
         {
             LevelNPC &npc = FileData.npc[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(npc.id));  // NPC ID
@@ -1859,7 +1845,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "PHYSICS\n";
         LevelPhysEnv defPhys = CreateLvlPhysEnv();
 
-        for(i = 0; i < static_cast<int>(FileData.physez.size()); i++)
+        for(i = 0; i < FileData.physez.size(); i++)
         {
             LevelPhysEnv &physEnv = FileData.physez[i];
             out << PGEFile::value("ET", PGEFile::WriteInt(physEnv.env_type));
@@ -1897,7 +1883,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "DOORS\n";
         LevelDoor defDoor = CreateLvlWarp();
 
-        for(i = 0; i < static_cast<int>(FileData.doors.size()); i++)
+        for(i = 0; i < FileData.doors.size(); i++)
         {
             LevelDoor &warp = FileData.doors[i];
 
@@ -1991,7 +1977,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     {
         out << "LAYERS\n";
 
-        for(i = 0; i < static_cast<int>(FileData.layers.size()); i++)
+        for(i = 0; i < FileData.layers.size(); i++)
         {
             LevelLayer &layer = FileData.layers[i];
             out << PGEFile::value("LR", PGEFile::WriteStr(layer.name));  // Layer name
@@ -2017,7 +2003,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "EVENTS_CLASSIC\n";
         bool addArray = false;
 
-        for(i = 0; i < static_cast<int>(FileData.events.size()); i++)
+        for(i = 0; i < FileData.events.size(); i++)
         {
             LevelSMBX64Event &event = FileData.events[i];
             out << PGEFile::value("ET", PGEFile::WriteStr(event.name));  // Event name
@@ -2094,7 +2080,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             */
             PGESTRINGList sectionSettingsSets;
 
-            for(int tt = 0; tt < static_cast<int>(event.sets.size()); tt++)
+            for(pge_size_t tt = 0; tt < event.sets.size(); tt++)
             {
                 bool hasParams = false;
                 PGESTRING sectionSettings;
@@ -2244,7 +2230,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             controls.push_back(event.ctrl_lock_keyboard);
             addArray = false;
 
-            for(int tt = 0; tt < static_cast<int>(controls.size()); tt++)
+            for(pge_size_t tt = 0; tt < controls.size(); tt++)
             {
                 if(controls[tt]) addArray = true;
             }
@@ -2262,7 +2248,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             {
                 PGESTRINGList moveLayers;
 
-                for(int j = 0; j < static_cast<int>(event.moving_layers.size()); j++)
+                for(pge_size_t j = 0; j < event.moving_layers.size(); j++)
                 {
                     LevelEvent_MoveLayer &mvl = event.moving_layers[j];
                     PGESTRING moveLayer;
@@ -2298,7 +2284,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             {
                 PGESTRINGList spawnNPCs;
 
-                for(int j = 0; j < static_cast<signed>(event.spawn_npc.size()); j++)
+                for(pge_size_t j = 0; j < event.spawn_npc.size(); j++)
                 {
                     PGESTRING spawnNPC;
                     LevelEvent_SpawnNPC &npc = event.spawn_npc[j];
@@ -2342,7 +2328,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             {
                 PGESTRINGList spawnEffects;
 
-                for(int j = 0; j < static_cast<signed>(event.spawn_effects.size()); j++)
+                for(pge_size_t j = 0; j < event.spawn_effects.size(); j++)
                 {
                     PGESTRING spawnEffect;
                     LevelEvent_SpawnEffect &effect = event.spawn_effects[j];
@@ -2385,7 +2371,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             {
                 PGESTRINGList updateVars;
 
-                for(int j = 0; j < static_cast<int>(event.update_variable.size()); j++)
+                for(pge_size_t j = 0; j < event.update_variable.size(); j++)
                 {
                     PGESTRING updateVar;
                     LevelEvent_UpdateVariable &updVar = event.update_variable[j];

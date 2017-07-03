@@ -466,7 +466,7 @@ namespace PGE_FileFormats_misc
             virtual PGESTRING readAll();
             virtual bool eof();
             virtual int64_t tell();
-            virtual void seek(int64_t pos, positions relativeTo);
+            virtual int seek(int64_t pos, positions relativeTo);
             virtual PGESTRING getFilePath();
             virtual void setFilePath(PGESTRING path);
             virtual long getCurrentLineNumber();
@@ -501,7 +501,7 @@ namespace PGE_FileFormats_misc
             virtual ~TextOutput();
             virtual int write(PGESTRING buffer);
             virtual int64_t tell();
-            virtual void seek(int64_t pos, positions relativeTo);
+            virtual int seek(int64_t pos, positions relativeTo);
             virtual PGESTRING getFilePath();
             virtual void setFilePath(PGESTRING path);
             virtual long getCurrentLineNumber();
@@ -527,7 +527,7 @@ namespace PGE_FileFormats_misc
             virtual PGESTRING readAll();
             virtual bool eof();
             virtual int64_t tell();
-            virtual void seek(int64_t _pos, positions relativeTo);
+            virtual int seek(int64_t _pos, positions relativeTo);
         private:
             int64_t _pos;
             PGESTRING *_data;
@@ -542,9 +542,9 @@ namespace PGE_FileFormats_misc
             virtual ~RawTextOutput();
             bool open(PGESTRING *rawString, outputMode mode = truncate);
             void close();
-            virtual int write(PGESTRING buffer);
-            virtual int64_t tell();
-            virtual void seek(int64_t _pos, positions relativeTo);
+            int write(PGESTRING buffer);
+            int64_t tell();
+            int seek(int64_t _pos, positions relativeTo);
         private:
             long long _pos;
             PGESTRING *_data;
@@ -624,7 +624,7 @@ namespace PGE_FileFormats_misc
              * \param pos Target position of carriage
              * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
              */
-            void seek(int64_t pos, positions relativeTo);
+            int seek(int64_t pos, positions relativeTo);
         private:
 #ifdef PGE_FILES_QT
             //! File handler used in Qt version of PGE file Library
@@ -687,7 +687,7 @@ namespace PGE_FileFormats_misc
              * \param pos Target position of carriage
              * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
              */
-            void seek(long long pos, positions relativeTo);
+            int seek(long long pos, positions relativeTo);
         private:
             bool m_forceCRLF;
 #ifdef PGE_FILES_QT

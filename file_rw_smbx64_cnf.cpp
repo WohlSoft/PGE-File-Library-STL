@@ -90,7 +90,7 @@ bool FileFormats::ReadSMBX64ConfigFile(PGE_FileFormats_misc::TextInput &in, SMBX
             SMBX64::ReadCSVBool(&FileData.fullScreen, line);
         }
 
-        for(int i = 0; i < 2; i++)
+        for(unsigned int i = 0; i < 2; i++)
         {
             SMBX64_ConfigPlayer plr;
             nextLine();
@@ -152,11 +152,11 @@ bool FileFormats::ReadSMBX64ConfigFile(PGE_FileFormats_misc::TextInput &in, SMBX
         else
             FileData.meta.ERROR_info = "It is not an SMBX game settings file\n";
 
-#ifdef PGE_FILES_QT
+        #ifdef PGE_FILES_QT
         FileData.meta.ERROR_info += QString::fromStdString(exception_to_pretty_string(err));
-#else
+        #else
         FileData.meta.ERROR_info += exception_to_pretty_string(err);
-#endif
+        #endif
         FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;
         FileData.meta.ReadFileValid = false;
@@ -167,7 +167,7 @@ bool FileFormats::ReadSMBX64ConfigFile(PGE_FileFormats_misc::TextInput &in, SMBX
 //*********************************************************
 //****************WRITE FILE FORMAT************************
 //*********************************************************
-bool FileFormats::WriteSMBX64ConfigFileF(PGESTRING filePath, SMBX64_ConfigFile &FileData, int file_format)
+bool FileFormats::WriteSMBX64ConfigFileF(PGESTRING filePath, SMBX64_ConfigFile &FileData, unsigned int file_format)
 {
     errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
@@ -181,7 +181,7 @@ bool FileFormats::WriteSMBX64ConfigFileF(PGESTRING filePath, SMBX64_ConfigFile &
     return WriteSMBX64ConfigFile(file, FileData, file_format);
 }
 
-bool FileFormats::WriteSMBX64ConfigFileRaw(SMBX64_ConfigFile &FileData, PGESTRING &rawdata, int file_format)
+bool FileFormats::WriteSMBX64ConfigFileRaw(SMBX64_ConfigFile &FileData, PGESTRING &rawdata, unsigned int file_format)
 {
     errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
@@ -195,20 +195,20 @@ bool FileFormats::WriteSMBX64ConfigFileRaw(SMBX64_ConfigFile &FileData, PGESTRIN
     return WriteSMBX64ConfigFile(file, FileData, file_format);
 }
 
-PGESTRING FileFormats::WriteSMBX64ConfigFile(SMBX64_ConfigFile &FileData, int file_format)
+PGESTRING FileFormats::WriteSMBX64ConfigFile(SMBX64_ConfigFile &FileData, unsigned int file_format)
 {
     PGESTRING raw;
     WriteSMBX64ConfigFileRaw(FileData, raw, file_format);
     return raw;
 }
 
-bool FileFormats::WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, SMBX64_ConfigFile &FileData, int file_format)
+bool FileFormats::WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, SMBX64_ConfigFile &FileData, unsigned int file_format)
 {
-    int i = 0;
+    pge_size_t i = 0;
 
     //Prevent out of range: 0....64
-    if(file_format < 0) file_format = 0;
-    else if(file_format > 64) file_format = 64;
+    if(file_format > 64)
+        file_format = 64;
 
     out << SMBX64::WriteSInt(file_format);   //Format version
 
@@ -220,7 +220,7 @@ bool FileFormats::WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, S
         FileData.players.push_back(plr);
     }
 
-    for(i = 0; i < ((signed)FileData.players.size()); i++)
+    for(i = 0; i < FileData.players.size(); i++)
     {
         out << SMBX64::WriteSInt(FileData.players[i].controllerType);
         out << SMBX64::WriteSInt(FileData.players[i].k_up);

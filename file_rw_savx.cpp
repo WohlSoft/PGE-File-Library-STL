@@ -272,7 +272,7 @@ bool FileFormats::WriteExtendedSaveFileRaw(GamesaveData &FileData, PGESTRING &ra
 
 bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, GamesaveData &FileData)
 {
-    int i;
+    pge_size_t i;
     out << "SAVE_HEADER\n";
     out << PGEFile::value("LV", PGEFile::WriteInt(FileData.lives));
     out << PGEFile::value("CN", PGEFile::WriteInt(FileData.coins));
@@ -291,7 +291,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     {
         out << "CHARACTERS\n";
 
-        for(i = 0; i < static_cast<signed>(FileData.characterStates.size()); i++)
+        for(i = 0; i < FileData.characterStates.size(); i++)
         {
             saveCharState &chState = FileData.characterStates[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(chState.id));
@@ -310,7 +310,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     {
         out << "CHARACTERS_PER_PLAYERS\n";
 
-        for(i = 0; i < static_cast<signed>(FileData.currentCharacter.size()); i++)
+        for(i = 0; i < FileData.currentCharacter.size(); i++)
         {
             out << PGEFile::value("ID", PGEFile::WriteInt(FileData.currentCharacter[i]));
             out << "\n";
@@ -323,7 +323,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     {
         out << "VIZ_LEVELS\n";
 
-        for(i = 0; i < static_cast<signed>(FileData.visibleLevels.size()); i++)
+        for(i = 0; i < FileData.visibleLevels.size(); i++)
         {
             visibleItem &slevel = FileData.visibleLevels[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(slevel.first));
@@ -338,7 +338,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     {
         out << "VIZ_PATHS\n";
 
-        for(i = 0; i < static_cast<signed>(FileData.visiblePaths.size()); i++)
+        for(i = 0; i < FileData.visiblePaths.size(); i++)
         {
             visibleItem &slevel = FileData.visiblePaths[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(slevel.first));
@@ -353,7 +353,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     {
         out << "VIZ_SCENERY\n";
 
-        for(i = 0; i < static_cast<signed>(FileData.visibleScenery.size()); i++)
+        for(i = 0; i < FileData.visibleScenery.size(); i++)
         {
             visibleItem &slevel = FileData.visibleScenery[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(slevel.first));
@@ -368,7 +368,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     {
         out << "STARS\n";
 
-        for(i = 0; i < static_cast<signed>(FileData.gottenStars.size()); i++)
+        for(i = 0; i < FileData.gottenStars.size(); i++)
         {
             starOnLevel &slevel = FileData.gottenStars[i];
             out << PGEFile::value("L", PGEFile::WriteStr(slevel.first));

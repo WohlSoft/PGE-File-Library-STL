@@ -51,7 +51,7 @@ PGESTRING FileStringList::readLine()
 
     if(!isEOF())
     {
-        sent = buffer[lineID];
+        sent = buffer[static_cast<pge_size_t>(lineID)];
         lineID++;
     }
     return sent;

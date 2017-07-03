@@ -84,12 +84,12 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
     if(!closed)
         goto badfile;
 
-    for(int zzz = 0; zzz < static_cast<signed>(header.size()); zzz++)
+    for(pge_size_t zzz = 0; zzz < header.size(); zzz++)
     {
         PGESTRING &header_line = header[zzz];
         PGELIST<PGESTRINGList >data = PGEFile::splitDataLine(header_line, &valid);
 
-        for(int i = 0; i < static_cast<signed>(data.size()); i++)
+        for(pge_size_t i = 0; i < data.size(); i++)
         {
             if(data[i].size() != 2) goto badfile;
 
@@ -473,15 +473,14 @@ bool FileFormats::WriteExtendedWldFileRaw(WorldData &FileData, PGESTRING &rawdat
 
 bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData)
 {
-    int i;
+    pge_size_t i;
     bool addArray = false;
     FileData.meta.RecentFormat = WorldData::PGEX;
     addArray = false;
 
-    for(int z = 0; z < static_cast<signed>(FileData.nocharacter.size()); z++)
+    for(pge_size_t z = 0; z < FileData.nocharacter.size(); z++)
     {
         bool x = FileData.nocharacter[z];
-
         if(x) addArray = true;
     }
 
@@ -503,10 +502,9 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
 
         addArray = false;
 
-        for(int z = 0; z < static_cast<signed>(FileData.nocharacter.size()); z++)
+        for(pge_size_t z = 0; z < FileData.nocharacter.size(); z++)
         {
             bool x = FileData.nocharacter[z];
-
             if(x) addArray = true;
         }
 
@@ -533,7 +531,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
     {
         out << "META_BOOKMARKS\n";
 
-        for(i = 0; i < static_cast<int>(FileData.metaData.bookmarks.size()); i++)
+        for(i = 0; i < FileData.metaData.bookmarks.size(); i++)
         {
             Bookmark &bm = FileData.metaData.bookmarks[i];
             //Bookmark name
@@ -570,7 +568,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
     {
         out << "TILES\n";
 
-        for(i = 0; i < static_cast<int>(FileData.tiles.size()); i++)
+        for(i = 0; i < FileData.tiles.size(); i++)
         {
             WorldTerrainTile &tt = FileData.tiles[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(tt.id));
@@ -588,7 +586,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
     {
         out << "SCENERY\n";
 
-        for(i = 0; i < static_cast<int>(FileData.scenery.size()); i++)
+        for(i = 0; i < FileData.scenery.size(); i++)
         {
             WorldScenery &ws = FileData.scenery[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(ws.id));
@@ -606,7 +604,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
     {
         out << "PATHS\n";
 
-        for(i = 0; i < static_cast<int>(FileData.paths.size()); i++)
+        for(i = 0; i < FileData.paths.size(); i++)
         {
             WorldPathTile &wp = FileData.paths[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(wp.id));
@@ -624,7 +622,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
     {
         out << "MUSICBOXES\n";
 
-        for(i = 0; i < static_cast<int>(FileData.music.size()); i++)
+        for(i = 0; i < FileData.music.size(); i++)
         {
             WorldMusicBox &wm = FileData.music[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(wm.id));
@@ -645,7 +643,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
         out << "LEVELS\n";
         WorldLevelTile defLvl = CreateWldLevel();
 
-        for(i = 0; i < static_cast<int>(FileData.levels.size()); i++)
+        for(i = 0; i < FileData.levels.size(); i++)
         {
             WorldLevelTile &lt = FileData.levels[i];
             out << PGEFile::value("ID", PGEFile::WriteInt(lt.id));

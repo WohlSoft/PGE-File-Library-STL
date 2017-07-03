@@ -74,7 +74,7 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
         goto badfile;
     }
 
-    for(int section = 0; section < static_cast<int>(pgeX_Data.dataTree.size()); section++) //look sections
+    for(pge_size_t section = 0; section < pgeX_Data.dataTree.size(); section++) //look sections
     {
         PGEFile::PGEX_Entry &f_section = pgeX_Data.dataTree[section];
 
@@ -86,7 +86,7 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
                 goto badfile;
             }
 
-            for(int sdata = 0; sdata < static_cast<int>(f_section.data.size()); sdata++)
+            for(pge_size_t sdata = 0; sdata < f_section.data.size(); sdata++)
             {
                 if(f_section.data[sdata].type != PGEFile::PGEX_Struct)
                 {
@@ -102,7 +102,7 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
                 meta_bookmark.x = 0;
                 meta_bookmark.y = 0;
 
-                for(int sval = 0; sval < static_cast<int>(x.values.size()); sval++) //Look markers and values
+                for(pge_size_t sval = 0; sval < x.values.size(); sval++) //Look markers and values
                 {
                     PGEFile::PGEX_Val v = x.values[sval];
                     errorString = PGESTRING("Wrong value syntax\nSection [") +
@@ -192,14 +192,14 @@ bool FileFormats::WriteNonSMBX64MetaDataRaw(MetaData &metaData, PGESTRING &rawda
 
 bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, MetaData &metaData)
 {
-    int i;
+    pge_size_t i;
 
     //Bookmarks
     if(!metaData.bookmarks.empty())
     {
         out << "META_BOOKMARKS\n";
 
-        for(i = 0; i < static_cast<int>(metaData.bookmarks.size()); i++)
+        for(i = 0; i < metaData.bookmarks.size(); i++)
         {
             Bookmark &bm = metaData.bookmarks[i];
             //Bookmark name

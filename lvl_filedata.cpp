@@ -41,7 +41,7 @@ const int _smbx64_bgo_sort_priorities[190] =
 void FileFormats::smbx64LevelPrepare(LevelData &lvl)
 {
     //Set SMBX64 specific option to BGO
-    for(int q = 0; q < (signed)lvl.bgo.size(); q++)
+    for(pge_size_t q = 0; q < lvl.bgo.size(); q++)
     {
         if(lvl.bgo[q].smbx64_sp < 0)
         {
@@ -59,7 +59,7 @@ void FileFormats::smbx64LevelPrepare(LevelData &lvl)
 int FileFormats::smbx64CountStars(LevelData &lvl)
 {
     int stars = 0;
-    for(int q = 0; q < (signed)lvl.npc.size(); q++)
+    for(pge_size_t q = 0; q < lvl.npc.size(); q++)
     {
         LevelNPC &npc = lvl.npc[q];
         npc.is_star = ((npc.id == 97) || (npc.id == 196)) && !npc.friendly;
@@ -84,43 +84,44 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
     LevelBlock piv;
     int i = 0, L, R, swapv;
     beg.push(0);
-    end.push(lvl.blocks.size());
+    end.push((int)lvl.blocks.size());
+#define ST(x) static_cast<pge_size_t>(x)
     while(i >= 0)
     {
-        L = beg.c[i];
-        R = end.c[i] - 1;
+        L = beg.c[ST(i)];
+        R = end.c[ST(i)] - 1;
         if(L < R)
         {
-            piv = lvl.blocks[L];
+            piv = lvl.blocks[ST(L)];
             while(L < R)
             {
                 while((
-                          (lvl.blocks[R].x > piv.x) ||
-                          ((lvl.blocks[R].x == piv.x) && (lvl.blocks[R].y > piv.y)) ||
-                          ((lvl.blocks[R].x == piv.x) && (lvl.blocks[R].y == piv.y) && (lvl.blocks[R].meta.array_id >= piv.meta.array_id))
+                          (lvl.blocks[ST(R)].x > piv.x) ||
+                          ((lvl.blocks[ST(R)].x == piv.x) && (lvl.blocks[ST(R)].y > piv.y)) ||
+                          ((lvl.blocks[ST(R)].x == piv.x) && (lvl.blocks[ST(R)].y == piv.y) && (lvl.blocks[ST(R)].meta.array_id >= piv.meta.array_id))
                       ) && (L < R)) R--;
-                if(L < R) lvl.blocks[L++] = lvl.blocks[R];
+                if(L < R) lvl.blocks[ST(L++)] = lvl.blocks[ST(R)];
 
                 while(
                     (
-                        (lvl.blocks[L].x < piv.x) ||
-                        ((lvl.blocks[L].x == piv.x) && (lvl.blocks[L].y < piv.y)) ||
-                        ((lvl.blocks[L].x == piv.x) && (lvl.blocks[L].y == piv.y) && (lvl.blocks[L].meta.array_id <= piv.meta.array_id))
+                        (lvl.blocks[ST(L)].x < piv.x) ||
+                        ((lvl.blocks[ST(L)].x == piv.x) && (lvl.blocks[ST(L)].y < piv.y)) ||
+                        ((lvl.blocks[ST(L)].x == piv.x) && (lvl.blocks[ST(L)].y == piv.y) && (lvl.blocks[ST(L)].meta.array_id <= piv.meta.array_id))
                     ) && (L < R)) L++;
-                if(L < R) lvl.blocks[R--] = lvl.blocks[L];
+                if(L < R) lvl.blocks[ST(R--)] = lvl.blocks[ST(L)];
             }
-            lvl.blocks[L] = piv;
+            lvl.blocks[ST(L)] = piv;
             beg.push(L + 1);
-            end.push(end.c[i]);
-            end.c[i++] = (L);
-            if((end.c[i] - beg.c[i]) > (end.c[i - 1] - beg.c[i - 1]))
+            end.push(end.c[ST(i)]);
+            end.c[ST(i++)] = (L);
+            if((end.c[ST(i)] - beg.c[ST(i)]) > (end.c[ST(i - 1)] - beg.c[ST(i - 1)]))
             {
-                swapv = beg.c[i];
-                beg.c[i] = beg.c[i - 1];
-                beg.c[i - 1] = swapv;
-                swapv = end.c[i];
-                end.c[i] = end.c[i - 1];
-                end.c[i - 1] = swapv;
+                swapv = beg.c[ST(i)];
+                beg.c[ST(i)] = beg.c[ST(i - 1)];
+                beg.c[ST(i - 1)] = swapv;
+                swapv = end.c[ST(i)];
+                end.c[ST(i)] = end.c[ST(i - 1)];
+                end.c[ST(i - 1)] = swapv;
             }
         }
         else
@@ -130,6 +131,7 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
             end.pop();
         }
     }
+#undef ST
 }
 
 void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
@@ -147,47 +149,48 @@ void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
     LevelBGO piv;
     int i = 0, L, R, swapv;
     beg.push(0);
-    end.push(lvl.bgo.size());
+    end.push((int)lvl.bgo.size());
+#define ST(x) static_cast<pge_size_t>(x)
     while(i >= 0)
     {
-        L = beg.c[i];
-        R = end.c[i] - 1;
+        L = beg.c[ST(i)];
+        R = end.c[ST(i)] - 1;
         if(L < R)
         {
-            piv = lvl.bgo[L];
+            piv = lvl.bgo[ST(L)];
             while(L < R)
             {
                 while((
-                          (lvl.bgo[R].smbx64_sp_apply > piv.smbx64_sp_apply) ||
+                          (lvl.bgo[ST(R)].smbx64_sp_apply > piv.smbx64_sp_apply) ||
                           /*((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x > piv.x))||
                             ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y > piv.y))||
                             ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y == piv.y) && (lvl.bgo[R].array_id >= piv.array_id))*/
-                          ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].meta.array_id >= piv.meta.array_id))
+                          ((lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(R)].meta.array_id >= piv.meta.array_id))
                       ) && (L < R)) R--;
-                if(L < R) lvl.bgo[L++] = lvl.bgo[R];
+                if(L < R) lvl.bgo[ST(L++)] = lvl.bgo[ST(R)];
 
                 while(
                     (
-                        (lvl.bgo[L].smbx64_sp_apply < piv.smbx64_sp_apply) ||
+                        (lvl.bgo[ST(L)].smbx64_sp_apply < piv.smbx64_sp_apply) ||
                         /*((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x < piv.x))||
                           ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y < piv.y))||
                           ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y == piv.y) && (lvl.bgo[L].array_id <= piv.array_id))*/
-                        ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].meta.array_id <= piv.meta.array_id))
+                        ((lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(L)].meta.array_id <= piv.meta.array_id))
                     ) && (L < R)) L++;
-                if(L < R) lvl.bgo[R--] = lvl.bgo[L];
+                if(L < R) lvl.bgo[ST(R--)] = lvl.bgo[ST(L)];
             }
-            lvl.bgo[L] = piv;
+            lvl.bgo[ST(L)] = piv;
             beg.push(L + 1);
-            end.push(end.c[i]);
-            end.c[i++] = (L);
-            if((end.c[i] - beg.c[i]) > (end.c[i - 1] - beg.c[i - 1]))
+            end.push(end.c[ST(i)]);
+            end.c[ST(i++)] = (L);
+            if((end.c[ST(i)] - beg.c[ST(i)]) > (end.c[ST(i - 1)] - beg.c[ST(i - 1)]))
             {
-                swapv = beg.c[i];
-                beg.c[i] = beg.c[i - 1];
-                beg.c[i - 1] = swapv;
-                swapv = end.c[i];
-                end.c[i] = end.c[i - 1];
-                end.c[i - 1] = swapv;
+                swapv = beg.c[ST(i)];
+                beg.c[ST(i)] = beg.c[ST(i - 1)];
+                beg.c[ST(i - 1)] = swapv;
+                swapv = end.c[ST(i)];
+                end.c[ST(i)] = end.c[ST(i - 1)];
+                end.c[ST(i - 1)] = swapv;
             }
         }
         else
@@ -197,6 +200,7 @@ void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
             end.pop();
         }
     }
+#undef ST
 }
 
 int FileFormats::smbx64LevelCheckLimits(LevelData &lvl)
@@ -364,7 +368,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
     //Append system layers if not exist
     bool def = false, desb = false, spawned = false;
 
-    for(int lrID = 0; lrID < (signed)FileData.layers.size(); lrID++)
+    for(pge_size_t lrID = 0; lrID < FileData.layers.size(); lrID++)
     {
         LevelLayer &lr = FileData.layers[lrID];
         if(lr.name == "Default") def = true;
@@ -396,7 +400,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
     //P Switch - Start
     //P Switch - End
     bool lstart = false, pstart = false, pend = false;
-    for(int evID = 0; evID < (signed)FileData.events.size(); evID++)
+    for(pge_size_t evID = 0; evID < FileData.events.size(); evID++)
     {
         LevelSMBX64Event &ev = FileData.events[evID];
         if(ev.name == "Level - Start") lstart = true;

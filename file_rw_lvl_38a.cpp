@@ -337,7 +337,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 section.PositionY = section.size_top - 10;
 
                 if(section.id < static_cast<signed>(FileData.sections.size()))
-                    FileData.sections[section.id] = section;//Replace if already exists
+                    FileData.sections[static_cast<pge_size_t>(section.id)] = section;//Replace if already exists
                 else
                     FileData.sections.push_back(section); //Add Section in main array
             }
@@ -532,7 +532,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     break;
                 }
 
-                npcdata.generator_period = PGE_FileLibrary::TimeUnitsCVT(npcdata.generator_period_orig,
+                npcdata.generator_period = PGE_FileLibrary::TimeUnitsCVT(static_cast<int>(npcdata.generator_period_orig),
                                            PGE_FileLibrary::TimeUnit::FrameOneOf65sec,
                                            PGE_FileLibrary::TimeUnit::Decisecond);
                 npcdata.meta.array_id = FileData.npc_array_id++;
@@ -737,7 +737,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     auto fieldReader = MakeDirectReader(nextFieldStr);
                     auto fullReader = MakeCSVReaderForPGESTRING(&fieldReader, ',');
                     int sectionID = fullReader.ReadField<int>(1) - 1;
-                    LevelEvent_Sets &nextSet = eventdata.sets[sectionID];
+                    LevelEvent_Sets &nextSet = eventdata.sets[static_cast<pge_size_t>(sectionID)];
                     bool customSize = false;
                     bool canAutoscroll = false;
                     fullReader.ReadDataLine(CSVDiscard(),
@@ -810,7 +810,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     auto fieldReader = MakeDirectReader(nextFieldStr);
                     auto fullReader = MakeCSVReaderForPGESTRING(&fieldReader, ',');
                     int sectionID = fullReader.ReadField<int>(1) - 1;
-                    LevelEvent_Sets &nextSet = eventdata.sets[sectionID];
+                    LevelEvent_Sets &nextSet = eventdata.sets[static_cast<pge_size_t>(sectionID)];
                     bool customBG = false;
                     long bgID = 0;
                     fullReader.ReadDataLine(CSVDiscard(),
@@ -845,7 +845,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     auto fieldReader = MakeDirectReader(nextFieldStr);
                     auto fullReader = MakeCSVReaderForPGESTRING(&fieldReader, ',');
                     int sectionID = fullReader.ReadField<int>(1) - 1;
-                    LevelEvent_Sets &nextSet = eventdata.sets[sectionID];
+                    LevelEvent_Sets &nextSet = eventdata.sets[static_cast<pge_size_t>(sectionID)];
                     bool customMusic = false;
                     long music_id;
                     fullReader.ReadDataLine(CSVDiscard(),

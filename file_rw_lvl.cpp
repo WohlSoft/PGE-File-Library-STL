@@ -251,7 +251,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
             section.id = i;
 
             if(i < static_cast<signed>(FileData.sections.size()))
-                FileData.sections[i] = section; //Replace if already exists
+                FileData.sections[static_cast<pge_size_t>(i)] = section; //Replace if already exists
             else
                 FileData.sections.push_back(section); //Add Section in main array
         }
@@ -263,7 +263,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
                 section.id = i;
 
                 if(i < static_cast<signed>(FileData.sections.size()))
-                    FileData.sections[i] = section; //Replace if already exists
+                    FileData.sections[static_cast<pge_size_t>(i)] = section; //Replace if already exists
                 else
                     FileData.sections.push_back(section); //Add Section in main array
             }
@@ -855,7 +855,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
 
                     if(((events.move_camera_x != 0.0) || (events.move_camera_y != 0.0)) && (events.scroll_section < static_cast<long>(events.sets.size())))
                     {
-                        int section = static_cast<int>(events.scroll_section);
+                        pge_size_t section = static_cast<pge_size_t>(events.scroll_section);
                         LevelEvent_Sets &set = events.sets[section];
                         set.autoscrol = true;
                         set.autoscrol_x = static_cast<float>(events.move_camera_x);
@@ -906,7 +906,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteSMBX64LvlFileF(PGESTRING filePath, LevelData &FileData, int file_format)
+bool FileFormats::WriteSMBX64LvlFileF(PGESTRING filePath, LevelData &FileData, unsigned int file_format)
 {
     errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
@@ -920,7 +920,7 @@ bool FileFormats::WriteSMBX64LvlFileF(PGESTRING filePath, LevelData &FileData, i
     return WriteSMBX64LvlFile(file, FileData, file_format);
 }
 
-bool FileFormats::WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata, int file_format)
+bool FileFormats::WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int file_format)
 {
     errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
@@ -934,13 +934,13 @@ bool FileFormats::WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata,
     return WriteSMBX64LvlFile(file, FileData, file_format);
 }
 
-bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData, int file_format)
+bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData, unsigned int file_format)
 {
-    int i, j;
+    pge_size_t i, j;
     //Count placed stars on this level
     FileData.stars = 0;
 
-    for(i = 0; i < static_cast<signed>(FileData.npc.size()); i++)
+    for(i = 0; i < FileData.npc.size(); i++)
     {
         if(FileData.npc[i].is_star)
             FileData.stars++;
@@ -952,8 +952,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     smbx64LevelSortBGOs(FileData);
 
     //Prevent out of range: 0....64
-    if(file_format < 0) file_format = 0;
-    else if(file_format > 64) file_format = 64;
+    if(file_format > 64) file_format = 64;
 
     FileData.meta.RecentFormat = LevelData::SMBX64;
     FileData.meta.RecentFormatVersion = file_format;
@@ -965,7 +964,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     if(file_format >= 60)
         out << SMBX64::WriteStr(FileData.LevelName);  //Level name
 
-    int s_limit = 21;
+    pge_size_t s_limit = 21;
 
     if(file_format < 8)
         s_limit = 6;
@@ -973,7 +972,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     //qDebug() << "sections "<<s_limit << "format "<<file_format ;
 
     //Sections settings
-    for(i = 0; (i < s_limit) && (i < static_cast<signed>(FileData.sections.size())); i++)
+    for(i = 0; (i < s_limit) && (i < FileData.sections.size()); i++)
     {
         LevelSection &section = FileData.sections[i];
         out << SMBX64::WriteSInt(section.size_left);
@@ -1017,7 +1016,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     {
         bool found = false;
 
-        for(i = 0; i < static_cast<signed>(FileData.players.size()); i++)
+        for(i = 0; i < FileData.players.size(); i++)
         {
             PlayerPoint &player = FileData.players[i];
             if(player.id != static_cast<unsigned int>(j))
@@ -1042,7 +1041,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
         out << "0\n0\n0\n0\n";
 
     //Blocks
-    for(int blkID = 0; blkID < static_cast<signed>(FileData.blocks.size()); blkID++)
+    for(pge_size_t blkID = 0; blkID < FileData.blocks.size(); blkID++)
     {
         LevelBlock &block = FileData.blocks[blkID];
         out << SMBX64::WriteSInt(block.x);
@@ -1055,7 +1054,6 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
         if(npcID < 0)
         {
             npcID *= -1;
-
             if(npcID > 99) npcID = 99;
         }
         else if(npcID != 0)
@@ -1117,7 +1115,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     out << "\"next\"\n";//Separator
 
     //BGOs
-    for(int bgoID = 0; bgoID < static_cast<signed>(FileData.bgo.size()); bgoID++)
+    for(pge_size_t bgoID = 0; bgoID < FileData.bgo.size(); bgoID++)
     {
         LevelBGO &bgo1 = FileData.bgo[bgoID];
         out << SMBX64::WriteSInt(bgo1.x);
@@ -1131,7 +1129,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     out << "\"next\"\n";//Separator
 
     //NPCs
-    for(i = 0; i < static_cast<signed>(FileData.npc.size()); i++)
+    for(i = 0; i < FileData.npc.size(); i++)
     {
         LevelNPC &npc = FileData.npc[i];
         //Section size
@@ -1245,7 +1243,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     out << "\"next\"\n";//Separator
 
     //Doors
-    for(i = 0; i < static_cast<signed>(FileData.doors.size()); i++)
+    for(i = 0; i < FileData.doors.size(); i++)
     {
         LevelDoor &warp = FileData.doors[i];
         if(((!warp.lvl_o) && (!warp.lvl_i)) || ((warp.lvl_o) && (!warp.lvl_i)))
@@ -1300,7 +1298,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
     {
         out << "\"next\"\n";//Separator
 
-        for(i = 0; i < static_cast<signed>(FileData.physez.size()); i++)
+        for(i = 0; i < FileData.physez.size(); i++)
         {
             LevelPhysEnv &physEnv = FileData.physez[i];
             out << SMBX64::WriteSInt(physEnv.x);
@@ -1321,7 +1319,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
         out << "\"next\"\n";//Separator
 
         //Layers
-        for(i = 0; i < static_cast<signed>(FileData.layers.size()); i++)
+        for(i = 0; i < FileData.layers.size(); i++)
         {
             LevelLayer &layer = FileData.layers[i];
             out << SMBX64::WriteStr(layer.name);
@@ -1331,7 +1329,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
         out << "\"next\"\n";//Separator
         LevelEvent_layers layerSet;
 
-        for(i = 0; i < static_cast<signed>(FileData.events.size()); i++)
+        for(i = 0; i < FileData.events.size(); i++)
         {
             LevelSMBX64Event &event = FileData.events[i];
             out << SMBX64::WriteStr(event.name);
@@ -1351,18 +1349,18 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
             for(j = 0; j < 20; j++)
             {
                 layerSet.hide =
-                    ((j < static_cast<signed>(event.layers_hide.size())) ?
+                    ((j < event.layers_hide.size()) ?
                      event.layers_hide[j] : "");
                 layerSet.show =
-                    ((j < static_cast<signed>(event.layers_show.size())) ?
+                    ((j < event.layers_show.size()) ?
                      event.layers_show[j] : "");;
                 layerSet.toggle =
-                    ((j < static_cast<signed>(event.layers_toggle.size())) ?
+                    ((j < event.layers_toggle.size()) ?
                      event.layers_toggle[j] : "");
                 events_layersArr.push_back(layerSet);
             }
 
-            for(j = 0; j < static_cast<signed>(events_layersArr.size()) && j < s_limit - 1; j++)
+            for(j = 0; j < events_layersArr.size() && j < s_limit - 1; j++)
             {
                 LevelEvent_layers &eLayer = events_layersArr[j];
                 out << SMBX64::WriteStr(eLayer.hide);
@@ -1382,7 +1380,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
 
             if(file_format >= 13)
             {
-                for(j = 0; j < static_cast<signed>(event.sets.size()) && j < s_limit; j++)
+                for(j = 0; j < event.sets.size() && j < s_limit; j++)
                 {
                     LevelEvent_Sets &set = event.sets[j];
                     out << SMBX64::WriteSInt(set.music_id);

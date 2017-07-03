@@ -25,25 +25,16 @@
 void old38a_SplitCSVStr(PGESTRINGList &dst, PGESTRING &Src)
 {
     dst.clear();
-    bool quoteOpen = false;
-
-    for(int i = 0; i < static_cast<signed>(Src.size());)
+    for(pge_size_t i = 0; i < Src.size();)
     {
         PGESTRING Buffer = "";
         PGEChar cur = ' ';
-
         do
         {
-            cur = Src[i++];
-
-            if(quoteOpen)
-                quoteOpen = !quoteOpen;
-            else
-            {
-                if(cur != ',') Buffer.push_back(cur);
-            }
+            cur = Src[static_cast<pge_size_t>(i++)];
+            if(cur != ',') Buffer.push_back(cur);
         }
-        while((i < static_cast<signed>(Src.size())) && (cur != ','));
+        while((i < Src.size()) && (cur != ','));
 
         dst.push_back(Buffer);
     }
@@ -54,19 +45,17 @@ void SMBX38A_SplitLine(PGESTRINGList &dst, PGESTRING &Src, char sep = '|')
 {
     dst.clear();
 
-    for(int i = 0; i < static_cast<signed>(Src.size());)
+    for(pge_size_t i = 0; i < Src.size();)
     {
         PGESTRING Buffer = "";
         PGEChar cur = ' ';
-
         do
         {
             cur = Src[i++];
 
             if(cur != sep) Buffer.push_back(cur);
         }
-        while((i < static_cast<signed>(Src.size())) && (cur != sep));
-
+        while((i < Src.size()) && (cur != sep));
         dst.push_back(Buffer);
     }
 }

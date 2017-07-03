@@ -126,7 +126,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
             }
             return true;
         }
-        break;
+        //break;
     case LVL_SMBX64:
         {
             //Apply SMBX64-specific things to entire array
@@ -149,7 +149,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
             }
             return true;
         }
-        break;
+        //break;
     case LVL_SMBX38A:
         {
             if(!FileFormats::WriteSMBX38ALvlFileF(filePath, FileData))
@@ -159,7 +159,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
             }
             return true;
         }
-        break;
+        //break;
     }
     errorString = "Unsupported file type";
     return false;
@@ -176,20 +176,20 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
             WriteExtendedLvlFileRaw(FileData, RawData);
             return true;
         }
-        break;
+        //break;
     case LVL_SMBX64:
         {
             smbx64LevelPrepare(FileData);
             WriteSMBX64LvlFileRaw(FileData, RawData, FormatVersion);
             return true;
         }
-        break;
+        //break;
     case LVL_SMBX38A:
         {
             FileFormats::WriteSMBX38ALvlFileRaw(FileData, RawData);
             return true;
         }
-        break;
+        //break;
     }
     errorString = "Unsupported file type";
     return false;
@@ -297,7 +297,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFor
             }
             return true;
         }
-        break;
+        //break;
     case WLD_SMBX64:
         {
             if(!FileFormats::WriteSMBX64WldFileF( filePath, FileData, FormatVersion))
@@ -317,7 +317,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFor
             }
             return true;
         }
-        break;
+        //break;
     case WLD_SMBX38A:
         {
             if(!FileFormats::WriteSMBX38AWldFileF(filePath, FileData))
@@ -327,7 +327,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFor
             }
             return true;
         }
-        break;
+        //break;
     }
     errorString = "Unsupported file type";
     return false;
@@ -343,19 +343,19 @@ bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFor
             WriteExtendedWldFileRaw(FileData, RawData);
             return true;
         }
-        break;
+        //break;
     case WLD_SMBX64:
         {
             WriteSMBX64WldFileRaw(FileData, RawData, FormatVersion);
             return true;
         }
-        break;
+        //break;
     case WLD_SMBX38A:
         {
             WriteSMBX38AWldFileRaw(FileData, RawData);
             return true;
         }
-        break;
+        //break;
     }
     errorString = "Unsupported file type";
     return false;

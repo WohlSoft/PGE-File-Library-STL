@@ -42,7 +42,7 @@ PGESTRING FileFormats::removeQuotes(PGESTRING str)
     if(target[0] == '\"')
         target.erase(target.begin() + 0);
     if((!target.empty()) && (target[target.size() - 1] == '\"'))
-        target.erase(target.begin() + target.size() - 1);
+        target.erase(target.begin() + (std::string::difference_type)target.size() - 1);
     #endif
     return target;
 }
@@ -65,9 +65,8 @@ PGESTRING FileFormats::getErrorString(FileFormats::ErrorCodes errCode)
         return "PGE-X Invalid data entry syntax";
     case ERROR_PGEX_InvalidDataType:
         return "PGE-X Invalid data type";
-    default:
-        return "Unknown error";
     }
+    return "Unknown error";
 }
 
 /***************************************************************************/

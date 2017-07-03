@@ -47,7 +47,7 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( (value * 10.0l) / 65.0l );
         case TimeUnit::Second:
             return static_cast<NumT>( value / 65.0l );
-        default: ;
+        default: break;
         };
     case TimeUnit::Millisecond:
         switch(into)
@@ -58,7 +58,7 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( value / 1000.0l );
         case TimeUnit::Second:
             return static_cast<NumT>( value / 10.0l );
-        default: ;
+        default: break;
         };
     case TimeUnit::Decisecond:
         switch(into)
@@ -69,7 +69,7 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( value * 100.0l );
         case TimeUnit::Second:
             return static_cast<NumT>( value / 10.0l );
-        default: ;
+        default: break;
         };
     case TimeUnit::Second:
         switch(into)
@@ -80,9 +80,8 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( value * 1000.0l );
         case TimeUnit::Decisecond:
             return static_cast<NumT>( value * 10.0l );
-        default: ;
+        default: break;
         };
-    default: ;
     };
     return in;
 }

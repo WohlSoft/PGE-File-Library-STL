@@ -26,7 +26,7 @@
 /*! \def PGEX_FetchSection()
     \brief Prepare to fetch all data from specified section
 */
-#define PGEX_FetchSection() for(int section=0; section<static_cast<signed>(pgeX_Data.dataTree.size()); section++)
+#define PGEX_FetchSection() for(pge_size_t section=0; section < pgeX_Data.dataTree.size(); section++)
 /*! \def PGEX_FetchSection_begin()
     \brief Prepare to detect separate data of different sections
 */
@@ -35,11 +35,11 @@
 /*! \def PGEX_Section(sct)
     \brief Defines block of fields for section of specified name
 */
-#define PGEX_Section(sct)   else if(f_section.name==sct)
+#define PGEX_Section(sct)   else if(f_section.name == sct)
 /*! \def PGEX_SectionBegin(stype)
     \brief Run syntax of raw data in this section for specified data type
 */
-#define PGEX_SectionBegin(stype) if(f_section.type!=stype) \
+#define PGEX_SectionBegin(stype) if(f_section.type != stype) \
 { \
     errorString=PGESTRING("Wrong section data syntax:\nSection ["+f_section.name+"]");\
     goto badfile;\
@@ -47,11 +47,11 @@
 /*! \def PGEX_Items()
     \brief Prepare to read items from this section
 */
-#define PGEX_Items() for(int sdata=0; sdata<static_cast<signed>(f_section.data.size()); sdata++)
+#define PGEX_Items() for(pge_size_t sdata = 0; sdata < f_section.data.size(); sdata++)
 /*! \def PGEX_ItemBegin(stype)
     \brief Declares block with a list of values
 */
-#define PGEX_ItemBegin(stype) if(f_section.data[sdata].type!=stype) \
+#define PGEX_ItemBegin(stype) if(f_section.data[sdata].type != stype) \
 { \
     errorString=PGESTRING("Wrong data item syntax:\nSection ["+f_section.name+"]\nData line "+fromNum(sdata));\
     goto badfile;\
@@ -61,7 +61,7 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
 /*! \def PGEX_Values()
     \brief Declares block with a list of values
 */
-#define PGEX_Values() for(int sval=0; sval<static_cast<signed>(x.values.size()); sval++)
+#define PGEX_Values() for(pge_size_t sval=0; sval < x.values.size(); sval++)
 /*! \def PGEX_ValueBegin()
     \brief Initializes getting of the values
 */
