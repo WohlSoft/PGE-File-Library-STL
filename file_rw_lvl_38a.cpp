@@ -23,7 +23,7 @@
 #include "smbx38a_private.h"
 
 // Settings
-static constexpr int newest_file_format = 68;
+static constexpr uint32_t newest_file_format = 68;
 
 /***********  Pre-defined values dependent to NPC Generator Effect field value  **************/
 
@@ -66,6 +66,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     #if !defined(_MSC_VER) || _MSC_VER > 1800
     PGE_FileFormats_misc::TextFileInput inf;
+    uint32_t file_version = 0;
 
     if(!inf.open(filePath, false))
     {
@@ -88,6 +89,8 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
         if(!PGE_StartsWith(fileIndentifier, "SMBXFile"))
             throw std::logic_error("Invalid file format");
 
+        file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+
         while(!inf.eof())
         {
             PGESTRING identifier = dataReader.ReadField<PGESTRING>(1);
@@ -107,8 +110,21 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     catch(const std::exception &err)
     {
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
+        FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
+        FileData.meta.ERROR_linedata = "";
+        return false;
+    }
+    catch(...)
+    {
+        /*
+         * This is an attempt to fix crash on Windows 32 bit release assembly,
+         * and possible, on some other platforms too
+         */
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
+                                   "Caused by unknown exception\n";
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
         return false;
@@ -208,7 +224,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     LevelScript scriptdata;
     LevelItemSetup38A customcfg;
 
-    PGESTRING identifier;
+    PGESTRING   identifier;
+    uint32_t    file_version = 0;
 
     //Add path data
     if(!IsEmpty(filePath))
@@ -230,6 +247,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
         if(!PGE_StartsWith(fileIndentifier, "SMBXFile"))
             throw std::logic_error("Invalid file format");
 
+        file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+
         while(!in.eof())
         {
             identifier = dataReader.ReadField<PGESTRING>(1);
@@ -239,11 +258,19 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 // FIXME: Remove copy from line 77
                 // A|param1|param2[|param3|param4]|
                 // A|param1|param2|param3|param4|s1,s2,s3,s4
+                /*
+                    exception: Failed to parse field 4 at line 2
+                     exception: Could not convert to unsigned int
+
+                     Field type A
+                */
+                // 0 1   2                               3  4{}
+                // A|0|%4C%61%79%65%72%20%53%70%69%6E%21| |,,,
                 PGESTRING s[4];
                 dataReader.ReadDataLine(CSVDiscard(), // Skip the first field (this is already "identifier")
                                         &FileData.stars,
                                         MakeCSVPostProcessor(&FileData.LevelName, PGEUrlDecodeFunc),
-                                        MakeCSVOptional(&FileData.open_level_on_fail, PGESTRING(""), nullptr, PGEUrlDecodeFunc),
+                                        MakeCSVOptional(&FileData.open_level_on_fail, PGESTRING(""), nullptr, PGEUrlDecodeFunc),//3
                                         MakeCSVOptionalEmpty(&FileData.open_level_on_fail_warpID, 0u),
                                         MakeCSVOptionalSubReader(dataReader, ',',
                                             MakeCSVOptional(&s[0], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
@@ -251,6 +278,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                             MakeCSVOptional(&s[2], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
                                             MakeCSVOptional(&s[3], PGESTRING(""), nullptr, PGEUrlDecodeFunc)
                                         ));
+
                 for(uint32_t i = 0; i < 4; i++)
                 {
                     if(!IsEmpty(s[i]))
@@ -364,6 +392,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 &blockdata.x, //FIXME rounding error?
                 //y=block position y
                 &blockdata.y,
+                /* contain=containing npc number
+                                [1001-1000+NPCMAX] npc-id
+                                [1-999] coin number
+                                [0] nothing
+                */
                 MakeCSVOptionalEmpty(&blockdata.npc_id, 0, nullptr, [](long & npcValue)
                 {
                     npcValue = (npcValue < 1000 ? -1 * npcValue : npcValue - 1000);
@@ -1075,7 +1108,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
         if(!IsEmpty(identifier))
             FileData.meta.ERROR_info += "\n Field type " + identifier;
@@ -1084,6 +1117,24 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
         if(FileData.meta.ERROR_linenum == 0)
             FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
 
+        FileData.meta.ERROR_linedata = "";
+        return false;
+    }
+    catch(...)
+    {
+        /*
+         * This is an attempt to fix crash on Windows 32 bit release assembly,
+         * and possible, on some other platforms too
+         */
+        // Now fill in the error data.
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
+                                   "Caused by unknown exception\n";
+        if(!IsEmpty(identifier))
+            FileData.meta.ERROR_info += "\n Field type " + identifier;
+        // If we were unable to find error line number from the exception, then get the line number from the file reader.
+        if(FileData.meta.ERROR_linenum == 0)
+            FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
         return false;
     }
@@ -1159,7 +1210,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //line 1:
     //    SMBXFile??
     //    ??=Version number
-    out << "SMBXFile67\n";
+    out << "SMBXFile" << fromNum(newest_file_format) << "\n";
     //next line: level settings
     //    A|param1|param2[|param3|param4]
     //    []=optional
@@ -1176,7 +1227,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    param4=normal entrance / to warp [0-WARPMAX]
         out << "|" << fromNum(FileData.open_level_on_fail_warpID);
     } else {
-        out << "||";
+        out << "|||";
     }
     //Custom special musics
     {
@@ -1302,11 +1353,12 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        [0] nothing
         out << "|" << ((blk.npc_id == 0) ? ""
                         : fromNum(blk.npc_id <= 0 ? (-1 * blk.npc_id) : (blk.npc_id + 1000)) );
-        //    b1=slippery[0=false !0=true]
+        //    b11=slippery[0=false !0=true]
         out << "|" << fromNum((int)blk.slippery);
+        //    b12=wing type
         //    b2=invisible[0=false !0=true]
-        out << "|" << fromNum((int)blk.invisible);
         out << "," << fromNum(blk.motion_ai_id);
+        out << "|" << fromNum((int)blk.invisible);
         //    e1=block destory event name[***urlencode!***]
         out << "|" << PGE_URLENC(blk.event_destroy);
         //    e2=block hit event name[***urlencode!***]

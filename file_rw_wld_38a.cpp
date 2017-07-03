@@ -23,7 +23,7 @@
 #include "smbx38a_private.h"
 
 // Settings
-static constexpr int newest_file_format = 68;
+//static constexpr uint32_t newest_file_format = 68; //TODO: Uncomment when implement 38A World writing support
 
 //*********************************************************
 //****************READ FILE FORMAT*************************
@@ -47,6 +47,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
+    uint32_t file_version = 0;
 
     try
     {
@@ -57,6 +58,8 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
 
         if(!PGE_StartsWith(fileIndentifier, "SMBXFile"))
             throw std::logic_error("Invalid file format");
+
+        file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
 
         while(!inf.eof())
         {
@@ -164,7 +167,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
     catch(const std::exception &err)
     {
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
@@ -253,6 +256,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     WorldEvent38A       event;
     WorldItemSetup38A   customcfg;
 
+    PGESTRING           identifier;
+    uint32_t            file_version = 0;
+
     //Add path data
     if(!IsEmpty(filePath))
     {
@@ -273,9 +279,11 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
         if(!PGE_StartsWith(fileIndentifier, "SMBXFile"))
             throw std::logic_error("Invalid file format");
 
+        file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+
         while(!in.eof())
         {
-            PGESTRING identifier = dataReader.ReadField<PGESTRING>(1);
+            identifier = dataReader.ReadField<PGESTRING>(1);
 
             if(identifier == "WS1")
             {
@@ -738,13 +746,31 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(newest_file_format) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
 
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
         if(FileData.meta.ERROR_linenum == 0)
             FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
 
+        FileData.meta.ERROR_linedata = "";
+        return false;
+    }
+    catch(...)
+    {
+        /*
+         * This is an attempt to fix crash on Windows 32 bit release assembly,
+         * and possible, on some other platforms too
+         */
+        // Now fill in the error data.
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
+                                   "Caused by unknown exception\n";
+        if(!IsEmpty(identifier))
+            FileData.meta.ERROR_info += "\n Field type " + identifier;
+        // If we were unable to find error line number from the exception, then get the line number from the file reader.
+        if(FileData.meta.ERROR_linenum == 0)
+            FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
         return false;
     }
