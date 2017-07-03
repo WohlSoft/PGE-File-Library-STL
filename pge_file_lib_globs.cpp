@@ -8,6 +8,14 @@
 #include <algorithm>
 #include <string>
 #include "charsetconvert.h"
+#ifndef PATH_MAX
+/*
+ * Needed to shut up CLang's static analyzer that showing usage of this
+ * macro as "not exists" even I have limits.h included here.
+ * For other cases it's just a dead code
+ */
+#define PATH_MAX 2048
+#endif
 #else
 #include <QFileInfo>
 #endif
@@ -83,7 +91,8 @@ namespace PGE_FileFormats_misc
     {
         std::string::size_type foundpos = sInput.find(sub);
         if(foundpos != std::string::npos)
-            sInput.erase(sInput.begin() + foundpos, sInput.begin() + foundpos + sub.length());
+            sInput.erase(sInput.begin() + std::string::difference_type(foundpos),
+                         sInput.begin() + std::string::difference_type(foundpos + sub.length()));
     }
 
     bool hasEnding(std::string const &fullString, std::string const &ending)
@@ -101,22 +110,21 @@ namespace PGE_FileFormats_misc
             return sSrc;
         const char DEC2HEX[16 + 1] = "0123456789ABCDEF";
         #ifndef PGE_FILES_QT
-        const unsigned char *pSrc = (const unsigned char *)sSrc.c_str();
+        const uint8_t *pSrc = reinterpret_cast<const uint8_t*>(sSrc.c_str());
         #else
         std::string ssSrc = sSrc.toStdString();
-        const unsigned char *pSrc = (const unsigned char *)ssSrc.c_str();
+        const uint8_t *pSrc = reinterpret_cast<const uint8_t*>(ssSrc.c_str());
         #endif
-        const int SRC_LEN = sSrc.length();
-        std::unique_ptr<unsigned char[]> pStart(new unsigned char[SRC_LEN * 3]);
-        unsigned char *pEnd = pStart.get();
-        const unsigned char *const SRC_END = pSrc + SRC_LEN;
-
+        const size_t SRC_LEN = static_cast<size_t>(sSrc.length());
+        std::unique_ptr<uint8_t[]> pStart(new uint8_t[SRC_LEN * 3]);
+        uint8_t *pEnd = pStart.get();
+        const uint8_t *const SRC_END = pSrc + SRC_LEN;
         for(; pSrc < SRC_END; ++pSrc)
         {
             //Do full encoding!
             *pEnd++ = '%';
-            *pEnd++ = DEC2HEX[*pSrc >> 4];
-            *pEnd++ = DEC2HEX[*pSrc & 0x0F];
+            *pEnd++ = static_cast<uint8_t>(DEC2HEX[*pSrc >> 4]);
+            *pEnd++ = static_cast<uint8_t>(DEC2HEX[*pSrc & 0x0F]);
         }
         #ifndef PGE_FILES_QT
         PGESTRING sResult((char *)pStart.get(), (char *)pEnd);
@@ -158,11 +166,11 @@ namespace PGE_FileFormats_misc
         // Note from RFC1630: "Sequences which start with a percent
         // sign but are not followed by two hexadecimal characters
         // (0-9, A-F) are reserved for future extension"
-        const unsigned char *pSrc = (const unsigned char *)sSrc.c_str();
-        const int SRC_LEN = sSrc.length();
-        const unsigned char *const SRC_END = pSrc + SRC_LEN;
+        const uint8_t *pSrc = (const unsigned char *)sSrc.c_str();
+        const size_t SRC_LEN = sSrc.length();
+        const uint8_t *const SRC_END = pSrc + SRC_LEN;
         // last decodable '%'
-        const unsigned char *const SRC_LAST_DEC = SRC_END - 2;
+        const uint8_t *const SRC_LAST_DEC = SRC_END - 2;
 
         char *pStart = (char*)malloc(SRC_LEN + 1);
         if(!pStart)
@@ -178,20 +186,20 @@ namespace PGE_FileFormats_misc
                 if(-1 != (dec1 = HEX2DEC[*(pSrc + 1)])
                    && -1 != (dec2 = HEX2DEC[*(pSrc + 2)]))
                 {
-                    *pEnd++ = (dec1 << 4) + dec2;
+                    *pEnd++ = static_cast<char>((dec1 << 4) + dec2);
                     pSrc += 3;
                     continue;
                 }
             }
 
-            *pEnd++ = *pSrc++;
+            *pEnd++ = static_cast<char>(*pSrc++);
         }
 
         // the last 2- chars
         while(pSrc < SRC_END)
-            *pEnd++ = *pSrc++;
+            *pEnd++ = static_cast<char>(*pSrc++);
 
-        std::string::size_type pLen = pEnd - pStart;
+        std::string::size_type pLen = static_cast<std::string::size_type>(pEnd - pStart);
         std::string sResult(pStart, pLen);
         free(pStart);
         return sResult;
@@ -214,11 +222,11 @@ namespace PGE_FileFormats_misc
     #define PGE_BASE64ENC_W(src) QString::fromStdString(PGE_FileFormats_misc::base64_encodeW(src.toStdWString()))
     #define PGE_BASE64DEC_W(src) src.fromStdWString(PGE_FileFormats_misc::base64_decodeW(src.toStdString()))
     */
-    QString      base64_encodeW(QString &source)
+    QString      base64_encodeW(QString &source, bool no_padding)
     {
         return QString::fromStdString(
-                   base64_encode(reinterpret_cast<const unsigned char *>(source.utf16()),
-                                 source.size() * sizeof(unsigned short))
+                   base64_encode(reinterpret_cast<const uint8_t *>(source.utf16()),
+                                 static_cast<size_t>(source.size()) * sizeof(uint16_t), no_padding)
                );
     }
 
@@ -226,49 +234,49 @@ namespace PGE_FileFormats_misc
     {
         std::string sout = base64_decode(source.toStdString());
         QString out;
-        out.setUtf16(reinterpret_cast<const unsigned short *>(sout.data()), sout.size() / 2);
+        out.setUtf16(reinterpret_cast<const uint16_t *>(sout.data()), static_cast<int>(sout.size() / 2));
         return out;
     }
-    QString      base64_encodeA(QString &source)
+    QString      base64_encodeA(QString &source, bool no_padding)
     {
         return QString::fromStdString(
                    base64_encode(reinterpret_cast<const unsigned char *>(source.toLatin1().data()),
-                                 source.size())
+                                 static_cast<size_t>(source.size()), no_padding)
                );
     }
 
     QString      base64_decodeA(QString &source)
     {
         std::string sout = base64_decode(source.toStdString());
-        return QString::fromLatin1(sout.data(), sout.size());
+        return QString::fromLatin1(sout.data(), static_cast<int>(sout.size()));
     }
 
-    QString      base64_encode(QString &source)
+    QString      base64_encode(QString &source, bool no_padding)
     {
         std::string out = source.toStdString();
         if((out.size() == 0) || (out[out.size() - 1] != '\0'))
             out.push_back('\0');
         return QString::fromStdString(
                    base64_encode(reinterpret_cast<const unsigned char *>(out.data()),
-                                 out.size())
+                                 out.size(), no_padding)
                );
     }
 
     QString      base64_decode(QString &source)
     {
         std::string sout = base64_decode(source.toStdString());
-        return QString::fromUtf8(sout.data(), sout.size());
+        return QString::fromUtf8(sout.data(), static_cast<int>(sout.size()));
     }
 
     #else
-    std::string  base64_encodeW(std::string &source)
+    std::string  base64_encodeW(std::string &source, bool no_padding)
     {
         SI_ConvertW<wchar_t> utf8(true);
         size_t new_len = utf8.SizeFromStore(source.c_str(), source.length());
         std::wstring t;
         t.resize(new_len);
         if(utf8.ConvertFromStore(source.c_str(), source.length(), (wchar_t *)t.c_str(), new_len))
-            return base64_encode(reinterpret_cast<const unsigned char *>(t.c_str()), t.size());
+            return base64_encode(reinterpret_cast<const unsigned char *>(t.c_str()), t.size(), no_padding);
         return "<fail to convert charset>";
     }
 
@@ -294,9 +302,9 @@ namespace PGE_FileFormats_misc
         return "<fail to convert charset>";
     }
 
-    std::string base64_encodeA(std::string &source)
+    std::string base64_encodeA(std::string &source, bool no_padding)
     {
-        return base64_encode(reinterpret_cast<const unsigned char *>(source.c_str()), source.size());
+        return base64_encode(reinterpret_cast<const unsigned char *>(source.c_str()), source.size(), no_padding);
     }
 
     std::string base64_decodeA(std::string &source)
@@ -305,12 +313,12 @@ namespace PGE_FileFormats_misc
     }
     #endif
 
-    std::string base64_encode(std::string const &source)
+    std::string base64_encode(std::string const &source, bool no_padding)
     {
-        return base64_encode(reinterpret_cast<const unsigned char *>(source.c_str()), source.size());
+        return base64_encode(reinterpret_cast<const uint8_t *>(source.c_str()), source.size(), no_padding);
     }
 
-    std::string base64_encode(unsigned char const *bytes_to_encode, unsigned int in_len)
+    std::string base64_encode(const uint8_t *bytes_to_encode, size_t in_len, bool no_padding)
     {
         std::string ret;
         int i = 0;
@@ -323,10 +331,10 @@ namespace PGE_FileFormats_misc
             char_array_3[i++] = *(bytes_to_encode++);
             if(i == 3)
             {
-                char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-                char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-                char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-                char_array_4[3] = char_array_3[2] & 0x3f;
+                char_array_4[0] = static_cast<uint8_t>((char_array_3[0] & 0xfc) >> 2);
+                char_array_4[1] = static_cast<uint8_t>(((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4));
+                char_array_4[2] = static_cast<uint8_t>(((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6));
+                char_array_4[3] = static_cast<uint8_t>(char_array_3[2] & 0x3f);
 
                 for(i = 0; (i < 4) ; i++)
                     ret += base64_chars[char_array_4[i]];
@@ -339,44 +347,45 @@ namespace PGE_FileFormats_misc
             for(j = i; j < 3; j++)
                 char_array_3[j] = '\0';
 
-            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-            char_array_4[3] = char_array_3[2] & 0x3f;
+            char_array_4[0] = static_cast<uint8_t>((char_array_3[0] & 0xfc) >> 2);
+            char_array_4[1] = static_cast<uint8_t>(((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4));
+            char_array_4[2] = static_cast<uint8_t>(((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6));
+            char_array_4[3] = static_cast<uint8_t>(char_array_3[2] & 0x3f);
 
             for(j = 0; (j < i + 1); j++)
                 ret += base64_chars[char_array_4[j]];
 
-            while((i++ < 3))
-                ret += '=';
+            while(i++ < 3)
+            {
+                if(!no_padding) ret += '=';
+            }
         }
+
         return ret;
     }
 
     std::string base64_decode(std::string const &encoded_string)
     {
-        int in_len = encoded_string.size();
-        int i = 0;
-        int j = 0;
-        int in_ = 0;
+        size_t in_len = encoded_string.size();
+        size_t i = 0;
+        size_t j = 0;
+        size_t in_ = 0;
         unsigned char char_array_4[4], char_array_3[3];
         std::string ret;
 
-        while(in_len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_]))
+        while(in_len-- && (encoded_string[in_] != '=') && is_base64(static_cast<uint8_t>(encoded_string[in_])))
         {
-            char_array_4[i++] = encoded_string[in_];
+            char_array_4[i++] = static_cast<uint8_t>(encoded_string[in_]);
             in_++;
             if(i == 4)
             {
                 for(i = 0; i < 4; i++)
-                    char_array_4[i] = base64_chars.find(char_array_4[i]);
-
-                char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-                char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-                char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
+                    char_array_4[i] = static_cast<uint8_t>(base64_chars.find(static_cast<char>(char_array_4[i])));
+                char_array_3[0] = static_cast<uint8_t>((char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4));
+                char_array_3[1] = static_cast<uint8_t>(((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2));
+                char_array_3[2] = static_cast<uint8_t>(((char_array_4[2] & 0x3) << 6) + char_array_4[3]);
                 for(i = 0; (i < 3); i++)
-                    ret += char_array_3[i];
+                    ret += static_cast<char>(char_array_3[i]);
                 i = 0;
             }
         }
@@ -387,14 +396,16 @@ namespace PGE_FileFormats_misc
                 char_array_4[j] = 0;
 
             for(j = 0; j < 4; j++)
-                char_array_4[j] = base64_chars.find(char_array_4[j]);
+                char_array_4[j] = static_cast<uint8_t>(base64_chars.find(static_cast<char>(char_array_4[j])));
 
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+            char_array_3[0] = static_cast<uint8_t>((char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4));
+            char_array_3[1] = static_cast<uint8_t>(((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2));
+            char_array_3[2] = static_cast<uint8_t>(((char_array_4[2] & 0x3) << 6) + char_array_4[3]);
 
-            for(j = 0; (j < i - 1); j++) ret += char_array_3[j];
+            for(j = 0; (j < i - 1); j++)
+                ret += static_cast<char>(char_array_3[j]);
         }
+
         //Remove zero from end
         if(ret.size() > 0)
         {
@@ -532,7 +543,7 @@ namespace PGE_FileFormats_misc
             len = static_cast<int64_t>(_data->size()) - _pos;
             _isEOF = true;
         }
-        PGESTRING buf(len + 1, '\0');
+        PGESTRING buf(static_cast<pge_size_t>(len + 1), '\0');
         #ifdef PGE_FILES_QT
         buf = _data->mid(static_cast<int>(_pos), static_cast<int>(len));
         #else
@@ -667,7 +678,7 @@ namespace PGE_FileFormats_misc
         if(mode == truncate)
             _data->clear();
         else if(mode == append)
-            _pos = _data->size();
+            _pos = static_cast<long long>(_data->size());
         return true;
     }
 
@@ -824,9 +835,9 @@ fillEnd:
     {
         #ifdef PGE_FILES_QT
         if(!file.isOpen()) return "";
-        char *buf = new char[len + 1];
+        char *buf = new char[static_cast<size_t>(len + 1)];
         buf[0] = '\0';
-        int gotten = file.read(buf, len);
+        int gotten = static_cast<int>(file.read(buf, static_cast<int>(len)));
         if(gotten >= 0)
             buf[gotten] = '\0';
         QString out(buf);
@@ -835,8 +846,8 @@ fillEnd:
         #else
         if(!stream)
             return "";
-        std::string buf(len + 1, '\0');
-        int lenR = fread(&buf[0], 1, len, stream);
+        std::string buf(static_cast<size_t>(len + 1), '\0');
+        size_t lenR = fread(&buf[0], 1, static_cast<size_t>(len), stream);
         (void)lenR;
         return buf;
         #endif
@@ -1097,7 +1108,7 @@ fillEnd:
         {
             #ifdef PGE_FILES_QT
             buffer.replace("\n", "\r\n");
-            writtenBytes = file.write(buffer.toLocal8Bit());
+            writtenBytes = static_cast<pge_size_t>(file.write(buffer.toLocal8Bit()));
             #else
             for(pge_size_t i = 0; i < buffer.size(); i++)
             {
@@ -1144,7 +1155,7 @@ fillEnd:
         #endif
     }
 
-    int TextFileOutput::seek(long long pos, TextOutput::positions relativeTo)
+    int TextFileOutput::seek(int64_t pos, TextOutput::positions relativeTo)
     {
         #ifdef PGE_FILES_QT
         (void)relativeTo;
@@ -1251,17 +1262,17 @@ fillEnd:
         #endif
 
         //Read directory path
-        i = filePath.size() - 1;
+        i = static_cast<int>(filePath.size() - 1);
         for(; i >= 0; i--)
         {
-            if((filePath[i] == '/') || (filePath[i] == '\\'))
+            if((filePath[static_cast<pge_size_t>(i)] == '/') || (filePath[static_cast<pge_size_t>(i)] == '\\'))
                 break;
         }
 
         if(i >= 0)
         {
             #ifndef PGE_FILES_QT
-            _dirpath = filePath.substr(0, i);
+            _dirpath = filePath.substr(0, static_cast<pge_size_t>(i));
             #else
             _dirpath = filePath.left(i);
             #endif
@@ -1271,7 +1282,7 @@ fillEnd:
         i = static_cast<int>(filePath.size()) - 1;
         for(; i > 0; i--)
         {
-            if(filePath[i] == '.')
+            if(filePath[static_cast<pge_size_t>(i)] == '.')
                 break;
         }
 
@@ -1280,14 +1291,20 @@ fillEnd:
         if(i == (static_cast<int>(filePath.size()) - 1))
             goto skipSuffix;
         for(; i < static_cast<int>(filePath.size()); i++)
-            _suffix.push_back(static_cast<char>(tolower(PGEGetChar(filePath[i]))));
+            _suffix.push_back(
+                        static_cast<char>(
+                            tolower(
+                                PGEGetChar(filePath[static_cast<pge_size_t>(i)])
+                            )
+                        )
+                    );
 skipSuffix:
 
         //Take file name without path
         i = static_cast<int>(filePath.size()) - 1;
         for(; i >= 0; i--)
         {
-            if((filePath[i] == '/') || (filePath[i] == '\\')) break;
+            if((filePath[static_cast<pge_size_t>(i)] == '/') || (filePath[static_cast<pge_size_t>(i)] == '\\')) break;
         }
         if(i > 0)
             i++;
@@ -1295,7 +1312,7 @@ skipSuffix:
         if(i >= (static_cast<int>(filePath.size()) - 1))
             goto skipFilename;
         for(; i < static_cast<int>(filePath.size()); i++)
-            _filename.push_back(filePath[i]);
+            _filename.push_back(filePath[static_cast<pge_size_t>(i)]);
 
 skipFilename:
         //Take base file name

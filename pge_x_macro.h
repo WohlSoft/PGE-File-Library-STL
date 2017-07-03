@@ -4,6 +4,8 @@
  * \brief Contains helper macroses for making PGE-X format based parsers
  *
  */
+
+#pragma once
 #ifndef PGE_X_MACRO_H
 #define PGE_X_MACRO_H
 

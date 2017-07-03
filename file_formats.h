@@ -20,7 +20,7 @@
  *  \brief Main header of PGE File Library which includes all provided features set
  */
 
-
+#pragma once
 #ifndef FILE_FORMATS_H
 #define FILE_FORMATS_H
 

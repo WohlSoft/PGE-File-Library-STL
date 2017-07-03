@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef PGE_FF_UNITS_H
 #define PGE_FF_UNITS_H
 
@@ -47,7 +48,9 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( (value * 10.0l) / 65.0l );
         case TimeUnit::Second:
             return static_cast<NumT>( value / 65.0l );
-        default: break;
+        default:;
+        case TimeUnit::FrameOneOf65sec:
+            return in;//Nothing to do
         };
     case TimeUnit::Millisecond:
         switch(into)
@@ -58,7 +61,9 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( value / 1000.0l );
         case TimeUnit::Second:
             return static_cast<NumT>( value / 10.0l );
-        default: break;
+        default:;
+        case TimeUnit::Millisecond:
+            return in;//Nothing to do
         };
     case TimeUnit::Decisecond:
         switch(into)
@@ -69,7 +74,9 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( value * 100.0l );
         case TimeUnit::Second:
             return static_cast<NumT>( value / 10.0l );
-        default: break;
+        default:;
+        case TimeUnit::Decisecond:
+            return in;//Nothing to do
         };
     case TimeUnit::Second:
         switch(into)
@@ -80,7 +87,9 @@ NumT TimeUnitsCVT(const NumT &in, TimeUnit from, TimeUnit into)
             return static_cast<NumT>( value * 1000.0l );
         case TimeUnit::Decisecond:
             return static_cast<NumT>( value * 10.0l );
-        default: break;
+        default:;
+        case TimeUnit::Second:
+            return in;//Nothing to do
         };
     };
     return in;

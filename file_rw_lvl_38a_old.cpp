@@ -574,7 +574,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 {
                     if(!SMBX64::IsUInt(cLine))
                         goto badfile;
-                    else npcdata.id = toInt(cLine);
+                    else npcdata.id = static_cast<uint64_t>(toInt(cLine));
                 }
                 break;
 
@@ -583,7 +583,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 {
                     if(!SMBX64::IsFloat(cLine))
                         goto badfile;
-                    else npcdata.x = (long)round(toFloat(cLine));
+                    else npcdata.x = static_cast<long>(std::round(toFloat(cLine)));
                 }
                 break;
 
@@ -592,7 +592,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 {
                     if(!SMBX64::IsFloat(cLine))
                         goto badfile;
-                    else npcdata.y = (long)round(toFloat(cLine));
+                    else npcdata.y = static_cast<long>(std::round(toFloat(cLine)));
                 }
                 break;
 
@@ -641,7 +641,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                             if(contID == 0)
                                 break;
 
-                            npcdata.contents = npcdata.id;
+                            npcdata.contents = static_cast<long>(npcdata.id);
 
                             switch(contID)
                             {

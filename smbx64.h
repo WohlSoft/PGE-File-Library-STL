@@ -20,6 +20,7 @@
  *  \brief Contains static class with SMBX64 standard file format fields validation and generation functions
  */
 
+#pragma once
 #ifndef SMBX64_H
 #define SMBX64_H
 

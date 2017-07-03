@@ -2029,12 +2029,13 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    script=script[***base64encode!***][utf-8]
         PGESTRING scriptT = script.script;
 
-        if(scriptT.size() > 0 && (PGEGetChar(scriptT[scriptT.size() - 1]) != '\n'))
-            scriptT.append("\n");
+        /* ********** Disabled appending "\n" until 38A will fix an inability to ignore empty lines in scripts ********** */
+        //if(scriptT.size() > 0 && (PGEGetChar(scriptT[scriptT.size() - 1]) != '\n'))
+        //    scriptT.append("\n");
 
         //Convert into CRLF
         PGE_ReplSTRING(scriptT, "\n", "\r\n");
-        out << "|" << PGE_BASE64ENC(scriptT);
+        out << "|" << PGE_BASE64ENC_nopad(scriptT);//"=" ending makes SMBX-38A fail to interpret scripts
         //    scriptu=script[***base64encode!***][ASCII]
         out << "\n";
     }

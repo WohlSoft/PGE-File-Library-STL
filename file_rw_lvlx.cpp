@@ -254,7 +254,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("UT", FileData.metaData.crash.untitled) //Untitled
                     PGEX_BoolVal("MD", FileData.metaData.crash.modifyed) //Modyfied
                     PGEX_SIntVal("FF", FileData.metaData.crash.fmtID) //Recent File format
-                    PGEX_SIntVal("FV", FileData.metaData.crash.fmtVer) //Recent File format version
+                    PGEX_UIntVal("FV", FileData.metaData.crash.fmtVer) //Recent File format version
                     PGEX_StrVal("N",  FileData.metaData.crash.filename)  //Filename
                     PGEX_StrVal("P",  FileData.metaData.crash.path)  //Path
                     PGEX_StrVal("FP", FileData.metaData.crash.fullPath)  //Full file Path

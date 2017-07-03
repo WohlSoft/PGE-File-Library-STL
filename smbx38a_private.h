@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef SMBX38A_PRIVATE_H
 #define SMBX38A_PRIVATE_H
 

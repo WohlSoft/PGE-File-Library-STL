@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SMBX64_MACRO_H
 #define SMBX64_MACRO_H
 

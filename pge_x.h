@@ -22,6 +22,7 @@
  *
  */
 
+#pragma once
 #ifndef PGE_X_H
 #define PGE_X_H
 

@@ -19,6 +19,7 @@
  * \file meta_filedata.h
  * \brief Contains defition of the common meta-data structures and classes
  */
+#pragma once
 #ifndef META_FILEDATA_H
 #define META_FILEDATA_H
 

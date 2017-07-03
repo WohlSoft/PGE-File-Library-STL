@@ -23,6 +23,7 @@
  *
  */
 
+#pragma once
 #ifndef SAVE_FILEDATA_H
 #define SAVE_FILEDATA_H
 

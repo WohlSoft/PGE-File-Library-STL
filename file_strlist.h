@@ -22,6 +22,7 @@
  *        which automatically splits lines by line feeds
  */
 
+#pragma once
 #ifndef FILE_STRLIST_H
 #define FILE_STRLIST_H
 

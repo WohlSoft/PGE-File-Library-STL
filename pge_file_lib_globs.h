@@ -4,9 +4,9 @@
     All defined here macroses are allows to build PGE File Library for both
     Qt and STL libraries set.
 */
-
-#ifndef _PGE_FILE_LIB_GLOBS_H
-#define _PGE_FILE_LIB_GLOBS_H
+#pragma once
+#ifndef PGE_FILE_LIB_GLOBS_H_
+#define PGE_FILE_LIB_GLOBS_H_
 
 /*! \def PGE_FILES_QT
     \brief If this macro is defined, Qt version of PGE File Library will be built
@@ -156,14 +156,14 @@ inline PGESTRING fromBoolToNum(bool num)
 namespace PGE_FileFormats_misc
 {
     PGESTRING    url_encode(const PGESTRING &sSrc);
-    std::string  base64_encode(unsigned char const *bytes_to_encode, unsigned int in_len);
-    std::string  base64_encode(std::string const &source);
+    std::string  base64_encode(uint8_t const *bytes_to_encode, size_t in_len, bool no_padding = false);
+    std::string  base64_encode(std::string const &source, bool no_padding = false);
     std::string  base64_decode(std::string const &encoded_string);
-    QString      base64_encode(QString &source);
+    QString      base64_encode(QString &source, bool no_padding = false);
     QString      base64_decode(QString &source);
-    QString      base64_encodeW(QString &source);
+    QString      base64_encodeW(QString &source, bool no_padding = false);
     QString      base64_decodeW(QString &source);
-    QString      base64_encodeA(QString &source);
+    QString      base64_encodeA(QString &source, bool no_padding = false);
     QString      base64_decodeA(QString &source);
 }
 inline PGESTRING PGE_URLENC(PGESTRING &src)
@@ -175,6 +175,7 @@ inline PGESTRING PGE_URLDEC(PGESTRING &src)
     return QUrl::fromPercentEncoding(src.toUtf8());
 }
 #define PGE_BASE64ENC(src)   PGE_FileFormats_misc::base64_encode(src)
+#define PGE_BASE64ENC_nopad(src)   PGE_FileFormats_misc::base64_encode(src, true)
 #define PGE_BASE64DEC(src)   PGE_FileFormats_misc::base64_decode(src)
 #define PGE_BASE64ENC_W(src) PGE_FileFormats_misc::base64_encodeW(src)
 #define PGE_BASE64DEC_W(src) PGE_FileFormats_misc::base64_decodeW(src)
@@ -223,12 +224,12 @@ namespace PGE_FileFormats_misc
     bool hasEnding(std::string const &fullString, std::string const &ending);
     PGESTRING url_encode(const PGESTRING &sSrc);
     PGESTRING url_decode(const std::string &sSrc);
-    std::string base64_encode(unsigned char const *bytes_to_encode, unsigned int in_len);
-    std::string base64_encode(std::string const &source);
+    std::string base64_encode(unsigned char const *bytes_to_encode, size_t in_len, bool no_padding = false);
+    std::string base64_encode(std::string const &source, bool no_padding = false);
     std::string base64_decode(std::string const &encoded_string);
-    std::string base64_encodeW(std::string &source);
+    std::string base64_encodeW(std::string &source, bool no_padding = false);
     std::string base64_decodeW(std::string &source);
-    std::string base64_encodeA(std::string &source);
+    std::string base64_encodeA(std::string &source, bool no_padding = false);
     std::string base64_decodeA(std::string &source);
 }
 inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGESTRING &sep)
@@ -313,6 +314,7 @@ inline PGESTRING fromBoolToNum(bool num)
 #define PGE_URLENC(src) PGE_FileFormats_misc::url_encode(src)
 #define PGE_URLDEC(src) PGE_FileFormats_misc::url_decode(src)
 #define PGE_BASE64ENC(src)   PGE_FileFormats_misc::base64_encode(src)
+#define PGE_BASE64ENC_nopad(src) PGE_FileFormats_misc::base64_encode(src, true)
 #define PGE_BASE64DEC(src)   PGE_FileFormats_misc::base64_decode(src)
 #define PGE_BASE64ENC_W(src) PGE_FileFormats_misc::base64_encodeW(src)
 #define PGE_BASE64DEC_W(src) PGE_FileFormats_misc::base64_decodeW(src)
@@ -687,7 +689,7 @@ namespace PGE_FileFormats_misc
              * \param pos Target position of carriage
              * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
              */
-            int seek(long long pos, positions relativeTo);
+            int seek(int64_t pos, positions relativeTo);
         private:
             bool m_forceCRLF;
 #ifdef PGE_FILES_QT
@@ -703,4 +705,4 @@ namespace PGE_FileFormats_misc
 
 }
 
-#endif // _PGE_FILE_LIB_GLOBS_H
+#endif // PGE_FILE_LIB_GLOBS_H_

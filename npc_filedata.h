@@ -21,6 +21,7 @@
  * \brief Contains defition of the SMBX64-NPC.txt config data structure
  */
 
+#pragma once
 #ifndef NPC_FILEDATA_H
 #define NPC_FILEDATA_H
 

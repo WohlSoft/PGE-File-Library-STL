@@ -21,6 +21,7 @@
  *  \brief Contains data structure definitions for a world map file data
  */
 
+#pragma once
 #ifndef WLD_FILEDATA_H
 #define WLD_FILEDATA_H
 

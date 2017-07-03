@@ -21,6 +21,7 @@
  *  \brief Contains data structure definitions for a level file data
  */
 
+#pragma once
 #ifndef LVL_FILEDATA_H
 #define LVL_FILEDATA_H
 

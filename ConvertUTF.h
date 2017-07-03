@@ -20,6 +20,10 @@
  * remains attached.
  */
 
+#pragma once
+#ifndef CONVERT_UTF_H
+#define CONVERT_UTF_H
+
 /* ---------------------------------------------------------------------
 
     Conversions between UTF32, UTF-16, and UTF-8.  Header file.
@@ -147,3 +151,4 @@ Boolean PGEFF_isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 #endif
 
 /* --------------------------------------------------------------------- */
+#endif //CONVERT_UTF_H

@@ -23,6 +23,7 @@
  *
  */
 
+#pragma once
 #ifndef CSVReader_H
 #define CSVReader_H
 
@@ -641,7 +642,7 @@ namespace CSVReader
             if(this->_currentCharIndex > StrTUtils::length(this->_currentLine))
                 throw parse_error("Expected " + std::to_string(this->_currentTotalFields) + " CSV-Fields, got "
                                   + std::to_string(this->_fieldTracker) + " at line "
-                                  + std::to_string(this->_lineTracker) + "!", this->_fieldTracker, this->_lineTracker);
+                                  + std::to_string(this->_lineTracker) + "!", this->_lineTracker, this->_fieldTracker);
         }
         template<class T, class... RestValues>
         void ReadNext(T nextVal, RestValues &&... restVals)

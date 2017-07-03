@@ -20,6 +20,7 @@
  *  \brief Contains definition of SMBX Engine settings data structure
  */
 
+#pragma once
 #ifndef SMBX64_CNF_FILEDATA_H
 #define SMBX64_CNF_FILEDATA_H
 
