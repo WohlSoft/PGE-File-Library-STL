@@ -1,4 +1,4 @@
-#PGE File Library v 0.3.1.12
+# PGE File Library v 0.3.1.13
 ----
 This library is a part of PGE Project.
 ----
@@ -37,9 +37,7 @@ You can read file as from file, also from the memory,
 you can use the openLevelFile() or openWorldFile() functions to open
 necessary file more convenient.
 
-==================================================
-SMBX files notes:
-==================================================
+# Notes for files of SMBX-64 format:
 1) If you saving file from raw data yourself, you must save a text file with CRLF
 for SMBX-* formats, or file will be not readable by SMBX Engine.
 You can write a file like binary, but when you detecting '\n' byte,
