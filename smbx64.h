@@ -375,7 +375,7 @@ namespace SMBX64
     inline PGESTRING WriteStr_multiline(PGESTRING input)
     {
         input = PGE_RemSubSTRING(input, "\t");
-        input = PGE_RemSubSTRING(input, "\"");
+        input = PGE_ReplSTRING(input, "\"", "'");
         return PGESTRING("\"")+input+PGESTRING("\"\n");
     }
 
