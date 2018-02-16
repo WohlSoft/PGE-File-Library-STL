@@ -1,4 +1,4 @@
-message("Path to PGE File Library is [${CMAKE_CURRENT_LIST_DIR}]")
+# message("Path to PGE File Library is [${CMAKE_CURRENT_LIST_DIR}]")
 include_directories(${CMAKE_CURRENT_LIST_DIR}/../)
 
 set(PGE_FILE_LIBRARY_SRCS)
