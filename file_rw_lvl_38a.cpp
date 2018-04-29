@@ -97,11 +97,30 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
 
             if(identifier == "A")
             {
+                PGESTRING s[4];
                 dataReader.ReadDataLine(CSVDiscard(), // Skip the first field (this is already "identifier")
                                         &FileData.stars,
                                         MakeCSVPostProcessor(&FileData.LevelName, PGEUrlDecodeFunc),
-                                        MakeCSVOptional(&FileData.LevelName, PGESTRING(""), nullptr, PGEUrlDecodeFunc),
-                                        MakeCSVOptional(&FileData.open_level_on_fail_warpID, 0u));
+                                        MakeCSVOptional(&FileData.open_level_on_fail, PGESTRING(""), nullptr, PGEUrlDecodeFunc),//3
+                                        MakeCSVOptionalEmpty(&FileData.open_level_on_fail_warpID, 0u),
+                                        MakeCSVOptionalSubReader(dataReader, ',',
+                                            MakeCSVOptional(&s[0], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
+                                            MakeCSVOptional(&s[1], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
+                                            MakeCSVOptional(&s[2], PGESTRING(""), nullptr, PGEUrlDecodeFunc),
+                                            MakeCSVOptional(&s[3], PGESTRING(""), nullptr, PGEUrlDecodeFunc)
+                                        ));
+
+                for(uint32_t i = 0; i < 4; i++)
+                {
+                    if(!IsEmpty(s[i]))
+                    {
+                        LevelData::MusicOverrider mo;
+                        mo.type = LevelData::MusicOverrider::SPECIAL;
+                        mo.id = (i + 1);
+                        mo.fileName = s[i];
+                        FileData.music_overrides.push_back(mo);
+                    }
+                }
             }
             else
                 dataReader.ReadDataLine();

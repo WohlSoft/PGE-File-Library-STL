@@ -166,12 +166,16 @@ namespace PGE_FileFormats_misc
     QString      base64_encodeA(QString &source, bool no_padding = false);
     QString      base64_decodeA(QString &source);
 }
-inline PGESTRING PGE_URLENC(PGESTRING &src)
+inline PGESTRING PGE_URLENC(const PGESTRING &src)
 {
     return PGE_FileFormats_misc::url_encode(src);
 }
-inline PGESTRING PGE_URLDEC(PGESTRING &src)
+inline PGESTRING PGE_URLDEC(const PGESTRING &src)
 {
+    /* Don't call fromPercentEncoding() on Windows with empty string,
+     * or crash will happen! */
+    if(IsEmpty(src))
+        return PGESTRING();
     return QUrl::fromPercentEncoding(src.toUtf8());
 }
 #define PGE_BASE64ENC(src)   PGE_FileFormats_misc::base64_encode(src)
