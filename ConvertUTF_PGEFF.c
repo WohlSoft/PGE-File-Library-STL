@@ -336,9 +336,9 @@ ConversionResult PGEFF_ConvertUTF16toUTF8(
 
         switch(bytesToWrite)    /* note: everything falls through. */
         {
-        case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-        case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-        case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+        case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
+        case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
+        case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
         case 1: *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);
         }
 
@@ -372,9 +372,9 @@ static Boolean isLegalUTF8(const UTF8 *source, int length)
     default:
         return False;
     /* Everything else falls through when "true"... */
-    case 4: if((a = (*--srcptr)) < 0x80 || a > 0xBF) return False;
-    case 3: if((a = (*--srcptr)) < 0x80 || a > 0xBF) return False;
-    case 2: if((a = (*--srcptr)) > 0xBF) return False;
+    case 4: if((a = (*--srcptr)) < 0x80 || a > 0xBF) return False;/*fallthrough*/
+    case 3: if((a = (*--srcptr)) < 0x80 || a > 0xBF) return False;/*fallthrough*/
+    case 2: if((a = (*--srcptr)) > 0xBF) return False;/*fallthrough*/
         switch(*source)
         {
         /* no fall-through in this inner switch */
@@ -383,7 +383,7 @@ static Boolean isLegalUTF8(const UTF8 *source, int length)
         case 0xF0: if(a < 0x90) return False; break;
         case 0xF4: if(a > 0x8F) return False; break;
         default:   if(a < 0x80) return False;
-        }
+        }/*fallthrough*/
     case 1:
         if(*source >= 0x80 && *source < 0xC2) return False;
     }
@@ -437,11 +437,11 @@ ConversionResult PGEFF_ConvertUTF8toUTF16(
          */
         switch(extraBytesToRead)
         {
-        case 5: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
-        case 4: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
-        case 3: ch += *source++; ch <<= 6;
-        case 2: ch += *source++; ch <<= 6;
-        case 1: ch += *source++; ch <<= 6;
+        case 5: ch += *source++; ch <<= 6;/*fallthrough*/ /* remember, illegal UTF-8 */
+        case 4: ch += *source++; ch <<= 6;/*fallthrough*/ /* remember, illegal UTF-8 */
+        case 3: ch += *source++; ch <<= 6;/*fallthrough*/
+        case 2: ch += *source++; ch <<= 6;/*fallthrough*/
+        case 1: ch += *source++; ch <<= 6;/*fallthrough*/
         case 0: ch += *source++;
         }
 
@@ -570,9 +570,9 @@ ConversionResult PGEFF_ConvertUTF32toUTF8(
 
         switch(bytesToWrite)    /* note: everything falls through. */
         {
-        case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-        case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-        case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+        case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
+        case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
+        case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
         case 1: *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);
         }
 
@@ -612,11 +612,11 @@ ConversionResult PGEFF_ConvertUTF8toUTF32(
          */
         switch(extraBytesToRead)
         {
-        case 5: ch += *source++; ch <<= 6;
-        case 4: ch += *source++; ch <<= 6;
-        case 3: ch += *source++; ch <<= 6;
-        case 2: ch += *source++; ch <<= 6;
-        case 1: ch += *source++; ch <<= 6;
+        case 5: ch += *source++; ch <<= 6;/*fallthrough*/
+        case 4: ch += *source++; ch <<= 6;/*fallthrough*/
+        case 3: ch += *source++; ch <<= 6;/*fallthrough*/
+        case 2: ch += *source++; ch <<= 6;/*fallthrough*/
+        case 1: ch += *source++; ch <<= 6;/*fallthrough*/
         case 0: ch += *source++;
         }
 

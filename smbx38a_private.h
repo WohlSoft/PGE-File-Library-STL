@@ -206,9 +206,9 @@ static inline PGESTRING SMBX38A_CC_encode(const int32_t &srcKey, const int64_t &
 {
     char keyBuf[6] = {0};
     char valueBuf[52] = {0};
-    int kb_l = std::snprintf(keyBuf, 5, "%04X", (const unsigned int)srcKey);
+    int kb_l = std::snprintf(keyBuf, 5, "%04X", static_cast<unsigned int>(srcKey));
     keyBuf[kb_l] = '\0';
-    int kv_l = std::snprintf(valueBuf, 51, "%X", (const unsigned int)srcValue);
+    int kv_l = std::snprintf(valueBuf, 51, "%X", static_cast<unsigned int>(srcValue));
     valueBuf[kv_l] = '\0';
     #ifdef PGE_FILES_QT
     return QString::fromUtf8(keyBuf, 4) + QString::fromUtf8(valueBuf, kv_l);
