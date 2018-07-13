@@ -4,7 +4,7 @@
 
 #include "CSVReader.h"
 
-#include "pge_file_lib_globs.h"
+#include "pge_file_lib_private.h"
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 

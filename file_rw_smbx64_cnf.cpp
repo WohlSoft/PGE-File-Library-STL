@@ -160,6 +160,8 @@ bool FileFormats::ReadSMBX64ConfigFile(PGE_FileFormats_misc::TextInput &in, SMBX
         FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;
         FileData.meta.ReadFileValid = false;
+        PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+        PGE_FilterBinary(FileData.meta.ERROR_linedata);
         return false;
     }
 }

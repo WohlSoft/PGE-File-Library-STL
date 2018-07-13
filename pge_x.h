@@ -27,6 +27,7 @@
 #define PGE_X_H
 
 #include "pge_file_lib_globs.h"
+#include "pge_file_lib_private.h"
 
 /*!
  * \brief Container of raw PGE-X data section

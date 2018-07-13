@@ -25,6 +25,7 @@
 #define SMBX64_H
 
 #include "pge_file_lib_globs.h"
+#include "pge_file_lib_private.h"
 
 /*!
  * \brief SMBX64 Standard validation and raw data conversion functions
@@ -126,28 +127,31 @@ namespace SMBX64
         *out = std::stoll(input);
         #endif
     }
+
     inline void ReadFloat(float*out, PGESTRING &input)
     {
         PGE_ReplSTRING(input, ",", ".");//Allow to parse floats of both comma and dot standard
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = input.toFloat(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to Float");
-        #else
+#else
         *out = std::stof(input);
-        #endif
+#endif
     }
+
     inline void ReadFloat(double*out, PGESTRING &input)
     {
         PGE_ReplSTRING(input, ",", ".");//Allow to parse floats of both comma and dot standard
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = input.toDouble(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to Float");
-        #else
+#else
         *out = std::stod(input);
-        #endif
+#endif
     }
+
     inline void ReadBool(bool*out, PGESTRING &input)
     {
         if(input == "0" || input == "") // FIXME: Is it correct? Or too hackish?
@@ -248,8 +252,6 @@ namespace SMBX64
             PGE_RemStrRng(target, target.size()-1, 1);
         target = PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
     }
-
-
 
 
     /*********************Validations**********************/

@@ -144,6 +144,8 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
         FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;
         FileData.meta.ReadFileValid = false;
+        PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+        PGE_FilterBinary(FileData.meta.ERROR_linedata);
         return false;
     }
 }
@@ -441,6 +443,8 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
         FileData.meta.ERROR_linenum  = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;
         FileData.meta.ReadFileValid  = false;
+        PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+        PGE_FilterBinary(FileData.meta.ERROR_linedata);
         return false;
     }
 }

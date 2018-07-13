@@ -22,7 +22,7 @@
 #endif
 
 #include "file_formats.h"
-#include "pge_file_lib_globs.h"
+#include "pge_file_lib_private.h"
 
 bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 {
@@ -50,7 +50,7 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
             return false;
         }
     }
-    else if( PGE_DetectSMBXFile( firstLine ) )
+    else if( PGE_FileFormats_misc::PGE_DetectSMBXFile( firstLine ) )
     {
         //Read SMBX LVL File
         if(!ReadSMBX64LvlFileF( filePath, FileData ))
@@ -99,7 +99,7 @@ bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData& data)
         //Read SMBX65-38A LVL File
         return ReadSMBX38ALvlFileHeader( filePath, data );
     }
-    else if( PGE_DetectSMBXFile(firstLine) )
+    else if( PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine) )
     {
         //Read SMBX LVL File
         return ReadSMBX64LvlFileHeader( filePath, data );
@@ -224,7 +224,7 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
             return false;
         }
     }
-    else if( PGE_DetectSMBXFile(firstLine) )
+    else if( PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine) )
     {
         //Read SMBX WLD File
         if(!ReadSMBX64WldFileF( filePath, data ))
@@ -273,7 +273,7 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
         //Read SMBX-38A WLD File
         return ReadSMBX38AWldFileHeader( filePath, data );
     }
-    else if( PGE_DetectSMBXFile(firstLine) )
+    else if( PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine) )
     {   //Read SMBX WLD File
         return ReadSMBX64WldFileHeader( filePath, data );
     }

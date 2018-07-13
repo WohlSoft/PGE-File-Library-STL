@@ -2426,5 +2426,7 @@ badfile:
     FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_format) + "format";
     FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
     FileData.meta.ERROR_linedata = line;
+    PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+    PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
 }

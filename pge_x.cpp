@@ -134,7 +134,10 @@ bool PGEFile::buildTreeFromRaw()
 
     if(sectionOpened)
     {
-        m_lastError = PGESTRING("Section [" + PGEXsection.first + "] is not closed");
+        PGESTRING errSect = PGEXsection.first;
+        PGE_CutLength(errSect, 20);
+        PGE_FilterBinary(errSect);
+        m_lastError = PGESTRING("Section [" + errSect + "] is not closed");
         return false;
     }
 

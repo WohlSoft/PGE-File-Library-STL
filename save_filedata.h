@@ -87,14 +87,14 @@ struct GamesaveData
 
     bool gameCompleted;   //!< Is episode was completed in last time
 
-    PGEVECTOR<saveCharState > characterStates;
+    PGELIST<saveCharState > characterStates;
     PGELIST<unsigned long > currentCharacter;
 
     //Visible state of world map items
-    PGEVECTOR<visibleItem > visibleLevels;
-    PGEVECTOR<visibleItem > visiblePaths;
-    PGEVECTOR<visibleItem > visibleScenery;
-    PGEVECTOR<starOnLevel > gottenStars;
+    PGELIST<visibleItem > visibleLevels;
+    PGELIST<visibleItem > visiblePaths;
+    PGELIST<visibleItem > visibleScenery;
+    PGELIST<starOnLevel > gottenStars;
 };
 
 #endif // SAVE_FILEDATA_H

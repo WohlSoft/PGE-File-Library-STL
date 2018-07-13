@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "pge_file_lib_globs.h"
+#include "pge_file_lib_private.h"
 #include "file_strlist.h"
 
 FileStringList::FileStringList()

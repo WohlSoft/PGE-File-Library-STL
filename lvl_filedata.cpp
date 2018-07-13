@@ -18,6 +18,7 @@
 
 #include "file_formats.h"
 #include "lvl_filedata.h"
+#include "pge_file_lib_private.h"
 
 #include <stack>
 

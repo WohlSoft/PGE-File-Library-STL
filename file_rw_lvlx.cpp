@@ -124,6 +124,8 @@ badfile:
     FileData.meta.ERROR_linenum = static_cast<long>(str_count);
     FileData.meta.ERROR_linedata = line;
     FileData.meta.ReadFileValid = false;
+    PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+    PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
 }
 
@@ -1442,6 +1444,8 @@ badfile:    //If file format is not correct
     FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
     FileData.meta.ERROR_linedata = line;
     FileData.meta.ReadFileValid = false;
+    PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+    PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
 }
 

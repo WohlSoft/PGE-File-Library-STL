@@ -58,7 +58,7 @@ struct SMBX64_ConfigFile
     FileFormatMeta meta;
 
     bool fullScreen;//>=16
-    PGEVECTOR<SMBX64_ConfigPlayer> players;
+    PGELIST<SMBX64_ConfigPlayer> players;
 };
 
 #endif // SMBX64_CNF_FILEDATA_H

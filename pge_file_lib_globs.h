@@ -50,331 +50,50 @@
 #ifdef PGE_FILES_QT
 #include <QString>
 #include <QStringList>
+#include <QList>
+#include <QPair>
 #include <QFile>
 #include <QTextStream>
-#include <QTextCodec>
-#include <QVector>
-#include <QPair>
-#include <QMap>
-#include <QHash>
-#include <QObject>
-#include <QUrl>
-#include <cmath>
-#if defined(PGE_ENGINE)||defined(PGE_EDITOR)
-#include <QSize>
-#endif
+
 #define PGE_FILES_INHERED public QObject
+
 typedef QString PGESTRING;
-typedef int     pge_size_t;
-inline PGESTRING PGESTR_Simpl(const PGESTRING &str)
-{
-    return str.simplified();
-}
-inline PGESTRING PGESTR_toLower(const PGESTRING &str)
-{
-    return str.toLower();
-}
-#define PGEGetChar(chr) chr.toLatin1()
-typedef QChar PGEChar;
 typedef QStringList PGESTRINGList;
-#define PGEVECTOR QVector
+typedef QChar   PGEChar;
 #define PGELIST QList
-typedef int pge_size_t;
+
 #define PGEPAIR QPair
-#define PGEMAP  QMap
-#define PGEHASH QHash
-typedef QFile PGEFILE;
-inline void PGE_SPLITSTRING(PGESTRINGList &dst, PGESTRING &src, PGESTRING sep)
-{
-    dst = src.split(sep);
-}
-inline PGESTRING PGE_ReplSTRING(PGESTRING &src, PGESTRING from, PGESTRING to)
-{
-    return src.replace(from, to);
-}
-inline PGESTRING PGE_RemSubSTRING(PGESTRING &src, PGESTRING substr)
-{
-    return src.remove(substr);
-}
-inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
-{
-    return str.remove(pos, len);
-}
-inline PGESTRING PGE_SubStr(PGESTRING &str, int pos, int len = -1)
-{
-    return str.mid(pos, len);
-}
-inline bool      IsNULL(const PGESTRING str)
-{
-    return str.isNull();
-}
-inline bool      IsEmpty(const PGESTRING &str)
-{
-    return str.isEmpty();
-}
-inline bool      IsEmpty(const PGESTRINGList &str)
-{
-    return str.isEmpty();
-}
-inline int       toInt(PGESTRING str)
-{
-    return str.toInt();
-}
-inline unsigned int toUInt(PGESTRING str)
-{
-    return str.toUInt();
-}
-inline long      toLong(PGESTRING str)
-{
-    return str.toLong();
-}
-inline unsigned long toULong(PGESTRING str)
-{
-    return str.toULong();
-}
-inline float     toFloat(PGESTRING str)
-{
-    return str.toFloat();
-}
-inline double    toDouble(PGESTRING str)
-{
-    return str.toDouble();
-}
-inline PGESTRING removeSpaces(PGESTRING src)
-{
-    return src.remove(' ');
-}
-template<typename T>
-PGESTRING fromNum(T num)
-{
-    return QString::number(num);
-}
-inline PGESTRING fromBoolToNum(bool num)
-{
-    return QString::number(static_cast<int>(num));
-}
-namespace PGE_FileFormats_misc
-{
-    PGESTRING    url_encode(const PGESTRING &sSrc);
-    std::string  base64_encode(uint8_t const *bytes_to_encode, size_t in_len, bool no_padding = false);
-    std::string  base64_encode(std::string const &source, bool no_padding = false);
-    std::string  base64_decode(std::string const &encoded_string);
-    QString      base64_encode(QString &source, bool no_padding = false);
-    QString      base64_decode(QString &source);
-    QString      base64_encodeW(QString &source, bool no_padding = false);
-    QString      base64_decodeW(QString &source);
-    QString      base64_encodeA(QString &source, bool no_padding = false);
-    QString      base64_decodeA(QString &source);
-}
-inline PGESTRING PGE_URLENC(const PGESTRING &src)
-{
-    return PGE_FileFormats_misc::url_encode(src);
-}
-inline PGESTRING PGE_URLDEC(const PGESTRING &src)
-{
-    /* Don't call fromPercentEncoding() on Windows with empty string,
-     * or crash will happen! */
-    if(IsEmpty(src))
-        return PGESTRING();
-    return QUrl::fromPercentEncoding(src.toUtf8());
-}
-#define PGE_BASE64ENC(src)   PGE_FileFormats_misc::base64_encode(src)
-#define PGE_BASE64ENC_nopad(src)   PGE_FileFormats_misc::base64_encode(src, true)
-#define PGE_BASE64DEC(src)   PGE_FileFormats_misc::base64_decode(src)
-#define PGE_BASE64ENC_W(src) PGE_FileFormats_misc::base64_encodeW(src)
-#define PGE_BASE64DEC_W(src) PGE_FileFormats_misc::base64_decodeW(src)
-#define PGE_BASE64ENC_A(src) PGE_FileFormats_misc::base64_encodeA(src)
-#define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
-#else
+
+#else /* PGE_FILES_QT */
+
 #include <string>
 #include <vector>
+#include <cstdio>
 #include <utility>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-#include <algorithm>
-#include <map>
-#include <cmath>
-#include <unordered_map>
+
 #define PGE_FILES_INGERED
-typedef std::string PGESTRING;
-typedef std::string::size_type pge_size_t;
-inline PGESTRING PGESTR_Simpl(PGESTRING str)
-{
-    str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
-    return str;
-}
-inline PGESTRING PGESTR_toLower(PGESTRING str)
-{
-    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-    return str;
-}
-#define PGEGetChar(chr) chr
+
+typedef std::string                 PGESTRING;
+typedef std::vector<std::string>    PGESTRINGList;
 typedef char PGEChar;
-typedef std::vector<std::string> PGESTRINGList;
-#define PGEVECTOR std::vector
 #define PGELIST std::vector
-typedef size_t pge_size_t;
+
 #define PGEPAIR std::pair
-#define PGEMAP  std::map
-#define PGEHASH std::unordered_map
-typedef std::fstream PGEFILE;
-namespace PGE_FileFormats_misc
-{
-    void split(std::vector<std::string> &dest, const std::string &str, const std::string& separator);
-    void replaceAll(std::string &str, const std::string &from, const std::string &to);
-    void RemoveSub(std::string &sInput, const std::string &sub);
-    bool hasEnding(std::string const &fullString, std::string const &ending);
-    PGESTRING url_encode(const PGESTRING &sSrc);
-    PGESTRING url_decode(const std::string &sSrc);
-    std::string base64_encode(unsigned char const *bytes_to_encode, size_t in_len, bool no_padding = false);
-    std::string base64_encode(std::string const &source, bool no_padding = false);
-    std::string base64_decode(std::string const &encoded_string);
-    std::string base64_encodeW(std::string &source, bool no_padding = false);
-    std::string base64_decodeW(std::string &source);
-    std::string base64_encodeA(std::string &source, bool no_padding = false);
-    std::string base64_decodeA(std::string &source);
-}
-inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGESTRING &sep)
-{
-    dst.clear();
-    PGE_FileFormats_misc::split(dst, src, sep);
-}
-inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
-{
-    PGE_FileFormats_misc::replaceAll(src, from, to);
-    return src;
-}
 
-inline PGESTRING PGE_RemSubSTRING(PGESTRING src, PGESTRING substr)
-{
-    PGE_FileFormats_misc::RemoveSub(src, substr);
-    return src;
-}
-inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
-{
-    str.erase(static_cast<size_t>(pos), static_cast<size_t>(len));
-    return str;
-}
-inline PGESTRING PGE_SubStr(PGESTRING &str, std::string::size_type pos, std::string::size_type len = std::string::npos)
-{
-    return str.substr(pos, len);
-}
-inline bool IsNULL(const PGESTRING str)
-{
-    return (str.empty());
-}
-inline bool IsEmpty(const PGESTRING &str)
-{
-    return str.empty();
-}
-inline bool IsEmpty(const PGESTRINGList &str)
-{
-    return str.empty();
-}
-inline int toInt(PGESTRING str)
-{
-    return std::atoi(str.c_str());
-}
-inline unsigned int toUInt(PGESTRING str)
-{
-    return static_cast<unsigned int>(std::atol(str.c_str()));
-}
-inline long toLong(PGESTRING str)
-{
-    return std::atol(str.c_str());
-}
-inline unsigned long toULong(PGESTRING str)
-{
-    return static_cast<unsigned long>(std::atoll(str.c_str()));
-}
-inline float toFloat(PGESTRING str)
-{
-    return static_cast<float>(std::atof(str.c_str()));
-}
-inline double toDouble(PGESTRING str)
-{
-    return std::atof(str.c_str());
-}
-inline PGESTRING removeSpaces(PGESTRING src)
-{
-    return PGE_RemSubSTRING(src, " ");
-}
-template<typename T>
-PGESTRING fromNum(T num)
-{
-    std::ostringstream n;
-    n << num;
-    return n.str();
-}
-
-inline PGESTRING fromBoolToNum(bool num)
-{
-    std::ostringstream n;
-    n << static_cast<int>(num);
-    return n.str();
-}
-#define PGE_URLENC(src) PGE_FileFormats_misc::url_encode(src)
-#define PGE_URLDEC(src) PGE_FileFormats_misc::url_decode(src)
-#define PGE_BASE64ENC(src)   PGE_FileFormats_misc::base64_encode(src)
-#define PGE_BASE64ENC_nopad(src) PGE_FileFormats_misc::base64_encode(src, true)
-#define PGE_BASE64DEC(src)   PGE_FileFormats_misc::base64_decode(src)
-#define PGE_BASE64ENC_W(src) PGE_FileFormats_misc::base64_encodeW(src)
-#define PGE_BASE64DEC_W(src) PGE_FileFormats_misc::base64_decodeW(src)
-#define PGE_BASE64ENC_A(src) PGE_FileFormats_misc::base64_encodeA(src)
-#define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
-#endif
-
-inline bool PGE_StartsWith(PGESTRING src, PGESTRING with)
-{
-#ifdef PGE_FILES_QT
-    return src.startsWith(with, Qt::CaseSensitive);
-#else
-    return !src.compare(0, with.size(), with);
-#endif
-}
-
-inline bool PGE_DetectSMBXFile(PGESTRING src)
-{
-    /*
-     * First line of SMBX1...64 file must contain number from 0 to 64
-     */
-    src.push_back('\n');//Append double line feed to end (for case if sent first line only)
-    src.push_back('\n');
-
-    if((src.size() < 3))
-        return false;//If line too short
-
-    if((src[1] != '\n') && (src[2] != '\n') &&
-       (src[1] != '\r') && (src[2] != '\r'))
-        return false;//If line contains no line feeds (also possible CRLF)
-
-    if((src[0] < '0') && (src[0] > '9'))
-        return false;//If first character is not numeric
-
-    if((src[1] != '\r') && (src[1] != '\n') && (src[1] < '0') && (src[1] > '9'))
-        return false;//If second character is not numeric and is not line feed
-
-    PGESTRING number;
-    number.push_back(src[0]);
-
-    if((src[1] != '\n') && (src[1] != '\r'))
-        number.push_back(src[1]);
-
-    int version = toInt(number);
-
-    if(version > 64)  //Unsupported version number!
-        return false;
-
-    return true;
-}
+#endif /* PGE_FILES_QT */
 
 /*!
  * Misc I/O classes used by PGE File Library internally
  */
 namespace PGE_FileFormats_misc
 {
+    /**
+     * @brief Check the header to identify valid SMBX64 file format
+     * @param src Header source string
+     * @return true if the header was identified as SMBX64 file
+     */
+    bool PGE_DetectSMBXFile(PGESTRING src);
+
     /*!
      * \brief Provides cross-platform file path calculation for a file names or paths
      */

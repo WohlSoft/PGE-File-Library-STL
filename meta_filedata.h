@@ -145,7 +145,7 @@ class CrashData
 struct MetaData
 {
     //! Array of all position bookmarks presented in the opened file
-    PGEVECTOR<Bookmark> bookmarks;
+    PGELIST<Bookmark> bookmarks;
 
     /* For Editor application only*/
 #ifdef PGE_EDITOR

@@ -164,4 +164,3 @@ bool SMBX64::IsQuotedString(PGESTRING in)
     if(i == 0) return QStrBAD; //This is INVERTED validator. If false - good, true - bad.
     return QStrGOOD;
 }
-

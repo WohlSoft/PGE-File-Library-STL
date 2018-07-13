@@ -18,6 +18,7 @@
 
 #include "file_formats.h"
 #include "file_strlist.h"
+#include "pge_file_lib_private.h"
 #include "pge_x.h"
 
 //*********************************************************
