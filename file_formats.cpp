@@ -71,13 +71,14 @@ PGESTRING FileFormats::getErrorString(FileFormats::ErrorCodes errCode)
 
 /***************************************************************************/
 #ifdef PGE_EDITOR
-CrashData::CrashData() : used(false), untitled(false), modifyed(false), fmtID(0), fmtVer(64) {}
+CrashData::CrashData() : used(false), untitled(false), modifyed(false), strictModeSMBX64(false), fmtID(0), fmtVer(64) {}
 
 CrashData::CrashData(const CrashData &_cd)
 {
     this->used = _cd.used;
     this->untitled = _cd.untitled;
     this->modifyed = _cd.modifyed;
+    this->strictModeSMBX64 = _cd.strictModeSMBX64;
     this->fmtID   = _cd.fmtID;
     this->fmtVer  = _cd.fmtVer;
     this->fullPath = _cd.fullPath;
@@ -90,6 +91,7 @@ CrashData::CrashData(CrashData &_cd)
     this->used = _cd.used;
     this->untitled = _cd.untitled;
     this->modifyed = _cd.modifyed;
+    this->strictModeSMBX64 = _cd.strictModeSMBX64;
     this->fmtID   = _cd.fmtID;
     this->fmtVer  = _cd.fmtVer;
     this->fullPath = _cd.fullPath;
@@ -102,6 +104,7 @@ void CrashData::reset()
     used = false;
     untitled = false;
     modifyed = false;
+    strictModeSMBX64 = false;
     fmtID   = 0;
     fmtVer  = 0;
     fullPath.clear();

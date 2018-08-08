@@ -126,6 +126,8 @@ class CrashData
         bool untitled;
         //! Is this level was modified before crash occouped?
         bool modifyed;
+        //! Turn on strict SMBX64 mode
+        bool strictModeSMBX64;
         //! Recent file format ID (specific enum in the format structure declaration)
         int fmtID;
         //! Recent file format version
