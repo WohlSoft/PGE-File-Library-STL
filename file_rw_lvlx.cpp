@@ -34,10 +34,32 @@ bool FileFormats::ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileD
 
     if(!inf.open(filePath, true))
     {
+        FileData.meta.ERROR_info = "Can't open file";
         FileData.meta.ReadFileValid = false;
         return false;
     }
 
+    return ReadExtendedLvlFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData)
+{
+    CreateLevelHeader(FileData);
+    FileData.meta.RecentFormat = LevelData::PGEX;
+    PGE_FileFormats_misc::RawTextInput inf;
+
+    if(!inf.open(rawdata, filePath))
+    {
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
+
+    return ReadExtendedLvlFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData)
+{
     PGESTRING line;
     int str_count = 0;
     bool valid = false;

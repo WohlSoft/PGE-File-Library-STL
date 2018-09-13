@@ -27,10 +27,6 @@
 bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 {
     PGE_FileFormats_misc::TextFileInput file;
-    PGESTRING firstLine;
-
-    FileData.meta.ERROR_info.clear();
-
     if(!file.open(filePath))
     {
         FileData.meta.ReadFileValid = false;
@@ -39,40 +35,53 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
         FileData.meta.ERROR_linenum = -1;
         return false;
     }
+    return OpenLevelFileT(file, FileData);
+}
+
+bool FileFormats::OpenLevelRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData)
+{
+    PGE_FileFormats_misc::RawTextInput file;
+    if(!file.open(&rawdata, filePath))
+    {
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        return false;
+    }
+    return OpenLevelFileT(file, FileData);
+}
+
+bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelData &FileData)
+{
+    PGESTRING firstLine;
+
+    FileData.meta.ERROR_info.clear();
     firstLine = file.read(8);
-    file.close();
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
         //Read SMBX65-38A LVL File
-        if(!ReadSMBX38ALvlFileF(filePath, FileData))
-        {
-            FileData.meta.ERROR_info = FileData.meta.ERROR_info;
+        if(!ReadSMBX38ALvlFile(file, FileData))
             return false;
-        }
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
         //Read SMBX LVL File
-        if(!ReadSMBX64LvlFileF(filePath, FileData))
-        {
-            FileData.meta.ERROR_info = FileData.meta.ERROR_info;
+        if(!ReadSMBX64LvlFile(file, FileData))
             return false;
-        }
     }
     else
     {
         //Read PGE LVLX File
-        if(!ReadExtendedLvlFileF(filePath, FileData))
-        {
-            FileData.meta.ERROR_info = FileData.meta.ERROR_info;
+        if(!ReadExtendedLvlFile(file, FileData))
             return false;
-        }
     }
 
-    if(PGE_FileFormats_misc::TextFileInput::exists(filePath + ".meta"))
+    if(PGE_FileFormats_misc::TextFileInput::exists(file.getFilePath() + ".meta"))
     {
-        if(! ReadNonSMBX64MetaDataF(filePath + ".meta", FileData.metaData))
+        if(!ReadNonSMBX64MetaDataF(file.getFilePath() + ".meta", FileData.metaData))
             FileData.meta.ERROR_info = "Can't open meta-file";
     }
 
@@ -82,7 +91,6 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData &data)
 {
     PGE_FileFormats_misc::TextFileInput file;
-    PGESTRING firstLine;
     data.meta.ERROR_info.clear();
 
     if(!file.open(filePath))
@@ -93,23 +101,45 @@ bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData &data)
         data.meta.ERROR_linenum = -1;
         return false;
     }
+    return OpenLevelFileHeaderT(file, data);
+}
+
+bool FileFormats::OpenLevelFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &data)
+{
+    PGE_FileFormats_misc::RawTextInput file;
+    data.meta.ERROR_info.clear();
+
+    if(!file.open(&rawdata, filePath))
+    {
+        data.meta.ReadFileValid = false;
+        data.meta.ERROR_info = "Can't open file";
+        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linenum = -1;
+        return false;
+    }
+    return OpenLevelFileHeaderT(file, data);
+}
+
+bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, LevelData &data)
+{
+    PGESTRING firstLine;
     firstLine = file.readLine();
-    file.close();
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
         //Read SMBX65-38A LVL File
-        return ReadSMBX38ALvlFileHeader(filePath, data);
+        return ReadSMBX38ALvlFileHeaderT(file, data);
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
         //Read SMBX LVL File
-        return ReadSMBX64LvlFileHeader(filePath, data);
+        return ReadSMBX64LvlFileHeaderT(file, data);
     }
     else
     {
         //Read PGE LVLX File
-        return ReadExtendedLvlFileHeader(filePath, data);
+        return ReadExtendedLvlFileHeaderT(file, data);
     }
 }
 

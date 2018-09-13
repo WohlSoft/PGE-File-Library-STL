@@ -43,11 +43,33 @@ bool FileFormats::ReadSMBX64LvlFileHeader(PGESTRING filePath, LevelData &FileDat
 
     if(!inf.open(filePath, false))
     {
+        FileData.meta.ERROR_info = "Can't open file";
         FileData.meta.ReadFileValid = false;
         return false;
     }
+    return ReadSMBX64LvlFileHeaderT(inf, FileData);
+}
 
-    PGE_FileFormats_misc::FileInfo in_1(filePath);
+bool FileFormats::ReadSMBX64LvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData)
+{
+    FileData.meta.ERROR_info.clear();
+    CreateLevelHeader(FileData);
+    FileData.meta.RecentFormat = LevelData::SMBX64;
+    FileData.meta.RecentFormatVersion = 64;
+    PGE_FileFormats_misc::RawTextInput inf;
+
+    if(!inf.open(&rawdata, filePath))
+    {
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
+    return ReadSMBX64LvlFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadSMBX64LvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData)
+{
+    PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
@@ -99,6 +121,8 @@ bool FileFormats::ReadSMBX64LvlFileHeader(PGESTRING filePath, LevelData &FileDat
         return false;
     }
 }
+
+
 
 bool FileFormats::ReadSMBX64LvlFileF(PGESTRING  filePath, LevelData &FileData)
 {

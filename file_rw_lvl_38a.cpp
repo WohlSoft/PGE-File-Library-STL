@@ -64,19 +64,43 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     FileData.meta.ERROR_info.clear();
     CreateLevelHeader(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
-    #if !defined(_MSC_VER) || _MSC_VER > 1800
     PGE_FileFormats_misc::TextFileInput inf;
-    uint32_t file_version = 0;
 
     if(!inf.open(filePath, false))
     {
+        FileData.meta.ERROR_info = "Can't open file";
         FileData.meta.ReadFileValid = false;
         return false;
     }
 
-    PGE_FileFormats_misc::FileInfo in_1(filePath);
+    return ReadSMBX38ALvlFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadSMBX38ALvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData)
+{
+    FileData.meta.ERROR_info.clear();
+    CreateLevelHeader(FileData);
+    FileData.meta.RecentFormat = LevelData::SMBX38A;
+    PGE_FileFormats_misc::RawTextInput inf;
+
+    if(!inf.open(rawdata, filePath))
+    {
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
+
+    return ReadSMBX38ALvlFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData)
+{
+#if !defined(_MSC_VER) || _MSC_VER > 1800
+    PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
+    uint32_t file_version = 0;
+
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
 
     try
@@ -152,12 +176,13 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
     FileData.CurSection = 0;
     FileData.playmusic = 0;
     return true;
-    #else
+#else
     FileData.meta.ReadFileValid = false;
     FileData.meta.ERROR_info = "Unsupported on MSVC2013";
     return false;
-    #endif
+#endif
 }
+
 
 bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
 {

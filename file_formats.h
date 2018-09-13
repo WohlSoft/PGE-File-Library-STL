@@ -127,6 +127,21 @@ public:
      * \return true if file successfully opened and parsed, false if error occouped
      */
     static bool OpenLevelFile(PGESTRING filePath, LevelData &FileData);
+    /**
+     * @brief Parses a level file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] rawdata Raw data of the supported level file
+     * @param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * @param [__out] FileData Level data structure
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenLevelRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    /**
+     * @brief Parses a level file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] file Input file descriptor
+     * @param [__out] FileData Level data structure
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelData &FileData);
     /*!
      * \brief Parses a level file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * \param [__in] filePath Full path to file which must be opened
@@ -134,6 +149,21 @@ public:
      * \return true if file successfully opened and parsed, false if error occouped
      */
     static bool OpenLevelFileHeader(PGESTRING filePath, LevelData &data);
+    /**
+     * @brief Parses a level file data header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] rawdata Input raw data
+     * @param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * @param [__out] data Level data structure (with initialized header data only)
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenLevelFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &data);
+    /**
+     * @brief Parses a level file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] file Input file descriptor
+     * @param [__out] data Level data structure (with initialized header data only)
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, LevelData &data);
     /*!
      * \brief Save a level file to the disk
      * \param [__in] FileData Level data structure
@@ -146,7 +176,7 @@ public:
     /*!
      * \brief Save a level file to the raw string
      * \param FileData Level data structure
-     * \param filePath Path to file to save encoded in UTF-8 (for STL-version)
+     * \param RawData Raw data string where to save levele file data
      * \param format Target file format (PGE LVLX, SMBX1...64 LVL, SMBX-38A LVL)
      * \param FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if data successfully generated
@@ -162,6 +192,21 @@ public:
      */
     static bool ReadSMBX64LvlFileHeader(PGESTRING filePath, LevelData &FileData);
     /*!
+     * \brief Parses SMBX1...64 level file header and skips other part of a file
+     * \param [__in] rawdata Raw data of the supported level file
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param [__out]  FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX64LvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    /*!
+     * \brief Parses SMBX1...64 level file header and skips other part of a file
+     * \param [__in] inf Input file descriptor
+     * \param [__out] FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX64LvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData);
+    /*!
      * \brief Parses SMBX1...64 level file data
      * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
      * \param [__out] FileData Level data structure
@@ -172,14 +217,14 @@ public:
      * \brief Parses SMBX1...64 level file data
      * \param [__in] rawdata Raw data of the SMBX1...64 level file
      * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
-     * \param [__Out] FileData
+     * \param [__Out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadSMBX64LvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath, LevelData &FileData);
     /*!
-     * \brief ReadSMBX64LvlFile
-     * \param [__in] in
-     * \param [__out] FileData
+     * \brief Parses SMBX1...64 level file data
+     * \param [__in] in Input file descriptor
+     * \param [__out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelData /*output*/ &FileData);
@@ -216,6 +261,22 @@ public:
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileData);
+    /*!
+     * \brief Parses SMBX-38A level file header and skips other part of a file
+     * \param [__in] rawdata Raw data of the supported level file
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38ALvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    /*!
+     * \brief Parses SMBX-38A level file header and skips other part of a file
+     * \param [__in] inf Input file descriptor
+     * \param [__out] FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData);
+
     /*!
      * \brief Parses SMBX-38A level file data from file
      * \param [__in] filePath Full path to flie
@@ -277,6 +338,21 @@ public:
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileData);
+    /*!
+     * \brief Parses PGE-X Level file header from the file
+     * \param [__in] rawdata Raw data of the supported level file
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param [__out]  FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    /*!
+     * \brief Parses PGE-X Level file header from the file
+     * \param [__in] inf Input file descriptor
+     * \param [__out] FileData Level data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData);
     /*!
      * \brief Parses PGE-X level file data from file
      * \param [__in] filePath Full path to the file
