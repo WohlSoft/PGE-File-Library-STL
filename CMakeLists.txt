@@ -32,6 +32,15 @@ endif()
 option(PGEFL_QT_SUPPORT "Build also Qt variant" ${OPT_DEF_PGEFL_QT_SUPPORT})
 if(PGEFL_QT_SUPPORT)
     message("== PGE-FL Qt Edition WILL be built!")
+    if(POLICY CMP0071) # Automoc
+        cmake_policy(SET CMP0071 NEW)
+    endif()
+    # Tell CMake to run moc when necessary:
+    set(CMAKE_AUTOMOC ON)
+
+    # As moc files are generated in the binary dir, tell CMake
+    # to always look for includes there:
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
 else()
     message("== PGE-FL Qt Edition is disabled")
 endif()

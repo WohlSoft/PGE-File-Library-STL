@@ -104,7 +104,7 @@ environment:
 build_script:
   - md build-%COMPILER%-%BUILD_TYPE%-%PLATFORM%
   - cd build-%COMPILER%-%BUILD_TYPE%-%PLATFORM%
-  - if [%COMPILER%]==[MinGW] set PATH=C:\MinGW\bin;%PATH:C:\Program Files\Git\usr\bin;=%
+  - if [%COMPILER%]==[MinGW] set PATH=C:\Qt\Tools\mingw530_32\bin;%PATH:C:\Program Files\Git\usr\bin;=%
   - if [%COMPILER%]==[MinGW-w32] set PATH=C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin;%PATH:C:\Program Files\Git\usr\bin;=%
   - if [%COMPILER%]==[MinGW-w64] set PATH=C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
   - cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%QT_PATH% -DPGEFL_QT_SUPPORT=%QT_BUILD% -DCMAKE_INSTALL_PREFIX=PGE-FL ..
