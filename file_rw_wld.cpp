@@ -63,7 +63,7 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
 
         nextLine();
         SMBX64::ReadStr(&FileData.EpisodeTitle, line); //Episode name
-        #if 0 //More detail header!
+#if 0 //More detail header!
         if(ge(55))
         {
             nextLine();
@@ -123,7 +123,7 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
             FileData.authors += (IsEmpty(FileData.author4)) ? "" : FileData.author4 + "\n";
             FileData.authors += (IsEmpty(FileData.author5)) ? "" : FileData.author5;
         }
-        #endif
+#endif
 
         FileData.meta.ReadFileValid = true;
         in.close();
@@ -136,11 +136,11 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
             FileData.meta.ERROR_info = "Detected file format: SMBX-" + fromNum(file_format) + " is invalid\n";
         else
             FileData.meta.ERROR_info = "It is not an SMBX world map file\n";
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         FileData.meta.ERROR_info += QString::fromStdString(exception_to_pretty_string(err));
-        #else
+#else
         FileData.meta.ERROR_info += exception_to_pretty_string(err);
-        #endif
+#endif
         FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;
         FileData.meta.ReadFileValid = false;
@@ -433,11 +433,11 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             FileData.meta.ERROR_info = "Detected file format: SMBX-" + fromNum(file_format) + " is invalid\n";
         else
             FileData.meta.ERROR_info = "It is not an SMBX world map file\n";
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         FileData.meta.ERROR_info += QString::fromStdString(exception_to_pretty_string(err));
-        #else
+#else
         FileData.meta.ERROR_info += exception_to_pretty_string(err);
-        #endif
+#endif
         FileData.meta.ERROR_linenum  = in.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;
         FileData.meta.ReadFileValid  = false;
