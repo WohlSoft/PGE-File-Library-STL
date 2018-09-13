@@ -35,7 +35,7 @@ struct LevelEvent_layers
 
 bool FileFormats::ReadSMBX64LvlFileHeader(PGESTRING filePath, LevelData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     CreateLevelHeader(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX64;
     FileData.meta.RecentFormatVersion = 64;
@@ -911,12 +911,12 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
 
 bool FileFormats::WriteSMBX64LvlFileF(PGESTRING filePath, LevelData &FileData, unsigned int file_format)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileOutput file;
 
     if(!file.open(filePath, false, true, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Fail to open file for write";
+        FileData.meta.ERROR_info = "Fail to open file for write";
         return false;
     }
 
@@ -925,12 +925,12 @@ bool FileFormats::WriteSMBX64LvlFileF(PGESTRING filePath, LevelData &FileData, u
 
 bool FileFormats::WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int file_format)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextOutput file;
 
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open raw string for write";
+        FileData.meta.ERROR_info = "Failed to open raw string for write";
         return false;
     }
 

@@ -164,13 +164,12 @@ badfile:
 
 bool FileFormats::ReadExtendedWldFileF(PGESTRING  filePath, WorldData &FileData)
 {
-    errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
+    FileData.meta.ERROR_info.clear();
 
     if(!file.open(filePath, true))
     {
-        errorString = "Failed to open file for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open file for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -182,13 +181,12 @@ bool FileFormats::ReadExtendedWldFileF(PGESTRING  filePath, WorldData &FileData)
 
 bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  WorldData &FileData)
 {
-    errorString.clear();
     PGE_FileFormats_misc::RawTextInput file;
+    FileData.meta.ERROR_info.clear();
 
     if(!file.open(&rawdata, filePath))
     {
-        errorString = "Failed to open raw string for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open raw string for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -200,7 +198,7 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath
 
 bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, WorldData &FileData)
 {
-    //PGESTRING errorString;
+    PGESTRING errorString;
     PGEX_FileBegin();
     PGESTRING filePath = in.getFilePath();
     CreateWorldData(FileData);
@@ -428,7 +426,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
         }//LEVELS
     }
     ///////////////////////////////////////EndFile///////////////////////////////////////
-    errorString.clear(); //If no errors, clear string;
+    FileData.meta.ERROR_info.clear(); //If no errors, clear string;
     FileData.meta.ReadFileValid = true;
     return true;
 badfile:    //If file format not corrects
@@ -449,12 +447,12 @@ badfile:    //If file format not corrects
 
 bool FileFormats::WriteExtendedWldFileF(PGESTRING filePath, WorldData &FileData)
 {
-    errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
+    FileData.meta.ERROR_info.clear();
 
     if(!file.open(filePath, true, false, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open file for write";
+        FileData.meta.ERROR_info = "Failed to open file for write";
         return false;
     }
 
@@ -463,12 +461,12 @@ bool FileFormats::WriteExtendedWldFileF(PGESTRING filePath, WorldData &FileData)
 
 bool FileFormats::WriteExtendedWldFileRaw(WorldData &FileData, PGESTRING &rawdata)
 {
-    errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
+    FileData.meta.ERROR_info.clear();
 
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open raw string for write";
+        FileData.meta.ERROR_info = "Failed to open raw string for write";
         return false;
     }
 

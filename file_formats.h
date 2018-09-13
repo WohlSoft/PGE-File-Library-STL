@@ -970,8 +970,6 @@ public:
      *         If string has no double quotes at edges, input string will be retured with no changes
      */
     static PGESTRING        removeQuotes(PGESTRING str);
-    //! String which contains info about last happened error
-    static PGESTRING        errorString;
 };
 
 #endif // FILE_FORMATS_H

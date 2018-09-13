@@ -33,6 +33,7 @@
 struct NPCConfigFile
 {
     bool        ReadFileValid = false;
+    PGESTRING   errorString;
     PGESTRING   unknownLines;
 
 /*

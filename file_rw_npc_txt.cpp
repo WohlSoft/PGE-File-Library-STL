@@ -27,11 +27,11 @@
 //*********************************************************
 bool FileFormats::ReadNpcTXTFileF(PGESTRING filePath, NPCConfigFile &FileData, bool IgnoreBad)
 {
-    errorString.clear();
+    FileData.errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
     if(!file.open(filePath, false))
     {
-        errorString = "Failed to open file for read";
+        FileData.errorString = "Failed to open file for read";
         FileData.ReadFileValid = false;
         return false;
     }
@@ -40,11 +40,11 @@ bool FileFormats::ReadNpcTXTFileF(PGESTRING filePath, NPCConfigFile &FileData, b
 
 bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData, bool IgnoreBad)
 {
-    errorString.clear();
+    FileData.errorString.clear();
     PGE_FileFormats_misc::RawTextInput file;
     if(!file.open(&rawdata))
     {
-        errorString = "Failed to open raw string for read";
+        FileData.errorString = "Failed to open raw string for read";
         FileData.ReadFileValid = false;
         return false;
     }
@@ -271,9 +271,10 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
 bool FileFormats::WriteNPCTxtFileF(PGESTRING filePath, NPCConfigFile &FileData)
 {
     PGE_FileFormats_misc::TextFileOutput file;
+    FileData.errorString.clear();
     if(!file.open(filePath, false, true, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open file for write";
+        FileData.errorString = "Failed to open file for write";
         return false;
     }
     return WriteNPCTxtFile(file, FileData);
@@ -282,9 +283,10 @@ bool FileFormats::WriteNPCTxtFileF(PGESTRING filePath, NPCConfigFile &FileData)
 bool FileFormats::WriteNPCTxtFileRaw(NPCConfigFile &FileData, PGESTRING &rawdata)
 {
     PGE_FileFormats_misc::RawTextOutput file;
+    FileData.errorString.clear();
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open target raw string for write";
+        FileData.errorString = "Failed to open target raw string for write";
         return false;
     }
     return WriteNPCTxtFile(file, FileData);

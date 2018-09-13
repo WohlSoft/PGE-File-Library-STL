@@ -24,7 +24,6 @@
 #include <common_features/themes.h>
 #endif
 
-PGESTRING FileFormats::errorString = "";
 
 PGESTRING FileFormats::removeQuotes(PGESTRING str)
 {

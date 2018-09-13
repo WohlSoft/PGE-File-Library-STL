@@ -64,7 +64,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
 {
     SMBX38A_FileBegin();
     PGESTRING filePath = in.getFilePath();
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     CreateLevelData(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     FileData.LevelName = "";

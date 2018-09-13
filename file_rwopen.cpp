@@ -26,16 +26,17 @@
 
 bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 {
-    errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
     PGESTRING firstLine;
+
+    FileData.meta.ERROR_info.clear();
+
     if(!file.open(filePath))
     {
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info="Can't open file";
-        FileData.meta.ERROR_linedata="";
-        FileData.meta.ERROR_linenum=-1;
-        errorString = FileData.meta.ERROR_info;
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
         return false;
     }
     firstLine = file.read(8);
@@ -46,7 +47,7 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
         //Read SMBX65-38A LVL File
         if(!ReadSMBX38ALvlFileF( filePath, FileData ))
         {
-            errorString = FileData.meta.ERROR_info;
+            FileData.meta.ERROR_info = FileData.meta.ERROR_info;
             return false;
         }
     }
@@ -55,7 +56,7 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
         //Read SMBX LVL File
         if(!ReadSMBX64LvlFileF( filePath, FileData ))
         {
-            errorString = FileData.meta.ERROR_info;
+            FileData.meta.ERROR_info = FileData.meta.ERROR_info;
             return false;
         }
     }
@@ -63,15 +64,15 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
     {   //Read PGE LVLX File
         if(!ReadExtendedLvlFileF( filePath, FileData ))
         {
-            errorString = FileData.meta.ERROR_info;
+            FileData.meta.ERROR_info = FileData.meta.ERROR_info;
             return false;
         }
     }
 
-    if(PGE_FileFormats_misc::TextFileInput::exists(filePath+".meta"))
+    if(PGE_FileFormats_misc::TextFileInput::exists(filePath + ".meta"))
     {
         if( ! ReadNonSMBX64MetaDataF( filePath+".meta", FileData.metaData ) )
-            errorString = "Can't open meta-file";
+            FileData.meta.ERROR_info = "Can't open meta-file";
     }
 
     return true;
@@ -79,16 +80,16 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 
 bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData& data)
 {
-    errorString.clear();
-
     PGE_FileFormats_misc::TextFileInput file;
     PGESTRING firstLine;
+    data.meta.ERROR_info.clear();
+
     if(!file.open(filePath))
     {
         data.meta.ReadFileValid = false;
-        data.meta.ERROR_info="Can't open file";
-        data.meta.ERROR_linedata="";
-        data.meta.ERROR_linenum=-1;
+        data.meta.ERROR_info = "Can't open file";
+        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linenum = -1;
         return false;
     }
     firstLine = file.readLine();
@@ -113,7 +114,7 @@ bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData& data)
 
 bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFileFormat format, unsigned int FormatVersion)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     switch(format)
     {
     case LVL_PGEX:
@@ -121,7 +122,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
             smbx64CountStars(FileData);
             if(!FileFormats::WriteExtendedLvlFileF(filePath, FileData))
             {
-                errorString="Cannot save file "+filePath+".";
+                FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
                 return false;
             }
             return true;
@@ -134,7 +135,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
 
             if(!FileFormats::WriteSMBX64LvlFileF( filePath, FileData, FormatVersion))
             {
-                errorString="Cannot save file "+filePath+".";
+                FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
                 return false;
             }
 
@@ -143,7 +144,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
             {
                 if(!FileFormats::WriteNonSMBX64MetaDataF(filePath+".meta", FileData.metaData))
                 {
-                    errorString="Cannot save file "+filePath+".meta.";
+                    FileData.meta.ERROR_info += "Cannot save file " + filePath + ".meta.";
                     return false;
                 }
             }
@@ -154,20 +155,20 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
         {
             if(!FileFormats::WriteSMBX38ALvlFileF(filePath, FileData))
             {
-                errorString="Cannot save file "+filePath+".";
+                FileData.meta.ERROR_info = "Cannot save file " + filePath + ".";
                 return false;
             }
             return true;
         }
         //break;
     }
-    errorString = "Unsupported file type";
+    FileData.meta.ERROR_info = "Unsupported file type";
     return false;
 }
 
 bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     switch(format)
     {
     case LVL_PGEX:
@@ -191,7 +192,8 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
         }
         //break;
     }
-    errorString = "Unsupported file type";
+    FileData.meta.ERROR_info = "Unsupported file type";
+    FileData.meta.ReadFileValid = false;
     return false;
 }
 
@@ -199,15 +201,15 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
 
 bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
 {
-    errorString.clear();
+    data.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
 
     PGESTRING firstLine;
     if(!file.open(filePath))
     {
-        data.meta.ERROR_info="Can't open file";
-        data.meta.ERROR_linedata="";
-        data.meta.ERROR_linenum=-1;
+        data.meta.ERROR_info = "Can't open file";
+        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linenum = -1;
         data.meta.ReadFileValid = false;
         return false;
     }
@@ -219,34 +221,25 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
     {
         //Read SMBX-38A WLD File
         if(!ReadSMBX38AWldFileF( filePath, data ))
-        {
-            errorString = data.meta.ERROR_info;
             return false;
-        }
     }
     else if( PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine) )
     {
         //Read SMBX WLD File
         if(!ReadSMBX64WldFileF( filePath, data ))
-        {
-            errorString = data.meta.ERROR_info;
             return false;
-        }
     }
     else
     {
         //Read PGE WLDX File
         if(!ReadExtendedWldFileF( filePath, data ))
-        {
-            errorString = data.meta.ERROR_info;
             return false;
-        }
     }
 
     if( PGE_FileFormats_misc::TextFileInput::exists(filePath+".meta") )
     {
-        if( ! ReadNonSMBX64MetaDataF( filePath+".meta", data.metaData ) )
-            errorString = "Can't open meta-file";
+        if(!ReadNonSMBX64MetaDataF(filePath + ".meta", data.metaData))
+            data.meta.ERROR_info = "Can't open meta-file";
     }
 
     return true;
@@ -254,8 +247,9 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
 
 bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
 {
-    errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
+    data.meta.ERROR_info.clear();
+
     if(!file.open(filePath))
     {
         data.meta.ERROR_info = "Can't open file";
@@ -264,11 +258,12 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
         data.meta.ReadFileValid = false;
         return false;
     }
+
     PGESTRING firstLine;
     firstLine = file.readLine();
     file.close();
 
-    if( PGE_StartsWith(firstLine, "SMBXFile") )
+    if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
         //Read SMBX-38A WLD File
         return ReadSMBX38AWldFileHeader( filePath, data );
@@ -285,14 +280,14 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData& data)
 
 bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFormats::WorldFileFormat format, unsigned int FormatVersion)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     switch(format)
     {
     case WLD_PGEX:
         {
             if(!FileFormats::WriteExtendedWldFileF(filePath, FileData))
             {
-                errorString="Cannot save file "+filePath+".";
+                FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
                 return false;
             }
             return true;
@@ -302,7 +297,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFor
         {
             if(!FileFormats::WriteSMBX64WldFileF( filePath, FileData, FormatVersion))
             {
-                errorString="Cannot save file "+filePath+".";
+                FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
                 return false;
             }
 
@@ -311,7 +306,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFor
             {
                 if(!FileFormats::WriteNonSMBX64MetaDataF(filePath+".meta", FileData.metaData))
                 {
-                    errorString="Cannot save file "+filePath+".meta.";
+                    FileData.meta.ERROR_info += "Cannot save file " + filePath + ".meta.";
                     return false;
                 }
             }
@@ -322,20 +317,20 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFor
         {
             if(!FileFormats::WriteSMBX38AWldFileF(filePath, FileData))
             {
-                errorString = "Cannot save file " + filePath + ".";
+                FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
                 return false;
             }
             return true;
         }
         //break;
     }
-    errorString = "Unsupported file type";
+    FileData.meta.ERROR_info = "Unsupported file type";
     return false;
 }
 
 bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFormats::WorldFileFormat format, unsigned int FormatVersion)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     switch(format)
     {
     case WLD_PGEX:
@@ -357,7 +352,7 @@ bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFor
         }
         //break;
     }
-    errorString = "Unsupported file type";
+    FileData.meta.ERROR_info = "Unsupported file type";
     return false;
 }
 

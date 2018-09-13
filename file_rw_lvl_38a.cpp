@@ -61,7 +61,7 @@ const int SMBX38A_NpcGeneratorDirections[29] =
 
 bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     CreateLevelHeader(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     #if !defined(_MSC_VER) || _MSC_VER > 1800
@@ -161,13 +161,12 @@ bool FileFormats::ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileDa
 
 bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
 
     if(!file.open(filePath, false))
     {
-        errorString = "Failed to open file for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open file for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -179,13 +178,12 @@ bool FileFormats::ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData)
 
 bool FileFormats::ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  LevelData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextInput file;
 
     if(!file.open(&rawdata, filePath))
     {
-        errorString = "Failed to open raw string for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open raw string for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -209,7 +207,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 {
     SMBX38A_FileBeginN();
     PGESTRING filePath = in.getFilePath();
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     CreateLevelData(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     #if !defined(_MSC_VER) || _MSC_VER > 1800
@@ -1177,12 +1175,12 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
 bool FileFormats::WriteSMBX38ALvlFileF(PGESTRING filePath, LevelData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileOutput file;
 
     if(!file.open(filePath, false, true, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open file for write";
+        FileData.meta.ERROR_info = "Failed to open file for write";
         return false;
     }
 
@@ -1191,12 +1189,12 @@ bool FileFormats::WriteSMBX38ALvlFileF(PGESTRING filePath, LevelData &FileData)
 
 bool FileFormats::WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextOutput file;
 
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open raw string for write";
+        FileData.meta.ERROR_info = "Failed to open raw string for write";
         return false;
     }
 

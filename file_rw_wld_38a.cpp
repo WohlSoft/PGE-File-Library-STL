@@ -31,7 +31,7 @@
 
 bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     CreateWorldHeader(FileData);
     FileData.meta.RecentFormat = WorldData::SMBX38A;
     #if !defined(_MSC_VER) || _MSC_VER > 1800
@@ -186,13 +186,12 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
 
 bool FileFormats::ReadSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
 
     if(!file.open(filePath, false))
     {
-        errorString = "Failed to open file for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open file for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -204,13 +203,12 @@ bool FileFormats::ReadSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
 
 bool FileFormats::ReadSMBX38AWldFileRaw(PGESTRING& rawdata, PGESTRING filePath, WorldData& FileData)
 {
-    errorString.clear();
     PGE_FileFormats_misc::RawTextInput file;
+    FileData.meta.ERROR_info.clear();
 
     if(!file.open(&rawdata, filePath))
     {
-        errorString = "Failed to open raw string for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open raw string for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -224,7 +222,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 {
     SMBX38A_FileBeginN();
     PGESTRING filePath = in.getFilePath();
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
 
     CreateWorldData(FileData);
 
@@ -794,12 +792,12 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 
 bool FileFormats::WriteSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
 {
-    errorString.clear();
     PGE_FileFormats_misc::TextFileOutput file;
+    FileData.meta.ERROR_info.clear();
 
     if(!file.open(filePath, false, true, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open file for write";
+        FileData.meta.ERROR_info = "Failed to open file for write";
         return false;
     }
 
@@ -808,12 +806,12 @@ bool FileFormats::WriteSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
 
 bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata)
 {
-    errorString.clear();
     PGE_FileFormats_misc::RawTextOutput file;
+    FileData.meta.ERROR_info.clear();
 
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open raw string for write";
+        FileData.meta.ERROR_info = "Failed to open raw string for write";
         return false;
     }
 
@@ -823,8 +821,7 @@ bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata
 bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, WorldData& FileData)
 {
     (void)out;
-    errorString = "Not implemented yet. Comming soon!";
-    FileData.meta.ERROR_info = errorString;
+    FileData.meta.ERROR_info = "Not implemented yet. Comming soon!";
     FileData.meta.ERROR_linedata = "";
     FileData.meta.ERROR_linenum = -1;
     FileData.meta.ReadFileValid = false;

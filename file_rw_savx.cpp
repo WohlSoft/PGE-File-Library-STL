@@ -31,13 +31,12 @@
 //*********************************************************
 bool FileFormats::ReadExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
 
     if(!file.open(filePath, true))
     {
-        errorString = "Failed to open file for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open file for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -49,13 +48,12 @@ bool FileFormats::ReadExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileDa
 
 bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, PGESTRING filePath, GamesaveData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextInput file;
 
     if(!file.open(&rawdata, filePath))
     {
-        errorString = "Failed to open raw string for read";
-        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_info = "Failed to open raw string for read";
         FileData.meta.ERROR_linedata = "";
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
@@ -246,12 +244,12 @@ badfile:    //If file format not corrects
 
 bool FileFormats::WriteExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileData)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileOutput file;
 
     if(!file.open(filePath, true, false, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open file for write";
+        FileData.meta.ERROR_info = "Failed to open file for write";
         return false;
     }
 
@@ -260,12 +258,12 @@ bool FileFormats::WriteExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileD
 
 bool FileFormats::WriteExtendedSaveFileRaw(GamesaveData &FileData, PGESTRING &rawdata)
 {
-    errorString.clear();
+    FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextOutput file;
 
     if(!file.open(&rawdata, PGE_FileFormats_misc::TextOutput::truncate))
     {
-        errorString = "Failed to open raw string for write";
+        FileData.meta.ERROR_info = "Failed to open raw string for write";
         return false;
     }
 
