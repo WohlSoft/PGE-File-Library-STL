@@ -9,21 +9,27 @@ environment:
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\mingw53_32
     - BUILD_TYPE: Release
       COMPILER: MinGW
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\mingw53_32
     - BUILD_TYPE: Debug
       COMPILER: MinGW-w64
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: x64
+      QT_BUILD: OFF
     - BUILD_TYPE: Release
       COMPILER: MinGW-w64
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: x64
+      QT_BUILD: OFF
     - BUILD_TYPE: Debug
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -31,6 +37,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
       PLATFORM: x64
       PLATFORMTOOLSET: "v140_xp"
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\msvc2015_64
     - BUILD_TYPE: Release
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -38,6 +46,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
       PLATFORM: x64
       PLATFORMTOOLSET: "v140_xp"
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\msvc2015_64
     - BUILD_TYPE: Debug
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -45,6 +55,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
       PLATFORM: Win32
       PLATFORMTOOLSET: "v140_xp"
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\msvc2015
     - BUILD_TYPE: Release
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -52,6 +64,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
       PLATFORM: Win32
       PLATFORMTOOLSET: "v140_xp"
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\msvc2015
     - BUILD_TYPE: Debug
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
@@ -59,6 +73,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
       PLATFORM: x64
       PLATFORMTOOLSET: "v141_xp"
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\msvc2017_64
     - BUILD_TYPE: Release
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
@@ -66,6 +82,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
       PLATFORM: x64
       PLATFORMTOOLSET: "v141_xp"
+      QT_BUILD: ON
+      QT_PATH: C:\Qt\5.11.1\msvc2017_64
     - BUILD_TYPE: Debug
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
@@ -73,6 +91,7 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
       PLATFORM: Win32
       PLATFORMTOOLSET: "v141_xp"
+      QT_BUILD: OFF
     - BUILD_TYPE: Release
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
@@ -80,6 +99,7 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
       PLATFORM: Win32
       PLATFORMTOOLSET: "v141_xp"
+      QT_BUILD: OFF
 
 build_script:
   - md build-%COMPILER%-%BUILD_TYPE%-%PLATFORM%
@@ -87,7 +107,7 @@ build_script:
   - if [%COMPILER%]==[MinGW] set PATH=C:\MinGW\bin;%PATH:C:\Program Files\Git\usr\bin;=%
   - if [%COMPILER%]==[MinGW-w32] set PATH=C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin;%PATH:C:\Program Files\Git\usr\bin;=%
   - if [%COMPILER%]==[MinGW-w64] set PATH=C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin;%PATH:C:\Program Files\Git\usr\bin;=%
-  - cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=. -DCMAKE_INSTALL_PREFIX=PGE-FL ..
+  - cmake -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%QT_PATH% -DPGEFL_QT_SUPPORT=%QT_BUILD% -DCMAKE_INSTALL_PREFIX=PGE-FL ..
   - if [%COMPILER_FAMILY%]==[MinGW] cmake --build . --config %BUILD_TYPE% -- -j 2
   - if [%COMPILER_FAMILY%]==[MinGW] mingw32-make install
   - if [%COMPILER_FAMILY%]==[MSVC] cmake --build . --config %BUILD_TYPE% --target install
