@@ -169,7 +169,7 @@ bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath
 
 bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)
 {
-    PGESTRING errorString;
+    //PGESTRING errorString;
     PGESTRING filePath = in.getFilePath();
     PGESTRING line;  /*Current Line data*/
     //LevelData FileData;
@@ -825,7 +825,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                                 errorString = "Invalid Section Autoscroll value type";
 
                                 if(PGEFile::IsBool(param[1]))
-                                    sectionSet.autoscrol = static_cast<bool>(toInt(param[1]));
+                                    sectionSet.autoscrol = static_cast<bool>(toInt(param[1]) != 0);
                                 else
                                     goto badfile;
                             }
@@ -1252,7 +1252,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                                 errorString = "Invalid Spawn Effect Gravity value type";
 
                                 if(PGEFile::IsBool(param[1]))
-                                    spawnEffect.gravity = static_cast<bool>(toInt(param[1]));
+                                    spawnEffect.gravity = static_cast<bool>(toInt(param[1]) != 0);
                                 else
                                     goto badfile;
                             }

@@ -686,7 +686,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         case 15:
                         case 39:
                         case 86: //Bind "Is Boss" flag for supported NPC's
-                            npcdata.is_boss = (bool)npcdata.special_data;
+                            npcdata.is_boss = static_cast<bool>(npcdata.special_data != 0);
                             npcdata.special_data = 0;
 
                         default:
@@ -1199,7 +1199,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsUInt(dLine))
                                 goto badfile;
-                            else doordata.locked = (bool)toInt(dLine);
+                            else doordata.locked = static_cast<bool>(toInt(dLine) != 0);
                         }
                         break;
 
@@ -1208,7 +1208,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsUInt(dLine))
                                 goto badfile;
-                            else doordata.novehicles = (bool)toInt(dLine);
+                            else doordata.novehicles = static_cast<bool>(toInt(dLine) != 0);
                         }
                         break;
 
@@ -1217,7 +1217,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsUInt(dLine))
                                 goto badfile;
-                            else doordata.allownpc = (bool)toInt(dLine);
+                            else doordata.allownpc = static_cast<bool>(toInt(dLine) != 0);
                         }
                         break;
 
@@ -1226,7 +1226,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsUInt(dLine))
                                 goto badfile;
-                            else doordata.need_a_bomb = (bool)toInt(dLine);
+                            else doordata.need_a_bomb = static_cast<bool>(toInt(dLine) != 0);
                         }
                         break;
 
@@ -1235,7 +1235,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsUInt(dLine))
                                 goto badfile;
-                            else doordata.hide_entering_scene = (bool)toInt(dLine);
+                            else doordata.hide_entering_scene = static_cast<bool>(toInt(dLine) != 0);
                         }
                         break;
 
@@ -1244,7 +1244,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsUInt(dLine))
                                 goto badfile;
-                            else doordata.allownpc_interlevel = (bool)toInt(dLine);
+                            else doordata.allownpc_interlevel = static_cast<bool>(toInt(dLine) != 0);
                         }
                         break;
 
@@ -1254,7 +1254,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsUInt(dLine))
                                 goto badfile;
-                            else doordata.special_state_required = (bool)toInt(dLine);
+                            else doordata.special_state_required = static_cast<bool>(toInt(dLine) != 0);
                         }
                         break;
 
@@ -1296,7 +1296,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 {
                     if(!SMBX64::IsUInt(cLine))
                         goto badfile;
-                    else doordata.lvl_i = (bool)toInt(cLine);
+                    else doordata.lvl_i = static_cast<bool>(toInt(cLine) != 0);
 
                     doordata.isSetIn = ((doordata.lvl_i) ? false : true);
                 }
@@ -1307,7 +1307,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 {
                     if(!SMBX64::IsFloat(cLine))
                         goto badfile;
-                    else doordata.world_x = (long)round(toFloat(cLine));
+                    else doordata.world_x = static_cast<long>(round(toFloat(cLine)));
                 }
                 break;
 
@@ -1325,7 +1325,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 {
                     if(!SMBX64::IsUInt(cLine))
                         goto badfile;
-                    else doordata.lvl_o = (bool)toInt(cLine);
+                    else doordata.lvl_o = static_cast<bool>(toInt(cLine) != 0);
 
                     doordata.isSetOut = (((doordata.lvl_o) ? false : true) || (doordata.lvl_i));
                 }

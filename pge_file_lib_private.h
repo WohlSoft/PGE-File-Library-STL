@@ -233,9 +233,9 @@ inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
     str.erase(static_cast<size_t>(pos), static_cast<size_t>(len));
     return str;
 }
-inline PGESTRING PGE_SubStr(PGESTRING &str, std::string::size_type pos, std::string::size_type len = std::string::npos)
+inline PGESTRING PGE_SubStr(PGESTRING &str, int pos, int len = -1)
 {
-    return str.substr(pos, len);
+    return str.substr(static_cast<std::string::size_type>(pos), static_cast<std::string::size_type>(len));
 }
 inline void PGE_CutLength(PGESTRING &str, int maxlength)
 {
@@ -273,7 +273,7 @@ inline int toInt(PGESTRING str)
 }
 inline unsigned int toUInt(PGESTRING str)
 {
-    return static_cast<unsigned int>(std::atol(str.c_str()));
+    return static_cast<unsigned int>(std::stoul(str.c_str(), NULL, 10));
 }
 inline long toLong(PGESTRING str)
 {

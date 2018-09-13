@@ -544,7 +544,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 case 15:
                 case 39:
                 case 86: //Bind "Is Boss" flag for supported NPC's
-                    npcdata.is_boss = static_cast<bool>(npcdata.special_data);
+                    npcdata.is_boss = static_cast<bool>(npcdata.special_data != 0);
                     npcdata.special_data = 0;
                     break;
                 default:
@@ -1255,21 +1255,21 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //s3=Starman Music Filename[***urlencode!***]
         //s4=MegaMushroom Music Filename[***urlencode!***]
         PGESTRING s[4];
-        for(pge_size_t i = 0; i < FileData.music_overrides.size(); i++)
+        for(pge_size_t it = 0; it < FileData.music_overrides.size(); it++)
         {
-            LevelData::MusicOverrider &mo = FileData.music_overrides[i];
+            LevelData::MusicOverrider &mo = FileData.music_overrides[it];
             if(mo.type == LevelData::MusicOverrider::SPECIAL)
             {
                 if(mo.id < 4)
-                    s[i] = mo.fileName;
+                    s[it] = mo.fileName;
             }
         }
 
-        for(int i = 0; i < 4; i++)
+        for(int it = 0; it < 4; it++)
         {
-            if(i > 0)
+            if(it > 0)
                 out << ",";
-            out << PGE_URLENC(s[i]);
+            out << PGE_URLENC(s[it]);
         }
     }
 

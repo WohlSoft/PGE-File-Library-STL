@@ -117,14 +117,14 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
             else if(data[i][0] == "HB") //Hub Styled
             {
                 if(PGEFile::IsBool(data[i][1]))
-                    FileData.HubStyledWorld = static_cast<bool>(toInt(data[i][1]));
+                    FileData.HubStyledWorld = static_cast<bool>(toInt(data[i][1]) != 0);
                 else
                     goto badfile;
             }
             else if(data[i][0] == "RL") //Restart level on fail
             {
                 if(PGEFile::IsBool(data[i][1]))
-                    FileData.restartlevel = static_cast<bool>(toInt(data[i][1]));
+                    FileData.restartlevel = static_cast<bool>(toInt(data[i][1]) != 0);
                 else
                     goto badfile;
             }
@@ -200,7 +200,7 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath
 
 bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, WorldData &FileData)
 {
-    PGESTRING errorString;
+    //PGESTRING errorString;
     PGEX_FileBegin();
     PGESTRING filePath = in.getFilePath();
     CreateWorldData(FileData);

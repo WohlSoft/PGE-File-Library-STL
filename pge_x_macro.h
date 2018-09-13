@@ -90,7 +90,7 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
     \brief Parse boolean flag value by requested Marker and write into target variable
 */
 #define PGEX_BoolVal(Mark, targetValue)  if(v.marker==Mark) { if(PGEFile::IsBool(v.value)) \
-                                         targetValue = static_cast<bool>(toInt(v.value));\
+                                         targetValue = static_cast<bool>(toInt(v.value) != 0);\
                                          else goto badfile; }
 
 /*! \def PGEX_BoolArrVal(Mark, targetValue)

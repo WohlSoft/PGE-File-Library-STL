@@ -102,7 +102,7 @@ bool FileFormats::ReadSMBX64LvlFileHeader(PGESTRING filePath, LevelData &FileDat
 
 bool FileFormats::ReadSMBX64LvlFileF(PGESTRING  filePath, LevelData &FileData)
 {
-    errorString.clear();
+    PGESTRING errorString;
     PGE_FileFormats_misc::TextFileInput file;
 
     if(!file.open(filePath, false))
@@ -120,7 +120,7 @@ bool FileFormats::ReadSMBX64LvlFileF(PGESTRING  filePath, LevelData &FileData)
 
 bool FileFormats::ReadSMBX64LvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  LevelData &FileData)
 {
-    errorString.clear();
+    PGESTRING errorString;
     PGE_FileFormats_misc::RawTextInput file;
 
     if(!file.open(&rawdata, filePath))
@@ -140,7 +140,6 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
 {
     SMBX64_FileBegin();
     PGESTRING filePath = in.getFilePath();
-    errorString.clear();
     //SMBX64_File( RawData );
     int i;                  //counters
     CreateLevelData(FileData);
@@ -857,8 +856,8 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
 
                     if(((events.move_camera_x != 0.0) || (events.move_camera_y != 0.0)) && (events.scroll_section < static_cast<long>(events.sets.size())))
                     {
-                        pge_size_t section = static_cast<pge_size_t>(events.scroll_section);
-                        LevelEvent_Sets &set = events.sets[section];
+                        pge_size_t scroll_section = static_cast<pge_size_t>(events.scroll_section);
+                        LevelEvent_Sets &set = events.sets[scroll_section];
                         set.autoscrol = true;
                         set.autoscrol_x = static_cast<float>(events.move_camera_x);
                         set.autoscrol_y = static_cast<float>(events.move_camera_y);
