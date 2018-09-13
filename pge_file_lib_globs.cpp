@@ -730,7 +730,7 @@ void RawTextOutput::close()
 int RawTextOutput::write(PGESTRING buffer)
 {
     if(!_data) return -1;
-    int written = 0;
+    int64_t written = 0;
 fillEnd:
     if(_pos >= static_cast<int64_t>(_data->size()))
     {
@@ -750,7 +750,7 @@ fillEnd:
         if(!IsEmpty(buffer))
             goto fillEnd;
     }
-    return written;
+    return static_cast<int>(written);
 }
 
 int64_t RawTextOutput::tell()
@@ -852,7 +852,7 @@ bool TextFileInput::open(PGESTRING filePath, bool utf8)
     #else
     (void)utf8;
     stream = utf8_fopen(filePath.c_str(), "rb");
-    return (bool)stream;
+    return (stream != NULL);
     #endif
 }
 
@@ -1001,7 +1001,7 @@ bool TextFileInput::eof()
     #ifdef PGE_FILES_QT
     return stream.atEnd();
     #else
-    return feof(stream);
+    return (feof(stream) != 0);
     #endif
 }
 
@@ -1053,7 +1053,7 @@ int TextFileInput::seek(int64_t pos, TextFileInput::positions relativeTo)
         s = SEEK_SET;
         break;
     }
-    return fseek(stream, pos, s);
+    return fseek(stream, static_cast<long>(pos), static_cast<int>(s));
     #endif
 }
 
@@ -1219,7 +1219,7 @@ int TextFileOutput::seek(int64_t pos, TextOutput::positions relativeTo)
         s = SEEK_SET;
         break;
     }
-    return fseek(stream, pos, s);
+    return fseek(stream, static_cast<long>(pos), static_cast<int>(s));
     #endif
 }
 

@@ -83,7 +83,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING file
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     PGE_FileFormats_misc::RawTextInput inf;
 
-    if(!inf.open(rawdata, filePath))
+    if(!inf.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Can't open file";
         FileData.meta.ReadFileValid = false;

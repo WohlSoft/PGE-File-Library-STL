@@ -137,7 +137,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
                 dest = 0;
             else
             {
-                dest = static_cast<bool>(toInt(input));
+                dest = static_cast<bool>(toInt(input) != 0);
                 dest_en = true;
             }
         }

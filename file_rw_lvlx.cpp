@@ -48,7 +48,7 @@ bool FileFormats::ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING fil
     FileData.meta.RecentFormat = LevelData::PGEX;
     PGE_FileFormats_misc::RawTextInput inf;
 
-    if(!inf.open(rawdata, filePath))
+    if(!inf.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Can't open file";
         FileData.meta.ReadFileValid = false;
@@ -63,7 +63,7 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
     PGESTRING line;
     int str_count = 0;
     bool valid = false;
-    PGE_FileFormats_misc::FileInfo in_1(filePath);
+    PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
 #define NextLine(line) str_count++;line = inf.readLine();
