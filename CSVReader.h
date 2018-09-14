@@ -39,6 +39,11 @@
 
 #include "invoke_default.hpp"
 
+#ifdef _MSC_VER
+#pragma warning (disable: 4244)
+#pragma warning (disable: 4503)
+#endif
+
 namespace CSVReader
 {
     // ========= Exceptions START ===========

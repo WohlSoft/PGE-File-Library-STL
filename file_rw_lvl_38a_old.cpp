@@ -1656,13 +1656,13 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         eventdata.sets.push_back(set);
                     }
 
-                    int evSetsSize = ev_sections.size();
+                    int evSetsSize = int(ev_sections.size());
 
                     if(evSetsSize < (signed)ev_bgs.size())
-                        evSetsSize = ev_bgs.size();
+                        evSetsSize = int(ev_bgs.size());
 
                     if(evSetsSize < (signed)ev_musics.size())
-                        evSetsSize = ev_musics.size();
+                        evSetsSize = int(ev_musics.size());
 
                     for(int j = 0; j < evSetsSize; j++)
                     {
@@ -1684,7 +1684,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                 {
                                     if(id < 0) goto badfile; //Missmatched section ID!
 
-                                    int last = eventdata.sets.size() - 1;
+                                    int last = int(eventdata.sets.size()) - 1;
 
                                     while(id >= (signed)eventdata.sets.size())
                                     {
@@ -1843,7 +1843,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                 {
                                     if(id < 0) goto badfile; //Missmatched section ID!
 
-                                    int last = eventdata.sets.size() - 1;
+                                    int last = int(eventdata.sets.size()) - 1;
 
                                     while(id >= (signed)eventdata.sets.size())
                                     {
@@ -1927,7 +1927,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                 {
                                     if(id < 0) goto badfile; //Missmatched section ID!
 
-                                    int last = eventdata.sets.size() - 1;
+                                    int last = int(eventdata.sets.size()) - 1;
 
                                     while(id >= (signed)eventdata.sets.size())
                                     {

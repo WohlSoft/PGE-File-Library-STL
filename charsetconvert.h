@@ -3,6 +3,10 @@
 
 #define SI_NO_MBSTOWCS_NULL
 
+#ifdef _MSC_VER
+#pragma warning (disable: 4127)
+#endif
+
 #define SI_Case     SI_GenericCase
 #define SI_NoCase   SI_GenericNoCase
 

@@ -249,7 +249,7 @@ namespace SMBX64
         if(target[0] == PGEChar('\"'))
             PGE_RemStrRng(target, 0, 1);
         if( (!IsEmpty(target)) && (target[target.size()-1] == PGEChar('\"')) )
-            PGE_RemStrRng(target, target.size()-1, 1);
+            PGE_RemStrRng(target, int(target.size() - 1), 1);
         target = PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
     }
 
@@ -323,7 +323,7 @@ namespace SMBX64
         if(target[0]==PGEChar('\"'))
             PGE_RemStrRng(target, 0, 1);
         if((!IsEmpty(target)) && (target[target.size()-1]==PGEChar('\"')))
-            PGE_RemStrRng(target, target.size()-1, 1);
+            PGE_RemStrRng(target, int(target.size() - 1), 1);
         target=PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
         return target;
     }

@@ -179,6 +179,15 @@ inline PGESTRING PGE_URLDEC(const PGESTRING &src)
 #include <cmath>
 #include <unordered_map>
 
+#ifdef _MSC_VER
+static char ToLowerFun(char ch)
+{
+    return static_cast<char>(::tolower(ch));
+}
+#else
+#define ToLowerFun ::tolower
+#endif
+
 typedef std::string::size_type pge_size_t;
 inline PGESTRING PGESTR_Simpl(PGESTRING str)
 {
@@ -187,7 +196,7 @@ inline PGESTRING PGESTR_Simpl(PGESTRING str)
 }
 inline PGESTRING PGESTR_toLower(PGESTRING str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    std::transform(str.begin(), str.end(), str.begin(), ToLowerFun);
     return str;
 }
 #define PGEGetChar(chr) chr

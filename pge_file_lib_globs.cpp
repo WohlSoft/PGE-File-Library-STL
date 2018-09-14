@@ -66,7 +66,7 @@ static std::wstring Str2WStr(const std::string &str)
 {
     std::wstring dest;
     dest.resize(str.size());
-    int newlen = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &dest[0], str.length());
+    int newlen = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), int(str.length()), &dest[0], int(str.length()));
     dest.resize(newlen);
     return dest;
 }
@@ -75,7 +75,7 @@ static std::string WStr2Str(const std::wstring &wstr)
 {
     std::string dest;
     dest.resize((wstr.size() * 2));
-    int newlen = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), &dest[0], dest.size(), NULL, NULL);
+    int newlen = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), int(wstr.length()), &dest[0], int(dest.size()), NULL, NULL);
     dest.resize(newlen);
     return dest;
 }
@@ -84,8 +84,8 @@ FILE *utf8_fopen(const char *file, const char *mode)
 {
     wchar_t wfile[MAX_PATH + 1];
     wchar_t wmode[21];
-    int wfile_len = strlen(file);
-    int wmode_len = strlen(mode);
+    int wfile_len = int(strlen(file));
+    int wmode_len = int(strlen(mode));
     wfile_len = MultiByteToWideChar(CP_UTF8, 0, file, wfile_len, wfile, MAX_PATH);
     wmode_len = MultiByteToWideChar(CP_UTF8, 0, mode, wmode_len, wmode, 20);
     wfile[wfile_len] = L'\0';
