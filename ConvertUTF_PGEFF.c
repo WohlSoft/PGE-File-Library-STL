@@ -339,7 +339,8 @@ ConversionResult PGEFF_ConvertUTF16toUTF8(
         case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
         case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
         case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;/*fallthrough*/
-        case 1: *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);
+        case 1: *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);/*fallthrough*/
+        default: break;
         }
 
         target += bytesToWrite;
@@ -382,8 +383,9 @@ static Boolean isLegalUTF8(const UTF8 *source, int length)
         case 0xED: if(a > 0x9F) return False; break;
         case 0xF0: if(a < 0x90) return False; break;
         case 0xF4: if(a > 0x8F) return False; break;
-        default:   if(a < 0x80) return False;
-        }/*fallthrough*/
+        default:   if(a < 0x80) return False; break;
+        }
+    /* fallthrough */
     case 1:
         if(*source >= 0x80 && *source < 0xC2) return False;
     }
