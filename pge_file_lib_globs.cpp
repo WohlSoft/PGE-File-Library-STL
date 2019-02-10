@@ -172,7 +172,7 @@ PGESTRING url_encode(const PGESTRING &sSrc)
 }
 
 #ifndef PGE_FILES_QT
-const char HEX2DEC[256] =
+const int_fast8_t HEX2DEC[256] =
 {
     /*       0  1  2  3   4  5  6  7   8  9  A  B   C  D  E  F */
     /* 0 */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -219,7 +219,7 @@ PGESTRING url_decode(const std::string &sSrc)
     {
         if(*pSrc == '%')
         {
-            char dec1, dec2;
+            int_fast8_t dec1, dec2;
             if(-1 != (dec1 = HEX2DEC[*(pSrc + 1)])
                && -1 != (dec2 = HEX2DEC[*(pSrc + 2)]))
             {
