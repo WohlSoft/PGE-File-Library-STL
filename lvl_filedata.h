@@ -61,6 +61,20 @@ struct LevelSection
     bool OffScreenEn = false;
     //! ID of background image of this section
     unsigned int background = 0;
+    /**
+     * \brief 38A: Lighting values
+     * -1 - not set
+     * =0 - disable
+     * >0 - pixels value
+     */
+    enum LightingValue
+    {
+        LIGHTING_NOT_SET = -1,
+        LIGHTING_DISABLED = 0,
+        LIGHTING_PIXELS_BEGIN = 1
+    };
+    //! 38A: Lighting value
+    int lighting_value = LIGHTING_DISABLED;
     //! Enable lock of walking to left direction
     bool lock_left_scroll = false;
     //! Enable lock of walking to right direction
@@ -125,6 +139,8 @@ struct LevelBlock
     unsigned long id = 0;
     //! ID of the included NPC (0 - empty, <0 - number of coins, >0 - NPC-ID of included NPC)
     long npc_id = 0;
+    //! Special value for in-block NPC
+    long npc_special_value = 0;
     //! Block is invizible until player will impacted to it at bottom side
     bool invisible = false;
     //! Block has a splippery surface
@@ -243,6 +259,41 @@ struct LevelNPC
     long gfx_dy = 0;
     //! <Container-NPC specific!> Contained NPC in this container.
     long contents = 0;
+    //! 38A: GFX Autoscale
+    bool gfx_autoscale = false;
+    //! Override width of NPC
+    long override_width = -1;
+    //! Override height of NPC
+    long override_height = -1;
+
+    /**
+     * \brief 38A specific "wings" setting
+     */
+    enum Wings38A
+    {
+        WINGS38A_NONE = 0,
+        WINGS38A_JUMP = 1,
+        WINGS38A_HOVER_LR = 2,
+        WINGS38A_HOVER_UD = 3,
+        WINGS38A_CHASE = 4,
+        WINGS38A_HOVER_FORWARD = 5,
+        WINGS38A_BUTTERFLY_AI = 6,
+        WINGS38A_CONTROL_BY_308 = 7,
+        WINGS38A_RAILS = 8
+    };
+    //! 38A: "wings" extra parameter
+    long wings_type = WINGS38A_NONE;
+    /**
+     * \brief 38A specific "wings style" setting
+     */
+    enum WingsStyle38A
+    {
+        WINGS38A_STYLE_WINGS = 0,
+        WINGS38A_STYLE_PROPELLER = 1,
+        WINGS38A_STYLE_HIDE = 2
+    };
+    //! 38A: style of "wings" extra parameter
+    long wings_style = WINGS38A_STYLE_WINGS;
     //! User-data integer #1 used for configuring some NPC-AI's (kept for SMBX64)
     long special_data = 0;
     //! User-data integer #2 used for configuring some NPC-AI's (kept for SMBX64)
@@ -394,12 +445,17 @@ struct LevelDoor
     };
     //! Warp type: [1] pipe, [2] door, [0] instant (zero velocity-X after exit), [3] portal (instant with Keeping of velocities)
     int type = WARP_INSTANT;
+    /**
+     * \brief Transition effect
+     */
     enum WarpTransitEffect
     {
-        TRANSIT_NONE,
+        TRANSIT_NONE = 0,
         TRANSIT_SCROLL,
         TRANSIT_FADE,
-        TRANSIT_CIRCLE_FADE
+        TRANSIT_CIRCLE_FADE,
+        TRANSIT_FLIP_H,
+        TRANSIT_FLIP_V
     };
     //! Transition effect
     int transition_effect = TRANSIT_NONE;
@@ -451,6 +507,8 @@ struct LevelDoor
     bool  cannon_exit = false;
     //! Cannon shoot projectile speed (pixels per 1/65 seconds)
     double cannon_exit_speed = 10.0;
+    //! Warp can entered by stood player only
+    bool stood_state_required = false;
 
     /*
      * Editor-only parameters which are not saving into file
@@ -496,7 +554,8 @@ struct LevelPhysEnv
         ENV_AIR                     = 12,
         ENV_TOUCH_EVENT_ONCE_NPC1   = 13,
         ENV_TOUCH_EVENT_NPC1        = 14,
-        ENV_NPC_HURTING_FIELD       = 15
+        ENV_NPC_HURTING_FIELD       = 15,
+        ENV_SUBAREA                 = 16
     };
     //! Enable quicksand physical environment, overwise water physical environment
     int env_type = ENV_WATER;
@@ -579,14 +638,38 @@ struct LevelEvent_Sets
 
     //! Enable autoscroll for this section
     bool  autoscrol = false;
+    enum AutoScrollStyle
+    {
+        AUTOSCROLL_SIMPLE = 0,
+        AUTOSCROLL_ADVANCED = 1
+    };
+    //! Autoscroll style
+    int autoscroll_style = AUTOSCROLL_SIMPLE;
     //! X speed of autoscrool
     float autoscrol_x = 0.0;
     //! Y speed of autoscrool
     float autoscrol_y = 0.0;
+    /**
+     * \brief Advanced auto-scroll data
+     */
+    struct AutoScrollStopPoint
+    {
+        long x;
+        long y;
+        enum
+        {
+            TYPE_LINE = 0,
+            TYPE_BEZIER_R = 1,
+            TYPE_BEZIER_L = 2
+        };
+        int type = TYPE_LINE;
+        long speed = 0;
+    };
+    PGELIST<AutoScrollStopPoint> autoscroll_path;
 
-    //! Ariphmetical expression calculates autoscrool X
+    //! Ariphmetical expression calculates auto-scroll X
     PGESTRING expression_autoscrool_x;
-    //! Ariphmetical expression calculates autoscrool y
+    //! Ariphmetical expression calculates auto-scroll y
     PGESTRING expression_autoscrool_y;
 };
 
@@ -824,8 +907,21 @@ struct LevelSMBX64Event
  */
 struct LevelVariable
 {
+    //! Name of variable
     PGESTRING name;
+    //! Value of variable
     PGESTRING value;
+    //! Is variable global
+    bool is_global;
+};
+
+/*!
+ * \brief Level Array entry (without initial data)
+ */
+struct LevelArray
+{
+    //! Name of array
+    PGESTRING name;
 };
 
 /*!
@@ -900,6 +996,9 @@ struct LevelData
     //! Target WarpID (0 - regular entrance, >=1 - WarpID of entrance)
     unsigned int open_level_on_fail_warpID = 0;
 
+    //! Overrides of playable character names per index/ID (blank entry - use config pack default)
+    PGESTRINGList player_names_overrides;
+
     struct MusicOverrider
     {
         enum Type {
@@ -960,8 +1059,12 @@ struct LevelData
     //! Last used Event's array ID
     unsigned int events_array_id = 1;
 
+    //! 38A: KEY=VALUE built-in variables
     PGELIST<LevelVariable> variables;
+    //! Built-in script source codes
     PGELIST<LevelScript>   scripts;
+    //! 38A: Array entries
+    PGELIST<LevelArray>    arrays;
 
     //! SMBX-38A specific custom configs
     PGELIST<LevelItemSetup38A> custom38A_configs;

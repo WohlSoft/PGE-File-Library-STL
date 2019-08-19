@@ -133,6 +133,13 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
                 else
                     goto badfile;
             }
+            else if(data[i][0] == "NO") //Overrides of player names
+            {
+                if(PGEFile::IsStringArray(data[i][1]))
+                    FileData.player_names_overrides = PGEFile::X2STRArr(data[i][1]);
+                else
+                    goto badfile;
+            }
         }
     }
 
@@ -216,6 +223,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
     LevelLayer layer;
     LevelSMBX64Event event;
     LevelVariable variable;
+    LevelArray array_field;
     LevelScript script;
     LevelItemSetup38A customcfg38A;
     ///////////////////////////////////////Begin file///////////////////////////////////////
@@ -237,6 +245,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_USIntVal("SZ", FileData.stars) //Starz number
                     PGEX_StrVal("DL", FileData.open_level_on_fail) //Open level on fail
                     PGEX_UIntVal("DE", FileData.open_level_on_fail_warpID) //Open level's warpID on fail
+                    PGEX_StrArrVal("NO", FileData.player_names_overrides) //Overrides of player names
                 }
             }
         }//HEADER
@@ -301,8 +310,9 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_SLongVal("R",  lvl_section.size_right)//Right side
                     PGEX_SLongVal("T",  lvl_section.size_top) //Top side
                     PGEX_SLongVal("B",  lvl_section.size_bottom)//Bottom side
-                    PGEX_UIntVal("MZ", lvl_section.music_id)//Stuff music ID
-                    PGEX_UIntVal("BG", lvl_section.background)//Stuff music ID
+                    PGEX_UIntVal("MZ", lvl_section.music_id)//Built-in music ID
+                    PGEX_UIntVal("BG", lvl_section.background)//Built-in background ID
+                    PGEX_SIntVal("LT", lvl_section.lighting_value)//Lighting value
                     PGEX_StrVal("MF", lvl_section.music_file) //External music file path
                     PGEX_BoolVal("CS", lvl_section.wrap_h)//Connect sides horizontally
                     PGEX_BoolVal("CSV", lvl_section.wrap_v)//Connect sides vertically
@@ -407,6 +417,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_SLongVal("GXX", block.gfx_dx) //38A graphics extend x
                     PGEX_SLongVal("GXY", block.gfx_dy) //38A graphics extend y
                     PGEX_SLongVal("CN", block.npc_id) //Contains (coins/NPC)
+                    PGEX_SLongVal("CS", block.npc_special_value) //Special value for contained NPC
                     PGEX_BoolVal("IV", block.invisible) //Invisible
                     PGEX_BoolVal("SL", block.slippery) //Slippery
                     PGEX_StrVal("LR", block.layer) //Layer name
@@ -464,6 +475,11 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("GXN", npcdata.gfx_name) //38A GFX-Name
                     PGEX_SLongVal("GXX", npcdata.gfx_dx) //38A graphics extend x
                     PGEX_SLongVal("GXY", npcdata.gfx_dy) //38A graphics extend y
+                    PGEX_SLongVal("OW", npcdata.override_width) //Override width
+                    PGEX_SLongVal("OH", npcdata.override_height) //Override height
+                    PGEX_BoolVal("GAS", npcdata.gfx_autoscale) //Autoscale GFX on size override
+                    PGEX_SLongVal("WGT", npcdata.wings_type) //38A: Wings type
+                    PGEX_SLongVal("WGS", npcdata.wings_style) //38A: Wings style
                     PGEX_SIntVal("D", npcdata.direct) //Direction
                     PGEX_SLongVal("CN", npcdata.contents) //Contents of container-NPC
                     PGEX_SLongVal("S1", npcdata.special_data) //Special value 1
@@ -562,6 +578,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("HS", door.hide_entering_scene) //Don't show entering scene
                     PGEX_BoolVal("AL", door.allownpc_interlevel) //Allow NPC's inter-level
                     PGEX_BoolVal("SR", door.special_state_required) //Required a special state to enter
+                    PGEX_BoolVal("STR", door.stood_state_required) //Required a stood state to enter
                     PGEX_BoolVal("PT", door.cannon_exit) //Cannon exit
                     PGEX_FloatVal("PS", door.cannon_exit_speed) //Cannon exit speed
                     PGEX_StrVal("LR", door.layer)  //Layer
@@ -846,6 +863,43 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                                 if(PGEFile::IsBool(param[1]))
                                     sectionSet.autoscrol = static_cast<bool>(toInt(param[1]) != 0);
+                                else
+                                    goto badfile;
+                            }
+                            else if(param[0] == "AST")
+                            {
+                                errorString = "Invalid Section Autoscroll type value type";
+
+                                if(PGEFile::IsIntU(param[1]))
+                                    sectionSet.autoscroll_style = toUInt(param[1]);
+                                else
+                                    goto badfile;
+                            }
+                            else if(param[0] == "ASP")
+                            {
+                                errorString = "Invalid Section Autoscroll path value type";
+
+                                if(PGEFile::IsIntArray(param[1]))
+                                {
+                                    bool valid = false;
+                                    PGELIST<long> arr = PGEFile::X2IntArr(param[1], &valid);
+                                    if(!valid)
+                                        goto badfile;
+                                    if(arr.size() % 4)
+                                    {
+                                        errorString = "Invalid Section Autoscroll path data contains non-multiple 4 entries";
+                                        goto badfile;
+                                    }
+                                    for(pge_size_t pe = 0; pe < arr.size(); pe += 4)
+                                    {
+                                        LevelEvent_Sets::AutoScrollStopPoint stop;
+                                        stop.x =     arr[pe + 0];
+                                        stop.y =     arr[pe + 1];
+                                        stop.type =  arr[pe + 2];
+                                        stop.speed = arr[pe + 3];
+                                        sectionSet.autoscroll_path.push_back(stop);
+                                    }
+                                }
                                 else
                                     goto badfile;
                             }
@@ -1380,10 +1434,27 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_ValueBegin()
                     PGEX_StrVal("N", variable.name) //Variable name
                     PGEX_StrVal("V", variable.value) //Variable value
+                    PGEX_BoolVal("G", variable.is_global) //Is global variable
                 }
                 FileData.variables.push_back(variable);
             }
         }//VARIABLES
+        ///////////////////ARRAYS//////////////////////
+        PGEX_Section("ARRAYS")
+        {
+            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_Items()
+            {
+                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                array_field = LevelArray();
+                PGEX_Values() //Look markers and values
+                {
+                    PGEX_ValueBegin()
+                    PGEX_StrVal("N", array_field.name) //Variable name
+                }
+                FileData.arrays.push_back(array_field);
+            }
+        }//ARRAYS
         ///////////////////SCRIPTS//////////////////////
         PGEX_Section("SCRIPTS")
         {
@@ -1535,6 +1606,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         if(FileData.open_level_on_fail_warpID > 0)
             out << PGEFile::value("DE", PGEFile::WriteInt(FileData.open_level_on_fail_warpID));    // Open WarpID of level on fail
 
+        if(!IsEmpty(FileData.player_names_overrides))
+            out << PGEFile::value("NO", PGEFile::WriteStrArr(FileData.player_names_overrides));    // Overrides of player names
+
         out << "\n";
         out << "HEAD_END\n";
     }
@@ -1622,6 +1696,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             out << PGEFile::value("MF", PGEFile::WriteStr(section.music_file));  // Music file
             out << PGEFile::value("BG", PGEFile::WriteInt(section.background));  // Background ID
             //out << PGEFile::value("BG", PGEFile::WriteStr(section.background_file));  // Background file
+
+            if(section.lighting_value != LevelSection::LIGHTING_DISABLED)
+                out << PGEFile::value("LT", PGEFile::WriteInt(section.lighting_value));  // Lighting value
 
             if(section.wrap_h)
                 out << PGEFile::value("CS", PGEFile::WriteBool(section.wrap_h));  // Connect sides horizontally
@@ -1720,6 +1797,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             //Included NPC
             if(blk.npc_id != 0) //Write only if not zero
                 out << PGEFile::value("CN", PGEFile::WriteInt(blk.npc_id));  // Included NPC
+            if(blk.npc_special_value != 0)
+                out << PGEFile::value("CS", PGEFile::WriteInt(blk.npc_special_value));  // Special value of included NPC
 
             //Boolean flags
             if(blk.invisible)
@@ -1798,6 +1877,18 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("GXX", PGEFile::WriteInt(npc.gfx_dx));  // 38A graphics extend x
             if(npc.gfx_dy > 0) //38A graphics extend y
                 out << PGEFile::value("GXX", PGEFile::WriteInt(npc.gfx_dy));  // 38A graphics extend y
+
+            if(npc.override_width >= 0) //38A graphics extend x
+                out << PGEFile::value("OW", PGEFile::WriteInt(npc.override_width));  // Width override
+            if(npc.override_height >= 0) //38A graphics extend y
+                out << PGEFile::value("OH", PGEFile::WriteInt(npc.override_height));  // Height override
+            if(npc.gfx_autoscale)
+                out << PGEFile::value("GAS", PGEFile::WriteBool(npc.gfx_autoscale));  // Autoscale GFX with overriden size
+
+            if(npc.wings_type != LevelNPC::WINGS38A_NONE)
+                out << PGEFile::value("WGT", PGEFile::WriteInt(npc.wings_type));  // 38A: Wings type
+            if(npc.wings_style != LevelNPC::WINGS38A_STYLE_WINGS)
+                out << PGEFile::value("WGS", PGEFile::WriteInt(npc.wings_style));  // 38A: Wings style
 
             out << PGEFile::value("D", PGEFile::WriteInt(npc.direct));  // NPC Direction
 
@@ -1976,6 +2067,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("AL", PGEFile::WriteBool(warp.allownpc_interlevel));   //Allow Items inter-level
             if(warp.special_state_required)
                 out << PGEFile::value("SR", PGEFile::WriteBool(warp.special_state_required));//Special state required
+            if(warp.stood_state_required)
+                out << PGEFile::value("STR", PGEFile::WriteBool(warp.stood_state_required));//Stood state required
             if(warp.cannon_exit)
             {
                 out << PGEFile::value("PT", PGEFile::WriteBool(warp.cannon_exit));//cannon exit
@@ -2182,6 +2275,26 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 if(x.autoscrol)
                 {
                     sectionSettings += PGEFile::value("AS", PGEFile::WriteBool(x.autoscrol));
+                    hasParams = true;
+                }
+
+                if(x.autoscroll_style != LevelEvent_Sets::AUTOSCROLL_SIMPLE)
+                {
+                    sectionSettings += PGEFile::value("AST", PGEFile::WriteInt(x.autoscroll_style));
+                    hasParams = true;
+                }
+
+                if(!x.autoscroll_path.empty())
+                {
+                    PGELIST<long> arr;
+                    for(auto &ap : x.autoscroll_path)
+                    {
+                        arr.push_back(ap.x);
+                        arr.push_back(ap.y);
+                        arr.push_back(ap.type);
+                        arr.push_back(ap.speed);
+                    }
+                    sectionSettings += PGEFile::value("ASP", PGEFile::WriteIntArr(arr));
                     hasParams = true;
                 }
 
@@ -2431,10 +2544,26 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("N", PGEFile::WriteStr(var.name));  // Variable name
                 if(!IsEmpty(var.value))
                     out << PGEFile::value("V", PGEFile::WriteStr(var.value));  // Value
+                if(var.is_global)
+                    out << PGEFile::value("G", PGEFile::WriteBool(var.is_global));  // Is GLobal
                 out << "\n";
             }
 
             out << "VARIABLES_END\n";
+        }
+
+        //ARRAYS section
+        if(!FileData.arrays.empty())
+        {
+            out << "ARRAYS\n";
+
+            for(auto &var : FileData.arrays)
+            {
+                out << PGEFile::value("N", PGEFile::WriteStr(var.name));  // Array name
+                out << "\n";
+            }
+
+            out << "ARRAYS_END\n";
         }
 
         //SCRIPTS section

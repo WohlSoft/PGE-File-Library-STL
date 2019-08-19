@@ -67,6 +67,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
 
             if(identifier == "WS1")
             {
+                // ws1|wn|bp1,bp2,bp3,bp4,bp5|asn,gvn|dtp,nwm,rsd,dcp,sc,sm,asg,smb3,dss|sn,mis|acm|sc
                 dataReader.ReadDataLine(CSVDiscard(), // Skip the first field (this is already "identifier")
                                         //  wn=episode name[***urlencode!***]
                                         MakeCSVPostProcessor(&FileData.EpisodeTitle, PGEUrlDecodeFunc),
@@ -119,6 +120,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
             }
             else if(identifier == "WS2")
             {
+                // ws2|credits|creditsmusic
                 dataReader.ReadDataLine(CSVDiscard(),
                                         //  credits=[1]
                                         //  #DEFT#xxxxxx[***base64encode!***]
@@ -132,8 +134,9 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
                                             if((prefix == "#DEFT#") || (prefix == "#CUST#"))
                                                 PGE_RemStrRng(value, 0, 6);
                                             value = PGE_BASE64DEC(value);
-                                        })
-                                        );
+                                        }),
+                                        MakeCSVOptionalEmpty(&FileData.authors_music, "", nullptr, PGEUrlDecodeFunc)
+                );
             }
             else if(identifier == "WS3")
             {
@@ -350,8 +353,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                             if((prefix == "#DEFT#") || (prefix == "#CUST#"))
                                                 PGE_RemStrRng(value, 0, 6);
                                             value = PGE_BASE64DEC(value);
-                                        })
-                                        );
+                                        }),
+                                        MakeCSVOptionalEmpty(&FileData.authors_music, "", nullptr, PGEUrlDecodeFunc)
+                );
             }
             else if(identifier == "WS3")
             {

@@ -655,6 +655,35 @@ PGESTRINGList PGEFile::X2STRArr(PGESTRING in, bool *_valid)
     return strArr;
 }
 
+PGELIST<long> PGEFile::X2IntArr(PGESTRING in, bool *_valid)
+{
+    PGELIST<long> intArr;
+    PGESTRINGList strArr;
+    PGESTRING entry;
+    if((in[0] != '[') || (in[in.size() - 1] != ']'))
+    {
+        if(_valid)
+            *_valid = false;
+        return intArr;
+    }
+
+    PGE_RemStrRng(in, 0, 1);
+    PGE_RemStrRng(in, in.size() - 1, 1);
+    PGE_SPLITSTRING(strArr, in, ",");
+    for(auto &s : strArr)
+    {
+        if(!IsIntS(s))
+        {
+            if(_valid) *_valid = false;
+            return intArr;
+        }
+        intArr.push_back(toLong(s));
+    }
+
+    if(_valid) *_valid = true;
+    return intArr;
+}
+
 PGELIST<bool > PGEFile::X2BollArr(PGESTRING src)
 {
     PGELIST<bool > arr;
@@ -758,6 +787,19 @@ PGESTRING PGEFile::WriteStrArr(PGESTRINGList &input)
 }
 
 PGESTRING PGEFile::WriteIntArr(PGELIST<int> input)
+{
+    PGESTRING output;
+    if(input.empty()) return PGESTRING("");
+    output.append("[");
+    for(pge_size_t i = 0; i < input.size(); i++)
+    {
+        output.append(fromNum(input[i]) + (i < input.size() - 1 ? "," : ""));
+    }
+    output.append("]");
+    return output;
+}
+
+PGESTRING PGEFile::WriteIntArr(PGELIST<long> input)
 {
     PGESTRING output;
     if(input.empty()) return PGESTRING("");

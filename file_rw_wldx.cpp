@@ -114,6 +114,13 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
                 else
                     goto badfile;
             }
+            else if(data[i][0] == "GO") //Game Over level
+            {
+                if(PGEFile::IsQoutedString(data[i][1]))
+                    FileData.GameOverLevel_file = PGEFile::X2STRING(data[i][1]);
+                else
+                    goto badfile;
+            }
             else if(data[i][0] == "HB") //Hub Styled
             {
                 if(PGEFile::IsBool(data[i][1]))
@@ -139,6 +146,13 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
             {
                 if(PGEFile::IsQoutedString(data[i][1]))
                     FileData.authors = PGEFile::X2STRING(data[i][1]);
+                else
+                    goto badfile;
+            }
+            else if(data[i][0] == "CM") //Credits scene background music
+            {
+                if(PGEFile::IsQoutedString(data[i][1]))
+                    FileData.authors_music = PGEFile::X2STRING(data[i][1]);
                 else
                     goto badfile;
             }
@@ -239,10 +253,12 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                     PGEX_StrVal("TL", FileData.EpisodeTitle)        //Episode Title
                     PGEX_BoolArrVal("DC", FileData.nocharacter)     //Disabled characters
                     PGEX_StrVal("IT", FileData.IntroLevel_file)     //Intro level
+                    PGEX_StrVal("GO", FileData.GameOverLevel_file)  //Game Over level
                     PGEX_BoolVal("HB", FileData.HubStyledWorld)     //Hub Styled
                     PGEX_BoolVal("RL", FileData.restartlevel)       //Restart level on fail
                     PGEX_UIntVal("SZ", FileData.stars)              //Starz number
                     PGEX_StrVal("CD", FileData.authors)     //Credits list
+                    PGEX_StrVal("CM", FileData.authors_music)     //Credits scene background music
                 }
             }
         }//head
@@ -514,6 +530,8 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
             out << PGEFile::value("DC", PGEFile::WriteBoolArr(FileData.nocharacter)); // Disabled characters
         if(!IsEmpty(FileData.IntroLevel_file))
             out << PGEFile::value("IT", PGEFile::WriteStr(FileData.IntroLevel_file)); // Intro level
+        if(!IsEmpty(FileData.IntroLevel_file))
+            out << PGEFile::value("GO", PGEFile::WriteStr(FileData.GameOverLevel_file)); // Game Over level
         if(FileData.HubStyledWorld)
             out << PGEFile::value("HB", PGEFile::WriteBool(FileData.HubStyledWorld)); // Hub-styled episode
         if(FileData.restartlevel)
@@ -522,6 +540,8 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
             out << PGEFile::value("SZ", PGEFile::WriteInt(FileData.stars));      // Total stars number
         if(!IsEmpty(FileData.authors))
             out << PGEFile::value("CD", PGEFile::WriteStr(FileData.authors));   // Credits
+        if(!IsEmpty(FileData.authors_music))
+            out << PGEFile::value("CM", PGEFile::WriteStr(FileData.authors_music));   // Credits scene background music
 
         out << "\n";
         out << "HEAD_END\n";

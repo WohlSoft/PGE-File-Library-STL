@@ -306,6 +306,12 @@ class PGEFile
          */
         static PGESTRING WriteIntArr(PGELIST<int > input);
         /*!
+         * \brief Encode array of integers into PGE-X escaped string
+         * \param input List of integer numbers
+         * \return Encoded PGE-X raw string
+         */
+        static PGESTRING WriteIntArr(PGELIST<long > input);
+        /*!
          * \brief Encode array of booleans into PGE-X escaped string
          * \param input List of boolean flags
          * \return Encoded PGE-X raw string
@@ -324,6 +330,12 @@ class PGEFile
          * \return List of plain text strings
          */
         static PGESTRINGList X2STRArr(PGESTRING in, bool *_valid = NULL);
+        /*!
+         * \brief Decodes PGE-X String array into array of plain text strings
+         * \param src Encoded PGE-X string value
+         * \return List of plain text strings
+         */
+        static PGELIST<long> X2IntArr(PGESTRING in, bool *_valid = NULL);
         /*!
          * \brief Decodes PGE-X Boolean array into array of boolean flags
          * \param src Encoded PGE-X boolean array

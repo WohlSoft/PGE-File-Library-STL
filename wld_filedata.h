@@ -267,17 +267,20 @@ struct WorldAreaRect
         SETUP_SET_VIEWPORT = 0x02,
         //! Set route area for self-moving object
         SETUP_OBJECTS_ROUTE= 0x04,
-        //! Autowalking area by current direction
-        SETUP_AUTOWALKING  = 0x08,
+        //! Forced walking area by current direction
+        SETUP_FORCE_WALKING = 0x08,
         //! Item-triggered events
-        SETUP_ITEM_EVENTS  = 0x0F
+        SETUP_ITEM_EVENTS  = 0x10,
+        //! Auto-Walking area by current direction
+        SETUP_AUTO_WALKING  = 0x20
     };
     //! Special markers of this area functionality
     uint32_t flags = SETUP_NOTHING;
     //! Touch event slot
     PGESTRING eventTouch;
 
-    enum TouchPolicy{
+    enum TouchPolicy
+    {
         TOUCH_TRIGGER_EVERY_ENTER = 0,
         TOUCH_TRIGGER_ENTER_AND_LEVEL_COMPLETION = 1,
         TOUCH_TRIGGER_ONCE = 2
@@ -464,6 +467,9 @@ struct WorldData
     PGESTRING author4 = "";
     //! Episode credits (SMBX64 single-line field 5)
     PGESTRING author5 = "";
+
+    //! Credits scene background music
+    PGESTRING authors_music = "";
 
     //! List of available terrain tiles
     PGELIST<WorldTerrainTile > tiles;

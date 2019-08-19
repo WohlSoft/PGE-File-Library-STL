@@ -23,7 +23,7 @@
 #include "smbx38a_private.h"
 
 // Settings
-static constexpr uint32_t newest_file_format = 68;
+static constexpr uint32_t newest_file_format = 69;
 
 /***********  Pre-defined values dependent to NPC Generator Effect field value  **************/
 
@@ -333,6 +333,21 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     }
                 }
             }
+            else if(identifier == "BTNS")
+            {
+                // BTNS|mario|luigi|peach|toad|link
+                FileData.player_names_overrides.clear();
+                PGESTRING plr[5];
+                dataReader.ReadDataLine(CSVDiscard(),
+                                        MakeCSVOptionalEmpty(&plr[0], ""),
+                                        MakeCSVOptionalEmpty(&plr[1], ""),
+                                        MakeCSVOptionalEmpty(&plr[2], ""),
+                                        MakeCSVOptionalEmpty(&plr[3], ""),
+                                        MakeCSVOptionalEmpty(&plr[4], "")
+                );
+                for(size_t i = 0; i < 5; i++)
+                    FileData.player_names_overrides.push_back(plr[i]);
+            }
             else if(identifier == "P1")
             {
                 // P1|x1|y1
@@ -350,7 +365,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             }
             else if(identifier == "M")
             {
-                // M|id|x|y|w|h|b1|b2|b3|b4|b5|b6|music|background|musicfile
+                // M|id|x|y|w|h|b1|b2|b3|b4|b5|b6|music|background,lightingvalue|musicfile
                 section = CreateLvlSection();
                 double x = 0.0, y = 0.0, w = 0.0, h = 0.0;
                 PGESTRING scroll_lock_x;
@@ -385,7 +400,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 //music=music number[same as smbx1.3]
                 &section.music_id,
                 //background=background number[same as the filename in 'background2' folder]
-                &section.background,
+                MakeCSVSubReader(dataReader, ',',
+                //[Since 69]lightingvalue=lighting value (-1=not set 0=disable >0=pixels)
+                                 &section.background,
+                                 MakeCSVOptionalEmpty(&section.lighting_value, -1)
+                ),
                 //musicfile=custom music file[***urlencode!***]
                 MakeCSVPostProcessor(&section.music_file, PGEUrlDecodeFunc));
                 SMBX38A_mapBGID_From(section.background);//Convert into SMBX64 ID set
@@ -413,7 +432,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             }
             else if(identifier == "B")
             {
-                // B|layer[,name]|id[,dx,dy]|x|y|contain|b11[,b12]|b2|[e1,e2,e3,e4]|w|h
+                // B|layer[,name]|id[,dx,dy]|x|y|contain,sp|b11[,b12]|b2|[e1,e2,e3,e4]|w|h
                 blockdata = CreateLvlBlock();
                 dataReader.ReadDataLine(CSVDiscard(),
                 MakeCSVSubReader(dataReader, ',',
@@ -439,10 +458,14 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                 [1-999] coin number
                                 [0] nothing
                 */
-                MakeCSVOptionalEmpty(&blockdata.npc_id, 0, nullptr, [](long & npcValue)
-                {
-                    npcValue = (npcValue < 1000 ? -1 * npcValue : npcValue - 1000);
-                }),
+                MakeCSVSubReader(dataReader, ',',
+                        MakeCSVOptionalEmpty(&blockdata.npc_id, 0, nullptr, [](long & npcValue)
+                        {
+                            npcValue = (npcValue < 1000 ? -1 * npcValue : npcValue - 1000);
+                        }),
+                        //! [Since 69] sp=advset of npc
+                        MakeCSVOptional(&blockdata.npc_special_value, 0)
+                ),
                 MakeCSVSubReader(dataReader, ',',
                         //b11=slippery[0=false !0=true]
                         &blockdata.slippery,
@@ -453,11 +476,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 &blockdata.invisible,
                 MakeCSVSubReader(dataReader, ',',
                                  //e1=block destory event name[***urlencode!***]
-                                 MakeCSVPostProcessor(&blockdata.event_destroy, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&blockdata.event_destroy, "", nullptr, PGEUrlDecodeFunc),
                                  //e2=block hit event name[***urlencode!***]
-                                 MakeCSVPostProcessor(&blockdata.event_hit, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&blockdata.event_hit, "", nullptr, PGEUrlDecodeFunc),
                                  //e3=no more object in layer event name[***urlencode!***]
-                                 MakeCSVPostProcessor(&blockdata.event_emptylayer, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&blockdata.event_emptylayer, "", nullptr, PGEUrlDecodeFunc),
                                  //e4=block onscreen event name[***urlencode!***]
                                  MakeCSVOptional(&blockdata.event_on_screen, "", nullptr, PGEUrlDecodeFunc)
                                 ),
@@ -491,6 +514,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             {
                 // N|layer[,name]|id[,dx,dy]|x|y|b1,b2,b3,b4|sp|[e1,e2,e3,e4,e5,e6,e7]|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
                 // N|layer[,name]|id[,dx,dy]|x|y|b1,b2,b3,b4|sp|[e1,e2,e3,e4,e5,e6,e7]|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
+                // N|layer[,name]|id[,dx,dy]|x|y|b1,b2,b3,b4,b5,b6|sp|[e1,e2,e3,e4,e5,e6,e7]|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|[wi,hi]
                 npcdata = CreateLvlNpc();
                 npcdata.generator_period_orig_unit = PGE_FileLibrary::TimeUnit::FrameOneOf65sec;
                 double specialData;
@@ -514,7 +538,10 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 }),
                 &npcdata.friendly,
                 &npcdata.nomove,
-                &npcdata.contents),
+                &npcdata.contents,
+                MakeCSVOptional(&npcdata.gfx_autoscale, false),// Since 69
+                MakeCSVOptional(&npcdata.wings_style, 0)       // Since 69
+                ),
                 &specialData,
                 MakeCSVSubReader(dataReader, ',',
                                  MakeCSVOptional(&npcdata.event_die, "", nullptr, PGEUrlDecodeFunc),
@@ -538,14 +565,18 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  MakeCSVOptional(&npcdata.generator_angle_range, 360.0),
                                  MakeCSVOptional(&npcdata.generator_initial_speed, 10.0)
                                 ),
-                MakeCSVPostProcessor(&npcdata.msg, PGEUrlDecodeFunc)
-                                       );
+                MakeCSVPostProcessor(&npcdata.msg, PGEUrlDecodeFunc),
+                MakeCSVOptionalSubReader(dataReader, ',',// Since 69
+                    MakeCSVOptional(&npcdata.override_width, -1),
+                    MakeCSVOptional(&npcdata.override_height, -1)
+                )
+                );
 
                 if(npcdata.contents > 0)
                 {
                     long contID = npcdata.contents;
                     npcdata.contents = static_cast<long>(npcdata.id);
-                    //b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300][6=npc347]
+                    //b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300][6=npc347][101~108=wing type]
                     static const uint64_t ContNPCID[] =
                     {
                         //  1  2    3    4    5    6
@@ -556,8 +587,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     else
                         npcdata.contents = 0; //Invalid container type
 
-                    if((contID > 101) && (contID <= 107))
-                        npcdata.meta.custom_params += "\"wings:\"" + fromNum(contID) + ",";
+                    if((contID > 101) && (contID <= 108))
+                        npcdata.wings_type = (contID - 100);
                 }
 
                 npcdata.special_data = static_cast<long>(round(specialData));
@@ -640,6 +671,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             else if(identifier == "W")
             {
                 // W|layer|x|y|ex|ey|type|enterd|exitd|sn,msg,hide|locked,noyoshi,canpick,bomb,hidef,anpc,mini,size|lik|liid|noexit|wx|wy|le|we
+                // W|layer|x|y|ex|ey|type|enterd|exitd|sn,msg,hide|locked,noyoshi,canpick,bomb,hidef,anpc,mini,size,ts,cannon,stand|lik|liid|noexit|wx|wy|le|we
                 doordata = CreateLvlWarp();
                 int type = 0;
                 dataReader.ReadDataLine(CSVDiscard(),
@@ -701,7 +733,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  //size=Warp Size(pixel)
                                  MakeCSVOptional(&doordata.length_i, 32u),
                                  MakeCSVOptional(&doordata.two_way, false),
-                                 MakeCSVOptional(&doordata.cannon_exit_speed, 0.0)
+                                 MakeCSVOptional(&doordata.cannon_exit_speed, 0.0),
+                                 MakeCSVOptional(&doordata.stood_state_required, false)// Since 69
                                 ),
                                 //lik=warp to level[***urlencode!***]
                                 MakeCSVPostProcessor(&doordata.lname, PGEUrlDecodeFunc),
@@ -763,18 +796,23 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 // The first two values are static ones, after that they come in packages (see below)
                 int spawnNpcReaderCurrentIndex = 0;
                 dataReader.ReadDataLine(CSVDiscard(),
+                                        // name=event name[***urlencode!***]
                                         MakeCSVPostProcessor(&eventdata.name, PGEUrlDecodeFunc),
+                                        // msg=show message after start event[***urlencode!***]
                                         MakeCSVPostProcessor(&eventdata.msg, PGEUrlDecodeFunc),
+                                        // ea=val,syntax
                                         MakeCSVSubReader(dataReader, ',',
                                                 &eventdata.autostart,
                                                 MakeCSVPostProcessor(&eventdata.autostart_condition, PGEUrlDecodeFunc)
                                                         ),
+                                        // el=b/s1,s2...sn/h1,h2...hn/t1,t2...tn
                                         MakeCSVSubReader(dataReader, '/',
                                                 &eventdata.nosmoke,
                                                 MakeCSVBatchReader(dataReader, ',', &eventdata.layers_show, PGEUrlDecodeFunc),
                                                 MakeCSVBatchReader(dataReader, ',', &eventdata.layers_hide, PGEUrlDecodeFunc),
                                                 MakeCSVBatchReader(dataReader, ',', &eventdata.layers_toggle, PGEUrlDecodeFunc)
                                                         ),
+                                        // elm=elm1/elm2...elmn
                                         MakeCSVIterator(dataReader, '/', [&eventdata](const PGESTRING & nextFieldStr)
                 {
                     auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -792,6 +830,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     eventdata.layer_speed_x = movingLayer.speed_x;
                     eventdata.layer_speed_y = movingLayer.speed_y;
                 }),
+                // epy=b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12
                 MakeCSVSubReader(dataReader, ',',
                                  &eventdata.ctrls_enable,
                                  &eventdata.ctrl_drop,
@@ -806,6 +845,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  &eventdata.ctrl_start,
                                  &eventdata.ctrl_lock_keyboard
                                 ),
+                // eps=esection/ebackground/emusic
                 MakeCSVSubReader(dataReader, '/',
                                  MakeCSVIterator(dataReader, ':', [&eventdata](const PGESTRING & nextFieldStr)
                 {
@@ -814,7 +854,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     int sectionID = fullReader.ReadField<int>(1) - 1;
                     LevelEvent_Sets &nextSet = eventdata.sets[static_cast<pge_size_t>(sectionID)];
                     bool customSize = false;
-                    bool canAutoscroll = false;
+                    unsigned int autoScrollType = 0;
+                    bool canAutoScroll = false;
                     fullReader.ReadDataLine(CSVDiscard(),
                                             MakeCSVPostProcessor(&nextSet.position_left, [&customSize](long & value)
                     {
@@ -838,13 +879,15 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     MakeCSVPostProcessor(&nextSet.expression_pos_y, PGEUrlDecodeFunc),
                     MakeCSVPostProcessor(&nextSet.expression_pos_w, PGEUrlDecodeFunc),
                     MakeCSVPostProcessor(&nextSet.expression_pos_h, PGEUrlDecodeFunc),
-                    MakeCSVPostProcessor(&nextSet.autoscrol, [&canAutoscroll](bool & value)
+                    MakeCSVPostProcessor(&autoScrollType, [&nextSet,&canAutoScroll](unsigned int &value)
                     {
-                        canAutoscroll = value;
+                        nextSet.autoscrol = (value != 0);
+                        nextSet.autoscroll_style = value ? (value - 1) : 0;//Since 69
+                        canAutoScroll = nextSet.autoscrol;
                     }),
                     MakeCSVPostProcessor(&nextSet.expression_autoscrool_x, PGEUrlDecodeFunc),
-                    MakeCSVPostProcessor(&nextSet.expression_autoscrool_y, PGEUrlDecodeFunc)
-                                           );
+                    MakeCSVOptionalEmpty(&nextSet.expression_autoscrool_y, "", nullptr, PGEUrlDecodeFunc)
+                    );
 
                     if(customSize)
                     {
@@ -860,11 +903,31 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                             nextSet.position_bottom += nextSet.position_top;
                     }
 
-                    if(canAutoscroll)
+                    if(canAutoScroll)
                     {
-                        SMBX38A_Exp2Float(nextSet.expression_autoscrool_x, nextSet.autoscrol_x);
-                        SMBX38A_Exp2Float(nextSet.expression_autoscrool_y, nextSet.autoscrol_y);
-                        //SMBX64 backwarth compatibility:
+                        if(nextSet.autoscroll_style == LevelEvent_Sets::AUTOSCROLL_SIMPLE)
+                        {
+                            SMBX38A_Exp2Float(nextSet.expression_autoscrool_x, nextSet.autoscrol_x);
+                            SMBX38A_Exp2Float(nextSet.expression_autoscrool_y, nextSet.autoscrol_y);
+                        }
+                        else
+                        {
+                            PGESTRINGList raw_data;
+                            PGE_SPLITSTRING(raw_data, nextSet.expression_autoscrool_x, "_");
+                            if(raw_data.size() % 4)
+                                throw(std::invalid_argument("Event path data entries count is not multiple 4!"));
+                            for(pge_size_t pe = 0; pe < raw_data.size(); pe+= 4)
+                            {
+                                LevelEvent_Sets::AutoScrollStopPoint stop;
+                                SMBX64::ReadSInt(&stop.x, raw_data[pe + 0]);
+                                SMBX64::ReadSInt(&stop.y, raw_data[pe + 1]);
+                                SMBX64::ReadSInt(&stop.type, raw_data[pe + 2]);
+                                SMBX64::ReadSInt(&stop.speed, raw_data[pe + 3]);
+                                nextSet.autoscroll_path.push_back(stop);
+                            }
+                            nextSet.expression_autoscrool_x.clear();
+                        }
+                        //SMBX64 backward compatibility:
                         eventdata.scroll_section = nextSet.id;//Set ID of autoscrollable section :-P
                         eventdata.move_camera_x = static_cast<double>(nextSet.autoscrol_x);
                         eventdata.move_camera_y = static_cast<double>(nextSet.autoscrol_y);
@@ -880,6 +943,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
                     eventdata.scroll_section = static_cast<long>(sectionID);
                 }),
+
                 MakeCSVIterator(dataReader, ':', [&eventdata](const PGESTRING & nextFieldStr)
                 {
                     auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -915,6 +979,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
                     SMBX38A_mapBGID_From(nextSet.background_id);//Convert into SMBX64 ID set
                 }),
+
                 MakeCSVIterator(dataReader, ':', [&eventdata](const PGESTRING & nextFieldStr)
                 {
                     auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -950,7 +1015,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     if(customMusic)
                         nextSet.music_id = music_id;
                 })
-                                ),
+                ),
+                // eef=sound/endgame/ce1/ce2...cen
                 MakeCSVIterator(dataReader, '/', [&eventdata, &spawnNpcReaderCurrentIndex](const PGESTRING & nextFieldStr)
                 {
                     switch(spawnNpcReaderCurrentIndex)
@@ -992,7 +1058,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                         break;
                     }
                 }),
-                // &effects,
+                // ecn=cn1/cn2...cnn
                 MakeCSVIterator(dataReader, '/', [&eventdata](const PGESTRING & nextFieldStr)
                 {
                     auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -1011,7 +1077,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     SMBX38A_Exp2Double(spawnnpc.expression_sy, spawnnpc.speed_y);
                     eventdata.spawn_npc.push_back(spawnnpc);
                 }),
-                // &spawn_npcs,
+                // evc=vc1/vc2...vcn
                 MakeCSVIterator(dataReader, '/', [&eventdata](const PGESTRING & nextFieldStr)
                 {
                     auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -1022,7 +1088,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                            );
                     eventdata.update_variable.push_back(updVar);
                 }),
-                // &update_var,
+                // ene=nextevent/timer/apievent/scriptname
                 MakeCSVSubReader(dataReader, '/',
                                  MakeCSVSubReader(dataReader, ',',
                                                   MakeCSVPostProcessor(&eventdata.trigger, PGEUrlDecodeFunc),
@@ -1034,8 +1100,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                                   &timer_def_interval_raw,
                                                   &eventdata.timer_def.count_dir,
                                                   &eventdata.timer_def.show),
-                                 &eventdata.trigger_api_id,
-                                 MakeCSVPostProcessor(&eventdata.trigger_script, PGEUrlDecodeFunc)
+                                 MakeCSVOptionalEmpty(&eventdata.trigger_api_id, 0),
+                                 MakeCSVOptionalEmpty(&eventdata.trigger_script, "", nullptr, PGEUrlDecodeFunc)
                                 )
                                        );
                 eventdata.trigger_timer_unit = PGE_FileLibrary::TimeUnit::FrameOneOf65sec;
@@ -1059,6 +1125,22 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                                           variables to be universal */
                                        );
                 FileData.variables.push_back(vardata);
+            }
+            else if(identifier == "R")
+            {
+                // R|name1|name2|name3|....namen
+                dataReader.IterateDataLine([&FileData](const PGESTRING & nextFieldStr)
+                {
+                    if(nextFieldStr == "R")
+                        return;
+                    auto fieldReader = MakeDirectReader(nextFieldStr);
+                    auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                    LevelArray arr;
+                    fullReader.ReadDataLine(
+                            MakeCSVPostProcessor(&arr.name, PGEUrlDecodeFunc)
+                    );
+                    FileData.arrays.push_back(arr);
+                });
             }
             else if(identifier == "S")
             {
@@ -1109,18 +1191,18 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             {
                 // CW|cdata1|cdata2|...|cdatan	:custom sound:	same as wls file format
                 dataReader.IterateDataLine([&FileData](const PGESTRING & nextFieldStr)
-                    {
-                        if(nextFieldStr == "CW")
-                            return;
+                {
+                    if(nextFieldStr == "CW")
+                        return;
 
-                        auto fieldReader = MakeDirectReader(nextFieldStr);
-                        auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
-                        LevelData::MusicOverrider mo;
-                        fullReader.ReadDataLine(&mo.id,
-                                                MakeCSVPostProcessor(&mo.fileName, PGEUrlDecodeFunc)
-                                               );
-                        FileData.sound_overrides.push_back(mo);
-                    });
+                    auto fieldReader = MakeDirectReader(nextFieldStr);
+                    auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                    LevelData::MusicOverrider mo;
+                    fullReader.ReadDataLine(&mo.id,
+                                            MakeCSVPostProcessor(&mo.fileName, PGEUrlDecodeFunc)
+                                           );
+                    FileData.sound_overrides.push_back(mo);
+                });
             }
             else
                 dataReader.ReadDataLine();
@@ -1252,7 +1334,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //line 1:
     //    SMBXFile??
     //    ??=Version number
-    out << "SMBXFile" << fromNum(newest_file_format) << "\n";
+    out << "SMBXFile" << fromNum(/*newest_file_format*/ 68) << "\n";
     //next line: level settings
     //    A|param1|param2[|param3|param4]
     //    []=optional
