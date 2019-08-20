@@ -318,6 +318,7 @@ LevelVariable FileFormats::CreateLvlVariable(PGESTRING vname)
     LevelVariable var;
     var.name = vname;
     var.value = "";
+    var.is_global = false;
     return var;
 }
 
