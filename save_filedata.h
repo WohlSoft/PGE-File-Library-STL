@@ -65,6 +65,40 @@ struct savePlayerState
 };
 
 /*!
+ * \brief User data bank, middle format for (de)serialization.
+ */
+struct saveUserData
+{
+    enum DataLocation
+    {
+        DATA_WORLD = 0,
+        DATA_LEVEL = 1,
+        DATA_GLOBAL =2
+    };
+
+    struct DataEntry
+    {
+        PGESTRING key;
+        PGESTRING value;
+    };
+
+    struct DataSection
+    {
+        //! Type of data location
+        int                 location = DATA_WORLD;
+        //! Optionally, for example, level filename
+        PGESTRING           location_name;
+        //! Name of data section
+        PGESTRING           name;
+        //! key=value Data entries
+        PGELIST<DataEntry>  data;
+    };
+    //! Data store
+    PGELIST<DataSection> store;
+};
+
+
+/*!
  * \brief Game save data structure
  */
 struct GamesaveData
@@ -72,20 +106,33 @@ struct GamesaveData
     //! Helper meta-data
     FileFormatMeta meta;
 
-    int lives;               //!< Number of lives
-    unsigned int coins;      //!< Number of coins
-    unsigned int points;     //!< Number of points
-    unsigned int totalStars; //!< Total stars
+    //! Number of lives
+    int lives;
+    //! Number of coins
+    unsigned int coins;
+    //! Number of points
+    unsigned int points;
+    //! Total stars
+    unsigned int totalStars;
 
-    long worldPosX; //!< Last world map position X
-    long worldPosY; //!< Last world map position Y
+    //! Last world map position X
+    long worldPosX;
+    //! Last world map position Y
+    long worldPosY;
 
-    unsigned long last_hub_warp; //!< Last entered/exited warp Array-ID on the HUB-based episodes.
+    //! Last entered/exited warp Array-ID on the HUB-based episodes.
+    unsigned long last_hub_warp;
 
-    unsigned int musicID; //!< Current world music ID
-    PGESTRING musicFile;    //!< Current world music file (custom music)
+    //! Current world music ID
+    unsigned int musicID;
+    //! Current world music file (custom music)
+    PGESTRING musicFile;
 
-    bool gameCompleted;   //!< Is episode was completed in last time
+    //! Is episode was completed in last time
+    bool gameCompleted;
+
+    //! Extra data bank, saved via lua
+    saveUserData userData;
 
     PGELIST<saveCharState > characterStates;
     PGELIST<unsigned long > currentCharacter;

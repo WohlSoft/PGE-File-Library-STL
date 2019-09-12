@@ -71,6 +71,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
     saveCharState plr_state;
     visibleItem        vz_item;
     starOnLevel        star_level;
+    saveUserData::DataSection user_data_entry;
     //Add path data
     PGESTRING fPath = in.getFilePath();
 
@@ -222,6 +223,40 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 FileData.gottenStars.push_back(star_level);
             }
         }//STARS
+        ///////////////////USERDATA//////////////////////
+        PGEX_Section("USERDATA")
+        {
+            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_Items()
+            {
+                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                user_data_entry.data.clear();
+                user_data_entry.name = "default";
+                user_data_entry.location_name.clear();
+                user_data_entry.location = saveUserData::DATA_WORLD;
+                PGESTRINGList data;
+                PGEX_Values() //Look markers and values
+                {
+                    PGEX_ValueBegin()
+                    PGEX_SIntVal("L", user_data_entry.location)
+                    PGEX_StrVal("SN", user_data_entry.name)
+                    PGEX_StrVal("LN", user_data_entry.location_name)
+                    PGEX_StrArrVal("D", data)
+                }
+                for(PGESTRING &s : data)
+                {
+                    saveUserData::DataEntry e;
+                    PGESTRINGList dp;
+                    PGE_SPLITSTRING(dp, s, "=");
+                    if(dp.size() < 2)
+                        goto badfile;
+                    e.key = PGE_ReplSTRING(PGEFile::X2STRING(dp[0]), "\\q", "=");
+                    e.value = PGE_ReplSTRING(PGEFile::X2STRING(dp[1]), "\\q", "=");
+                    user_data_entry.data.push_back(e);
+                }
+                FileData.userData.store.push_back(user_data_entry);
+            }
+        }//USERDATA
     }
     ///////////////////////////////////////EndFile///////////////////////////////////////
     errorString.clear(); //If no errors, clear string;
@@ -377,6 +412,30 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
         }
 
         out << "STARS_END\n";
+    }
+
+    if(!FileData.userData.store.empty())
+    {
+        out << "USERDATA\n";
+
+        for(const auto &e : FileData.userData.store)
+        {
+            if(!IsEmpty(e.name) && (e.name != "default"))
+                out << PGEFile::value("SN", PGEFile::WriteStr(e.name));
+            if(!IsEmpty(e.location_name))
+                out << PGEFile::value("LN", PGEFile::WriteStr(e.location_name));
+            out << PGEFile::value("L", PGEFile::WriteInt(e.location));
+            PGESTRINGList data;
+            for(const auto &d : e.data)
+            {
+                PGESTRING key   = PGE_ReplSTRING(d.key, "=", "\\q"),
+                          value = PGE_ReplSTRING(d.value, "=", "\\q");
+                data.push_back( PGEFile::WriteStr(key) + "=" + PGEFile::WriteStr(value));
+            }
+            out << PGEFile::value("D", PGEFile::WriteStrArr(data));
+            out << "\n";
+        }
+        out << "USERDATA_END\n";
     }
 
     out << "\n";

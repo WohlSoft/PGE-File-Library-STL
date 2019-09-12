@@ -49,7 +49,7 @@ inline void PGE_SPLITSTRING(PGESTRINGList &dst, PGESTRING &src, PGESTRING sep)
 {
     dst = src.split(sep);
 }
-inline PGESTRING PGE_ReplSTRING(PGESTRING &src, PGESTRING from, PGESTRING to)
+inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
 {
     return src.replace(from, to);
 }
