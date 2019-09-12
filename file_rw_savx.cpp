@@ -420,11 +420,14 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
 
         for(const auto &e : FileData.userData.store)
         {
+            if((e.location & saveUserData::DATA_VOLATILE_FLAG) != 0)
+                continue;// Don't save volatile fields into the file!
+            int location_clean = (e.location & saveUserData::DATA_LOCATION_MASK);
+            out << PGEFile::value("L", PGEFile::WriteInt(location_clean));
             if(!IsEmpty(e.name) && (e.name != "default"))
                 out << PGEFile::value("SN", PGEFile::WriteStr(e.name));
             if(!IsEmpty(e.location_name))
                 out << PGEFile::value("LN", PGEFile::WriteStr(e.location_name));
-            out << PGEFile::value("L", PGEFile::WriteInt(e.location));
             PGESTRINGList data;
             for(const auto &d : e.data)
             {

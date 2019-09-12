@@ -73,7 +73,9 @@ struct saveUserData
     {
         DATA_WORLD = 0,
         DATA_LEVEL = 1,
-        DATA_GLOBAL =2
+        DATA_GLOBAL =2,
+        DATA_LOCATION_MASK = 0x0000FFFF,
+        DATA_VOLATILE_FLAG = 0x10000
     };
 
     struct DataEntry
