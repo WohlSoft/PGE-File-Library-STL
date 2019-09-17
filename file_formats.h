@@ -753,6 +753,12 @@ public:
      */
     static WorldMusicBox       CreateWldMusicbox();
 
+    /*!
+     * \brief Sorts some item objects by array_id key (to restore original order after history actions)
+     * \param [__inout] wld World map data structure object
+     */
+    static void                WorldPrepare(WorldData &wld);
+
 
     /****************************Save of game file********************************/
 

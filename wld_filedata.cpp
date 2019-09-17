@@ -18,7 +18,9 @@
 
 #include "file_formats.h"
 #include "wld_filedata.h"
+#include "pge_file_lib_private.h"
 
+#include <stack>
 
 int FileFormats::smbx64WorldCheckLimits(WorldData &wld)
 {
@@ -95,4 +97,78 @@ WorldData FileFormats::CreateWorldData()
     WorldData NewFileData;
     CreateWorldData(NewFileData);
     return NewFileData;
+}
+
+
+template<class T, class U>
+void quickSortByArrayId(T &array)
+{
+    if(array.size() <= 1)
+        return; //Nothing to sort!
+
+    class my_stack : public std::stack< int >
+    {
+    public:
+        using std::stack<int>::c; // expose the container
+    };
+
+    my_stack beg;
+    my_stack end;
+    U piv;
+    int i = 0, L, R, swapv;
+    beg.push(0);
+    end.push(static_cast<int>(array.size()));
+#define ST(x) static_cast<pge_size_t>(x)
+    while(i >= 0)
+    {
+        L = beg.c[ST(i)];
+        R = end.c[ST(i)] - 1;
+        if(L < R)
+        {
+            piv = array[ST(L)];
+            while(L < R)
+            {
+                while(
+                      (array[ST(R)].meta.array_id >= piv.meta.array_id) &&
+                      (L < R)) R--;
+                if(L < R) array[ST(L++)] = array[ST(R)];
+
+                while(
+                    (
+                        (array[ST(L)].meta.array_id <= piv.meta.array_id)
+                    ) && (L < R)) L++;
+                if(L < R) array[ST(R--)] = array[ST(L)];
+            }
+            array[ST(L)] = piv;
+            beg.push(L + 1);
+            end.push(end.c[ST(i)]);
+            end.c[ST(i++)] = (L);
+            if((end.c[ST(i)] - beg.c[ST(i)]) > (end.c[ST(i - 1)] - beg.c[ST(i - 1)]))
+            {
+                swapv = beg.c[ST(i)];
+                beg.c[ST(i)] = beg.c[ST(i - 1)];
+                beg.c[ST(i - 1)] = swapv;
+                swapv = end.c[ST(i)];
+                end.c[ST(i)] = end.c[ST(i - 1)];
+                end.c[ST(i - 1)] = swapv;
+            }
+        }
+        else
+        {
+            i--;
+            beg.pop();
+            end.pop();
+        }
+    }
+#undef ST
+}
+
+
+void FileFormats::WorldPrepare(WorldData &wld)
+{
+    quickSortByArrayId<PGELIST<WorldTerrainTile>, WorldTerrainTile>(wld.tiles);
+    quickSortByArrayId<PGELIST<WorldScenery>, WorldScenery>(wld.scenery);
+    quickSortByArrayId<PGELIST<WorldPathTile>, WorldPathTile>(wld.paths);
+    quickSortByArrayId<PGELIST<WorldLevelTile>, WorldLevelTile>(wld.levels);
+    quickSortByArrayId<PGELIST<WorldMusicBox>, WorldMusicBox>(wld.music);
 }
