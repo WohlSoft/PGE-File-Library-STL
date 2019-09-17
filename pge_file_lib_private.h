@@ -329,6 +329,18 @@ inline PGESTRING fromBoolToNum(bool num)
 #define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
 #endif
 
+inline bool PGE_floatEqual(double l, double r, double precission)
+{
+    return static_cast<long long>(l * std::pow(10.0, precission)) ==
+           static_cast<long long>(r * std::pow(10.0, precission));
+}
+
+inline bool PGE_floatEqual(float l, float r, float precission)
+{
+    return static_cast<long long>(l * std::pow(10.0f, precission)) ==
+           static_cast<long long>(r * std::pow(10.0f, precission));
+}
+
 inline bool PGE_StartsWith(PGESTRING src, PGESTRING with)
 {
 #ifdef PGE_FILES_QT

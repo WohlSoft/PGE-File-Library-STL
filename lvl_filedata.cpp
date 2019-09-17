@@ -27,7 +27,7 @@
 /*********************************************************************************/
 
 //Built-in order priorities per SMBX-64 BGO's
-const int _smbx64_bgo_sort_priorities[190] =
+static const int _smbx64_bgo_sort_priorities[190] =
 {
     77, 75, 75, 75, 75, 75, 75, 75, 75, 75, 20, 20, 75, 10, 75, 75, 75, 75, 75, 75, 75, 75, 125, 125, 125, 26,
     75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 125, 125, 75, 80, 125, 125, 125, 30,
@@ -46,7 +46,7 @@ void FileFormats::smbx64LevelPrepare(LevelData &lvl)
     {
         if(lvl.bgo[q].smbx64_sp < 0)
         {
-            if((lvl.bgo[q].id > 0) && (lvl.bgo[q].id <= (unsigned)190))
+            if((lvl.bgo[q].id > 0u) && (lvl.bgo[q].id <= 190u))
                 lvl.bgo[q].smbx64_sp_apply = _smbx64_bgo_sort_priorities[lvl.bgo[q].id - 1];
         }
         else
@@ -135,6 +135,7 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
 #undef ST
 }
 
+
 void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
 {
     if(lvl.bgo.size() <= 1) return; //Nothing to sort!
@@ -163,20 +164,34 @@ void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
             {
                 while((
                           (lvl.bgo[ST(R)].smbx64_sp_apply > piv.smbx64_sp_apply) ||
+
+                            (( (lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply) ||
+                               (lvl.bgo[ST(R)].id == piv.id)) && (lvl.bgo[ST(R)].z_offset > piv.z_offset))||
+
+                            ((lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply || lvl.bgo[ST(R)].id == piv.id) &&
+                                PGE_floatEqual(lvl.bgo[ST(R)].z_offset, piv.z_offset, 8) &&
+                               (lvl.bgo[ST(L)].meta.array_id >= piv.meta.array_id)) // ||
                           /*((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x > piv.x))||
                             ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y > piv.y))||
                             ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y == piv.y) && (lvl.bgo[R].array_id >= piv.array_id))*/
-                          ((lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(R)].meta.array_id >= piv.meta.array_id))
+                          //((lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(R)].meta.array_id >= piv.meta.array_id))
                       ) && (L < R)) R--;
                 if(L < R) lvl.bgo[ST(L++)] = lvl.bgo[ST(R)];
 
                 while(
                     (
                         (lvl.bgo[ST(L)].smbx64_sp_apply < piv.smbx64_sp_apply) ||
+
+                            (( (lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply) ||
+                               (lvl.bgo[ST(R)].id == piv.id)) && (lvl.bgo[ST(L)].z_offset < piv.z_offset))||
+
+                            ((lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply || lvl.bgo[ST(R)].id == piv.id) &&
+                                PGE_floatEqual(lvl.bgo[ST(L)].z_offset, piv.z_offset, 8) &&
+                                (lvl.bgo[ST(L)].meta.array_id <= piv.meta.array_id)) // ||
                         /*((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x < piv.x))||
                           ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y < piv.y))||
                           ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y == piv.y) && (lvl.bgo[L].array_id <= piv.array_id))*/
-                        ((lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(L)].meta.array_id <= piv.meta.array_id))
+                        // ((lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(L)].meta.array_id <= piv.meta.array_id))
                     ) && (L < R)) L++;
                 if(L < R) lvl.bgo[ST(R--)] = lvl.bgo[ST(L)];
             }
