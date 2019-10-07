@@ -150,7 +150,7 @@ static inline bool bMore(const LevelBGO &a, const LevelBGO &b)
     bool sp_gr = sp_use && (a.smbx64_sp_apply > b.smbx64_sp_apply);
     bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
 
-    bool id_eq = a.id == b.id;
+    bool id_eq = !sp_use && (a.id == b.id);
 
     bool zOffset_gr = a.z_offset > b.z_offset;
     bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
@@ -168,7 +168,7 @@ static inline bool bLess(const LevelBGO &a, const LevelBGO &b)
     bool sp_lt = sp_use && (a.smbx64_sp_apply < b.smbx64_sp_apply);
     bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
 
-    bool id_eq = a.id == b.id;
+    bool id_eq = !sp_use && (a.id == b.id);
 
     bool zOffset_lt = a.z_offset < b.z_offset;
     bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
