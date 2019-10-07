@@ -95,6 +95,8 @@ struct LevelSection
     long PositionX = -10;
     //! Recent camera Y position
     long PositionY = -10;
+    //! JSON-like string with a custom properties (without master brackets, like "param":"value,["subparam":value])
+    PGESTRING custom_params;
 };
 
 /*!

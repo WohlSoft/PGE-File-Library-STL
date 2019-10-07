@@ -322,6 +322,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("SD", lvl_section.lock_up_scroll)//Down-way scroll only (No Turn-forward)
                     PGEX_BoolVal("SU", lvl_section.lock_down_scroll)//Up-way scroll only (No Turn-forward)
                     PGEX_BoolVal("UW", lvl_section.underwater)//Underwater bit
+                    PGEX_StrVal("XTRA", lvl_section.custom_params)//Custom JSON data tree
                 }
                 lvl_section.PositionX = lvl_section.size_left - 10;
                 lvl_section.PositionY = lvl_section.size_top - 10;
@@ -1723,6 +1724,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             if(section.underwater)
                 out << PGEFile::value("UW", PGEFile::WriteBool(section.underwater));  // Underwater bit
+
+            if(!IsEmpty(section.custom_params))
+                out << PGEFile::value("XTRA", PGEFile::WriteStr(section.custom_params));
 
             //out << PGEFile::value("SL", PGEFile::WriteBool(section.noforward));  // Left-way scroll only (No Turn-forward)
             out << "\n";
