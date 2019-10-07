@@ -70,9 +70,24 @@ int FileFormats::smbx64CountStars(LevelData &lvl)
     return stars;
 }
 
+static inline bool bMore(const LevelBlock &a, const LevelBlock &b)
+{
+    return (a.x > b.x) ||
+          ((a.x == b.x) && (a.y >  b.y)) ||
+          ((a.x == b.x) && (a.y == b.y) && (a.meta.array_id >= b.meta.array_id));
+}
+
+static inline bool bLess(const LevelBlock &a, const LevelBlock &b)
+{
+    return (a.x < b.x) ||
+          ((a.x == b.x) && (a.y <  b.y)) ||
+          ((a.x == b.x) && (a.y == b.y) && (a.meta.array_id <= b.meta.array_id));
+}
+
 void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
 {
-    if(lvl.blocks.size() <= 1) return; //Nothing to sort!
+    if(lvl.blocks.size() <= 1)
+        return; //Nothing to sort!
 
     class my_stack : public std::stack< int >
     {
@@ -96,20 +111,14 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
             piv = lvl.blocks[ST(L)];
             while(L < R)
             {
-                while((
-                          (lvl.blocks[ST(R)].x > piv.x) ||
-                          ((lvl.blocks[ST(R)].x == piv.x) && (lvl.blocks[ST(R)].y > piv.y)) ||
-                          ((lvl.blocks[ST(R)].x == piv.x) && (lvl.blocks[ST(R)].y == piv.y) && (lvl.blocks[ST(R)].meta.array_id >= piv.meta.array_id))
-                      ) && (L < R)) R--;
-                if(L < R) lvl.blocks[ST(L++)] = lvl.blocks[ST(R)];
-
-                while(
-                    (
-                        (lvl.blocks[ST(L)].x < piv.x) ||
-                        ((lvl.blocks[ST(L)].x == piv.x) && (lvl.blocks[ST(L)].y < piv.y)) ||
-                        ((lvl.blocks[ST(L)].x == piv.x) && (lvl.blocks[ST(L)].y == piv.y) && (lvl.blocks[ST(L)].meta.array_id <= piv.meta.array_id))
-                    ) && (L < R)) L++;
-                if(L < R) lvl.blocks[ST(R--)] = lvl.blocks[ST(L)];
+                while(bMore(lvl.blocks[ST(R)], piv) && (L < R))
+                    R--;
+                if(L < R)
+                    lvl.blocks[ST(L++)] = lvl.blocks[ST(R)];
+                while(bLess(lvl.blocks[ST(L)], piv) && (L < R))
+                    L++;
+                if(L < R)
+                    lvl.blocks[ST(R--)] = lvl.blocks[ST(L)];
             }
             lvl.blocks[ST(L)] = piv;
             beg.push(L + 1);
@@ -135,6 +144,41 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
 #undef ST
 }
 
+static inline bool bMore(const LevelBGO &a, const LevelBGO &b)
+{
+    bool sp_use = (a.id > 0u) && (a.id <= 190u) && (b.id > 0u) && (b.id <= 190u);
+    bool sp_gr = sp_use && (a.smbx64_sp_apply > b.smbx64_sp_apply);
+    bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
+
+    bool id_eq = !sp_use && (a.id == b.id);
+
+    bool zOffset_gr = a.z_offset > b.z_offset;
+    bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
+
+    bool arrayId_ge = a.meta.array_id >= b.meta.array_id;
+
+    return  sp_gr ||
+          ((sp_eq || id_eq) && zOffset_gr) ||
+          ((sp_eq || id_eq) && zOffset_eq && arrayId_ge);
+}
+
+static inline bool bLess(const LevelBGO &a, const LevelBGO &b)
+{
+    bool sp_use = (a.id > 0u) && (a.id <= 190u) && (b.id > 0u) && (b.id <= 190u);
+    bool sp_lt = sp_use && (a.smbx64_sp_apply < b.smbx64_sp_apply);
+    bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
+
+    bool id_eq = !sp_use && (a.id == b.id);
+
+    bool zOffset_lt = a.z_offset < b.z_offset;
+    bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
+
+    bool arrayId_le = a.meta.array_id <= b.meta.array_id;
+
+    return  sp_lt ||
+          ((sp_eq || id_eq) && zOffset_lt) ||
+          ((sp_eq || id_eq) && zOffset_eq && arrayId_le);
+}
 
 void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
 {
@@ -162,38 +206,14 @@ void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
             piv = lvl.bgo[ST(L)];
             while(L < R)
             {
-                while((
-                          (lvl.bgo[ST(R)].smbx64_sp_apply > piv.smbx64_sp_apply) ||
-
-                            (( (lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply) ||
-                               (lvl.bgo[ST(R)].id == piv.id)) && (lvl.bgo[ST(R)].z_offset > piv.z_offset))||
-
-                            ((lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply || lvl.bgo[ST(R)].id == piv.id) &&
-                                PGE_floatEqual(lvl.bgo[ST(R)].z_offset, piv.z_offset, 8) &&
-                               (lvl.bgo[ST(L)].meta.array_id >= piv.meta.array_id)) // ||
-                          /*((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x > piv.x))||
-                            ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y > piv.y))||
-                            ((lvl.bgo[R].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[R].x == piv.x) && (lvl.bgo[R].y == piv.y) && (lvl.bgo[R].array_id >= piv.array_id))*/
-                          //((lvl.bgo[ST(R)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(R)].meta.array_id >= piv.meta.array_id))
-                      ) && (L < R)) R--;
-                if(L < R) lvl.bgo[ST(L++)] = lvl.bgo[ST(R)];
-
-                while(
-                    (
-                        (lvl.bgo[ST(L)].smbx64_sp_apply < piv.smbx64_sp_apply) ||
-
-                            (( (lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply) ||
-                               (lvl.bgo[ST(R)].id == piv.id)) && (lvl.bgo[ST(L)].z_offset < piv.z_offset))||
-
-                            ((lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply || lvl.bgo[ST(R)].id == piv.id) &&
-                                PGE_floatEqual(lvl.bgo[ST(L)].z_offset, piv.z_offset, 8) &&
-                                (lvl.bgo[ST(L)].meta.array_id <= piv.meta.array_id)) // ||
-                        /*((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x < piv.x))||
-                          ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y < piv.y))||
-                          ((lvl.bgo[L].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[L].x == piv.x) && (lvl.bgo[L].y == piv.y) && (lvl.bgo[L].array_id <= piv.array_id))*/
-                        // ((lvl.bgo[ST(L)].smbx64_sp_apply == piv.smbx64_sp_apply) && (lvl.bgo[ST(L)].meta.array_id <= piv.meta.array_id))
-                    ) && (L < R)) L++;
-                if(L < R) lvl.bgo[ST(R--)] = lvl.bgo[ST(L)];
+                while(bMore(lvl.bgo[ST(R)], piv) && (L < R))
+                    R--;
+                if(L < R)
+                    lvl.bgo[ST(L++)] = lvl.bgo[ST(R)];
+                while(bLess(lvl.bgo[ST(L)], piv) && (L < R))
+                    L++;
+                if(L < R)
+                    lvl.bgo[ST(R--)] = lvl.bgo[ST(L)];
             }
             lvl.bgo[ST(L)] = piv;
             beg.push(L + 1);

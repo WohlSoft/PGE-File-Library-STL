@@ -55,16 +55,17 @@ namespace smbx64Format
 bool SMBX64::IsUInt(PGESTRING in) // UNSIGNED INT
 {
     using namespace smbx64Format;
-    #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
     PGEChar *data = in.data();
-    #else
-    PGEChar *data = (char *)in.data();
-    #endif
+#else
+    PGEChar *data = const_cast<char *>(in.data());
+#endif
     pge_size_t strSize = in.size();
     for(pge_size_t i = 0; i < strSize; i++)
     {
         PGEChar c = *data++;
-        if((c < '0') || (c > '9')) return false;
+        if((c < '0') || (c > '9'))
+            return false;
     }
     return true;
 }
@@ -74,19 +75,22 @@ bool SMBX64::IsSInt(PGESTRING in) // SIGNED INT
     using namespace smbx64Format;
     if(IsEmpty(in)) return false;
 
-    if((in.size() == 1) && (!isDegit(in[0])))           return false;
-    if((!isDegit(in[0])) && (PGEGetChar(in[0]) != '-')) return false;
+    if((in.size() == 1) && (!isDegit(in[0])))
+        return false;
+    if((!isDegit(in[0])) && (PGEGetChar(in[0]) != '-'))
+        return false;
 
-    #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
     PGEChar *data = in.data() + 1;
-    #else
-    PGEChar *data = (char *)in.data() + 1;
-    #endif
+#else
+    PGEChar *data = &in[0] + 1;
+#endif
     pge_size_t strSize = in.size();
     for(pge_size_t i = 1; i < strSize; i++)
     {
         PGEChar c = *data++;
-        if((c < '0') || (c > '9')) return false;
+        if((c < '0') || (c > '9'))
+            return false;
     }
 
     return true;
@@ -152,15 +156,22 @@ bool SMBX64::IsQuotedString(PGESTRING in)
     {
         if(i == 0)
         {
-            if(in[i] != '"') return QStrBAD;
+            if(in[i] != '"')
+                return QStrBAD;
         }
         else if(i == in.size() - 1)
         {
-            if(in[i] != '"') return QStrBAD;
+            if(in[i] != '"')
+                return QStrBAD;
         }
-        else if(in[i] == '"') return QStrBAD;
-        else if(in[i] == '"') return QStrBAD;
+        else if(in[i] == '"')
+            return QStrBAD;
+        else if(in[i] == '"')
+            return QStrBAD;
     }
-    if(i == 0) return QStrBAD; //This is INVERTED validator. If false - good, true - bad.
+    if(i == 0)
+        return QStrBAD; //This is INVERTED validator. If false - good, true - bad.
     return QStrGOOD;
+#undef QStrGOOD
+#undef QStrBAD
 }
