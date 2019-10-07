@@ -82,3 +82,10 @@ install(FILES
         DESTINATION include/PGE_File_Formats
 )
 
+# === Unit tests ====
+option(WITH_UNIT_TESTS "Enable unit testing" OFF)
+if(WITH_UNIT_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
+

@@ -274,7 +274,7 @@ class PGEFile
          * \param input Plain text string
          * \return Encoded PGE-X raw string
          */
-        static inline PGESTRING WriteStr(PGESTRING &input)
+        static inline PGESTRING WriteStr(const PGESTRING &input)
         {
             PGESTRING output;
             escapeString(output, input, true);

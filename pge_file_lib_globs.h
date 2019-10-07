@@ -61,7 +61,6 @@ typedef QString PGESTRING;
 typedef QStringList PGESTRINGList;
 typedef QChar   PGEChar;
 #define PGELIST QList
-
 #define PGEPAIR QPair
 
 #else /* PGE_FILES_QT */
@@ -77,7 +76,6 @@ typedef std::string                 PGESTRING;
 typedef std::vector<std::string>    PGESTRINGList;
 typedef char PGEChar;
 #define PGELIST std::vector
-
 #define PGEPAIR std::pair
 
 #endif /* PGE_FILES_QT */

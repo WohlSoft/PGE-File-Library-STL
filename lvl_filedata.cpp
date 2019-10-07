@@ -27,7 +27,7 @@
 /*********************************************************************************/
 
 //Built-in order priorities per SMBX-64 BGO's
-const int _smbx64_bgo_sort_priorities[190] =
+static const int _smbx64_bgo_sort_priorities[190] =
 {
     77, 75, 75, 75, 75, 75, 75, 75, 75, 75, 20, 20, 75, 10, 75, 75, 75, 75, 75, 75, 75, 75, 125, 125, 125, 26,
     75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 125, 125, 75, 80, 125, 125, 125, 30,
@@ -46,7 +46,7 @@ void FileFormats::smbx64LevelPrepare(LevelData &lvl)
     {
         if(lvl.bgo[q].smbx64_sp < 0)
         {
-            if((lvl.bgo[q].id > 0) && (lvl.bgo[q].id <= (unsigned)190))
+            if((lvl.bgo[q].id > 0u) && (lvl.bgo[q].id <= 190u))
                 lvl.bgo[q].smbx64_sp_apply = _smbx64_bgo_sort_priorities[lvl.bgo[q].id - 1];
         }
         else

@@ -49,7 +49,7 @@ inline void PGE_SPLITSTRING(PGESTRINGList &dst, PGESTRING &src, PGESTRING sep)
 {
     dst = src.split(sep);
 }
-inline PGESTRING PGE_ReplSTRING(PGESTRING &src, PGESTRING from, PGESTRING to)
+inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
 {
     return src.replace(from, to);
 }
@@ -328,6 +328,18 @@ inline PGESTRING fromBoolToNum(bool num)
 #define PGE_BASE64ENC_A(src) PGE_FileFormats_misc::base64_encodeA(src)
 #define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
 #endif
+
+inline bool PGE_floatEqual(double l, double r, double precission)
+{
+    return static_cast<long long>(l * std::pow(10.0, precission)) ==
+           static_cast<long long>(r * std::pow(10.0, precission));
+}
+
+inline bool PGE_floatEqual(float l, float r, float precission)
+{
+    return static_cast<long long>(l * std::pow(10.0f, precission)) ==
+           static_cast<long long>(r * std::pow(10.0f, precission));
+}
 
 inline bool PGE_StartsWith(PGESTRING src, PGESTRING with)
 {
