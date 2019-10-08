@@ -150,6 +150,7 @@ static inline bool bMore(const LevelBGO &a, const LevelBGO &b)
     bool sp_gr = sp_use && (a.smbx64_sp_apply > b.smbx64_sp_apply);
     bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
 
+    bool id_gr = !sp_use && (a.id >  b.id);
     bool id_eq = !sp_use && (a.id == b.id);
 
     bool zOffset_gr = a.z_offset > b.z_offset;
@@ -158,6 +159,7 @@ static inline bool bMore(const LevelBGO &a, const LevelBGO &b)
     bool arrayId_ge = a.meta.array_id >= b.meta.array_id;
 
     return  sp_gr ||
+            id_gr ||
           ((sp_eq || id_eq) && zOffset_gr) ||
           ((sp_eq || id_eq) && zOffset_eq && arrayId_ge);
 }
@@ -168,6 +170,7 @@ static inline bool bLess(const LevelBGO &a, const LevelBGO &b)
     bool sp_lt = sp_use && (a.smbx64_sp_apply < b.smbx64_sp_apply);
     bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
 
+    bool id_lt = !sp_use && (a.id <  b.id);
     bool id_eq = !sp_use && (a.id == b.id);
 
     bool zOffset_lt = a.z_offset < b.z_offset;
@@ -176,6 +179,7 @@ static inline bool bLess(const LevelBGO &a, const LevelBGO &b)
     bool arrayId_le = a.meta.array_id <= b.meta.array_id;
 
     return  sp_lt ||
+            id_lt ||
           ((sp_eq || id_eq) && zOffset_lt) ||
           ((sp_eq || id_eq) && zOffset_eq && arrayId_le);
 }
