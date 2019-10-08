@@ -63,7 +63,7 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
 
         nextLine();
         SMBX64::ReadStr(&FileData.EpisodeTitle, line); //Episode name
-#if 0 //More detail header!
+
         if(ge(55))
         {
             nextLine();
@@ -123,7 +123,6 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
             FileData.authors += (IsEmpty(FileData.author4)) ? "" : FileData.author4 + "\n";
             FileData.authors += (IsEmpty(FileData.author5)) ? "" : FileData.author5;
         }
-#endif
 
         FileData.meta.ReadFileValid = true;
         in.close();
