@@ -471,6 +471,9 @@ struct WorldData
     //! Credits scene background music
     PGESTRING authors_music = "";
 
+    //! JSON-like string with a custom properties (without master brackets, like "param":"value,["subparam":value])
+    PGESTRING custom_params;
+
     //! List of available terrain tiles
     PGELIST<WorldTerrainTile > tiles;
     unsigned int tile_array_id = 1;

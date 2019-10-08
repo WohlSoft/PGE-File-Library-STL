@@ -156,6 +156,13 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
                 else
                     goto badfile;
             }
+            else if(data[i][0] == "XTRA") //Extra settings
+            {
+                if(PGEFile::IsQoutedString(data[i][1]))
+                    FileData.custom_params = PGEFile::X2STRING(data[i][1]);
+                else
+                    goto badfile;
+            }
         }
     }
 
@@ -259,6 +266,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                     PGEX_UIntVal("SZ", FileData.stars)              //Starz number
                     PGEX_StrVal("CD", FileData.authors)     //Credits list
                     PGEX_StrVal("CM", FileData.authors_music)     //Credits scene background music
+                    PGEX_StrVal("XTRA", FileData.custom_params)     //World-wide Extra settings
                 }
             }
         }//head
@@ -542,6 +550,8 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
             out << PGEFile::value("CD", PGEFile::WriteStr(FileData.authors));   // Credits
         if(!IsEmpty(FileData.authors_music))
             out << PGEFile::value("CM", PGEFile::WriteStr(FileData.authors_music));   // Credits scene background music
+        if(!IsEmpty(FileData.custom_params))
+            out << PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));   // World-wide extra settings
 
         out << "\n";
         out << "HEAD_END\n";

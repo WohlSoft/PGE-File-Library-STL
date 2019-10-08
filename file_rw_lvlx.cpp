@@ -140,6 +140,13 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
                 else
                     goto badfile;
             }
+            else if(data[i][0] == "XTRA") //Extra settings
+            {
+                if(PGEFile::IsQoutedString(data[i][1]))
+                    FileData.custom_params = PGEFile::X2STRING(data[i][1]);
+                else
+                    goto badfile;
+            }
         }
     }
 
@@ -246,6 +253,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrVal("DL", FileData.open_level_on_fail) //Open level on fail
                     PGEX_UIntVal("DE", FileData.open_level_on_fail_warpID) //Open level's warpID on fail
                     PGEX_StrArrVal("NO", FileData.player_names_overrides) //Overrides of player names
+                    PGEX_StrVal("XTRA", FileData.custom_params) //Level-wide Extra settings
                 }
             }
         }//HEADER
@@ -1609,6 +1617,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
         if(!IsEmpty(FileData.player_names_overrides))
             out << PGEFile::value("NO", PGEFile::WriteStrArr(FileData.player_names_overrides));    // Overrides of player names
+
+        if(!IsEmpty(FileData.custom_params))
+            out << PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));
 
         out << "\n";
         out << "HEAD_END\n";

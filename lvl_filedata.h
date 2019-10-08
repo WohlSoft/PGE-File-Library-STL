@@ -1001,6 +1001,9 @@ struct LevelData
     //! Overrides of playable character names per index/ID (blank entry - use config pack default)
     PGESTRINGList player_names_overrides;
 
+    //! JSON-like string with a custom properties (without master brackets, like "param":"value,["subparam":value])
+    PGESTRING custom_params;
+
     struct MusicOverrider
     {
         enum Type {
