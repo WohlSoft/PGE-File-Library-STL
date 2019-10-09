@@ -1597,36 +1597,28 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     }
 
     //HEAD section
-    if(
-        (!IsEmpty(FileData.LevelName)) ||
-        (FileData.stars > 0) ||
-        (!IsEmpty(FileData.open_level_on_fail)) ||
-        (FileData.open_level_on_fail_warpID > 0) ||
-        (!IsEmpty(FileData.player_names_overrides)) ||
-        (!IsEmpty(FileData.custom_params))
-    )
     {
-        out << "HEAD\n";
-
+        PGESTRING outHeader;
         if(!IsEmpty(FileData.LevelName))
-            out << PGEFile::value("TL", PGEFile::WriteStr(FileData.LevelName)); // Level title
+            outHeader += PGEFile::value("TL", PGEFile::WriteStr(FileData.LevelName)); // Level title
 
-        out << PGEFile::value("SZ", PGEFile::WriteInt(FileData.stars));      // Stars number
+        if(FileData.stars > 0)
+            outHeader += PGEFile::value("SZ", PGEFile::WriteInt(FileData.stars));      // Stars number
 
         if(!IsEmpty(FileData.open_level_on_fail))
-            out << PGEFile::value("DL", PGEFile::WriteStr(FileData.open_level_on_fail)); // Open level on fail
+            outHeader += PGEFile::value("DL", PGEFile::WriteStr(FileData.open_level_on_fail)); // Open level on fail
 
         if(FileData.open_level_on_fail_warpID > 0)
-            out << PGEFile::value("DE", PGEFile::WriteInt(FileData.open_level_on_fail_warpID));    // Open WarpID of level on fail
+            outHeader += PGEFile::value("DE", PGEFile::WriteInt(FileData.open_level_on_fail_warpID));    // Open WarpID of level on fail
 
         if(!IsEmpty(FileData.player_names_overrides))
-            out << PGEFile::value("NO", PGEFile::WriteStrArr(FileData.player_names_overrides));    // Overrides of player names
+            outHeader += PGEFile::value("NO", PGEFile::WriteStrArr(FileData.player_names_overrides));    // Overrides of player names
 
         if(!IsEmpty(FileData.custom_params))
-            out << PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));
+            outHeader += PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));
 
-        out << "\n";
-        out << "HEAD_END\n";
+        if(!IsEmpty(outHeader))
+            out << "HEAD\n" << outHeader << "\n" << "HEAD_END\n";
     }
 
     //////////////////////////////////////MetaData////////////////////////////////////////////////

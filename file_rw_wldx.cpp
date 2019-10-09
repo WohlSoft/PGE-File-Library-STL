@@ -499,65 +499,47 @@ bool FileFormats::WriteExtendedWldFileRaw(WorldData &FileData, PGESTRING &rawdat
 
 bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData)
 {
-    pge_size_t i;
-    bool addArray = false;
+    pge_size_t i = 0;
     FileData.meta.RecentFormat = WorldData::PGEX;
-    addArray = false;
-
-    for(pge_size_t z = 0; z < FileData.nocharacter.size(); z++)
-    {
-        bool x = FileData.nocharacter[z];
-        if(x) addArray = true;
-    }
 
     //HEAD section
-    if(
-        (!IsEmpty(FileData.EpisodeTitle)) ||
-        (addArray) ||
-        (!IsEmpty(FileData.IntroLevel_file)) ||
-        (!IsEmpty(FileData.GameOverLevel_file)) ||
-        (FileData.HubStyledWorld) ||
-        (FileData.restartlevel) ||
-        (FileData.stars > 0) ||
-        (!IsEmpty(FileData.authors)) ||
-        (!IsEmpty(FileData.authors_music)) ||
-        (!IsEmpty(FileData.custom_params))
-    )
     {
-        out << "HEAD\n";
+        PGESTRING outHeader;
 
         if(!IsEmpty(FileData.EpisodeTitle))
-            out << PGEFile::value("TL", PGEFile::WriteStr(FileData.EpisodeTitle)); // Episode title
+            outHeader += PGEFile::value("TL", PGEFile::WriteStr(FileData.EpisodeTitle)); // Episode title
 
-        addArray = false;
-
-        for(pge_size_t z = 0; z < FileData.nocharacter.size(); z++)
         {
-            bool x = FileData.nocharacter[z];
-            if(x) addArray = true;
+            bool needToAdd = false;
+            for(pge_size_t z = 0; z < FileData.nocharacter.size(); z++)
+            {
+                bool x = FileData.nocharacter[z];
+                if(x) needToAdd = true;
+            }
+
+            if(needToAdd)
+                outHeader += PGEFile::value("DC", PGEFile::WriteBoolArr(FileData.nocharacter)); // Disabled characters
         }
 
-        if(addArray)
-            out << PGEFile::value("DC", PGEFile::WriteBoolArr(FileData.nocharacter)); // Disabled characters
         if(!IsEmpty(FileData.IntroLevel_file))
-            out << PGEFile::value("IT", PGEFile::WriteStr(FileData.IntroLevel_file)); // Intro level
+            outHeader += PGEFile::value("IT", PGEFile::WriteStr(FileData.IntroLevel_file)); // Intro level
         if(!IsEmpty(FileData.GameOverLevel_file))
-            out << PGEFile::value("GO", PGEFile::WriteStr(FileData.GameOverLevel_file)); // Game Over level
+            outHeader += PGEFile::value("GO", PGEFile::WriteStr(FileData.GameOverLevel_file)); // Game Over level
         if(FileData.HubStyledWorld)
-            out << PGEFile::value("HB", PGEFile::WriteBool(FileData.HubStyledWorld)); // Hub-styled episode
+            outHeader += PGEFile::value("HB", PGEFile::WriteBool(FileData.HubStyledWorld)); // Hub-styled episode
         if(FileData.restartlevel)
-            out << PGEFile::value("RL", PGEFile::WriteBool(FileData.restartlevel)); // Restart on fail
+            outHeader += PGEFile::value("RL", PGEFile::WriteBool(FileData.restartlevel)); // Restart on fail
         if(FileData.stars > 0)
-            out << PGEFile::value("SZ", PGEFile::WriteInt(FileData.stars));      // Total stars number
+            outHeader += PGEFile::value("SZ", PGEFile::WriteInt(FileData.stars));      // Total stars number
         if(!IsEmpty(FileData.authors))
-            out << PGEFile::value("CD", PGEFile::WriteStr(FileData.authors));   // Credits
+            outHeader += PGEFile::value("CD", PGEFile::WriteStr(FileData.authors));   // Credits
         if(!IsEmpty(FileData.authors_music))
-            out << PGEFile::value("CM", PGEFile::WriteStr(FileData.authors_music));   // Credits scene background music
+            outHeader += PGEFile::value("CM", PGEFile::WriteStr(FileData.authors_music));   // Credits scene background music
         if(!IsEmpty(FileData.custom_params))
-            out << PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));   // World-wide extra settings
+            outHeader += PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));   // World-wide extra settings
 
-        out << "\n";
-        out << "HEAD_END\n";
+        if(!IsEmpty(outHeader))
+            out << "HEAD\n" << outHeader << "\n" << "HEAD_END\n";
     }
 
     //////////////////////////////////////MetaData////////////////////////////////////////////////
