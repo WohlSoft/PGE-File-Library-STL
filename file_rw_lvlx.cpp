@@ -1597,10 +1597,14 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
     }
 
     //HEAD section
-    if((!IsEmpty(FileData.LevelName)) ||
-       (FileData.stars > 0) ||
-       (!IsEmpty(FileData.open_level_on_fail)) ||
-       (FileData.open_level_on_fail_warpID > 0))
+    if(
+        (!IsEmpty(FileData.LevelName)) ||
+        (FileData.stars > 0) ||
+        (!IsEmpty(FileData.open_level_on_fail)) ||
+        (FileData.open_level_on_fail_warpID > 0) ||
+        (!IsEmpty(FileData.player_names_overrides)) ||
+        (!IsEmpty(FileData.custom_params))
+    )
     {
         out << "HEAD\n";
 

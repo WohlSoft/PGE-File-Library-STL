@@ -515,10 +515,13 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
         (!IsEmpty(FileData.EpisodeTitle)) ||
         (addArray) ||
         (!IsEmpty(FileData.IntroLevel_file)) ||
+        (!IsEmpty(FileData.GameOverLevel_file)) ||
         (FileData.HubStyledWorld) ||
         (FileData.restartlevel) ||
         (FileData.stars > 0) ||
-        (!IsEmpty(FileData.authors))
+        (!IsEmpty(FileData.authors)) ||
+        (!IsEmpty(FileData.authors_music)) ||
+        (!IsEmpty(FileData.custom_params))
     )
     {
         out << "HEAD\n";
@@ -538,7 +541,7 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
             out << PGEFile::value("DC", PGEFile::WriteBoolArr(FileData.nocharacter)); // Disabled characters
         if(!IsEmpty(FileData.IntroLevel_file))
             out << PGEFile::value("IT", PGEFile::WriteStr(FileData.IntroLevel_file)); // Intro level
-        if(!IsEmpty(FileData.IntroLevel_file))
+        if(!IsEmpty(FileData.GameOverLevel_file))
             out << PGEFile::value("GO", PGEFile::WriteStr(FileData.GameOverLevel_file)); // Game Over level
         if(FileData.HubStyledWorld)
             out << PGEFile::value("HB", PGEFile::WriteBool(FileData.HubStyledWorld)); // Hub-styled episode
