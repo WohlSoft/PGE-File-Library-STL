@@ -158,42 +158,22 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
 
 static inline bool smbx64BgoMore(const LevelBGO &a, const LevelBGO &b)
 {
-    bool sp_use = (a.id > 0u) && (a.id <= 190u) && (b.id > 0u) && (b.id <= 190u);
-    bool sp_gr = sp_use && (a.smbx64_sp_apply > b.smbx64_sp_apply);
-    bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
-
-    bool id_gr = !sp_use && (a.id >  b.id);
-    bool id_eq = !sp_use && (a.id == b.id);
-
-    bool zOffset_gr = a.z_offset > b.z_offset;
-    bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
+    bool sp_gr = (a.smbx64_sp_apply > b.smbx64_sp_apply);
+    bool sp_eq = (a.smbx64_sp_apply == b.smbx64_sp_apply);
 
     bool arrayId_ge = a.meta.array_id >= b.meta.array_id;
 
-    return  sp_gr ||
-            id_gr ||
-          ((sp_eq || id_eq) && zOffset_gr) ||
-          ((sp_eq || id_eq) && zOffset_eq && arrayId_ge);
+    return  sp_gr || (sp_eq && arrayId_ge);
 }
 
 static inline bool smbx64BgoLess(const LevelBGO &a, const LevelBGO &b)
 {
-    bool sp_use = (a.id > 0u) && (a.id <= 190u) && (b.id > 0u) && (b.id <= 190u);
-    bool sp_lt = sp_use && (a.smbx64_sp_apply < b.smbx64_sp_apply);
-    bool sp_eq = sp_use && (a.smbx64_sp_apply == b.smbx64_sp_apply);
-
-    bool id_lt = !sp_use && (a.id <  b.id);
-    bool id_eq = !sp_use && (a.id == b.id);
-
-    bool zOffset_lt = a.z_offset < b.z_offset;
-    bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
+    bool sp_lt = (a.smbx64_sp_apply < b.smbx64_sp_apply);
+    bool sp_eq = (a.smbx64_sp_apply == b.smbx64_sp_apply);
 
     bool arrayId_le = a.meta.array_id <= b.meta.array_id;
 
-    return  sp_lt ||
-            id_lt ||
-          ((sp_eq || id_eq) && zOffset_lt) ||
-          ((sp_eq || id_eq) && zOffset_eq && arrayId_le);
+    return  sp_lt || (sp_eq && arrayId_le);
 }
 
 void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
