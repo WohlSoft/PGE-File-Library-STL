@@ -231,6 +231,21 @@ void FileFormats::smbx2bLevelSortBGOs(LevelData &lvl)
     quickSort<PGELIST<LevelBGO>, LevelBGO>(lvl.bgo, smbx2BgoLess, sbx2BgoMore);
 }
 
+static inline bool arrayIdBgoMore(const LevelBGO &a, const LevelBGO &b)
+{
+    return a.meta.array_id >= b.meta.array_id;
+}
+
+static inline bool arrayIdBgoLess(const LevelBGO &a, const LevelBGO &b)
+{
+    return a.meta.array_id <= b.meta.array_id;
+}
+
+void FileFormats::arrayIdLevelSortBGOs(LevelData &lvl)
+{
+    quickSort<PGELIST<LevelBGO>, LevelBGO>(lvl.bgo, arrayIdBgoLess, arrayIdBgoMore);
+}
+
 int FileFormats::smbx64LevelCheckLimits(LevelData &lvl)
 {
     int errorCode = SMBX64_FINE;
