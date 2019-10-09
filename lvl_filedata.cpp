@@ -70,23 +70,10 @@ int FileFormats::smbx64CountStars(LevelData &lvl)
     return stars;
 }
 
-static inline bool bMore(const LevelBlock &a, const LevelBlock &b)
+template<class T, class U>
+void quickSort(T &array, bool (*qLess)(const U&, const U&), bool (*qMore)(const U&, const U&))
 {
-    return (a.x > b.x) ||
-          ((a.x == b.x) && (a.y >  b.y)) ||
-          ((a.x == b.x) && (a.y == b.y) && (a.meta.array_id >= b.meta.array_id));
-}
-
-static inline bool bLess(const LevelBlock &a, const LevelBlock &b)
-{
-    return (a.x < b.x) ||
-          ((a.x == b.x) && (a.y <  b.y)) ||
-          ((a.x == b.x) && (a.y == b.y) && (a.meta.array_id <= b.meta.array_id));
-}
-
-void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
-{
-    if(lvl.blocks.size() <= 1)
+    if(array.size() <= 1)
         return; //Nothing to sort!
 
     class my_stack : public std::stack< int >
@@ -97,10 +84,10 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
 
     my_stack beg;
     my_stack end;
-    LevelBlock piv;
+    U piv;
     int i = 0, L, R, swapv;
     beg.push(0);
-    end.push((int)lvl.blocks.size());
+    end.push((int)array.size());
 #define ST(x) static_cast<pge_size_t>(x)
     while(i >= 0)
     {
@@ -108,19 +95,19 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
         R = end.c[ST(i)] - 1;
         if(L < R)
         {
-            piv = lvl.blocks[ST(L)];
+            piv = array[ST(L)];
             while(L < R)
             {
-                while(bMore(lvl.blocks[ST(R)], piv) && (L < R))
+                while(qMore(array[ST(R)], piv) && (L < R))
                     R--;
                 if(L < R)
-                    lvl.blocks[ST(L++)] = lvl.blocks[ST(R)];
-                while(bLess(lvl.blocks[ST(L)], piv) && (L < R))
+                    array[ST(L++)] = array[ST(R)];
+                while(qLess(array[ST(L)], piv) && (L < R))
                     L++;
                 if(L < R)
-                    lvl.blocks[ST(R--)] = lvl.blocks[ST(L)];
+                    array[ST(R--)] = array[ST(L)];
             }
-            lvl.blocks[ST(L)] = piv;
+            array[ST(L)] = piv;
             beg.push(L + 1);
             end.push(end.c[ST(i)]);
             end.c[ST(i++)] = (L);
@@ -144,7 +131,32 @@ void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
 #undef ST
 }
 
-static inline bool bMore(const LevelBGO &a, const LevelBGO &b)
+
+/* Blocks sorting conditions for SMBX-64 standard*/
+
+static inline bool blkMore(const LevelBlock &a, const LevelBlock &b)
+{
+    return (a.x > b.x) ||
+          ((a.x == b.x) && (a.y >  b.y)) ||
+          ((a.x == b.x) && (a.y == b.y) && (a.meta.array_id >= b.meta.array_id));
+}
+
+static inline bool blkLess(const LevelBlock &a, const LevelBlock &b)
+{
+    return (a.x < b.x) ||
+          ((a.x == b.x) && (a.y <  b.y)) ||
+          ((a.x == b.x) && (a.y == b.y) && (a.meta.array_id <= b.meta.array_id));
+}
+
+void FileFormats::smbx64LevelSortBlocks(LevelData &lvl)
+{
+    quickSort<PGELIST<LevelBlock>, LevelBlock>(lvl.blocks, blkLess, blkMore);
+}
+
+
+/* BGO sorting conditions for SMBX-64 standard*/
+
+static inline bool smbx64BgoMore(const LevelBGO &a, const LevelBGO &b)
 {
     bool sp_use = (a.id > 0u) && (a.id <= 190u) && (b.id > 0u) && (b.id <= 190u);
     bool sp_gr = sp_use && (a.smbx64_sp_apply > b.smbx64_sp_apply);
@@ -164,7 +176,7 @@ static inline bool bMore(const LevelBGO &a, const LevelBGO &b)
           ((sp_eq || id_eq) && zOffset_eq && arrayId_ge);
 }
 
-static inline bool bLess(const LevelBGO &a, const LevelBGO &b)
+static inline bool smbx64BgoLess(const LevelBGO &a, const LevelBGO &b)
 {
     bool sp_use = (a.id > 0u) && (a.id <= 190u) && (b.id > 0u) && (b.id <= 190u);
     bool sp_lt = sp_use && (a.smbx64_sp_apply < b.smbx64_sp_apply);
@@ -186,61 +198,37 @@ static inline bool bLess(const LevelBGO &a, const LevelBGO &b)
 
 void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
 {
-    if(lvl.bgo.size() <= 1) return; //Nothing to sort!
+    quickSort<PGELIST<LevelBGO>, LevelBGO>(lvl.bgo, smbx64BgoLess, smbx64BgoMore);
+}
 
-    class my_stack : public std::stack< int >
-    {
-    public:
-        using std::stack<int>::c; // expose the container
-    };
 
-    my_stack beg;
-    my_stack end;
-    LevelBGO piv;
-    int i = 0, L, R, swapv;
-    beg.push(0);
-    end.push((int)lvl.bgo.size());
-#define ST(x) static_cast<pge_size_t>(x)
-    while(i >= 0)
-    {
-        L = beg.c[ST(i)];
-        R = end.c[ST(i)] - 1;
-        if(L < R)
-        {
-            piv = lvl.bgo[ST(L)];
-            while(L < R)
-            {
-                while(bMore(lvl.bgo[ST(R)], piv) && (L < R))
-                    R--;
-                if(L < R)
-                    lvl.bgo[ST(L++)] = lvl.bgo[ST(R)];
-                while(bLess(lvl.bgo[ST(L)], piv) && (L < R))
-                    L++;
-                if(L < R)
-                    lvl.bgo[ST(R--)] = lvl.bgo[ST(L)];
-            }
-            lvl.bgo[ST(L)] = piv;
-            beg.push(L + 1);
-            end.push(end.c[ST(i)]);
-            end.c[ST(i++)] = (L);
-            if((end.c[ST(i)] - beg.c[ST(i)]) > (end.c[ST(i - 1)] - beg.c[ST(i - 1)]))
-            {
-                swapv = beg.c[ST(i)];
-                beg.c[ST(i)] = beg.c[ST(i - 1)];
-                beg.c[ST(i - 1)] = swapv;
-                swapv = end.c[ST(i)];
-                end.c[ST(i)] = end.c[ST(i - 1)];
-                end.c[ST(i - 1)] = swapv;
-            }
-        }
-        else
-        {
-            i--;
-            beg.pop();
-            end.pop();
-        }
-    }
-#undef ST
+/* BGO sorting conditions for SMBX2 */
+
+static inline bool sbx2BgoMore(const LevelBGO &a, const LevelBGO &b)
+{
+    bool zOffset_gr = a.z_offset > b.z_offset;
+    bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
+
+    bool arrayId_ge = a.meta.array_id >= b.meta.array_id;
+
+    return  zOffset_gr ||
+           (zOffset_eq && arrayId_ge);
+}
+
+static inline bool smbx2BgoLess(const LevelBGO &a, const LevelBGO &b)
+{
+    bool zOffset_lt = a.z_offset < b.z_offset;
+    bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
+
+    bool arrayId_le = a.meta.array_id <= b.meta.array_id;
+
+    return zOffset_lt ||
+          (zOffset_eq && arrayId_le);
+}
+
+void FileFormats::smbx2bLevelSortBGOs(LevelData &lvl)
+{
+    quickSort<PGELIST<LevelBGO>, LevelBGO>(lvl.bgo, smbx2BgoLess, sbx2BgoMore);
 }
 
 int FileFormats::smbx64LevelCheckLimits(LevelData &lvl)

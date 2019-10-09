@@ -502,6 +502,13 @@ public:
      * \param [__inout] lvl Level data structure object
      */
     static void             smbx64LevelSortBGOs(LevelData &lvl);
+    /*!
+     * \brief Sorts Background objects by special order priority value
+     *        Modifying of order priority values allowing to force specific non-foreground BGO's
+     *        to be rendered foreground
+     * \param [__inout] lvl Level data structure object
+     */
+    static void             smbx2bLevelSortBGOs(LevelData &lvl);
 
 
     /******************************World map files***********************************/
