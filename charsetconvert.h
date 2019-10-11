@@ -19,7 +19,8 @@
  * library functions. This can be used on all platforms.
  */
 template<class SI_CHAR>
-class SI_ConvertW {
+class SI_ConvertW
+{
     bool m_bStoreIsUtf8;
 protected:
     SI_ConvertW() { }
@@ -100,7 +101,7 @@ public:
             // ConvertUTF.h and ConvertUTF.c which should be included in
             // the distribution but are publically available from unicode.org
             // at http://www.unicode.org/Public/PROGRAMS/CVTUTF/
-            ConversionResult retval;
+            pgeFfConversionResult retval;
             const UTF8 * pUtf8 = (const UTF8 *) a_pInputData;
             if (sizeof(SI_CHAR) == sizeof(UTF32)) {
                 UTF32 * pUtf32 = (UTF32 *) a_pOutputData;
@@ -188,7 +189,7 @@ public:
             // ConvertUTF.h and ConvertUTF.c which should be included in
             // the distribution but are publically available from unicode.org
             // at http://www.unicode.org/Public/PROGRAMS/CVTUTF/
-            ConversionResult retval;
+            pgeFfConversionResult retval;
             UTF8 * pUtf8 = (UTF8 *) a_pOutputData;
             if (sizeof(SI_CHAR) == sizeof(UTF32)) {
                 const UTF32 * pUtf32 = (const UTF32 *) a_pInputData;

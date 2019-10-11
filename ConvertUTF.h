@@ -108,41 +108,41 @@ typedef enum {
 	sourceExhausted,	/* partial character in source, but hit end */
 	targetExhausted,	/* insuff. room in target for conversion */
 	sourceIllegal		/* source sequence is illegal/malformed */
-} ConversionResult;
+} pgeFfConversionResult;
 
 typedef enum {
 	strictConversion = 0,
 	lenientConversion
-} ConversionFlags;
+} pgeFfConversionFlags;
 
 /* This is for C++ and does no harm in C */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-ConversionResult PGEFF_ConvertUTF8toUTF16 (
+pgeFfConversionResult PGEFF_ConvertUTF8toUTF16 (
 		const UTF8** sourceStart, const UTF8* sourceEnd, 
-		UTF16** targetStart, UTF16* targetEnd, ConversionFlags flags);
+		UTF16** targetStart, UTF16* targetEnd, pgeFfConversionFlags flags);
 
-ConversionResult PGEFF_ConvertUTF16toUTF8 (
+pgeFfConversionResult PGEFF_ConvertUTF16toUTF8 (
 		const UTF16** sourceStart, const UTF16* sourceEnd, 
-		UTF8** targetStart, UTF8* targetEnd, ConversionFlags flags);
+		UTF8** targetStart, UTF8* targetEnd, pgeFfConversionFlags flags);
 		
-ConversionResult PGEFF_ConvertUTF8toUTF32 (
+pgeFfConversionResult PGEFF_ConvertUTF8toUTF32 (
 		const UTF8** sourceStart, const UTF8* sourceEnd, 
-		UTF32** targetStart, UTF32* targetEnd, ConversionFlags flags);
+		UTF32** targetStart, UTF32* targetEnd, pgeFfConversionFlags flags);
 
-ConversionResult PGEFF_ConvertUTF32toUTF8 (
+pgeFfConversionResult PGEFF_ConvertUTF32toUTF8 (
 		const UTF32** sourceStart, const UTF32* sourceEnd, 
-		UTF8** targetStart, UTF8* targetEnd, ConversionFlags flags);
+		UTF8** targetStart, UTF8* targetEnd, pgeFfConversionFlags flags);
 		
-ConversionResult PGEFF_ConvertUTF16toUTF32 (
+pgeFfConversionResult PGEFF_ConvertUTF16toUTF32 (
 		const UTF16** sourceStart, const UTF16* sourceEnd, 
-		UTF32** targetStart, UTF32* targetEnd, ConversionFlags flags);
+		UTF32** targetStart, UTF32* targetEnd, pgeFfConversionFlags flags);
 
-ConversionResult PGEFF_ConvertUTF32toUTF16 (
+pgeFfConversionResult PGEFF_ConvertUTF32toUTF16 (
 		const UTF32** sourceStart, const UTF32* sourceEnd, 
-		UTF16** targetStart, UTF16* targetEnd, ConversionFlags flags);
+		UTF16** targetStart, UTF16* targetEnd, pgeFfConversionFlags flags);
 
 Boolean PGEFF_isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 
