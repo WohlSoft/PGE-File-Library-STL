@@ -95,51 +95,49 @@ struct Bookmark
     double y;               //!< Bookmarked Y position of the camera
 };
 
-#ifdef PGE_EDITOR
 /*!
  * \brief Contains backup of helpful techincal data used by PGE Editor
  */
 class CrashData
 {
-    public:
-        /*!
-         * \brief Constructor
-         */
-        explicit CrashData();
-        /*!
-         * \brief Copy constructor
-         * \param _cd another CrashData object
-         */
-        CrashData(const CrashData &_cd);
-        /*!
-         * \brief Copy constructor
-         * \param _cd another CrashData object
-         */
-        CrashData(CrashData &_cd);
-        /*!
-         * \brief Sets default preferences
-         */
-        void reset();
-        //! Is crash data was used by editor (if false, LVLX writer will not record crash data into file)
-        bool used;
-        //! Is this level was untitled since crash occopued?
-        bool untitled;
-        //! Is this level was modified before crash occouped?
-        bool modifyed;
-        //! Turn on strict SMBX64 mode
-        bool strictModeSMBX64;
-        //! Recent file format ID (specific enum in the format structure declaration)
-        int fmtID;
-        //! Recent file format version
-        unsigned int fmtVer;
-        //! Full original file path file which was opened before crash occouped
-        PGESTRING fullPath;
-        //! Full episode path of file which was opened before crash occouped
-        PGESTRING path;
-        //! Base file name of file which was opened before crash occouped
-        PGESTRING filename;
+public:
+    /*!
+     * \brief Constructor
+     */
+    explicit CrashData();
+    /*!
+     * \brief Copy constructor
+     * \param _cd another CrashData object
+     */
+    CrashData(const CrashData &_cd);
+    /*!
+     * \brief Copy constructor
+     * \param _cd another CrashData object
+     */
+    CrashData(CrashData &_cd);
+    /*!
+     * \brief Sets default preferences
+     */
+    void reset();
+    //! Is crash data was used by editor (if false, LVLX writer will not record crash data into file)
+    bool used;
+    //! Is this level was untitled since crash occopued?
+    bool untitled;
+    //! Is this level was modified before crash occouped?
+    bool modifyed;
+    //! Turn on strict SMBX64 mode
+    bool strictModeSMBX64;
+    //! Recent file format ID (specific enum in the format structure declaration)
+    int fmtID;
+    //! Recent file format version
+    unsigned int fmtVer;
+    //! Full original file path file which was opened before crash occouped
+    PGESTRING fullPath;
+    //! Full episode path of file which was opened before crash occouped
+    PGESTRING path;
+    //! Base file name of file which was opened before crash occouped
+    PGESTRING filename;
 };
-#endif
 
 /*!
  * \brief Contains additional helpful meda-data used by PGE Applications
@@ -150,10 +148,8 @@ struct MetaData
     PGELIST<Bookmark> bookmarks;
 
     /* For Editor application only*/
-#ifdef PGE_EDITOR
     //! Crash backup of Editor's special data
     CrashData crash;
-#endif
 
     //!Helper meta-data
     FileFormatMeta meta;

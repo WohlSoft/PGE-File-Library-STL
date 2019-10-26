@@ -294,7 +294,6 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
             }
         }
         ////////////////////////meta bookmarks////////////////////////
-#ifdef PGE_EDITOR
         PGEX_Section("META_SYS_CRASH")
         {
             str_count++;
@@ -317,7 +316,6 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 }
             }
         }//meta sys crash
-#endif
         ///////////////////////////////MetaDATA//End////////////////////////////////////////
         ///////////////////TILES//////////////////////
         PGEX_Section("TILES")
@@ -561,8 +559,6 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
         out << "META_BOOKMARKS_END\n";
     }
 
-#ifdef PGE_EDITOR
-
     //Some System information
     if(FileData.metaData.crash.used)
     {
@@ -577,8 +573,6 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
         out << "\n";
         out << "META_SYS_CRASH_END\n";
     }
-
-#endif
     //////////////////////////////////////MetaData///END//////////////////////////////////////////
 
     if(!FileData.tiles.empty())

@@ -279,7 +279,6 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
             }
         }
         ////////////////////////meta bookmarks////////////////////////
-#ifdef PGE_EDITOR
         PGEX_Section("META_SYS_CRASH")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
@@ -300,7 +299,6 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
             }
         }//meta sys crash
-#endif
         ///////////////////////////////MetaDATA//End////////////////////////////////////////
         ///////////////////SECTION//////////////////////
         PGEX_Section("SECTION")
@@ -1640,8 +1638,6 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "META_BOOKMARKS_END\n";
     }
 
-#ifdef PGE_EDITOR
-
     //Some System information
     if(FileData.metaData.crash.used)
     {
@@ -1657,7 +1653,6 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
         out << "META_SYS_CRASH_END\n";
     }
 
-#endif
     //////////////////////////////////////MetaData///END//////////////////////////////////////////
     //SECTION section
     //Count available level sections
@@ -2604,7 +2599,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("ID", PGEFile::WriteInt(cfg.id));
                 PGESTRINGList data;
                 for(auto &e : cfg.data)
-                    data.push_back( PGEFile::WriteInt(e.key) + "=" + PGEFile::WriteInt(e.value));
+                    data.push_back(PGEFile::WriteInt(e.key) + "=" + PGEFile::WriteInt(e.value));
                 out << PGEFile::value("D", PGEFile::WriteStrArr(data));
                 out << "\n";
             }

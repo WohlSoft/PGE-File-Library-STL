@@ -44,13 +44,10 @@
  * \brief PGE File library class of static functions.
  *        Library is buildable in both Qt and STL applications
  */
+class FileFormats PGE_FILES_INHERED
+{
 #ifdef PGE_FILES_QT
-class FileFormats: PGE_FILES_INHERED
-{
     Q_OBJECT
-#else
-class FileFormats
-{
 #endif
 
 public:

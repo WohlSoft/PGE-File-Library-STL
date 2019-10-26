@@ -12,14 +12,6 @@
     \brief If this macro is defined, Qt version of PGE File Library will be built
 */
 
-/*! \def PGE_ENGINE
-    \brief If this macro is defined, this library builds as part of PGE Engine
-*/
-
-/*! \def PGE_EDITOR
-    \brief If this macro is defined, this library builds as part of PGE Editor
-*/
-
 /*! \def PGEChar
     \brief A macro which equal to 'char' if PGE File Library built in the STL mode
            and equal to QChar if PGE File Library built in the Qt mode
@@ -55,7 +47,7 @@
 #include <QFile>
 #include <QTextStream>
 
-#define PGE_FILES_INHERED public QObject
+#define PGE_FILES_INHERED : public QObject
 
 typedef QString PGESTRING;
 typedef QStringList PGESTRINGList;
@@ -70,7 +62,7 @@ typedef QChar   PGEChar;
 #include <cstdio>
 #include <utility>
 
-#define PGE_FILES_INGERED
+#define PGE_FILES_INHERED
 
 typedef std::string                 PGESTRING;
 typedef std::vector<std::string>    PGESTRINGList;
@@ -145,23 +137,23 @@ private:
     /*!
      * \brief Current filename
      */
-    PGESTRING filePath;
+    PGESTRING m_filePath;
     /*!
      * \brief Current filename without directory path
      */
-    PGESTRING _filename;
+    PGESTRING m_fileName;
     /*!
      * \brief File name suffix (last part of file name after last dot)
      */
-    PGESTRING _suffix;
+    PGESTRING m_suffix;
     /*!
      * \brief Base name (first part of file name before first dot)
      */
-    PGESTRING _basename;
+    PGESTRING m_baseName;
     /*!
      * \brief Full directory path where file is located
      */
-    PGESTRING _dirpath;
+    PGESTRING m_dirPath;
 };
 
 
@@ -193,9 +185,10 @@ public:
     virtual PGESTRING getFilePath();
     virtual void setFilePath(PGESTRING path);
     virtual long getCurrentLineNumber();
+
 protected:
-    PGESTRING _filePath;
-    long  _lineNumber;
+    PGESTRING m_filePath;
+    long  m_lineNumber = 0;
 };
 
 class TextOutput
@@ -230,9 +223,10 @@ public:
     virtual long getCurrentLineNumber();
     TextOutput &operator<<(const PGESTRING &s);
     TextOutput &operator<<(const char *s);
+
 protected:
-    PGESTRING _filePath;
-    long  _lineNumber;
+    PGESTRING m_filePath;
+    long  m_lineNumber = 0;
 };
 
 
@@ -250,11 +244,12 @@ public:
     virtual PGESTRING readAll();
     virtual bool eof();
     virtual int64_t tell();
-    virtual int seek(int64_t _pos, positions relativeTo);
+    virtual int seek(int64_t pos, positions relativeTo);
+
 private:
-    int64_t _pos;
-    PGESTRING *_data;
-    bool _isEOF;
+    int64_t m_pos = 0;
+    PGESTRING *m_data = nullptr;
+    bool m_isEOF = false;
 };
 
 class RawTextOutput: public TextOutput
@@ -267,10 +262,10 @@ public:
     void close();
     int write(PGESTRING buffer);
     int64_t tell();
-    int seek(int64_t _pos, positions relativeTo);
+    int seek(int64_t pos, positions relativeTo);
 private:
-    long long _pos;
-    PGESTRING *_data;
+    long long m_pos = 0ll;
+    PGESTRING *m_data = nullptr;
 };
 
 
@@ -348,8 +343,10 @@ public:
      * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
      */
     int seek(int64_t pos, positions relativeTo);
+
 private:
 #ifdef PGE_FILES_QT
+    //! Read as UTF8 or as ANSI
     bool m_utf8 = true;
     //! File handler used in Qt version of PGE file Library
     QFile file;
@@ -357,7 +354,7 @@ private:
     QTextStream stream;
 #else
     //! File input stream used in STL version of PGE file Library
-    FILE *stream;
+    FILE *stream = nullptr;
 #endif
 };
 
@@ -412,9 +409,12 @@ public:
      * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
      */
     int seek(int64_t pos, positions relativeTo);
+
 private:
+    //! Enfoce CRLF line ending in a file, even on non-Windows platforms
     bool m_forceCRLF = false;
 #ifdef PGE_FILES_QT
+    //! Write in UTF8 or in ANSI
     bool m_utf8 = true;
     //! File handler used in Qt version of PGE file Library
     QFile file;
@@ -422,7 +422,7 @@ private:
     QTextStream stream;
 #else
     //! File input stream used in STL version of PGE file Library
-    FILE *stream;
+    FILE *stream = nullptr;
 #endif
 };
 

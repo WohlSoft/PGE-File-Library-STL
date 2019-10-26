@@ -16,10 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef PGE_EDITOR
-#include <common_features/logger.h>
-#endif
-
 #include "file_formats.h"
 #include "npc_filedata.h"
 

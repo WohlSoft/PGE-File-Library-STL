@@ -20,29 +20,26 @@
 #include "pge_file_lib_private.h"
 
 #include "file_formats.h"
-#ifdef PGE_EDITOR
-#include <common_features/themes.h>
-#endif
 
 
 PGESTRING FileFormats::removeQuotes(PGESTRING str)
 {
     PGESTRING target = str;
-    #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
     if(target.isEmpty())
         return target;
     if(target[0] == QChar('\"'))
         target.remove(0, 1);
     if((!target.isEmpty()) && (target[target.size() - 1] == QChar('\"')))
         target.remove(target.size() - 1, 1);
-    #else
+#else
     if(target.empty())
         return target;
     if(target[0] == '\"')
         target.erase(target.begin() + 0);
     if((!target.empty()) && (target[target.size() - 1] == '\"'))
         target.erase(target.begin() + (std::string::difference_type)target.size() - 1);
-    #endif
+#endif
     return target;
 }
 
@@ -69,7 +66,6 @@ PGESTRING FileFormats::getErrorString(FileFormats::ErrorCodes errCode)
 }
 
 /***************************************************************************/
-#ifdef PGE_EDITOR
 CrashData::CrashData() : used(false), untitled(false), modifyed(false), strictModeSMBX64(false), fmtID(0), fmtVer(64) {}
 
 CrashData::CrashData(const CrashData &_cd)
@@ -110,4 +106,3 @@ void CrashData::reset()
     filename.clear();
     path.clear();
 }
-#endif

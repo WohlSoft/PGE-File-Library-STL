@@ -6,6 +6,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR})
 
 add_executable(SaveUserDataTest save_userdata.cpp $<TARGET_OBJECTS:Catch-objects>)
-target_link_libraries(SaveUserDataTest PRIVATE PGE_FL)
+target_link_libraries(SaveUserDataTest PRIVATE pgefl)
 add_test(NAME SaveUserDataTest COMMAND SaveUserDataTest)
 
