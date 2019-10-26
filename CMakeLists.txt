@@ -19,7 +19,9 @@ else()
     set(OPT_DEF_PGEFL_QT_SUPPORT ON)
 endif()
 
-option(PGEFL_QT_SUPPORT "Build also Qt variant" ${OPT_DEF_PGEFL_QT_SUPPORT})
+if(NOT PGEFL_QT_SUPPORT)
+    option(PGEFL_QT_SUPPORT "Build also Qt variant" ${OPT_DEF_PGEFL_QT_SUPPORT})
+endif()
 if(PGEFL_QT_SUPPORT)
     message("== PGE-FL Qt Edition WILL be built!")
     if(POLICY CMP0071) # Automoc
