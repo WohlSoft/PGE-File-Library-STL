@@ -886,7 +886,7 @@ PGESTRING TextFileInput::read(int64_t len)
     int gotten = static_cast<int>(file.read(buf, static_cast<int>(len)));
     if(gotten >= 0)
         buf[gotten] = '\0';
-    QString out(buf);
+    QString out = m_utf8 ? QString::fromUtf8(buf, gotten) : QString::fromLocal8Bit(buf, gotten);
     delete[] buf;
     return out;//stream.read(len);
 #else
@@ -952,7 +952,7 @@ PGESTRING TextFileInput::readCVSLine()
     }
     while((((cur != '\n') && (cur != ',')) || quoteIsOpen)
           && !file.atEnd());
-    return QString::fromStdString(buffer);
+    return m_utf8 ? QString::fromStdString(buffer) : QString::fromLocal8Bit(buffer.c_str(), buffer.size());
 #else
     buffer.reserve(1024);
     if(!stream)
@@ -1100,13 +1100,15 @@ bool TextFileOutput::open(PGESTRING filePath, bool utf8, bool forceCRLF, TextOut
 #ifdef PGE_FILES_QT
     bool state = false;
     file.setFileName(filePath);
+    m_utf8 = utf8;
     if(mode == truncate)
         state = file.open(QIODevice::WriteOnly | QIODevice::Truncate);
     else if(mode == append)
         state = file.open(QIODevice::WriteOnly | QIODevice::Append);
     else
         state = file.open(QIODevice::WriteOnly);
-    if(!state) return false;
+    if(!state)
+        return false;
     if(!m_forceCRLF)
     {
         stream.setDevice(&file);
@@ -1154,7 +1156,7 @@ int TextFileOutput::write(PGESTRING buffer)
     {
 #ifdef PGE_FILES_QT
         buffer.replace("\n", "\r\n");
-        writtenBytes = static_cast<pge_size_t>(file.write(buffer.toLocal8Bit()));
+        writtenBytes = static_cast<pge_size_t>(file.write(m_utf8 ? buffer.toUtf8() : buffer.toLocal8Bit()));
 #else
         for(pge_size_t i = 0; i < buffer.size(); i++)
         {
@@ -1277,7 +1279,7 @@ PGESTRING FileInfo::dirpath()
 void FileInfo::rebuildData()
 {
 #ifdef _WIN32
-#define PATH_MAXLEN MAX_PATH
+#   define PATH_MAXLEN MAX_PATH
 #else
 #   define PATH_MAXLEN PATH_MAX
 #endif
@@ -1337,6 +1339,7 @@ void FileInfo::rebuildData()
     if(i == (static_cast<int>(filePath.size()) - 1))
         goto skipSuffix;
     for(; i < static_cast<int>(filePath.size()); i++)
+    {
         _suffix.push_back(
             static_cast<char>(
                 tolower(
@@ -1344,6 +1347,7 @@ void FileInfo::rebuildData()
                 )
             )
         );
+    }
 skipSuffix:
 
     //Take file name without path

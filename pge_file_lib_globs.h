@@ -350,6 +350,7 @@ public:
     int seek(int64_t pos, positions relativeTo);
 private:
 #ifdef PGE_FILES_QT
+    bool m_utf8 = true;
     //! File handler used in Qt version of PGE file Library
     QFile file;
     //! File input stream used in Qt version of PGE file Library
