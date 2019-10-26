@@ -85,344 +85,345 @@ typedef char PGEChar;
  */
 namespace PGE_FileFormats_misc
 {
-    /**
-     * @brief Check the header to identify valid SMBX64 file format
-     * @param src Header source string
-     * @return true if the header was identified as SMBX64 file
-     */
-    bool PGE_DetectSMBXFile(PGESTRING src);
+/**
+ * @brief Check the header to identify valid SMBX64 file format
+ * @param src Header source string
+ * @return true if the header was identified as SMBX64 file
+ */
+bool PGE_DetectSMBXFile(PGESTRING src);
 
+/*!
+ * \brief Provides cross-platform file path calculation for a file names or paths
+ */
+class FileInfo
+{
+public:
     /*!
-     * \brief Provides cross-platform file path calculation for a file names or paths
+     * \brief Constructor
      */
-    class FileInfo
-    {
-        public:
-            /*!
-             * \brief Constructor
-             */
-            FileInfo();
-            /*!
-             * \brief Constructor with pre-opening of a file
-             * \param filepath relative or absolute file path
-             */
-            FileInfo(PGESTRING filepath);
-            /*!
-             * \brief Sets file which will be used to calculate file information
-             * \param filepath
-             */
-            void setFile(PGESTRING filepath);
-            /*!
-             * \brief Returns file extension (last part of filename after last dot)
-             * \return file suffix or name extension (last part of filename after last dot)
-             */
-            PGESTRING suffix();
-            /*!
-             * \brief Returns full filename without path
-             * \return full filename without path
-             */
-            PGESTRING filename();
-            /*!
-             * \brief Returns absolute path to file
-             * \return absolute path to file
-             */
-            PGESTRING fullPath();
-            /*!
-             * \brief Returns base name part (first part of file name before first dot)
-             * \return base name part (first part of file name before first dot)
-             */
-            PGESTRING basename();
-            /*!
-             * \brief Returns full directory path where actual file is located
-             * \return full directory path where actual file is located
-             */
-            PGESTRING dirpath();
-        private:
-            /*!
-             * \brief Recalculates all internal fields
-             */
-            void rebuildData();
-            /*!
-             * \brief Current filename
-             */
-            PGESTRING filePath;
-            /*!
-             * \brief Current filename without directory path
-             */
-            PGESTRING _filename;
-            /*!
-             * \brief File name suffix (last part of file name after last dot)
-             */
-            PGESTRING _suffix;
-            /*!
-             * \brief Base name (first part of file name before first dot)
-             */
-            PGESTRING _basename;
-            /*!
-             * \brief Full directory path where file is located
-             */
-            PGESTRING _dirpath;
-    };
-
-
-    class TextInput
-    {
-        public:
-            /*!
-             * \brief Relative positions of carriage
-             */
-            enum positions
-            {
-                //! Relative to current position
-                current = 0,
-                //! Relative to begin of file
-                begin,
-                //! Relative to end of file
-                end
-            };
-
-            TextInput();
-            virtual ~TextInput();
-            virtual PGESTRING read(int64_t len);
-            virtual PGESTRING readLine();
-            virtual PGESTRING readCVSLine();
-            virtual PGESTRING readAll();
-            virtual bool eof();
-            virtual int64_t tell();
-            virtual int seek(int64_t pos, positions relativeTo);
-            virtual PGESTRING getFilePath();
-            virtual void setFilePath(PGESTRING path);
-            virtual long getCurrentLineNumber();
-        protected:
-            PGESTRING _filePath;
-            long  _lineNumber;
-    };
-
-    class TextOutput
-    {
-        public:
-            /*!
-             * \brief Relative positions of carriage
-             */
-            enum positions
-            {
-                //! Relative to current position
-                current = 0,
-                //! Relative to begin of file
-                begin,
-                //! Relative to end of file
-                end
-            };
-            enum outputMode
-            {
-                truncate = 0,
-                append,
-                overwrite
-            };
-
-            TextOutput();
-            virtual ~TextOutput();
-            virtual int write(PGESTRING buffer);
-            virtual int64_t tell();
-            virtual int seek(int64_t pos, positions relativeTo);
-            virtual PGESTRING getFilePath();
-            virtual void setFilePath(PGESTRING path);
-            virtual long getCurrentLineNumber();
-            TextOutput &operator<<(const PGESTRING &s);
-            TextOutput &operator<<(const char *s);
-        protected:
-            PGESTRING _filePath;
-            long  _lineNumber;
-    };
-
-
-    class RawTextInput: public TextInput
-    {
-        public:
-            RawTextInput();
-            RawTextInput(PGESTRING *rawString, PGESTRING filepath = "");
-            virtual ~RawTextInput();
-            bool open(PGESTRING *rawString, PGESTRING filepath = "");
-            void close();
-            virtual PGESTRING read(int64_t len);
-            virtual PGESTRING readLine();
-            virtual PGESTRING readCVSLine();
-            virtual PGESTRING readAll();
-            virtual bool eof();
-            virtual int64_t tell();
-            virtual int seek(int64_t _pos, positions relativeTo);
-        private:
-            int64_t _pos;
-            PGESTRING *_data;
-            bool _isEOF;
-    };
-
-    class RawTextOutput: public TextOutput
-    {
-        public:
-            RawTextOutput();
-            RawTextOutput(PGESTRING *rawString, outputMode mode = truncate);
-            virtual ~RawTextOutput();
-            bool open(PGESTRING *rawString, outputMode mode = truncate);
-            void close();
-            int write(PGESTRING buffer);
-            int64_t tell();
-            int seek(int64_t _pos, positions relativeTo);
-        private:
-            long long _pos;
-            PGESTRING *_data;
-    };
-
-
-
+    FileInfo();
     /*!
-     * \brief Provides cross-platform text file reading interface
+     * \brief Constructor with pre-opening of a file
+     * \param filepath relative or absolute file path
      */
-    class TextFileInput: public TextInput
-    {
-        public:
-            /*!
-             * \brief Checks is requested file exist
-             * \param filePath Full or relative path to the file
-             * \return true if file exists
-             */
-            static bool exists(PGESTRING filePath);
-            /*!
-             * \brief Constructor
-             */
-            TextFileInput();
-            /*!
-             * \brief Constructor with pre-opening of the file
-             * \param filePath Full or relative path to the file
-             * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
-             */
-            TextFileInput(PGESTRING filePath, bool utf8 = false);
-            /*!
-             * \brief Destructor
-             */
-            virtual ~TextFileInput();
-            /*!
-             * \brief Opening of the file
-             * \param filePath Full or relative path to the file
-             * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
-             */
-            bool open(PGESTRING filePath, bool utf8 = false);
-            /*!
-             * \brief Close currently opened file
-             */
-            void close();
-            /*!
-             * \brief Reads requested number of characters from a file
-             * \param Maximal lenght of characters to read from file
-             * \return string contains requested line of characters
-             */
-            PGESTRING read(int64_t len);
-            /*!
-             * \brief Reads whole line before line feed character
-             * \return string contains gotten line
-             */
-            PGESTRING readLine();
-            /*!
-             * \brief Reads whole line before line feed character or before first unquoted comma
-             * \return string contains gotten line
-             */
-            PGESTRING readCVSLine();
-            /*!
-             * \brief Reads all data from a file at current position of carriage
-             * \return
-             */
-            PGESTRING readAll();
-            /*!
-             * \brief Is carriage position at end of file
-             * \return true if carriage position at end of file
-             */
-            bool eof();
-            /*!
-             * \brief Returns current position of carriage relative to begin of file
-             * \return current position of carriage relative to begin of file
-             */
-            int64_t tell();
-            /*!
-             * \brief Changes position of carriage to specific file position
-             * \param pos Target position of carriage
-             * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
-             */
-            int seek(int64_t pos, positions relativeTo);
-        private:
-#ifdef PGE_FILES_QT
-            //! File handler used in Qt version of PGE file Library
-            QFile file;
-            //! File input stream used in Qt version of PGE file Library
-            QTextStream stream;
-#else
-            //! File input stream used in STL version of PGE file Library
-            FILE *stream;
-#endif
-    };
+    FileInfo(PGESTRING filepath);
+    /*!
+     * \brief Sets file which will be used to calculate file information
+     * \param filepath
+     */
+    void setFile(PGESTRING filepath);
+    /*!
+     * \brief Returns file extension (last part of filename after last dot)
+     * \return file suffix or name extension (last part of filename after last dot)
+     */
+    PGESTRING suffix();
+    /*!
+     * \brief Returns full filename without path
+     * \return full filename without path
+     */
+    PGESTRING filename();
+    /*!
+     * \brief Returns absolute path to file
+     * \return absolute path to file
+     */
+    PGESTRING fullPath();
+    /*!
+     * \brief Returns base name part (first part of file name before first dot)
+     * \return base name part (first part of file name before first dot)
+     */
+    PGESTRING basename();
+    /*!
+     * \brief Returns full directory path where actual file is located
+     * \return full directory path where actual file is located
+     */
+    PGESTRING dirpath();
+private:
+    /*!
+     * \brief Recalculates all internal fields
+     */
+    void rebuildData();
+    /*!
+     * \brief Current filename
+     */
+    PGESTRING filePath;
+    /*!
+     * \brief Current filename without directory path
+     */
+    PGESTRING _filename;
+    /*!
+     * \brief File name suffix (last part of file name after last dot)
+     */
+    PGESTRING _suffix;
+    /*!
+     * \brief Base name (first part of file name before first dot)
+     */
+    PGESTRING _basename;
+    /*!
+     * \brief Full directory path where file is located
+     */
+    PGESTRING _dirpath;
+};
 
 
-    class TextFileOutput: public TextOutput
+class TextInput
+{
+public:
+    /*!
+     * \brief Relative positions of carriage
+     */
+    enum positions
     {
-        public:
-            /*!
-             * \brief Checks is requested file exist
-             * \param filePath Full or relative path to the file
-             * \return true if file exists
-             */
-            static bool exists(PGESTRING filePath);
-            /*!
-             * \brief Constructor
-             */
-            TextFileOutput();
-            /*!
-             * \brief Constructor with pre-opening of the file
-             * \param filePath Full or relative path to the file
-             * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
-             */
-            TextFileOutput(PGESTRING filePath, bool utf8 = false, bool forceCRLF = false, outputMode mode = truncate);
-            /*!
-             * \brief Destructor
-             */
-            virtual ~TextFileOutput();
-            /*!
-             * \brief Opening of the file
-             * \param filePath Full or relative path to the file
-             * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
-             */
-            bool open(PGESTRING filePath, bool utf8 = false, bool forceCRLF = false, outputMode mode = truncate);
-            /*!
-             * \brief Close currently opened file
-             */
-            void close();
-            /*!
-             * \brief Reads requested number of characters from a file
-             * \param Maximal lenght of characters to read from file
-             * \return string contains requested line of characters
-             */
-            int write(PGESTRING buffer);
-            /*!
-             * \brief Returns current position of carriage relative to begin of file
-             * \return current position of carriage relative to begin of file
-             */
-            int64_t tell();
-            /*!
-             * \brief Changes position of carriage to specific file position
-             * \param pos Target position of carriage
-             * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
-             */
-            int seek(int64_t pos, positions relativeTo);
-        private:
-            bool m_forceCRLF;
-#ifdef PGE_FILES_QT
-            //! File handler used in Qt version of PGE file Library
-            QFile file;
-            //! File input stream used in Qt version of PGE file Library
-            QTextStream stream;
-#else
-            //! File input stream used in STL version of PGE file Library
-            FILE *stream;
-#endif
+        //! Relative to current position
+        current = 0,
+        //! Relative to begin of file
+        begin,
+        //! Relative to end of file
+        end
     };
+
+    TextInput();
+    virtual ~TextInput();
+    virtual PGESTRING read(int64_t len);
+    virtual PGESTRING readLine();
+    virtual PGESTRING readCVSLine();
+    virtual PGESTRING readAll();
+    virtual bool eof();
+    virtual int64_t tell();
+    virtual int seek(int64_t pos, positions relativeTo);
+    virtual PGESTRING getFilePath();
+    virtual void setFilePath(PGESTRING path);
+    virtual long getCurrentLineNumber();
+protected:
+    PGESTRING _filePath;
+    long  _lineNumber;
+};
+
+class TextOutput
+{
+public:
+    /*!
+     * \brief Relative positions of carriage
+     */
+    enum positions
+    {
+        //! Relative to current position
+        current = 0,
+        //! Relative to begin of file
+        begin,
+        //! Relative to end of file
+        end
+    };
+    enum outputMode
+    {
+        truncate = 0,
+        append,
+        overwrite
+    };
+
+    TextOutput();
+    virtual ~TextOutput();
+    virtual int write(PGESTRING buffer);
+    virtual int64_t tell();
+    virtual int seek(int64_t pos, positions relativeTo);
+    virtual PGESTRING getFilePath();
+    virtual void setFilePath(PGESTRING path);
+    virtual long getCurrentLineNumber();
+    TextOutput &operator<<(const PGESTRING &s);
+    TextOutput &operator<<(const char *s);
+protected:
+    PGESTRING _filePath;
+    long  _lineNumber;
+};
+
+
+class RawTextInput: public TextInput
+{
+public:
+    RawTextInput();
+    RawTextInput(PGESTRING *rawString, PGESTRING filepath = "");
+    virtual ~RawTextInput();
+    bool open(PGESTRING *rawString, PGESTRING filepath = "");
+    void close();
+    virtual PGESTRING read(int64_t len);
+    virtual PGESTRING readLine();
+    virtual PGESTRING readCVSLine();
+    virtual PGESTRING readAll();
+    virtual bool eof();
+    virtual int64_t tell();
+    virtual int seek(int64_t _pos, positions relativeTo);
+private:
+    int64_t _pos;
+    PGESTRING *_data;
+    bool _isEOF;
+};
+
+class RawTextOutput: public TextOutput
+{
+public:
+    RawTextOutput();
+    RawTextOutput(PGESTRING *rawString, outputMode mode = truncate);
+    virtual ~RawTextOutput();
+    bool open(PGESTRING *rawString, outputMode mode = truncate);
+    void close();
+    int write(PGESTRING buffer);
+    int64_t tell();
+    int seek(int64_t _pos, positions relativeTo);
+private:
+    long long _pos;
+    PGESTRING *_data;
+};
+
+
+
+/*!
+ * \brief Provides cross-platform text file reading interface
+ */
+class TextFileInput: public TextInput
+{
+public:
+    /*!
+     * \brief Checks is requested file exist
+     * \param filePath Full or relative path to the file
+     * \return true if file exists
+     */
+    static bool exists(PGESTRING filePath);
+    /*!
+     * \brief Constructor
+     */
+    TextFileInput();
+    /*!
+     * \brief Constructor with pre-opening of the file
+     * \param filePath Full or relative path to the file
+     * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
+     */
+    TextFileInput(PGESTRING filePath, bool utf8 = false);
+    /*!
+     * \brief Destructor
+     */
+    virtual ~TextFileInput();
+    /*!
+     * \brief Opening of the file
+     * \param filePath Full or relative path to the file
+     * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
+     */
+    bool open(PGESTRING filePath, bool utf8 = false);
+    /*!
+     * \brief Close currently opened file
+     */
+    void close();
+    /*!
+     * \brief Reads requested number of characters from a file
+     * \param Maximal lenght of characters to read from file
+     * \return string contains requested line of characters
+     */
+    PGESTRING read(int64_t len);
+    /*!
+     * \brief Reads whole line before line feed character
+     * \return string contains gotten line
+     */
+    PGESTRING readLine();
+    /*!
+     * \brief Reads whole line before line feed character or before first unquoted comma
+     * \return string contains gotten line
+     */
+    PGESTRING readCVSLine();
+    /*!
+     * \brief Reads all data from a file at current position of carriage
+     * \return
+     */
+    PGESTRING readAll();
+    /*!
+     * \brief Is carriage position at end of file
+     * \return true if carriage position at end of file
+     */
+    bool eof();
+    /*!
+     * \brief Returns current position of carriage relative to begin of file
+     * \return current position of carriage relative to begin of file
+     */
+    int64_t tell();
+    /*!
+     * \brief Changes position of carriage to specific file position
+     * \param pos Target position of carriage
+     * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
+     */
+    int seek(int64_t pos, positions relativeTo);
+private:
+#ifdef PGE_FILES_QT
+    //! File handler used in Qt version of PGE file Library
+    QFile file;
+    //! File input stream used in Qt version of PGE file Library
+    QTextStream stream;
+#else
+    //! File input stream used in STL version of PGE file Library
+    FILE *stream;
+#endif
+};
+
+
+class TextFileOutput: public TextOutput
+{
+public:
+    /*!
+     * \brief Checks is requested file exist
+     * \param filePath Full or relative path to the file
+     * \return true if file exists
+     */
+    static bool exists(PGESTRING filePath);
+    /*!
+     * \brief Constructor
+     */
+    TextFileOutput();
+    /*!
+     * \brief Constructor with pre-opening of the file
+     * \param filePath Full or relative path to the file
+     * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
+     */
+    TextFileOutput(PGESTRING filePath, bool utf8 = false, bool forceCRLF = false, outputMode mode = truncate);
+    /*!
+     * \brief Destructor
+     */
+    virtual ~TextFileOutput();
+    /*!
+     * \brief Opening of the file
+     * \param filePath Full or relative path to the file
+     * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
+     */
+    bool open(PGESTRING filePath, bool utf8 = false, bool forceCRLF = false, outputMode mode = truncate);
+    /*!
+     * \brief Close currently opened file
+     */
+    void close();
+    /*!
+     * \brief Reads requested number of characters from a file
+     * \param Maximal lenght of characters to read from file
+     * \return string contains requested line of characters
+     */
+    int write(PGESTRING buffer);
+    /*!
+     * \brief Returns current position of carriage relative to begin of file
+     * \return current position of carriage relative to begin of file
+     */
+    int64_t tell();
+    /*!
+     * \brief Changes position of carriage to specific file position
+     * \param pos Target position of carriage
+     * \param relativeTo defines relativity of target position of carriage (current position, begin of file or end of file)
+     */
+    int seek(int64_t pos, positions relativeTo);
+private:
+    bool m_forceCRLF = false;
+#ifdef PGE_FILES_QT
+    bool m_utf8 = true;
+    //! File handler used in Qt version of PGE file Library
+    QFile file;
+    //! File input stream used in Qt version of PGE file Library
+    QTextStream stream;
+#else
+    //! File input stream used in STL version of PGE file Library
+    FILE *stream;
+#endif
+};
 
 }
 
