@@ -847,6 +847,7 @@ bool TextFileInput::open(PGESTRING filePath, bool utf8)
 #ifdef PGE_FILES_QT
     bool state = false;
     file.setFileName(filePath);
+    m_utf8 = utf8;
     state = file.open(QIODevice::ReadOnly | QIODevice::Text);
     if(!state) return false;
     stream.setDevice(&file);
