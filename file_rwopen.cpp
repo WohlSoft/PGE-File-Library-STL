@@ -27,7 +27,7 @@
 bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 {
     PGE_FileFormats_misc::TextFileInput file;
-    if(!file.open(filePath))
+    if(!file.open(filePath, true))
     {
         FileData.meta.ReadFileValid = false;
         FileData.meta.ERROR_info = "Can't open file";
@@ -68,6 +68,9 @@ bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelDat
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
         //Read SMBX LVL File
         if(!ReadSMBX64LvlFile(file, FileData))
             return false;
@@ -93,7 +96,7 @@ bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData &data)
     PGE_FileFormats_misc::TextFileInput file;
     data.meta.ERROR_info.clear();
 
-    if(!file.open(filePath))
+    if(!file.open(filePath, true))
     {
         data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
@@ -133,6 +136,9 @@ bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, Le
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
         //Read SMBX LVL File
         return ReadSMBX64LvlFileHeaderT(file, data);
     }
@@ -237,7 +243,7 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
     PGE_FileFormats_misc::TextFileInput file;
 
     PGESTRING firstLine;
-    if(!file.open(filePath))
+    if(!file.open(filePath, true))
     {
         data.meta.ERROR_info = "Can't open file";
         data.meta.ERROR_linedata = "";
@@ -257,6 +263,9 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
         //Read SMBX WLD File
         if(!ReadSMBX64WldFileF(filePath, data))
             return false;
@@ -282,7 +291,7 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
     PGE_FileFormats_misc::TextFileInput file;
     data.meta.ERROR_info.clear();
 
-    if(!file.open(filePath))
+    if(!file.open(filePath, true))
     {
         data.meta.ERROR_info = "Can't open file";
         data.meta.ERROR_linedata = "";
@@ -302,6 +311,9 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
         //Read SMBX WLD File
         return ReadSMBX64WldFileHeader(filePath, data);
     }
@@ -389,5 +401,3 @@ bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFor
     FileData.meta.ERROR_info = "Unsupported file type";
     return false;
 }
-
-

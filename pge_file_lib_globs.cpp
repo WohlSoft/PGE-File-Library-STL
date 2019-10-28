@@ -66,8 +66,9 @@ static std::wstring Str2WStr(const std::string &str)
 {
     std::wstring dest;
     dest.resize(str.size());
-    int newlen = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), int(str.length()), &dest[0], int(str.length()));
-    dest.resize(newlen);
+    int dest_len = static_cast<int>(str.length());
+    int new_len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), dest_len, &dest[0], dest_len);
+    dest.resize(static_cast<size_t>(new_len));
     return dest;
 }
 
@@ -75,8 +76,10 @@ static std::string WStr2Str(const std::wstring &wstr)
 {
     std::string dest;
     dest.resize((wstr.size() * 2));
-    int newlen = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), int(wstr.length()), &dest[0], int(dest.size()), NULL, NULL);
-    dest.resize(newlen);
+    int wstr_len = static_cast<int>(wstr.length());
+    int dest_len = static_cast<int>(dest.size());
+    int new_len = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr_len, &dest[0], dest_len, nullptr, nullptr);
+    dest.resize(static_cast<size_t>(new_len));
     return dest;
 }
 
@@ -94,7 +97,7 @@ FILE *utf8_fopen(const char *file, const char *mode)
 }
 
 #else
-#define utf8_fopen fopen
+#   define utf8_fopen fopen
 #endif
 
 void split(std::vector<std::string> &dest, const std::string &str, const std::string &separator)
@@ -166,7 +169,7 @@ PGESTRING url_encode(const PGESTRING &sSrc)
         *pEnd++ = static_cast<uint8_t>(DEC2HEX[*pSrc & 0x0F]);
     }
 #ifndef PGE_FILES_QT
-    PGESTRING sResult((char *)pStart.get(), (char *)pEnd);
+    PGESTRING sResult(reinterpret_cast<char *>(pStart.get()), reinterpret_cast<char *>(pEnd));
 #else
     PGESTRING sResult = QString::fromUtf8(reinterpret_cast<char *>(pStart.get()), static_cast<int>(pEnd - pStart.get()));
 #endif
@@ -205,16 +208,16 @@ PGESTRING url_decode(const std::string &sSrc)
     // Note from RFC1630: "Sequences which start with a percent
     // sign but are not followed by two hexadecimal characters
     // (0-9, A-F) are reserved for future extension"
-    const uint8_t *pSrc = (const unsigned char *)sSrc.c_str();
+    const uint8_t *pSrc = reinterpret_cast<const uint8_t *>(sSrc.c_str());
     const size_t SRC_LEN = sSrc.length();
     const uint8_t *const SRC_END = pSrc + SRC_LEN;
     // last decodable '%'
     const uint8_t *const SRC_LAST_DEC = SRC_END - 2;
 
-    char *pStart = (char *)malloc(SRC_LEN + 1);
+    char *pStart = reinterpret_cast<char *>(std::malloc(SRC_LEN + 1));
     if(!pStart)
         return "";
-    memset(pStart, 0, SRC_LEN + 1);
+    std::memset(pStart, 0, SRC_LEN + 1);
     char *pEnd = pStart;
 
     while(pSrc < SRC_LAST_DEC)
@@ -240,7 +243,7 @@ PGESTRING url_decode(const std::string &sSrc)
 
     std::string::size_type pLen = static_cast<std::string::size_type>(pEnd - pStart);
     std::string sResult(pStart, pLen);
-    free(pStart);
+    std::free(pStart);
     return sResult;
 }
 #endif
@@ -314,7 +317,7 @@ std::string  base64_encodeW(std::string &source, bool no_padding)
     size_t new_len = utf8.SizeFromStore(source.c_str(), source.length());
     std::wstring t;
     t.resize(new_len);
-    if(utf8.ConvertFromStore(source.c_str(), source.length(), (wchar_t *)t.c_str(), new_len))
+    if(utf8.ConvertFromStore(source.c_str(), source.length(), &t[0], new_len))
         return base64_encode(reinterpret_cast<const unsigned char *>(t.c_str()), t.size(), no_padding);
     return "<fail to convert charset>";
 }
@@ -331,12 +334,12 @@ std::string base64_decodeW(std::string &source)
     fflush(x);
     fclose(x);
 #endif
-    std::wstring outw((wchar_t *)out.c_str());
+    std::wstring outw(reinterpret_cast<const wchar_t *>(out.c_str()));
     SI_ConvertW<wchar_t> utf8(true);
     size_t new_len = outw.length() * 2; //utf8.SizeToStore(outw.c_str());
     std::string out2;
     out2.resize(new_len);
-    if(utf8.ConvertToStore(outw.c_str(), (char *)out2.c_str(), new_len))
+    if(utf8.ConvertToStore(outw.c_str(), &out2[0], new_len))
         return out2;
     return "<fail to convert charset>";
 }
@@ -515,6 +518,12 @@ long TextInput::getCurrentLineNumber()
     return m_lineNumber;
 }
 
+bool TextInput::reOpen(bool)
+{
+    // Do nothing
+    return true;
+}
+
 
 TextOutput::TextOutput() : m_lineNumber(0) {}
 TextOutput::~TextOutput() {}
@@ -546,9 +555,9 @@ long TextOutput::getCurrentLineNumber()
 
 
 /*****************RAW TEXT I/O CLASS***************************/
-RawTextInput::RawTextInput() : TextInput(), m_pos(0), m_data(0), m_isEOF(true) {}
+RawTextInput::RawTextInput() : TextInput(), m_pos(0), m_data(nullptr), m_isEOF(true) {}
 
-RawTextInput::RawTextInput(PGESTRING *rawString, PGESTRING filepath) : TextInput(), m_pos(0), m_data(0), m_isEOF(true)
+RawTextInput::RawTextInput(PGESTRING *rawString, PGESTRING filepath) : TextInput(), m_pos(0), m_data(nullptr), m_isEOF(true)
 {
     if(!open(rawString, filepath))
         m_data = nullptr;
@@ -706,9 +715,9 @@ int RawTextInput::seek(int64_t pos, TextInput::positions relativeTo)
 
 
 
-RawTextOutput::RawTextOutput() : TextOutput(), m_pos(0), m_data(0) {}
+RawTextOutput::RawTextOutput() : TextOutput(), m_pos(0), m_data(nullptr) {}
 
-RawTextOutput::RawTextOutput(PGESTRING *rawString, outputMode mode) : TextOutput(), m_pos(0), m_data(0)
+RawTextOutput::RawTextOutput(PGESTRING *rawString, outputMode mode) : TextOutput(), m_pos(0), m_data(nullptr)
 {
     if(!open(rawString, mode))
         m_data = nullptr;
@@ -732,7 +741,7 @@ bool RawTextOutput::open(PGESTRING *rawString, outputMode mode)
 
 void RawTextOutput::close()
 {
-    m_data = NULL;
+    m_data = nullptr;
     m_pos = 0;
     m_lineNumber = 0;
 }
@@ -790,7 +799,7 @@ int RawTextOutput::seek(int64_t pos, TextOutput::positions relativeTo)
         m_pos = 0;
         return -1;
     }
-    if(m_pos >= (signed)m_data->size())
+    if(m_pos >= static_cast<signed>(m_data->size()))
         m_pos = static_cast<long long>(m_data->size());
     return 0;
 }
@@ -815,20 +824,20 @@ TextOutput &TextOutput::operator <<(const char *s)
 TextFileInput::TextFileInput() :
     TextInput()
 #ifndef PGE_FILES_QT
-    , stream(NULL)
+    , stream(nullptr)
 #endif
 {}
 
 TextFileInput::TextFileInput(PGESTRING filePath, bool utf8) :
     TextInput()
 #ifndef PGE_FILES_QT
-    , stream(NULL)
+    , stream(nullptr)
 #endif
 {
     if(!open(filePath, utf8))
     {
 #ifndef PGE_FILES_QT
-        stream = NULL;
+        stream = nullptr;
 #else
         file.close();
 #endif
@@ -863,8 +872,15 @@ bool TextFileInput::open(PGESTRING filePath, bool utf8)
 #else
     (void)utf8;
     stream = utf8_fopen(filePath.c_str(), "rb");
-    return (stream != NULL);
+    return (stream != nullptr);
 #endif
+}
+
+bool TextFileInput::reOpen(bool utf8)
+{
+    PGESTRING fpath = m_filePath;
+    close();
+    return open(fpath, utf8);
 }
 
 void TextFileInput::close()
@@ -876,7 +892,7 @@ void TextFileInput::close()
 #else
     if(stream)
         fclose(stream);
-    stream = NULL;
+    stream = nullptr;
 #endif
 }
 
@@ -957,7 +973,7 @@ PGESTRING TextFileInput::readCVSLine()
           && !file.atEnd());
     return m_utf8 ?
            QString::fromStdString(buffer) :
-           QString::fromLocal8Bit(buffer.c_str(), buffer.size());
+           QString::fromLocal8Bit(buffer.c_str(), static_cast<int>(buffer.size()));
 #else
     buffer.reserve(1024);
     if(!stream)
@@ -1077,7 +1093,7 @@ int TextFileInput::seek(int64_t pos, TextFileInput::positions relativeTo)
 TextFileOutput::TextFileOutput() : TextOutput(), m_forceCRLF(false)
 {
 #ifndef PGE_FILES_QT
-    stream = NULL;
+    stream = nullptr;
 #endif
 }
 
@@ -1086,7 +1102,7 @@ TextFileOutput::TextFileOutput(PGESTRING filePath, bool utf8, bool forceCRLF, Te
     if(!open(filePath, utf8, forceCRLF, mode))
     {
 #ifndef PGE_FILES_QT
-        stream = NULL;
+        stream = nullptr;
 #else
         file.close();
 #endif
@@ -1130,7 +1146,7 @@ bool TextFileOutput::open(PGESTRING filePath, bool utf8, bool forceCRLF, TextOut
     return true;
 #else
     (void)utf8;
-    const char *tmode = NULL;
+    const char *tmode = nullptr;
     if(mode == truncate)
         tmode = "wb";
     else if(mode == append)
@@ -1138,7 +1154,7 @@ bool TextFileOutput::open(PGESTRING filePath, bool utf8, bool forceCRLF, TextOut
     else
         tmode = "wb";
     stream = utf8_fopen(filePath.c_str(), tmode);
-    return (stream != NULL);
+    return (stream != nullptr);
 #endif
 }
 
@@ -1151,7 +1167,7 @@ void TextFileOutput::close()
 #else
     if(stream)
         fclose(stream);
-    stream = NULL;
+    stream = nullptr;
 #endif
 }
 
@@ -1307,8 +1323,8 @@ void FileInfo::rebuildData()
         m_filePath = buf;
 #   else
     wchar_t bufW[MAX_PATH + 1];
-    int ret = 0;
-    ret = GetFullPathNameW(Str2WStr(m_filePath).c_str(), MAX_PATH, bufW, NULL);
+    DWORD ret = 0;
+    ret = GetFullPathNameW(Str2WStr(m_filePath).c_str(), MAX_PATH, bufW, nullptr);
     if(ret != 0)
         m_filePath = WStr2Str(bufW);
     std::replace(m_filePath.begin(), m_filePath.end(), '\\', '/');

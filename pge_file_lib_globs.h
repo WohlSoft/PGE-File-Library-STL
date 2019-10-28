@@ -185,6 +185,7 @@ public:
     virtual PGESTRING getFilePath();
     virtual void setFilePath(PGESTRING path);
     virtual long getCurrentLineNumber();
+    virtual bool reOpen(bool utf8);
 
 protected:
     PGESTRING m_filePath;
@@ -302,6 +303,11 @@ public:
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
     bool open(PGESTRING filePath, bool utf8 = false);
+    /*!
+     * \brief Re-open opened file with or without UTF8 mode enabled
+     * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
+     */
+    bool reOpen(bool utf8 = false);
     /*!
      * \brief Close currently opened file
      */
