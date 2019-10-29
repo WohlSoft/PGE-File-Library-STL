@@ -59,21 +59,23 @@ if(PGEFL_QT_SUPPORT)
     list(APPEND PGEFL_INSTALLS pgefl_qt)
 endif()
 
+# Don't install libraries when PGE-FL was built as a part of Moondust master project
+if(NOT Moondust_SOURCE_DIR)
+    install(TARGETS ${PGEFL_INSTALLS}
+        RUNTIME DESTINATION "bin"
+        LIBRARY DESTINATION "lib"
+        ARCHIVE DESTINATION "lib"
+        FRAMEWORK DESTINATION "lib"
+        INCLUDES DESTINATION "include"
+    )
 
-install(TARGETS ${PGEFL_INSTALLS}
-    RUNTIME DESTINATION "bin"
-    LIBRARY DESTINATION "lib"
-    ARCHIVE DESTINATION "lib"
-    FRAMEWORK DESTINATION "lib"
-    INCLUDES DESTINATION "include"
-)
+    file(GLOB PGE_FL_HEADS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
-file(GLOB PGE_FL_HEADS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
-
-install(FILES
-        ${PGE_FL_HEADS}
-        DESTINATION include/PGE_File_Formats
-)
+    install(FILES
+            ${PGE_FL_HEADS}
+            DESTINATION include/PGE_File_Formats
+    )
+endif()
 
 # === Unit tests ====
 option(WITH_UNIT_TESTS "Enable unit testing" OFF)
