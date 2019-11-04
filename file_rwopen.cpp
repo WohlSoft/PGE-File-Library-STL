@@ -253,12 +253,12 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
     }
 
     firstLine = file.read(8);
-    file.close();
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
         //Read SMBX-38A WLD File
-        if(!ReadSMBX38AWldFileF(filePath, data))
+        if(!ReadSMBX38AWldFile(file, data))
             return false;
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
@@ -267,13 +267,13 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
         if(!file.reOpen(false))
             return false;
         //Read SMBX WLD File
-        if(!ReadSMBX64WldFileF(filePath, data))
+        if(!ReadSMBX64WldFile(file, data))
             return false;
     }
     else
     {
         //Read PGE WLDX File
-        if(!ReadExtendedWldFileF(filePath, data))
+        if(!ReadExtendedWldFile(file, data))
             return false;
     }
 
