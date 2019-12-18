@@ -81,19 +81,6 @@ CrashData::CrashData(const CrashData &_cd)
     this->path = _cd.path;
 }
 
-CrashData::CrashData(CrashData &_cd)
-{
-    this->used = _cd.used;
-    this->untitled = _cd.untitled;
-    this->modifyed = _cd.modifyed;
-    this->strictModeSMBX64 = _cd.strictModeSMBX64;
-    this->fmtID   = _cd.fmtID;
-    this->fmtVer  = _cd.fmtVer;
-    this->fullPath = _cd.fullPath;
-    this->filename = _cd.filename;
-    this->path = _cd.path;
-}
-
 void CrashData::reset()
 {
     used = false;

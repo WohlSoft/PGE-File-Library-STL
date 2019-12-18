@@ -111,11 +111,6 @@ public:
      */
     CrashData(const CrashData &_cd);
     /*!
-     * \brief Copy constructor
-     * \param _cd another CrashData object
-     */
-    CrashData(CrashData &_cd);
-    /*!
      * \brief Sets default preferences
      */
     void reset();
