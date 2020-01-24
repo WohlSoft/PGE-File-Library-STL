@@ -97,7 +97,7 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
         SMBX64::ReadUInt(&file_format, line);//File format number
         FileData.meta.RecentFormatVersion = file_format;
         nextLine();
-        SMBX64::ReadUInt(&FileData.lives, line); //Number of lives
+        SMBX64::ReadSInt(&FileData.lives, line); //Number of lives
         nextLine();
         SMBX64::ReadUInt(&FileData.coins, line); //Number of coins
         nextLine();
