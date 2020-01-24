@@ -57,8 +57,7 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
       PLATFORM: Win32
       PLATFORMTOOLSET: "v140_xp"
-      QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13\msvc2015
+      QT_BUILD: OFF
     - BUILD_TYPE: Release
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -66,8 +65,7 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2015"
       PLATFORM: Win32
       PLATFORMTOOLSET: "v140_xp"
-      QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13\msvc2015
+      QT_BUILD: OFF
     - BUILD_TYPE: Debug
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
