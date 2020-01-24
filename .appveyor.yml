@@ -10,14 +10,16 @@ environment:
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\mingw73_32
+      QT_PATH: C:\Qt\5.13\mingw73_32
+      APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2019"
     - BUILD_TYPE: Release
       COMPILER: MinGW
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\mingw73_32
+      QT_PATH: C:\Qt\5.13\mingw73_32
+      APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2019"
     - BUILD_TYPE: Debug
       COMPILER: MinGW-w64
       COMPILER_FAMILY: MinGW
@@ -38,7 +40,7 @@ environment:
       PLATFORM: x64
       PLATFORMTOOLSET: "v140_xp"
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\msvc2015_64
+      QT_PATH: C:\Qt\5.13\msvc2015_64
     - BUILD_TYPE: Release
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -47,7 +49,7 @@ environment:
       PLATFORM: x64
       PLATFORMTOOLSET: "v140_xp"
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\msvc2015_64
+      QT_PATH: C:\Qt\5.13\msvc2015_64
     - BUILD_TYPE: Debug
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -56,7 +58,7 @@ environment:
       PLATFORM: Win32
       PLATFORMTOOLSET: "v140_xp"
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\msvc2015
+      QT_PATH: C:\Qt\5.13\msvc2015
     - BUILD_TYPE: Release
       COMPILER: MSVC15
       COMPILER_FAMILY: MSVC
@@ -65,7 +67,7 @@ environment:
       PLATFORM: Win32
       PLATFORMTOOLSET: "v140_xp"
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\msvc2015
+      QT_PATH: C:\Qt\5.13\msvc2015
     - BUILD_TYPE: Debug
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
@@ -74,7 +76,7 @@ environment:
       PLATFORM: x64
       PLATFORMTOOLSET: "v141_xp"
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\msvc2017_64
+      QT_PATH: C:\Qt\5.13\msvc2017_64
     - BUILD_TYPE: Release
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
@@ -83,7 +85,7 @@ environment:
       PLATFORM: x64
       PLATFORMTOOLSET: "v141_xp"
       QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13.0\msvc2017_64
+      QT_PATH: C:\Qt\5.13\msvc2017_64
     - BUILD_TYPE: Debug
       COMPILER: MSVC17
       COMPILER_FAMILY: MSVC
