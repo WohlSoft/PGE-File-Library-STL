@@ -22,8 +22,6 @@
 
 #include "smbx38a_private.h"
 
-// Settings
-static constexpr uint32_t newest_file_format = 69;
 
 /***********  Pre-defined values dependent to NPC Generator Effect field value  **************/
 
@@ -114,6 +112,9 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
             throw std::logic_error("Invalid file format");
 
         file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+
+        if(file_version > latest_version_38a)
+            throw std::logic_error("File format has newer version which is not supported yet");
 
         while(!inf.eof())
         {
@@ -290,6 +291,9 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
             throw std::logic_error("Invalid file format");
 
         file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+
+        if(file_version > latest_version_38a)
+            throw std::logic_error("File format has newer version which is not supported yet");
 
         while(!in.eof())
         {
