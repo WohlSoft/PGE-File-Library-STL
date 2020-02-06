@@ -536,8 +536,8 @@ struct LevelPhysEnv
     long h = 0;
     //! Width of physical environment zone
     long w = 0;
-    //! [Unused] reserved long integer value, always 0
-    long unknown = 0;
+    //! Buoy value, reserved and unused in SMBX
+    float buoy = 0;
 
     enum EnvTypes
     {

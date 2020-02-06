@@ -693,7 +693,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
                 nextLine();
                 SMBX64::ReadUInt(&waters.h, line);
                 nextLine();
-                SMBX64::ReadUInt(&waters.unknown, line); //Unused value
+                SMBX64::ReadFloat(&waters.buoy, line);
 
                 if(ge(62))
                 {
@@ -1332,7 +1332,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
             out << SMBX64::WriteSInt(physEnv.y);
             out << SMBX64::WriteSInt(physEnv.w);
             out << SMBX64::WriteSInt(physEnv.h);
-            out << SMBX64::WriteSInt(physEnv.unknown);
+            out << SMBX64::WriteSInt(physEnv.buoy);
 
             if(file_format >= 62)
                 out << SMBX64::WriteCSVBool(physEnv.env_type != LevelPhysEnv::ENV_WATER);
