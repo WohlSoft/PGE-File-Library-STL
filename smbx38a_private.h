@@ -36,9 +36,9 @@ extern const int SMBX38A_NpcGeneratorDirections[29];
 //Use it if you want read file partially
 //(you must create QTextStream in(&fstream); !!!)
 #define SMBX38A_FileBegin() int file_format=0;  /*File format number*/\
-    PGESTRING line;     /*Current Line data*/
+    PGESTRING line       /*Current Line data*/
 #define SMBX38A_FileBeginN() /*int file_format=0;*/  /*File format number*/\
-    PGESTRING line;      /*Current Line data*/
+    PGESTRING line       /*Current Line data*/
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
 #define ReadSMBX38Level ReadSMBX38ALvlFile
@@ -50,7 +50,7 @@ extern const int SMBX38A_NpcGeneratorDirections[29];
 #ifdef nextLine
 #undef nextLine
 #endif
-#define nextLine() line = in.readLine();
+#define nextLine() line = in.readLine()
 
 // Common functions
 static auto PGEUrlDecodeFunc = [](PGESTRING &data)

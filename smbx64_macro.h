@@ -12,10 +12,10 @@
 
 //(you must create and open PGE_FileFormats_misc::TextInput &in; !!!)
 #define SMBX64_FileBegin() unsigned int file_format = 0;   /*File format number*/\
-                           PGESTRING line;      /*Current Line data*/
+                           PGESTRING line                  /*Current Line data*/
 
 //Jump to next line
-#define nextLine() line = in.readCVSLine();
+#define nextLine() line = in.readCVSLine()
 
 //Version comparison
 #define ge(v) file_format>=v

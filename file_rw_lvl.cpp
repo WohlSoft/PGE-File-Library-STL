@@ -74,7 +74,7 @@ bool FileFormats::ReadSMBX64LvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf,
     FileData.meta.path = in_1.dirpath();
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
     SMBX64_FileBegin();
-#define nextLineH() line = inf.readCVSLine();
+#define nextLineH() line = inf.readCVSLine()
 
     try
     {
@@ -1380,7 +1380,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
                      event.layers_hide[j] : "");
                 layerSet.show =
                     ((j < event.layers_show.size()) ?
-                     event.layers_show[j] : "");;
+                     event.layers_show[j] : "");
                 layerSet.toggle =
                     ((j < event.layers_toggle.size()) ?
                      event.layers_toggle[j] : "");
