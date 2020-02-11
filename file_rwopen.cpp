@@ -302,7 +302,7 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
 
     PGESTRING firstLine;
     firstLine = file.readLine();
-    file.close();
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
