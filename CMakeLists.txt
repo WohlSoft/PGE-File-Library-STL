@@ -6,6 +6,10 @@ if(NOT CMAKE_BUILD_TYPE)
     message("== Using default build configuration which is a Release!")
 endif()
 
+if(POLICY CMP0077) # Allow external configuring when building as sub-directory
+    cmake_policy(SET CMP0077 NEW)
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
