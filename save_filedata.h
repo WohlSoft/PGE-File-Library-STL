@@ -42,17 +42,17 @@ struct saveCharState
 {
     saveCharState() : id(1), state(1), itemID(0), mountType(0), mountID(0), health(1) {}
     //! ID of playable character
-    unsigned long id;
+    unsigned long id = 0;
     //! Curent ID of playable character's state
-    unsigned long state;
+    unsigned long state = 0;
     //! Current item ID in the item slot (SMBX64-only)
-    unsigned long itemID;
+    unsigned long itemID = 0;
     //! Mounted vehicle type (SMBX64-only)
-    unsigned int mountType;
+    unsigned int mountType = 0;
     //! Mounted vehicle ID (SMBX64-only)
-    unsigned int mountID;
+    unsigned int mountID = 0;
     //! Recent health level
-    unsigned int health;
+    unsigned int health = 0;
 };
 
 /*!
@@ -109,29 +109,29 @@ struct GamesaveData
     FileFormatMeta meta;
 
     //! Number of lives
-    int lives;
+    int lives = 0;
     //! Number of coins
-    unsigned int coins;
+    unsigned int coins = 0;
     //! Number of points
-    unsigned int points;
+    unsigned int points = 0;
     //! Total stars
-    unsigned int totalStars;
+    unsigned int totalStars = 0;
 
     //! Last world map position X
-    long worldPosX;
+    long worldPosX = 0;
     //! Last world map position Y
-    long worldPosY;
+    long worldPosY = 0;
 
     //! Last entered/exited warp Array-ID on the HUB-based episodes.
-    unsigned long last_hub_warp;
+    unsigned long last_hub_warp = 0;
 
     //! Current world music ID
-    unsigned int musicID;
+    unsigned int musicID = 0;
     //! Current world music file (custom music)
     PGESTRING musicFile;
 
     //! Is episode was completed in last time
-    bool gameCompleted;
+    bool gameCompleted = false;
 
     //! Extra data bank, saved via lua
     saveUserData userData;
