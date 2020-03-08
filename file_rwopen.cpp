@@ -70,7 +70,10 @@ bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelDat
     {
         //Disable UTF8 for SMBX64 files
         if(!file.reOpen(false))
+        {
+            FileData.meta.ReadFileValid = false;
             return false;
+        }
         //Read SMBX LVL File
         if(!ReadSMBX64LvlFile(file, FileData))
             return false;
@@ -138,7 +141,10 @@ bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, Le
     {
         //Disable UTF8 for SMBX64 files
         if(!file.reOpen(false))
+        {
+            data.meta.ReadFileValid = false;
             return false;
+        }
         //Read SMBX LVL File
         return ReadSMBX64LvlFileHeaderT(file, data);
     }
@@ -283,7 +289,10 @@ bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldDat
     {
         //Disable UTF8 for SMBX64 files
         if(!file.reOpen(false))
+        {
+            data.meta.ReadFileValid = false;
             return false;
+        }
         //Read SMBX WLD File
         if(!ReadSMBX64WldFile(file, data))
             return false;
@@ -351,7 +360,10 @@ bool FileFormats::OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, Wo
     {
         //Disable UTF8 for SMBX64 files
         if(!file.reOpen(false))
+        {
+            data.meta.ReadFileValid = false;
             return false;
+        }
         //Read SMBX WLD File
         return ReadSMBX64WldFileHeaderT(file, data);
     }
