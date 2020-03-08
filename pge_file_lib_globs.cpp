@@ -1104,6 +1104,7 @@ TextFileOutput::TextFileOutput(PGESTRING filePath, bool utf8, bool forceCRLF, Te
 #ifndef PGE_FILES_QT
         stream = nullptr;
 #else
+        file.flush();
         file.close();
 #endif
     }
@@ -1163,6 +1164,7 @@ void TextFileOutput::close()
     m_filePath.clear();
     m_lineNumber = 0;
 #ifdef PGE_FILES_QT
+    file.flush();
     file.close();
 #else
     if(stream)
