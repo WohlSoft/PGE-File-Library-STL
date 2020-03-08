@@ -55,6 +55,7 @@ namespace smbx64Format
 bool SMBX64::IsUInt(PGESTRING in) // UNSIGNED INT
 {
     using namespace smbx64Format;
+    if(IsEmpty(in)) return false;
 #ifdef PGE_FILES_QT
     PGEChar *data = in.data();
 #else
