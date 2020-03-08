@@ -32,7 +32,6 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
     FileData.meta.ERROR_info.clear();
     CreateWorldHeader(FileData);
     FileData.meta.RecentFormat = WorldData::SMBX38A;
-    #if !defined(_MSC_VER) || _MSC_VER > 1800
     PGE_FileFormats_misc::TextFileInput inf;
 
     if(!inf.open(filePath, false))
@@ -41,7 +40,30 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
         return false;
     }
 
-    PGE_FileFormats_misc::FileInfo in_1(filePath);
+    return ReadSMBX38AWldFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadSMBX38AWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+{
+    FileData.meta.ERROR_info.clear();
+    CreateWorldHeader(FileData);
+    FileData.meta.RecentFormat = LevelData::SMBX38A;
+    PGE_FileFormats_misc::RawTextInput inf;
+
+    if(!inf.open(&rawdata, filePath))
+    {
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
+
+    return ReadSMBX38AWldFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData)
+{
+#if !defined(_MSC_VER) || _MSC_VER > 1800
+    PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
@@ -181,11 +203,11 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
     FileData.CurSection = 0;
     FileData.playmusic = 0;
     return true;
-    #else
+#else
     FileData.meta.ReadFileValid = false;
-    FileData.meta.ERROR_info = "Unsupported on MSVC2013";
+    FileData.meta.ERROR_info = "Unsupported on MSVC2013 or lower";
     return false;
-    #endif
+#endif
 }
 
 bool FileFormats::ReadSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
@@ -232,7 +254,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 
     FileData.meta.RecentFormat = WorldData::SMBX38A;
 
-    #if !defined(_MSC_VER) || _MSC_VER > 1800
+#if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.EpisodeTitle = "" ;
     FileData.stars = 0;
     FileData.CurSection = 0;
@@ -785,11 +807,11 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     FileData.playmusic = 0;
     FileData.meta.ReadFileValid = true;
     return true;
-    #else
+#else
     FileData.meta.ReadFileValid = false;
-    FileData.meta.ERROR_info = "Unsupported on MSVC2013";
+    FileData.meta.ERROR_info = "Unsupported on MSVC2013 or lower";
     return false;
-    #endif
+#endif
 }
 
 

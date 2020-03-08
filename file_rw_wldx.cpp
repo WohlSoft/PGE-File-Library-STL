@@ -38,19 +38,41 @@
 bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileData)
 {
     CreateWorldHeader(FileData);
-    FileData.meta.RecentFormat = WorldData::PGEX;
-    PGE_FileFormats_misc::TextFileInput  inf;
+    FileData.meta.RecentFormat = LevelData::PGEX;
+    PGE_FileFormats_misc::TextFileInput inf;
 
     if(!inf.open(filePath, true))
     {
+        FileData.meta.ERROR_info = "Can't open file";
         FileData.meta.ReadFileValid = false;
         return false;
     }
 
+    return ReadExtendedWldFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+{
+    CreateWorldHeader(FileData);
+    FileData.meta.RecentFormat = LevelData::PGEX;
+    PGE_FileFormats_misc::RawTextInput inf;
+
+    if(!inf.open(&rawdata, filePath))
+    {
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
+
+    return ReadExtendedWldFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData)
+{
     PGESTRING line;
     int str_count = 0;
     bool valid = false;
-    PGE_FileFormats_misc::FileInfo in_1(filePath);
+    PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
 
@@ -170,10 +192,8 @@ skipHeaderParse:
     FileData.CurSection = 0;
     FileData.playmusic = 0;
     FileData.meta.ReadFileValid = true;
-    inf.close();
     return true;
 badfile:
-    inf.close();
     FileData.meta.ERROR_info = "Invalid file format";
     FileData.meta.ERROR_linenum = str_count;
     FileData.meta.ERROR_linedata = line;

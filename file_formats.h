@@ -532,6 +532,21 @@ public:
      * \return true on success file reading, false if error was occouped
      */
     static bool OpenWorldFile(PGESTRING filePath, WorldData &data);
+    /**
+     * @brief Parses a world map file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] rawdata Raw data of the supported level file
+     * @param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * @param [__out] FileData World data structure
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenWorldRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    /**
+     * @brief Parses a level world map data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] file Input file descriptor
+     * @param [__out] FileData World data structure
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldData &data);
     /*!
      * \brief Parses a world map file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-WLDX)
      * \param [__in] filePath Full path to file which must be opened
@@ -539,6 +554,21 @@ public:
      * \return true on success file reading, false if error was occouped
      */
     static bool OpenWorldFileHeader(PGESTRING filePath, WorldData &data);
+    /**
+     * @brief Parses a level file data header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] rawdata Input raw data
+     * @param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * @param [__out] data Level data structure (with initialized header data only)
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenWorldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &data);
+    /**
+     * @brief Parses a level file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] file Input file descriptor
+     * @param [__out] data Level data structure (with initialized header data only)
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, WorldData &data);
     /*!
      * \brief Save a world file to the disk
      * \param [__in] FileData World data structure
@@ -567,6 +597,21 @@ public:
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX1...64 world map  file header and skips other part of a file
+     * \param [__in] rawdata Raw data of the supported level file
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param [__out]  FileData World map data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX64WldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX1...64 world map file header and skips other part of a file
+     * \param [__in] inf Input file descriptor
+     * \param [__out] FileData World map data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX64WldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData);
     /*!
      * \brief Parses SMBX1...64 World map file from raw data from file
      * \param [__in] filePath Full path to file to open
@@ -623,6 +668,21 @@ public:
      */
     static bool ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData &FileData);
     /*!
+     * \brief Parses SMBX-38A world map file header and skips other part of a file
+     * \param [__in] rawdata Raw data of the supported level file
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param FileData World data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    /*!
+     * \brief Parses SMBX-38A world map file header and skips other part of a file
+     * \param [__in] inf Input file descriptor
+     * \param [__out] FileData World map data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData);
+    /*!
      * \brief Parses SMBX-38A world map file data from file
      * \param [__in] filePath Full path to flie
      * \param [__out] FileData
@@ -674,6 +734,21 @@ public:
      * \return true if file successfully saved, false if error occouped
      */
     static bool ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileData);
+    /*!
+     * \brief Parses PGE-X World map file header from the file
+     * \param [__in] rawdata Raw data of the supported level file
+     * \param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * \param [__out]  FileData World data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    /*!
+     * \brief Parses PGE-X World map file header from the file
+     * \param [__in] inf Input file descriptor
+     * \param [__out] FileData World data structure (with initialized header data only)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData);
     /*!
      * \brief Parses PGE-X World map file from file
      * \param [__in] filePath

@@ -239,19 +239,37 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
 
 bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
 {
-    data.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
-
-    PGESTRING firstLine;
     if(!file.open(filePath, true))
     {
+        data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
         data.meta.ERROR_linedata = "";
         data.meta.ERROR_linenum = -1;
-        data.meta.ReadFileValid = false;
         return false;
     }
+    return OpenWorldFileT(file, data);
+}
 
+bool FileFormats::OpenWorldRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+{
+    PGE_FileFormats_misc::RawTextInput file;
+    if(!file.open(&rawdata, filePath))
+    {
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linenum = -1;
+        return false;
+    }
+    return OpenWorldFileT(file, FileData);
+}
+
+bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldData &data)
+{
+    PGESTRING firstLine;
+
+    data.meta.ERROR_info.clear();
     firstLine = file.read(8);
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
@@ -277,9 +295,9 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
             return false;
     }
 
-    if(PGE_FileFormats_misc::TextFileInput::exists(filePath + ".meta"))
+    if(PGE_FileFormats_misc::TextFileInput::exists(file.getFilePath() + ".meta"))
     {
-        if(!ReadNonSMBX64MetaDataF(filePath + ".meta", data.metaData))
+        if(!ReadNonSMBX64MetaDataF(file.getFilePath() + ".meta", data.metaData))
             data.meta.ERROR_info = "Can't open meta-file";
     }
 
@@ -293,13 +311,33 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
 
     if(!file.open(filePath, true))
     {
+        data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
         data.meta.ERROR_linedata = "";
         data.meta.ERROR_linenum = -1;
-        data.meta.ReadFileValid = false;
         return false;
     }
+    return OpenWorldFileHeaderT(file, data);
+}
 
+bool FileFormats::OpenWorldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &data)
+{
+    PGE_FileFormats_misc::RawTextInput file;
+    data.meta.ERROR_info.clear();
+
+    if(!file.open(&rawdata, filePath))
+    {
+        data.meta.ReadFileValid = false;
+        data.meta.ERROR_info = "Can't open file";
+        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linenum = -1;
+        return false;
+    }
+    return OpenWorldFileHeaderT(file, data);
+}
+
+bool FileFormats::OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, WorldData &data)
+{
     PGESTRING firstLine;
     firstLine = file.readLine();
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
@@ -307,7 +345,7 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
         //Read SMBX-38A WLD File
-        return ReadSMBX38AWldFileHeader(filePath, data);
+        return ReadSMBX38AWldFileHeaderT(file, data);
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
@@ -315,12 +353,12 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
         if(!file.reOpen(false))
             return false;
         //Read SMBX WLD File
-        return ReadSMBX64WldFileHeader(filePath, data);
+        return ReadSMBX64WldFileHeaderT(file, data);
     }
     else
     {
         //Read PGE WLDX File
-        return ReadExtendedWldFileHeader(filePath, data);
+        return ReadExtendedWldFileHeaderT(file, data);
     }
 }
 

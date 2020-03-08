@@ -30,24 +30,48 @@
 
 bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileData)
 {
-    SMBX64_FileBegin();
     FileData.meta.ERROR_info.clear();
     CreateWorldHeader(FileData);
-    FileData.meta.RecentFormat = WorldData::SMBX64;
+    FileData.meta.RecentFormat = LevelData::SMBX64;
     FileData.meta.RecentFormatVersion = 64;
+    PGE_FileFormats_misc::TextFileInput inf;
 
-    PGE_FileFormats_misc::TextFileInput in;
-    if(!in.open(filePath, false))
+    if(!inf.open(filePath, false))
     {
+        FileData.meta.ERROR_info = "Can't open file";
         FileData.meta.ReadFileValid = false;
         return false;
     }
+    return ReadSMBX64WldFileHeaderT(inf, FileData);
+}
 
-    PGE_FileFormats_misc::FileInfo in_1(filePath);
+bool FileFormats::ReadSMBX64WldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+{
+    FileData.meta.ERROR_info.clear();
+    CreateWorldHeader(FileData);
+    FileData.meta.RecentFormat = LevelData::SMBX64;
+    FileData.meta.RecentFormatVersion = 64;
+    PGE_FileFormats_misc::RawTextInput inf;
+
+    if(!inf.open(&rawdata, filePath))
+    {
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
+    return ReadSMBX64WldFileHeaderT(inf, FileData);
+}
+
+bool FileFormats::ReadSMBX64WldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData)
+{
+    PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
-
-    in.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
+    inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
+    SMBX64_FileBegin();
+#define nextLineH() line = inf.readCVSLine()
+    FileData.meta.RecentFormat = WorldData::SMBX64;
+    FileData.meta.RecentFormatVersion = 64;
 
     FileData.meta.untitled = false;
     FileData.meta.modified = false;
@@ -57,26 +81,26 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
 
     try
     {
-        nextLine();   //Read first Line
+        nextLineH();   //Read first Line
         SMBX64::ReadUInt(&file_format, line); //File format number
         FileData.meta.RecentFormatVersion = file_format;
 
-        nextLine();
+        nextLineH();
         SMBX64::ReadStr(&FileData.EpisodeTitle, line); //Episode name
 
         if(ge(55))
         {
-            nextLine();
+            nextLineH();
             SMBX64::ReadCSVBool(&FileData.nocharacter1, line);//Edisode without Mario
-            nextLine();
+            nextLineH();
             SMBX64::ReadCSVBool(&FileData.nocharacter2, line);//Edisode without Luigi
-            nextLine();
+            nextLineH();
             SMBX64::ReadCSVBool(&FileData.nocharacter3, line);//Edisode without Peach
-            nextLine();
+            nextLineH();
             SMBX64::ReadCSVBool(&FileData.nocharacter4, line);//Edisode without Toad
             if(ge(56))
             {
-                nextLine();
+                nextLineH();
                 SMBX64::ReadCSVBool(&FileData.nocharacter5, line);//Edisode without Link
             }
             //Convert into the bool array
@@ -89,31 +113,31 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
 
         if(ge(3))
         {
-            nextLine();
+            nextLineH();
             SMBX64::ReadStr(&FileData.IntroLevel_file, line);//Autostart level
-            nextLine();
+            nextLineH();
             SMBX64::ReadCSVBool(&FileData.HubStyledWorld, line); //Don't use world map on this episode
-            nextLine();
+            nextLineH();
             SMBX64::ReadCSVBool(&FileData.restartlevel, line);//Restart level on playable character's death
         }
 
         if(ge(20))
         {
-            nextLine();
+            nextLineH();
             SMBX64::ReadUInt(&FileData.stars, line);//Stars number
         }
 
         if(file_format >= 17)
         {
-            nextLine();
+            nextLineH();
             SMBX64::ReadStr(&FileData.author1, line); //Author 1
-            nextLine();
+            nextLineH();
             SMBX64::ReadStr(&FileData.author2, line); //Author 2
-            nextLine();
+            nextLineH();
             SMBX64::ReadStr(&FileData.author3, line); //Author 3
-            nextLine();
+            nextLineH();
             SMBX64::ReadStr(&FileData.author4, line); //Author 4
-            nextLine();
+            nextLineH();
             SMBX64::ReadStr(&FileData.author5, line); //Author 5
 
             FileData.authors.clear();
@@ -125,12 +149,10 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
         }
 
         FileData.meta.ReadFileValid = true;
-        in.close();
         return true;
     }
     catch(const std::exception &err)
     {
-        in.close();
         if(file_format > 0)
             FileData.meta.ERROR_info = "Detected file format: SMBX-" + fromNum(file_format) + " is invalid\n";
         else
@@ -140,13 +162,14 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
 #else
         FileData.meta.ERROR_info += exception_to_pretty_string(err);
 #endif
-        FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
+        FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = line;
         FileData.meta.ReadFileValid = false;
         PGE_CutLength(FileData.meta.ERROR_linedata, 50);
         PGE_FilterBinary(FileData.meta.ERROR_linedata);
         return false;
     }
+#undef nextLineH
 }
 
 
