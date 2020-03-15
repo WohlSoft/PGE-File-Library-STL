@@ -23,6 +23,7 @@
 #include "smbx64_macro.h"
 #include "CSVUtils.h"
 
+
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
@@ -451,48 +452,40 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
             {
             //SMBX64 Fixed special options for NPC
             /*parakoopas*/
-            case 76:
-            case 121:
-            case 122:
-            case 123:
-            case 124:
-            case 161:
-            case 176:
-            case 177:
+            case 76: case 121: case 122: case 123:
+            case 124: case 161: case 176: case 177:
             /*Paragoomba*/
-            case 243:
-            case 244:
+            case 243: case 244:
             /*Cheep-Cheep*/
-            case 28:
-            case 229:
-            case 230:
-            case 232:
-            case 233:
-            case 234:
-            case 236:
+            case 28: case 229: case 230: case 232:
+            case 233: case 234: case 236:
             /*WarpSelection*/
-            case 288:
-            case 289:
+            case 288: case 289:
             /*firebar*/
             case 260:
-                if(
-                    ((npcdata.id != 76) && (npcdata.id != 28))
-                    ||
-                    (
-                        ((ge(15)) && (npcdata.id == 76))
-                        || ((ge(31)) && (npcdata.id == 28))
-                    )
-                )
+            {
+                if(npcdata.id == 76 && lt(15))
+                {
+                    npcdata.special_data = 0;
+                }
+                else if(npcdata.id == 28 && lt(31))
+                {
+                    npcdata.special_data = 2;
+                }
+                else
                 {
                     nextLine();
                     SMBX64::ReadSInt(&npcdata.special_data, line); //NPC special option
                 }
+
                 break;
+            }
             /*Containers*/
             case 91: /*buried*/
             case 96: /*egg*/
             case 283:/*Bubble*/
             case 284:/*SMW Lakitu*/
+            {
                 nextLine();
                 SMBX64::ReadSInt(&npcdata.contents, line);
                 if(npcdata.id == 91)
@@ -509,6 +502,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
                     }
                 }
                 break;
+            }
             default:
                 break;
             }
