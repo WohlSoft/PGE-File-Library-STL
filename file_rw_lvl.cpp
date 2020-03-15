@@ -423,7 +423,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
             if((file_format < 10) && (bgodata.id == 65)) //set foreground for BGO-65 (SMBX 1.0)
             {
                 bgodata.z_mode = LevelBGO::Foreground1;
-                bgodata.smbx64_sp = 80;
+                bgodata.smbx64_sp = 125;
             }
 
             bgodata.meta.array_id = FileData.bgo_array_id++;
