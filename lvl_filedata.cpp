@@ -463,15 +463,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
 
 void FileFormats::CreateLevelHeader(LevelData &NewFileData)
 {
-    NewFileData.CurSection = 0;
-    NewFileData.playmusic = 0;
-    NewFileData.meta = FileFormatMeta();
-
-    NewFileData.open_level_on_fail = "";
-    NewFileData.open_level_on_fail_warpID = 0;
-
-    NewFileData.LevelName = "";
-    NewFileData.stars = 0;
+    NewFileData = LevelData();
 }
 
 void FileFormats::CreateLevelData(LevelData &NewFileData)
@@ -513,7 +505,10 @@ void FileFormats::CreateLevelData(LevelData &NewFileData)
 
     NewFileData.layers.clear();
     NewFileData.variables.clear();
+    NewFileData.arrays.clear();
     NewFileData.scripts.clear();
+
+    NewFileData.custom38A_configs.clear();
 
     //Create system layers
     //Default
