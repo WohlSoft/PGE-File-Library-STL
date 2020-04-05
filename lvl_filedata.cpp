@@ -186,24 +186,26 @@ void FileFormats::smbx64LevelSortBGOs(LevelData &lvl)
 
 static inline bool sbx2BgoMore(const LevelBGO &a, const LevelBGO &b)
 {
+    bool sp_gr = (a.smbx64_sp_apply > b.smbx64_sp_apply);
+    bool sp_eq = (a.smbx64_sp_apply == b.smbx64_sp_apply);
     bool zOffset_gr = a.z_offset > b.z_offset;
     bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
 
     bool arrayId_ge = a.meta.array_id >= b.meta.array_id;
 
-    return  zOffset_gr ||
-           (zOffset_eq && arrayId_ge);
+    return sp_gr || (sp_eq && (zOffset_gr || (zOffset_eq && arrayId_ge)));
 }
 
 static inline bool smbx2BgoLess(const LevelBGO &a, const LevelBGO &b)
 {
+    bool sp_lt = (a.smbx64_sp_apply < b.smbx64_sp_apply);
+    bool sp_eq = (a.smbx64_sp_apply == b.smbx64_sp_apply);
     bool zOffset_lt = a.z_offset < b.z_offset;
     bool zOffset_eq = PGE_floatEqual(a.z_offset, b.z_offset, 8);
 
     bool arrayId_le = a.meta.array_id <= b.meta.array_id;
 
-    return zOffset_lt ||
-          (zOffset_eq && arrayId_le);
+    return sp_lt || (sp_eq && (zOffset_lt || (zOffset_eq && arrayId_le)));
 }
 
 void FileFormats::smbx2bLevelSortBGOs(LevelData &lvl)
