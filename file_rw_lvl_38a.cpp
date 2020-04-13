@@ -883,13 +883,13 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     MakeCSVPostProcessor(&nextSet.expression_pos_y, PGEUrlDecodeFunc),
                     MakeCSVPostProcessor(&nextSet.expression_pos_w, PGEUrlDecodeFunc),
                     MakeCSVPostProcessor(&nextSet.expression_pos_h, PGEUrlDecodeFunc),
-                    MakeCSVPostProcessor(&autoScrollType, [&nextSet,&canAutoScroll](unsigned int &value)
+                    MakeCSVOptionalEmpty(&autoScrollType, 0, nullptr, [&nextSet,&canAutoScroll](unsigned int &value)
                     {
                         nextSet.autoscrol = (value != 0);
                         nextSet.autoscroll_style = value ? (static_cast<int>(value) - 1) : 0;//Since 69
                         canAutoScroll = nextSet.autoscrol;
                     }),
-                    MakeCSVPostProcessor(&nextSet.expression_autoscrool_x, PGEUrlDecodeFunc),
+                    MakeCSVOptionalEmpty(&nextSet.expression_autoscrool_x, "", nullptr, PGEUrlDecodeFunc),
                     MakeCSVOptionalEmpty(&nextSet.expression_autoscrool_y, "", nullptr, PGEUrlDecodeFunc)
                     );
 

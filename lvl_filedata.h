@@ -136,7 +136,7 @@ struct LevelBlock
     //! but takes effect in the SMBX Engine)
     long w = 0;
     //! Automatically scale cropping of the block size (if false, sprite will be cropped to fit into defined size)
-    bool autoscale = true;
+    bool autoscale = false;
     //! ID of block type defined in the lvl_blocks.ini
     unsigned long id = 0;
     //! ID of the included NPC (0 - empty, <0 - number of coins, >0 - NPC-ID of included NPC)
