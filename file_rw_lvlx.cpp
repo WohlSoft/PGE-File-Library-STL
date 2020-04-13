@@ -72,7 +72,7 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
     do
     {
         str_count++;
-        NextLine(line);
+        NextLine(line)
     }
     while((line != "HEAD") && (!IsNULL(line)));
 
@@ -82,12 +82,12 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
     if(line != "HEAD")//Header not found, this level is head-less
         goto skipHeaderParse;
 
-    NextLine(line);
+    NextLine(line)
     while((line != "HEAD_END") && (!IsNULL(line)))
     {
         header.push_back(line);
         str_count++;
-        NextLine(line);
+        NextLine(line)
         if(line == "HEAD_END")
             closed = true;
     }
@@ -234,17 +234,17 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
     LevelScript script;
     LevelItemSetup38A customcfg38A;
     ///////////////////////////////////////Begin file///////////////////////////////////////
-    PGEX_FileParseTree(in.readAll());
+    PGEX_FileParseTree(in.readAll())
     PGEX_FetchSection() //look sections
     {
         PGEX_FetchSection_begin()
         ///////////////////HEADER//////////////////////
         PGEX_Section("HEAD")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
@@ -260,10 +260,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////////////////MetaDATA/////////////////////////////////////////////
         PGEX_Section("META_BOOKMARKS")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 Bookmark meta_bookmark;
                 meta_bookmark.bookmarkName.clear();
                 meta_bookmark.x = 0;
@@ -281,10 +281,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ////////////////////////meta bookmarks////////////////////////
         PGEX_Section("META_SYS_CRASH")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 FileData.metaData.crash.used = true;
                 PGEX_Values() //Look markers and values
                 {
@@ -303,10 +303,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////SECTION//////////////////////
         PGEX_Section("SECTION")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 lvl_section = CreateLvlSection();
                 PGEX_Values() //Look markers and values
                 {
@@ -332,14 +332,13 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
                 lvl_section.PositionX = lvl_section.size_left - 10;
                 lvl_section.PositionY = lvl_section.size_top - 10;
+
                 //add captured value into array
-                bool found = false;
-                pge_size_t q = 0;
                 pge_size_t sections_count = FileData.sections.size();
 
-                if(lvl_section.id >= (int)sections_count)
+                if(lvl_section.id >= static_cast<int>(sections_count))
                 {
-                    pge_size_t needToAdd = (FileData.sections.size() - 1) - static_cast<pge_size_t>(lvl_section.id);
+                    pge_size_t needToAdd = static_cast<pge_size_t>(lvl_section.id) - (FileData.sections.size() - 1);
                     while(needToAdd > 0)
                     {
                         LevelSection dummySct = CreateLvlSection();
@@ -349,28 +348,16 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     }
                 }
 
-                for(q = 0; q < sections_count; q++)
-                {
-                    if(FileData.sections[q].id == lvl_section.id)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if(found)
-                    FileData.sections[q] = lvl_section;
-                else
-                    FileData.sections.push_back(lvl_section);
+                FileData.sections[static_cast<pge_size_t>(lvl_section.id)] = lvl_section;
             }
         }//SECTION
         ///////////////////STARTPOINT//////////////////////
         PGEX_Section("STARTPOINT")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 player = CreateLvlPlayerPoint();
                 PGEX_Values() //Look markers and values
                 {
@@ -406,10 +393,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////BLOCK//////////////////////
         PGEX_Section("BLOCK")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 block = CreateLvlBlock();
                 PGEX_Values() //Look markers and values
                 {
@@ -441,10 +428,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////BGO//////////////////////
         PGEX_Section("BGO")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 bgodata = CreateLvlBgo();
                 PGEX_Values() //Look markers and values
                 {
@@ -468,10 +455,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////NPC//////////////////////
         PGEX_Section("NPC")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 npcdata = CreateLvlNpc();
                 PGEX_Values() //Look markers and values
                 {
@@ -523,10 +510,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////PHYSICS//////////////////////
         PGEX_Section("PHYSICS")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 physiczone = CreateLvlPhysEnv();
                 PGEX_Values() //Look markers and values
                 {
@@ -552,10 +539,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////DOORS//////////////////////
         PGEX_Section("DOORS")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 door = CreateLvlWarp();
                 PGEX_Values() //Look markers and values
                 {
@@ -616,10 +603,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////LAYERS//////////////////////
         PGEX_Section("LAYERS")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 layer = CreateLvlLayer();
                 PGEX_Values() //Look markers and values
                 {
@@ -678,10 +665,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////EVENTS_CLASSIC//////////////////////
         PGEX_Section("EVENTS_CLASSIC")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 event = CreateLvlEvent();
                 PGESTRINGList musicSets;
                 PGESTRINGList bgSets;
@@ -878,7 +865,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                                 errorString = "Invalid Section Autoscroll type value type";
 
                                 if(PGEFile::IsIntU(param[1]))
-                                    sectionSet.autoscroll_style = toUInt(param[1]);
+                                    sectionSet.autoscroll_style = static_cast<int>(toUInt(param[1]));
                                 else
                                     goto badfile;
                             }
@@ -1431,10 +1418,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////VARIABLES//////////////////////
         PGEX_Section("VARIABLES")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 variable = CreateLvlVariable("unknown");
                 PGEX_Values() //Look markers and values
                 {
@@ -1449,10 +1436,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////ARRAYS//////////////////////
         PGEX_Section("ARRAYS")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 array_field = LevelArray();
                 PGEX_Values() //Look markers and values
                 {
@@ -1465,10 +1452,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////SCRIPTS//////////////////////
         PGEX_Section("SCRIPTS")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 script = CreateLvlScript("unknown", LevelScript::LANG_LUA);
                 PGEX_Values() //Look markers and values
                 {
@@ -1495,10 +1482,10 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
         ///////////////////CUSTOM ITEM CONFIGS (38A)//////////////////////
         PGEX_Section("CUSTOM_ITEMS_38A")
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_SectionBegin(PGEFile::PGEX_Struct)
             PGEX_Items()
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 customcfg38A = LevelItemSetup38A();
                 PGESTRINGList data;
                 unsigned int type = 0;
