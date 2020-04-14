@@ -66,8 +66,9 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
+    FileData.meta.RecentFormat = WorldData::SMBX38A;
+    FileData.meta.RecentFormatVersion = latest_version_38a;
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
-    uint32_t file_version = 0;
 
     try
     {
@@ -79,9 +80,9 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
         if(!PGE_StartsWith(fileIndentifier, "SMBXFile"))
             throw std::logic_error("Invalid file format");
 
-        file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+        FileData.meta.RecentFormatVersion = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
 
-        if(file_version > latest_version_38a)
+        if(FileData.meta.RecentFormatVersion > latest_version_38a)
             throw std::logic_error("File format has newer version which is not supported yet");
 
         while(!inf.eof())
@@ -193,7 +194,7 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     catch(const std::exception &err)
     {
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
@@ -253,6 +254,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     CreateWorldData(FileData);
 
     FileData.meta.RecentFormat = WorldData::SMBX38A;
+    FileData.meta.RecentFormatVersion = latest_version_38a;
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.EpisodeTitle = "" ;
@@ -281,7 +283,6 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     WorldItemSetup38A   customcfg;
 
     PGESTRING           identifier;
-    uint32_t            file_version = 0;
 
     //Add path data
     if(!IsEmpty(filePath))
@@ -303,9 +304,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
         if(!PGE_StartsWith(fileIndentifier, "SMBXFile"))
             throw std::logic_error("Invalid file format");
 
-        file_version = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+        FileData.meta.RecentFormatVersion = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
 
-        if(file_version > latest_version_38a)
+        if(FileData.meta.RecentFormatVersion > latest_version_38a)
             throw std::logic_error("File format has newer version which is not supported yet");
 
         while(!in.eof())
@@ -774,7 +775,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
 
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
@@ -792,7 +793,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
          */
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(file_version) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by unknown exception\n";
         if(!IsEmpty(identifier))
             FileData.meta.ERROR_info += "\n Field type " + identifier;
@@ -855,6 +856,8 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
     FileData.meta.ERROR_linedata = "";
     FileData.meta.ERROR_linenum = -1;
     FileData.meta.ReadFileValid = false;
+    FileData.meta.RecentFormat = WorldData::SMBX38A;
+    FileData.meta.RecentFormatVersion = latest_version_38a;
     return false;
 }
 

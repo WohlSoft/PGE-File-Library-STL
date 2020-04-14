@@ -75,6 +75,7 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
     PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
+    FileData.meta.RecentFormat = LevelData::PGEX;
 
     //Find level header part
     do

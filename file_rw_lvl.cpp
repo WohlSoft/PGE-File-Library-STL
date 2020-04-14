@@ -73,6 +73,8 @@ bool FileFormats::ReadSMBX64LvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf,
     PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
+    FileData.meta.RecentFormat = LevelData::SMBX64;
+    FileData.meta.RecentFormatVersion = 64;
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
     SMBX64_FileBegin();
 #define nextLineH() line = inf.readCVSLine()
