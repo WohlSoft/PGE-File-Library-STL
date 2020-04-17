@@ -73,12 +73,12 @@ static inline PGESTRING invalidLine_BOOL(long line, PGESTRING data)
     return fromNum(line) + ": " + data + " <Should be 1 or 0!>\n";
 }
 
-bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfigFile &FileData, bool IgnoreBad)
+bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfigFile &fileData, bool ignoreBad)
 {
     PGESTRING line;           //Current Line data
-    PGESTRINGList Params;
-    FileData = CreateEmpytNpcTXT();
-    bool doLog = !IgnoreBad;
+    PGESTRINGList params;
+    fileData = CreateEmpytNpcTXT();
+    bool doLog = !ignoreBad;
 
     auto handlerSInt = [&](bool &dest_en, int32_t &dest, PGESTRING &input)
     {
@@ -87,7 +87,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(!SMBX64::IsSInt(input))
         {
             if(doLog)
-                FileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
+                fileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
         }
         else
         {
@@ -108,7 +108,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(!SMBX64::IsUInt(input))
         {
             if(doLog)
-                FileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
+                fileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
         }
         else
         {
@@ -129,7 +129,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(!SMBX64::IsBool(input))
         {
             if(doLog)
-                FileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
+                fileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
         }
         else
         {
@@ -150,7 +150,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(!SMBX64::IsFloat(input))
         {
             if(doLog)
-                FileData.unknownLines += invalidLine_FLT(inf.getCurrentLineNumber(), line);
+                fileData.unknownLines += invalidLine_FLT(inf.getCurrentLineNumber(), line);
         }
         else
         {
@@ -166,11 +166,11 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
     };
 
     typedef PGEHASH<PGESTRING, std::function<void(PGESTRING&)>> NpcCfgHandlerMap;
-    #define SINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerSInt(FileData.en_##param_name, FileData.param_name, param);} }
-    #define UINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerUInt(FileData.en_##param_name, FileData.param_name, param);} }
-    #define BOOL_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerBool(FileData.en_##param_name, FileData.param_name, param);} }
-    #define STR_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerString(FileData.en_##param_name, FileData.param_name, param);} }
-    #define FLT_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerDouble(FileData.en_##param_name, FileData.param_name, param);} }
+    #define SINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerSInt(fileData.en_##param_name, fileData.param_name, param);} }
+    #define UINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerUInt(fileData.en_##param_name, fileData.param_name, param);} }
+    #define BOOL_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerBool(fileData.en_##param_name, fileData.param_name, param);} }
+    #define STR_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerString(fileData.en_##param_name, fileData.param_name, param);} }
+    #define FLT_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerDouble(fileData.en_##param_name, fileData.param_name, param);} }
 
     NpcCfgHandlerMap paramsHandler =
     {
@@ -226,39 +226,62 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         if(IsEmpty(PGE_RemSubSTRING(line, " ")))
             continue;//Skip empty strings
 
-        #ifdef PGE_FILES_QT
-        Params = line.split("=", QString::SkipEmptyParts); // split the Parameter and value (example: chicken=2)
-        #else
-        PGE_SPLITSTRING(Params, line, "=");
-        #endif
+        params.clear();
 
-        if(Params.size() != 2) // If string does not contain strings with "=" as separator
+        // split the Parameter and value (example: chicken=2)
+#ifdef PGE_FILES_QT
+        int splitSign = line.indexOf('=');
+        if(splitSign < 0) // Invalid line
         {
             if(doLog)
-                FileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
-            if(doLog || (Params.size() < 2))
+                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
+            continue;
+        }
+        params.push_back(line.mid(0, splitSign));
+        params.push_back(line.mid(splitSign + 1, -1));
+#else
+        size_t splitSign = line.find('=');
+        if(splitSign == std::string::npos)
+        {
+            if(doLog)
+                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
+            continue;
+        }
+        params.push_back(line.substr(0, splitSign));
+        params.push_back(line.substr(splitSign + 1, std::string::npos));
+#endif
+
+        if(params.size() != 2) // If string does not contain strings with "=" as separator
+        {
+            if(doLog)
+                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
+            if(doLog || (params.size() < 2))
                 continue;
         }
 
-        Params[0] = PGESTR_Simpl(Params[0]);
-        Params[0] = PGE_RemSubSTRING(Params[0], " "); //Delete spaces
-        Params[0] = PGESTR_toLower(Params[0]);//To lower case
+        params[0] = PGESTR_Trim(params[0]);
+        params[0] = PGESTR_Simpl(params[0]);
+        params[0] = PGE_RemSubSTRING(params[0], " "); //Delete spaces
+        params[0] = PGESTR_toLower(params[0]);//To lower case
 
-        NpcCfgHandlerMap::iterator hand = paramsHandler.find(Params[0]);
+        params[1] = PGESTR_Trim(params[1]); // Trim it!
+
+        NpcCfgHandlerMap::iterator hand = paramsHandler.find(params[0]);
         if(hand != paramsHandler.end())
         {
-            #ifdef PGE_FILES_QT
-            (*hand)(Params[1]);
-            #else
-            (hand->second)(Params[1]);
-            #endif
+            PGEMAPVAL(hand)(params[1]);
         }
-        else if(doLog)//Store unknown value into warnings list
-            FileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + "\n";
+        else
+        {
+            // Custom value
+            fileData.entries[params[0]] = params[1];
+            if(doLog) //[DEPRECATED] Store unknown value into warnings list
+                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + "\n";
+        }
     }
     while(!inf.eof());
 
-    FileData.ReadFileValid = true;
+    fileData.ReadFileValid = true;
     return true;
 }
 
@@ -293,95 +316,101 @@ bool FileFormats::WriteNPCTxtFileRaw(NPCConfigFile &FileData, PGESTRING &rawdata
 }
 
 //Convert NPC Options structore to text for saving
-bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConfigFile &FileData)
+bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConfigFile &fileData)
 {
-    if(FileData.en_gfxoffsetx)
-        out << "gfxoffsetx=" + fromNum(FileData.gfxoffsetx) + "\n";
-    if(FileData.en_gfxoffsety)
-        out << "gfxoffsety=" + fromNum(FileData.gfxoffsety) + "\n";
-    if(FileData.en_gfxwidth)
-        out << "gfxwidth=" + fromNum(FileData.gfxwidth) + "\n";
-    if(FileData.en_gfxheight)
-        out << "gfxheight=" + fromNum(FileData.gfxheight) + "\n";
-    if(FileData.en_foreground)
-        out << "foreground=" + fromBoolToNum(FileData.foreground) + "\n";
-    if(FileData.en_width)
-        out << "width=" + fromNum(FileData.width) + "\n";
-    if(FileData.en_height)
-        out << "height=" + fromNum(FileData.height) + "\n";
+    if(fileData.en_gfxoffsetx)
+        out << "gfxoffsetx=" + fromNum(fileData.gfxoffsetx) + "\n";
+    if(fileData.en_gfxoffsety)
+        out << "gfxoffsety=" + fromNum(fileData.gfxoffsety) + "\n";
+    if(fileData.en_gfxwidth)
+        out << "gfxwidth=" + fromNum(fileData.gfxwidth) + "\n";
+    if(fileData.en_gfxheight)
+        out << "gfxheight=" + fromNum(fileData.gfxheight) + "\n";
+    if(fileData.en_foreground)
+        out << "foreground=" + fromBoolToNum(fileData.foreground) + "\n";
+    if(fileData.en_width)
+        out << "width=" + fromNum(fileData.width) + "\n";
+    if(fileData.en_height)
+        out << "height=" + fromNum(fileData.height) + "\n";
 
-    if(FileData.en_score)
-        out << "score=" + fromNum(FileData.score) + "\n";
-    if(FileData.en_health)
-        out << "health=" + fromNum(FileData.health) + "\n";
+    if(fileData.en_score)
+        out << "score=" + fromNum(fileData.score) + "\n";
+    if(fileData.en_health)
+        out << "health=" + fromNum(fileData.health) + "\n";
 
-    if(FileData.en_playerblock)
-        out << "playerblock=" + fromBoolToNum(FileData.playerblock) + "\n";
+    if(fileData.en_playerblock)
+        out << "playerblock=" + fromBoolToNum(fileData.playerblock) + "\n";
 
-    if(FileData.en_playerblocktop)
-        out << "playerblocktop=" + fromBoolToNum(FileData.playerblocktop) + "\n";
+    if(fileData.en_playerblocktop)
+        out << "playerblocktop=" + fromBoolToNum(fileData.playerblocktop) + "\n";
 
-    if(FileData.en_npcblock)
-        out << "npcblock=" + fromBoolToNum(FileData.npcblock) + "\n";
+    if(fileData.en_npcblock)
+        out << "npcblock=" + fromBoolToNum(fileData.npcblock) + "\n";
 
-    if(FileData.en_npcblocktop)
-        out << "npcblocktop=" + fromBoolToNum(FileData.npcblocktop) + "\n";
-    if(FileData.en_grabside)
-        out << "grabside=" + fromBoolToNum(FileData.grabside) + "\n";
-    if(FileData.en_grabtop)
-        out << "grabtop=" + fromBoolToNum(FileData.grabtop) + "\n";
-    if(FileData.en_jumphurt)
-        out << "jumphurt=" + fromBoolToNum(FileData.jumphurt) + "\n";
-    if(FileData.en_nohurt)
-        out << "nohurt=" + fromBoolToNum(FileData.nohurt) + "\n";
-    if(FileData.en_speed)
-        out << "speed=" + fromNum(FileData.speed) + "\n";
-    if(FileData.en_noblockcollision)
-        out << "noblockcollision=" + fromBoolToNum(FileData.noblockcollision) + "\n";
-    if(FileData.en_cliffturn)
-        out << "cliffturn=" + fromBoolToNum(FileData.cliffturn) + "\n";
-    if(FileData.en_noyoshi)
-        out << "noyoshi=" + fromBoolToNum(FileData.noyoshi) + "\n";
-    if(FileData.en_nofireball)
-        out << "nofireball=" + fromBoolToNum(FileData.nofireball) + "\n";
-    if(FileData.en_nogravity)
-        out << "nogravity=" + fromBoolToNum(FileData.nogravity) + "\n";
-    if(FileData.en_noiceball)
-        out << "noiceball=" + fromBoolToNum(FileData.noiceball) + "\n";
-    if(FileData.en_frames)
-        out << "frames=" + fromNum(FileData.frames) + "\n";
-    if(FileData.en_framespeed)
-        out << "framespeed=" + fromNum(FileData.framespeed) + "\n";
-    if(FileData.en_framestyle)
-        out << "framestyle=" + fromNum(FileData.framestyle) + "\n";
+    if(fileData.en_npcblocktop)
+        out << "npcblocktop=" + fromBoolToNum(fileData.npcblocktop) + "\n";
+    if(fileData.en_grabside)
+        out << "grabside=" + fromBoolToNum(fileData.grabside) + "\n";
+    if(fileData.en_grabtop)
+        out << "grabtop=" + fromBoolToNum(fileData.grabtop) + "\n";
+    if(fileData.en_jumphurt)
+        out << "jumphurt=" + fromBoolToNum(fileData.jumphurt) + "\n";
+    if(fileData.en_nohurt)
+        out << "nohurt=" + fromBoolToNum(fileData.nohurt) + "\n";
+    if(fileData.en_speed)
+        out << "speed=" + fromNum(fileData.speed) + "\n";
+    if(fileData.en_noblockcollision)
+        out << "noblockcollision=" + fromBoolToNum(fileData.noblockcollision) + "\n";
+    if(fileData.en_cliffturn)
+        out << "cliffturn=" + fromBoolToNum(fileData.cliffturn) + "\n";
+    if(fileData.en_noyoshi)
+        out << "noyoshi=" + fromBoolToNum(fileData.noyoshi) + "\n";
+    if(fileData.en_nofireball)
+        out << "nofireball=" + fromBoolToNum(fileData.nofireball) + "\n";
+    if(fileData.en_nogravity)
+        out << "nogravity=" + fromBoolToNum(fileData.nogravity) + "\n";
+    if(fileData.en_noiceball)
+        out << "noiceball=" + fromBoolToNum(fileData.noiceball) + "\n";
+    if(fileData.en_frames)
+        out << "frames=" + fromNum(fileData.frames) + "\n";
+    if(fileData.en_framespeed)
+        out << "framespeed=" + fromNum(fileData.framespeed) + "\n";
+    if(fileData.en_framestyle)
+        out << "framestyle=" + fromNum(fileData.framestyle) + "\n";
 
     //Extended
-    if(FileData.en_nohammer)
-        out << "nohammer=" + fromBoolToNum(FileData.nohammer) + "\n";
-    if(FileData.en_noshell)
-        out << "noshell=" + fromBoolToNum(FileData.noshell) + "\n";
-    if(FileData.en_name && !IsEmpty(FileData.name))
-        out << "name=" + SMBX64::WriteStr(FileData.name);
-    if(FileData.en_description && !IsEmpty(FileData.description))
-        out << "description=" + SMBX64::WriteStr(FileData.description);
-    if(FileData.en_image && !IsEmpty(FileData.image))
-        out << "image=" + SMBX64::WriteStr(FileData.image);
-    if(FileData.en_icon && !IsEmpty(FileData.icon))
-        out << "icon=" + SMBX64::WriteStr(FileData.icon);
-    if(FileData.en_script && !IsEmpty(FileData.script))
-        out << "script=" + SMBX64::WriteStr(FileData.script);
-    if(FileData.en_group && !IsEmpty(FileData.group))
-        out << "group=" + SMBX64::WriteStr(FileData.group);
-    if(FileData.en_category && !IsEmpty(FileData.category))
-        out << "category=" + SMBX64::WriteStr(FileData.category);
-    if(FileData.en_grid)
-        out << "grid=" + fromNum(FileData.grid) + "\n";
-    if(FileData.en_gridoffsetx)
-        out << "gridoffsetx=" + fromNum(FileData.gridoffsetx) + "\n";
-    if(FileData.en_gridoffsety)
-        out << "gridoffsety=" + fromNum(FileData.gridoffsety) + "\n";
-    if(FileData.en_gridalign)
-        out << "gridalign=" + fromNum(FileData.gridalign) + "\n";
+    if(fileData.en_nohammer)
+        out << "nohammer=" + fromBoolToNum(fileData.nohammer) + "\n";
+    if(fileData.en_noshell)
+        out << "noshell=" + fromBoolToNum(fileData.noshell) + "\n";
+    if(fileData.en_name && !IsEmpty(fileData.name))
+        out << "name=" + SMBX64::WriteStr(fileData.name);
+    if(fileData.en_description && !IsEmpty(fileData.description))
+        out << "description=" + SMBX64::WriteStr(fileData.description);
+    if(fileData.en_image && !IsEmpty(fileData.image))
+        out << "image=" + SMBX64::WriteStr(fileData.image);
+    if(fileData.en_icon && !IsEmpty(fileData.icon))
+        out << "icon=" + SMBX64::WriteStr(fileData.icon);
+    if(fileData.en_script && !IsEmpty(fileData.script))
+        out << "script=" + SMBX64::WriteStr(fileData.script);
+    if(fileData.en_group && !IsEmpty(fileData.group))
+        out << "group=" + SMBX64::WriteStr(fileData.group);
+    if(fileData.en_category && !IsEmpty(fileData.category))
+        out << "category=" + SMBX64::WriteStr(fileData.category);
+    if(fileData.en_grid)
+        out << "grid=" + fromNum(fileData.grid) + "\n";
+    if(fileData.en_gridoffsetx)
+        out << "gridoffsetx=" + fromNum(fileData.gridoffsetx) + "\n";
+    if(fileData.en_gridoffsety)
+        out << "gridoffsety=" + fromNum(fileData.gridoffsety) + "\n";
+    if(fileData.en_gridalign)
+        out << "gridalign=" + fromNum(fileData.gridalign) + "\n";
+
+    // Custom values
+    for(NPCConfigFile::EntriesMap::iterator it = fileData.entries.begin(); it != fileData.entries.end(); ++it)
+    {
+        out << PGEMAPKEY(it) << "=" << PGEMAPVAL(it) + "\n";
+    }
 
     return true;
 }

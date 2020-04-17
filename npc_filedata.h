@@ -36,6 +36,11 @@ struct NPCConfigFile
     PGESTRING   errorString;
     PGESTRING   unknownLines;
 
+    typedef PGEMAP<PGESTRING, PGESTRING> EntriesMap;
+
+    //! Universal store of all NPCTxt values
+    EntriesMap entries;
+
 /*
  * SMBX64 Standard
  */

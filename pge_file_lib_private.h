@@ -36,6 +36,10 @@ inline PGESTRING PGESTR_toLower(const PGESTRING &str)
 {
     return str.toLower();
 }
+inline PGESTRING PGESTR_Trim(const PGESTRING &str)
+{
+    return str.trimmed();
+}
 #define PGEGetChar(chr) chr.toLatin1()
 typedef QChar PGEChar;
 #define PGEVECTOR QVector
@@ -199,6 +203,33 @@ inline PGESTRING PGESTR_toLower(PGESTRING str)
     std::transform(str.begin(), str.end(), str.begin(), ToLowerFun);
     return str;
 }
+
+// trim from start (in place)
+static inline void PGESTR_ltrim(std::string &s)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch)
+    {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void PGESTR_rtrim(std::string &s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch)
+    {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+inline PGESTRING PGESTR_Trim(const PGESTRING &str)
+{
+    PGESTRING s = str;
+    PGESTR_ltrim(s);
+    PGESTR_rtrim(s);
+    return s;
+}
+
 #define PGEGetChar(chr) chr
 #define PGEVECTOR std::vector
 typedef size_t pge_size_t;

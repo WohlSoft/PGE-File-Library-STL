@@ -45,6 +45,7 @@
 #include <QList>
 #include <QPair>
 #include <QFile>
+#include <QMap>
 #include <QTextStream>
 
 #define PGE_FILES_INHERED : public QObject
@@ -54,6 +55,9 @@ typedef QStringList PGESTRINGList;
 typedef QChar   PGEChar;
 #define PGELIST QList
 #define PGEPAIR QPair
+#define PGEMAP QMap
+#define PGEMAPKEY(it) (it.key())
+#define PGEMAPVAL(it) (it.value())
 
 #else /* PGE_FILES_QT */
 
@@ -61,6 +65,7 @@ typedef QChar   PGEChar;
 #include <vector>
 #include <cstdio>
 #include <utility>
+#include <map>
 
 #define PGE_FILES_INHERED
 
@@ -69,6 +74,9 @@ typedef std::vector<std::string>    PGESTRINGList;
 typedef char PGEChar;
 #define PGELIST std::vector
 #define PGEPAIR std::pair
+#define PGEMAP std::map
+#define PGEMAPKEY(it) (it->first)
+#define PGEMAPVAL(it) (it->second)
 
 #endif /* PGE_FILES_QT */
 
