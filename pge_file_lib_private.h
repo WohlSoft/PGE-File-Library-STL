@@ -181,6 +181,7 @@ inline PGESTRING PGE_URLDEC(const PGESTRING &src)
 #include <algorithm>
 #include <map>
 #include <cmath>
+#include <cctype>
 #include <unordered_map>
 
 #ifdef _MSC_VER
