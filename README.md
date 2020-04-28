@@ -1,6 +1,6 @@
 # PGE File Library v 0.3.1.14
 ----
-This library is a part of PGE Project.
+This library is a part of Moondust (PGE Project).
 ----
 Supported file formats:
 
@@ -32,28 +32,32 @@ Use library with this header:
 
 ----
 
-Library parses and generates files or RAW text strings.
-You can read file as from file, also from the memory,
-you can use the openLevelFile() or openWorldFile() functions to open
-necessary file more convenient.
+The Library parses and generates files or RAW text strings.
+You can read data from the memory as well as from the file.
+You can use the openLevelFile() or openWorldFile() functions to open
+necessary files more convenient.
 
 # Notes for files of SMBX-64 format:
-1) If you saving file from raw data yourself, you must save a text file with CRLF
-for SMBX-* formats, or file will be not readable by SMBX Engine.
-You can write a file like binary, but when you detecting '\n' byte,
-write a CRLF ("\r\n") bytes instead!
+1) If you saving a file from raw data yourself, you should save a text file with
+using of CRLF for SMBX-* formats, or file will be not readable by SMBX Engine.
+You can write a file like binary, but when you detecting '\n' byte, write a
+CRLF ("\r\n") bytes instead!
 
-2) When you saving a level file (World file is not requires that) into Legacy Engine's format,
-you must prepare data structure before saving it:
+2) When you saving a level file (World file does not require that) into SMBX64 format,
+you must prepare your data structures until you will save it:
 ```C++
-FileFormats::smbx64LevelPrepare(YourLevelData);     //To initialize order priorities fields and mark all star NPCs
+//To initialize order priorities fields and mark all star NPCs
+FileFormats::smbx64LevelPrepare(YourLevelData);
 ```
 
-3) If you trying to use PGE File data in the LunaLUA, before fill internal arrays, need to apply next set of the functions:
+3) If you trying to use PGE File data in the LunaLUA, before filling internal arrays, need to apply the next set of the functions:
 
 ```C++
-FileFormats::smbx64LevelPrepare(YourLevelData);     //To initialize order priorities fields and mark all star NPCs
-FileFormats::smbx64LevelSortBlocks(YourLevelData);  //Order blocks
-FileFormats::smbx64LevelSortBGOs(YourLevelData);    //Order BGO's
+//To initialize order priorities fields and mark all star NPCs
+FileFormats::smbx64LevelPrepare(YourLevelData);
+//Order blocks
+FileFormats::smbx64LevelSortBlocks(YourLevelData);
+//Order BGO's
+FileFormats::smbx64LevelSortBGOs(YourLevelData);
 ```
 
