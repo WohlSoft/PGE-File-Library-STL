@@ -57,9 +57,9 @@ inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
 {
     return src.replace(from, to);
 }
-inline PGESTRING PGE_RemSubSTRING(PGESTRING &src, PGESTRING substr)
+inline PGESTRING PGE_RemSubSTRING(const PGESTRING &src, PGESTRING substr)
 {
-    return src.remove(substr);
+    return QString(src).remove(substr);
 }
 inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
