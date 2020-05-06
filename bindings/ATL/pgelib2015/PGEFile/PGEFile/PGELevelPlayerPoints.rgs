@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {EF83F47D-58FA-4C4E-A2CD-010952E2F817} = s 'PGELevelPlayerPoints Class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{C1D4D123-A764-4385-A2BB-9D9D2D776057}'
+			Version = s '1.0'
+		}
+	}
+}

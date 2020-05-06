@@ -1,0 +1,420 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1175F17C-027E-4389-BD6A-283D228CCBB4}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <Keyword>AtlProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <HeaderFileName>PGEFile_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>PGEFile_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>PGEFile_p.c</ProxyFileName>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)PGEFile.tlb</TypeLibraryName>
+      <DllDataFileName />
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0407</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ModuleDefinitionFile>.\PGEFile.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <RegisterOutput>true</RegisterOutput>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;_CRT_SECURE_NO_WARNINGS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <HeaderFileName>PGEFile_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>PGEFile_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>PGEFile_p.c</ProxyFileName>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)PGEFile.tlb</TypeLibraryName>
+      <DllDataFileName />
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0407</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ModuleDefinitionFile>.\PGEFile.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <RegisterOutput>true</RegisterOutput>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <HeaderFileName>PGEFile_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>PGEFile_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>PGEFile_p.c</ProxyFileName>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)PGEFile.tlb</TypeLibraryName>
+      <DllDataFileName />
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0407</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ModuleDefinitionFile>.\PGEFile.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <RegisterOutput>true</RegisterOutput>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;_CRT_SECURE_NO_WARNINGS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <HeaderFileName>PGEFile_i.h</HeaderFileName>
+      <InterfaceIdentifierFileName>PGEFile_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>PGEFile_p.c</ProxyFileName>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)PGEFile.tlb</TypeLibraryName>
+      <DllDataFileName />
+      <ValidateAllParameters>true</ValidateAllParameters>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0407</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <ModuleDefinitionFile>.\PGEFile.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <RegisterOutput>true</RegisterOutput>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ErrorHelper\Error.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\ConvertUTF_PGEFF.c" />
+    <ClCompile Include="PGE-File-Library-STL\file_formats.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rwopen.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvl.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvlx.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvl_38a.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvl_38a_old.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_meta.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_npc_txt.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_sav.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_savx.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_smbx64_cnf.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_wld.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_wldx.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_rw_wld_38a.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\file_strlist.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\lvl_filedata.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\npc_filedata.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\pge_file_lib_globs.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\pge_x.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\save_filedata.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\smbx64.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\smbx64_cnf_filedata.cpp" />
+    <ClCompile Include="PGE-File-Library-STL\wld_filedata.cpp" />
+    <ClCompile Include="PGELevelBGO.cpp" />
+    <ClCompile Include="PGELevelBGOs.cpp" />
+    <ClCompile Include="PGELevelBlock.cpp" />
+    <ClCompile Include="PGELevelBlocks.cpp" />
+    <ClCompile Include="PGEFile.cpp" />
+    <ClCompile Include="PGEFileFactory.cpp" />
+    <ClCompile Include="PGEFile_i.c">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="PGELevelData.cpp" />
+    <ClCompile Include="PGELevelEvent.cpp" />
+    <ClCompile Include="PGELevelEvents.cpp" />
+    <ClCompile Include="PGELevelLayer.cpp" />
+    <ClCompile Include="PGELevelLayers.cpp" />
+    <ClCompile Include="PGELevelNPC.cpp" />
+    <ClCompile Include="PGELevelNPCs.cpp" />
+    <ClCompile Include="PGELevelPhysicalEnvironments.cpp" />
+    <ClCompile Include="PGELevelPhysicalEnvironment.cpp" />
+    <ClCompile Include="PGELevelPlayerPoint.cpp" />
+    <ClCompile Include="PGELevelPlayerPoints.cpp" />
+    <ClCompile Include="PGELevelSection.cpp" />
+    <ClCompile Include="PGELevelSectionModifier.cpp" />
+    <ClCompile Include="PGELevelSectionModifiers.cpp" />
+    <ClCompile Include="PGELevelSections.cpp" />
+    <ClCompile Include="PGELevelWarp.cpp" />
+    <ClCompile Include="PGELevelWarps.cpp" />
+    <ClCompile Include="PGEStringCollection.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Utils\ComUtils.cpp" />
+    <ClCompile Include="xdlldata.c">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dllmain.h" />
+    <ClInclude Include="ErrorHelper\Error.h" />
+    <ClInclude Include="PGE-File-Library-STL\charsetconvert.h" />
+    <ClInclude Include="PGE-File-Library-STL\ConvertUTF.h" />
+    <ClInclude Include="PGE-File-Library-STL\CSVReader.h" />
+    <ClInclude Include="PGE-File-Library-STL\CSVReaderPGE.h" />
+    <ClInclude Include="PGE-File-Library-STL\CSVUtils.h" />
+    <ClInclude Include="PGE-File-Library-STL\file_formats.h" />
+    <ClInclude Include="PGE-File-Library-STL\file_strlist.h" />
+    <ClInclude Include="PGE-File-Library-STL\invoke_default.hpp" />
+    <ClInclude Include="PGE-File-Library-STL\lvl_filedata.h" />
+    <ClInclude Include="PGE-File-Library-STL\meta_filedata.h" />
+    <ClInclude Include="PGE-File-Library-STL\npc_filedata.h" />
+    <ClInclude Include="PGE-File-Library-STL\pge_ff_units.h" />
+    <ClInclude Include="PGE-File-Library-STL\pge_file_lib_globs.h" />
+    <ClInclude Include="PGE-File-Library-STL\pge_file_lib_sys.h" />
+    <ClInclude Include="PGE-File-Library-STL\pge_x.h" />
+    <ClInclude Include="PGE-File-Library-STL\pge_x_macro.h" />
+    <ClInclude Include="PGE-File-Library-STL\save_filedata.h" />
+    <ClInclude Include="PGE-File-Library-STL\smbx38a_private.h" />
+    <ClInclude Include="PGE-File-Library-STL\smbx64.h" />
+    <ClInclude Include="PGE-File-Library-STL\smbx64_cnf_filedata.h" />
+    <ClInclude Include="PGE-File-Library-STL\smbx64_macro.h" />
+    <ClInclude Include="PGE-File-Library-STL\wld_filedata.h" />
+    <ClInclude Include="PGELevelBGO.h" />
+    <ClInclude Include="PGELevelBGOs.h" />
+    <ClInclude Include="PGELevelEvent.h" />
+    <ClInclude Include="PGELevelEvents.h" />
+    <ClInclude Include="PGELevelLayer.h" />
+    <ClInclude Include="PGELevelLayers.h" />
+    <ClInclude Include="PGELevelNPC.h" />
+    <ClInclude Include="PGELevelNPCs.h" />
+    <ClInclude Include="PGELevelPhysicalEnvironments.h" />
+    <ClInclude Include="PGELevelPhysicalEnvironment.h" />
+    <ClInclude Include="PGELevelPlayerPoint.h" />
+    <ClInclude Include="PGELevelPlayerPoints.h" />
+    <ClInclude Include="PGELevelSection.h" />
+    <ClInclude Include="PGELevelSectionModifier.h" />
+    <ClInclude Include="PGELevelSectionModifiers.h" />
+    <ClInclude Include="PGELevelSections.h" />
+    <ClInclude Include="PGELevelWarp.h" />
+    <ClInclude Include="PGELevelWarps.h" />
+    <ClInclude Include="PGEStringCollection.h" />
+    <ClInclude Include="Utils\PGEStringUtils.h" />
+    <ClInclude Include="Utils\ComUtils.h" />
+    <ClInclude Include="Utils\GenericCopyPolicy.h" />
+    <ClInclude Include="PGELevelBlock.h" />
+    <ClInclude Include="PGELevelBlocks.h" />
+    <ClInclude Include="PGEFileFactory.h" />
+    <ClInclude Include="PGEFile_i.h" />
+    <ClInclude Include="PGELevelData.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="xdlldata.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PGEFile.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PGE-File-Library-STL\.gitignore" />
+    <None Include="PGE-File-Library-STL\File_FormatsQT.pri" />
+    <None Include="PGE-File-Library-STL\File_FormatsSTL.pri" />
+    <None Include="PGE-File-Library-STL\LICENSE" />
+    <None Include="PGE-File-Library-STL\README.md" />
+    <None Include="PGELevelBGO.rgs" />
+    <None Include="PGELevelBGOs.rgs" />
+    <None Include="PGELevelBlock.rgs" />
+    <None Include="PGELevelBlocks.rgs" />
+    <None Include="PGEFile.def" />
+    <None Include="PGEFile.rgs" />
+    <None Include="PGEFileFactory.rgs" />
+    <None Include="PGELevelData.rgs" />
+    <None Include="PGELevelEvent.rgs" />
+    <None Include="PGELevelEvents.rgs" />
+    <None Include="PGELevelLayer.rgs" />
+    <None Include="PGELevelLayers.rgs" />
+    <None Include="PGELevelNPC.rgs" />
+    <None Include="PGELevelNPCs.rgs" />
+    <None Include="PGELevelPhysicalEnvironments.rgs" />
+    <None Include="PGELevelPhysicalEnvironment.rgs" />
+    <None Include="PGELevelPlayerPoint.rgs" />
+    <None Include="PGELevelPlayerPoints.rgs" />
+    <None Include="PGELevelSection.rgs" />
+    <None Include="PGELevelSectionModifier.rgs" />
+    <None Include="PGELevelSectionModifiers.rgs" />
+    <None Include="PGELevelSections.rgs" />
+    <None Include="PGELevelWarp.rgs" />
+    <None Include="PGELevelWarps.rgs" />
+    <None Include="PGEStringCollection.rgs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="PGEFile.idl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

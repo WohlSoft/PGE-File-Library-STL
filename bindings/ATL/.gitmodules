@@ -1,0 +1,3 @@
+[submodule "pgelib2015/PGEFile/PGEFile/PGE-File-Library-STL"]
+	path = pgelib2015/PGEFile/PGEFile/PGE-File-Library-STL
+	url = https://github.com/WohlSoft/PGE-File-Library-STL

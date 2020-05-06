@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {2DD0D194-DE25-4C30-995B-F57AD18929B1} = s 'PGELevelLayer Class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			TypeLib = s '{C1D4D123-A764-4385-A2BB-9D9D2D776057}'
+			Version = s '1.0'
+		}
+	}
+}

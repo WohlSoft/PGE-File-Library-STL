@@ -1,0 +1,1037 @@
+// PGEFile.idl : IDL-Quelle für PGEFile
+//
+
+// Diese Datei wird mit dem MIDL-Tool bearbeitet,
+// um den Quellcode für die Typbibliothek (PGEFile.tlb) und den Marshallingcode zu erzeugen.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+// Structures
+
+// Enums
+typedef [helpstring("The format type of a level file.")] enum PGELevelFormats {
+    [helpstring("Detect the level file format.")] LVLFORMAT_DETECT,
+    [helpstring("Use the SMBX64 .lvl file format.")] LVLFORMAT_LVL,
+    [helpstring("Use the PGE .lvlx file format.")] LVLFORMAT_LVLX
+} PGELevelFormats;
+
+typedef [helpstring("The format type of a world file.")] enum PGEWorldFormats {
+    [helpstring("Detect the world file format.")] WLDFORMAT_DETECT,
+    [helpstring("Use the SMBX64 .wld file format.")] WLDFORMAT_WLD,
+    [helpstring("Use the PGE .wldx file format.")] WLDFORMAT_WLDX
+} PGEWorldFormats;
+
+typedef [helpstring("Direction values for various items.")] enum PGEDirection {
+    [helpstring("Left direction")] DIRECTION_LEFT = -1,
+    [helpstring("Random direction (left or right)")] DIRECTION_RANDOM = 0,
+    [helpstring("No direction")] DIRECTION_NONE = 0,
+    [helpstring("Right direction")] DIRECTION_RIGHT = 1
+} PGEDirection;
+
+typedef [helpstring("Generator spawn direction.")] enum PGEGeneratorDirection {
+    [helpstring("Up direction")] GENERATOR_UP = 1,
+    [helpstring("Left direction")] GENERATOR_LEFT = 2,
+    [helpstring("Down direction")] GENERATOR_DOWN = 3,
+    [helpstring("Right direction")] GENERATOR_RIGHT = 4
+} PGEGeneratorDirection;
+
+typedef [helpstring("Generator type")] enum PGEGeneratorType {
+    [helpstring("The generator spawns NPCs, which go out of a pipe/warp.")] GENERATOR_WARP = 1,
+    [helpstring("The generator shoots NPCs.")] GENERATOR_PROJECTIVE = 2
+} PGEGeneratorType;
+
+typedef [helpstring("The entrance warp direction.")] enum PGEWarpEntrance {
+    [helpstring("Up direction")] ENTRANCE_UP = 1,
+    [helpstring("Left direction")] ENTRANCE_LEFT = 2,
+    [helpstring("Down direction")] ENTRANCE_DOWN = 3,
+    [helpstring("Right direction")] ENTRANCE_RIGHT = 4
+} PGEWarpEntrance;
+
+typedef [helpstring("The exit warp direction.")] enum PGEWarpExit {
+    [helpstring("Up direction")] EXIT_DOWN = 1,
+    [helpstring("Left direction")] EXIT_RIGHT = 2,
+    [helpstring("Down direction")] EXIT_UP = 3,
+    [helpstring("Right direction")] EXIT_LEFT = 4
+} PGEWarpExit;
+
+typedef [helpstring("The warp type.")] enum PGEWarpType {
+    [helpstring("Instant warp. The player will be teleported directly to the exit.")] WARP_INSTANT = 0,
+    [helpstring("Pipe warp. The player will go through a pipe.")] WARP_PIPE = 1,
+    [helpstring("Door warp. The player will enter or exit through a door.")] WARP_DOOR = 2
+} PGEWarpType;
+
+typedef [helpstring("End game type for events.")] enum PGEEventEndGame {
+    [helpstring("No end game by event.")] ENDGAME_NONE = 0,
+    [helpstring("End game, when bowser is defeated.")] ENDGAME_BOWSER_DEFEAT = 1
+} PGEEventEndGame;
+
+typedef [helpstring("Physical environment types")] enum PGEPhysicalEnvironmentType {
+    [helpstring("Water environment")] ENVIRONMENT_WATER = 0,
+    [helpstring("Quicksand environment")] ENVIRONMENT_QUICKSAND = 1,
+    [helpstring("Custom liquid environment")] ENVIRONMENT_CUSTOM_LIQUID = 2,
+    [helpstring("Gravitational field environment")] ENVIRONMENT_GRAVITATIONAL_FIELD = 3,
+    [helpstring("Touch event once player environment")] ENVIRONMENT_TOUCH_EVENT_ONCE_PLAYER = 4,
+    [helpstring("Touch event player environment")] ENVIRONMENT_TOUCH_EVENT_PLAYER = 5,
+    [helpstring("Touch event once NPC environment")] ENVIRONMENT_TOUCH_EVENT_ONCE_NPC = 6,
+    [helpstring("Touch event NPC environment")] ENVIRONMENT_TOUCH_EVENT_NPC = 7,
+    [helpstring("Click event environment")] ENVIRONMENT_CLICK_EVENT = 8,
+    [helpstring("Collision script environment")] ENVIRONMENT_COLLISION_SCRIPT = 9,
+    [helpstring("Click script environment")] ENVIRONMENT_CLICK_SCRIPT = 10,
+    [helpstring("Collision event environment")] ENVIRONMENT_COLLISION_EVENT = 11,
+    [helpstring("Air environment")] ENVIRONMENT_AIR = 12
+} PGEPhysicalEnvironmentType;
+
+
+[
+    object,
+    uuid(18AFC511-4D12-4589-949A-E3A6D16B5B93),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGEStringCollection : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all Strings.")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a String at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] BSTR* pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of Strings.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all Strings in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new String to the collection.")]
+    HRESULT Add([in] BSTR pVal);
+
+    [id(0x00000004), helpstring("Removes a String at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Looks for the string item in the collection and removes it if found.")]
+    HRESULT RemoveItem([in] BSTR ItemToRemove);
+};
+
+
+
+// Interfaces
+[
+    object,
+    uuid(A6ABC9BF-1212-4704-824A-FFA7354984ED),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelSection : IDispatch {
+    [propget, id(1)] HRESULT ID([out, retval] LONG* pVal);
+    [propput, id(1)] HRESULT ID([in] LONG newVal);
+    [propget, id(2), helpstring("The top size of the section.")] HRESULT Top([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The top size of the section.")] HRESULT Top([in] LONG newVal);
+    [propget, id(3), helpstring("The bottom size of the section.")] HRESULT Bottom([out, retval] LONG* pVal);
+    [propput, id(3), helpstring("The bottom size of the section.")] HRESULT Bottom([in] LONG newVal);
+    [propget, id(4), helpstring("The left size of the section.")] HRESULT Left([out, retval] LONG* pVal);
+    [propput, id(4), helpstring("The left size of the section.")] HRESULT Left([in] LONG newVal);
+    [propget, id(5), helpstring("The right size of the section.")] HRESULT Right([out, retval] LONG* pVal);
+    [propput, id(5), helpstring("The right size of the section.")] HRESULT Right([in] LONG newVal);
+    [propget, id(6), helpstring("The music id of the section.")] HRESULT MusicID([out, retval] LONG* pVal);
+    [propput, id(6), helpstring("The music id of the section.")] HRESULT MusicID([in] LONG newVal);
+    [propget, id(7), helpstring("The background color of the section. This value was used by the earlier versions of SMBX.")] HRESULT BGColor([out, retval] LONG* pVal);
+    [propput, id(7), helpstring("The background color of the section. This value was used by the earlier versions of SMBX.")] HRESULT BGColor([in] LONG newVal);
+    [propget, id(8), helpstring("If the section is warp section.")] HRESULT IsWarp([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(8), helpstring("If the section is warp section.")] HRESULT IsWarp([in] VARIANT_BOOL newVal);
+    [propget, id(9), helpstring("If the player can exit the level by walking out of the section.")] HRESULT IsOffscreenExit([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(9), helpstring("If the player can exit the level by walking out of the section.")] HRESULT IsOffscreenExit([in] VARIANT_BOOL newVal);
+    [propget, id(10), helpstring("The background id of the section.")] HRESULT BackgroundID([out, retval] LONG* pVal);
+    [propput, id(10), helpstring("The background id of the section.")] HRESULT BackgroundID([in] LONG newVal);
+    [propget, id(11), helpstring("If the player can turn back in the left direction.")] HRESULT NoTurnBack([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(11), helpstring("If the player can turn back in the left direction.")] HRESULT NoTurnBack([in] VARIANT_BOOL newVal);
+    [propget, id(12), helpstring("If the section is a whole underwater section.")] HRESULT IsUnderwater([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(12), helpstring("If the section is a whole underwater section.")] HRESULT IsUnderwater([in] VARIANT_BOOL newVal);
+    [propget, id(13), helpstring("The custom music file of the section.")] HRESULT CustomMusicFile([out, retval] BSTR* pVal);
+    [propput, id(13), helpstring("The custom music file of the section.")] HRESULT CustomMusicFile([in] BSTR newVal);
+};
+
+
+[
+    object,
+    uuid(D0606EB6-F02C-4D7E-828D-FE72237706CD),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelSections : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all Sections")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a Section at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelSection** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of Sections.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all Sections in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new Section. Returns a new section, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelSection** pVal);
+
+    [id(0x00000004), helpstring("Removes a Section at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a Section from the collection. The removed Section is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelSection* ItemToRemove);
+};
+
+
+
+[
+    object,
+    uuid(FA6D894D-99B2-4EF3-8624-B1B319182120),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelPlayerPoint : IDispatch {
+
+    [propget, id(1), helpstring("The id of the player point.")] HRESULT ID([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The id of the player point.")] HRESULT ID([in] LONG newVal);
+    [propget, id(2), helpstring("The x position of the player point.")] HRESULT X([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The x position of the player point.")] HRESULT X([in] LONG newVal);
+    [propget, id(3), helpstring("The y position of the player point.")] HRESULT Y([out, retval] LONG* pVal);
+    [propput, id(3), helpstring("The y position of the player point.")] HRESULT Y([in] LONG newVal);
+    [propget, id(4), helpstring("The width of the player point.")] HRESULT Width([out, retval] LONG* pVal);
+    [propput, id(4), helpstring("The width of the player point.")] HRESULT Width([in] LONG newVal);
+    [propget, id(5), helpstring("The height of the player point.")] HRESULT Height([out, retval] LONG* pVal);
+    [propput, id(5), helpstring("The height of the player point.")] HRESULT Height([in] LONG newVal);
+};
+
+
+[
+    object,
+    uuid(976CB059-2B9E-4CDB-AA82-90A2ED1E6EA6),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelPlayerPoints : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all player points")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a player point at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelPlayerPoint** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of player points.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all player points in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new player point. Returns a new player point, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelPlayerPoint** pVal);
+
+    [id(0x00000004), helpstring("Removes a player point at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a player point from the collection. The removed player point is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelPlayerPoint* ItemToRemove);
+};
+
+[
+    object,
+    uuid(E4D8CA95-7BFB-488F-8521-7BD85D3B3BEB),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelBGO : IDispatch {
+    [propget, id(1), helpstring("The x position of the BGO.")] HRESULT X([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The x position of the BGO.")] HRESULT X([in] LONG newVal);
+    [propget, id(2), helpstring("The y position of the BGO.")] HRESULT Y([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The y position of the BGO.")] HRESULT Y([in] LONG newVal);
+    [propget, id(3), helpstring("The id of the BGO.")] HRESULT ID([out, retval] LONG* pVal);
+    [propput, id(3), helpstring("The id of the BGO.")] HRESULT ID([in] LONG newVal);
+    [propget, id(4), helpstring("The layer of the BGO.")] HRESULT LayerName([out, retval] BSTR* pVal);
+    [propput, id(4), helpstring("The layer of the BGO.")] HRESULT LayerName([in] BSTR newVal);
+};
+
+[
+    object,
+    uuid(E0DF0BC6-5C29-464D-A59B-D953FDA40F90),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelBGOs : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all BGOs")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a BGO at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelBGO** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of BGOs.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all BGOs in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new BGO. Returns a new BGO, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelBGO** pVal);
+
+    [id(0x00000004), helpstring("Removes a BGO at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a BGO from the collection. The removed BGO is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelBGO* ItemToRemove);
+};
+
+
+[
+    object,
+    uuid(649635C9-DAE8-42AB-85DB-1CDC657D9975),
+    dual,
+    nonextensible,
+    pointer_default(unique),
+    helpstring("Represents a SMBX Block object.")
+]
+interface IPGELevelBlock : IDispatch {
+    [propget, id(1), helpstring("The x position of the block.")] HRESULT X([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The x position of the block.")] HRESULT X([in] LONG newVal);
+    [propget, id(2), helpstring("The y position of the block.")] HRESULT Y([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The y position of the block.")] HRESULT Y([in] LONG newVal);
+    [propget, id(3), helpstring("The width of the block.")] HRESULT Width([out, retval] LONG* pVal);
+    [propput, id(3), helpstring("The width of the block.")] HRESULT Width([in] LONG newVal);
+    [propget, id(4), helpstring("The height of the block.")] HRESULT Height([out, retval] LONG* pVal);
+    [propput, id(4), helpstring("The height of the block.")] HRESULT Height([in] LONG newVal);
+    [propget, id(5), helpstring("The id of the block.")] HRESULT ID([out, retval] LONG* pVal);
+    [propput, id(5), helpstring("The id of the block.")] HRESULT ID([in] LONG newVal);
+    [propget, id(6), helpstring("The npc id type contained in the block.")] HRESULT NPCID([out, retval] LONG* pVal);
+    [propput, id(6), helpstring("The npc id type contained in the block.")] HRESULT NPCID([in] LONG newVal);
+    [propget, id(7), helpstring("If the block is invisible.")] HRESULT Invisible([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(7), helpstring("If the block is invisible.")] HRESULT Invisible([in] VARIANT_BOOL newVal);
+    [propget, id(8), helpstring("If the block is slippery.")] HRESULT Slippery([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(8), helpstring("If the block is slippery.")] HRESULT Slippery([in] VARIANT_BOOL newVal);
+    [propget, id(9), helpstring("The layer of the block.")] HRESULT LayerName([out, retval] BSTR* pVal);
+    [propput, id(9), helpstring("The layer of the block.")] HRESULT LayerName([in] BSTR newVal);
+    [propget, id(10), helpstring("The 'destroyed' event of the block.")] HRESULT EventDestroyedName([out, retval] BSTR* pVal);
+    [propput, id(10), helpstring("The 'destroyed' event of the block.")] HRESULT EventDestroyedName([in] BSTR newVal);
+    [propget, id(11), helpstring("The 'hit' event of the block.")] HRESULT EventHitName([out, retval] BSTR* pVal);
+    [propput, id(11), helpstring("The 'hit' event of the block.")] HRESULT EventHitName([in] BSTR newVal);
+    [propget, id(12), helpstring("The 'no more object in layer' event of the block.")] HRESULT EventNoMoreObjectInLayerName([out, retval] BSTR* pVal);
+    [propput, id(12), helpstring("The 'no more object in layer' event of the block.")] HRESULT EventNoMoreObjectInLayerName([in] BSTR newVal);
+};
+
+[
+    object,
+    uuid(A0B6DED4-2AEB-4704-94F3-62C473741BCF),
+    dual,
+    nonextensible,
+    pointer_default(unique),
+    helpstring("A collection of blocks of a level. The collections is index 1-based.")
+]
+interface IPGELevelBlocks : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all blocks")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a block at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelBlock** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of blocks.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all blocks in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new blocks. Returns a new block, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelBlock** pVal);
+
+    [id(0x00000004), helpstring("Removes a block at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a block from the collection. The removed block is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelBlock* ItemToRemove);
+};
+
+
+[
+    object,
+    uuid(670E7A4E-2956-49F1-B18A-0F02FAFADB76),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelNPC : IDispatch {
+    [propget, id(1), helpstring("The x position of the NPC.")] HRESULT X([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The x position of the NPC.")] HRESULT X([in] LONG newVal);
+    [propget, id(2), helpstring("The y position of the NPC.")] HRESULT Y([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The y position of the NPC.")] HRESULT Y([in] LONG newVal);
+    [propget, id(3), helpstring("The initial direction of the NPC.")] HRESULT Direction([out, retval] PGEDirection* pVal);
+    [propput, id(3), helpstring("The initial direction of the NPC.")] HRESULT Direction([in] PGEDirection newVal);
+    [propget, id(4), helpstring("The id of the npc.")] HRESULT ID([out, retval] LONG* pVal);
+    [propput, id(4), helpstring("The id of the npc.")] HRESULT ID([in] LONG newVal);
+    [propget, id(5), helpstring("Special data value 1. Is used by multiple NPCs as behaviour settings.")] HRESULT SpecialData1([out, retval] LONG* pVal);
+    [propput, id(5), helpstring("Special data value 1. Is used by multiple NPCs as behaviour settings.")] HRESULT SpecialData1([in] LONG newVal);
+    [propget, id(6), helpstring("Special data value 2. Is used by multiple NPCs as second behaviour settings.")] HRESULT SpecialData2([out, retval] LONG* pVal);
+    [propput, id(6), helpstring("Special data value 2. Is used by multiple NPCs as second behaviour settings.")] HRESULT SpecialData2([in] LONG newVal);
+    [propget, id(7), helpstring("if the npc object is a generator.")] HRESULT IsGenerator([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(7), helpstring("if the npc object is a generator.")] HRESULT IsGenerator([in] VARIANT_BOOL newVal);
+    [propget, id(8), helpstring("The direction where the NPCs are getting spawned.")] HRESULT GeneratorDirection([out, retval] PGEGeneratorDirection* pVal);
+    [propput, id(8), helpstring("The direction where the NPCs are getting spawned.")] HRESULT GeneratorDirection([in] PGEGeneratorDirection newVal);
+    [propget, id(9), helpstring("The type of the generator.")] HRESULT GeneratorType([out, retval] PGEGeneratorType* pVal);
+    [propput, id(9), helpstring("The type of the generator.")] HRESULT GeneratorType([in] PGEGeneratorType newVal);
+    [propget, id(10), helpstring("The period value (1/10 second).")] HRESULT GeneratorPeriod([out, retval] LONG* pVal);
+    [propput, id(10), helpstring("The period value (1/10 second).")] HRESULT GeneratorPeriod([in] LONG newVal);
+    [propget, id(11), helpstring("The talk message of the NPC.")] HRESULT Message([out, retval] BSTR* pVal);
+    [propput, id(11), helpstring("The talk message of the NPC.")] HRESULT Message([in] BSTR newVal);
+    [propget, id(12), helpstring("If the NPC is friendly.")] HRESULT IsFriendly([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(12), helpstring("If the NPC is friendly.")] HRESULT IsFriendly([in] VARIANT_BOOL newVal);
+    [propget, id(13), helpstring("If the NPC doesn't move.")] HRESULT NoMove([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(13), helpstring("If the NPC doesn't move.")] HRESULT NoMove([in] VARIANT_BOOL newVal);
+    [propget, id(14), helpstring("If the NPC is a legacy boss.")] HRESULT IsLegacyBoss([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(14), helpstring("If the NPC is a legacy boss.")] HRESULT IsLegacyBoss([in] VARIANT_BOOL newVal);
+    [propget, id(15), helpstring("The layer of the NPC.")] HRESULT LayerName([out, retval] BSTR* pVal);
+    [propput, id(15), helpstring("The layer of the NPC.")] HRESULT LayerName([in] BSTR newVal);
+    [propget, id(16), helpstring("The 'activate' event of the NPC.")] HRESULT EventActivateName([out, retval] BSTR* pVal);
+    [propput, id(16), helpstring("The 'activate' event of the NPC.")] HRESULT EventActivateName([in] BSTR newVal);
+    [propget, id(17), helpstring("The 'die' event of the NPC.")] HRESULT EventDieName([out, retval] BSTR* pVal);
+    [propput, id(17), helpstring("The 'die' event of the NPC.")] HRESULT EventDieName([in] BSTR newVal);
+    [propget, id(18), helpstring("The 'talk' event of the NPC.")] HRESULT EventTalkName([out, retval] BSTR* pVal);
+    [propput, id(18), helpstring("The 'talk' event of the NPC.")] HRESULT EventTalkName([in] BSTR newVal);
+    [propget, id(19), helpstring("The 'no more object in layer' event of the NPC.")] HRESULT EventNoMoreObjectInLayerName([out, retval] BSTR* pVal);
+    [propput, id(19), helpstring("The 'no more object in layer' event of the NPC.")] HRESULT EventNoMoreObjectInLayerName([in] BSTR newVal);
+    [propget, id(20), helpstring("The layer which the NPC is attached on.")] HRESULT AttachLayerName([out, retval] BSTR* pVal);
+    [propput, id(20), helpstring("The layer which the NPC is attached on.")] HRESULT AttachLayerName([in] BSTR newVal);
+};
+
+
+[
+    object,
+    uuid(DDE035FD-B559-46AF-82FC-9C23A932A98A),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelNPCs : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all NPCs")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a NPC at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelNPC** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of NPCs.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all NPCs in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new NPC. Returns a new NPC, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelNPC** pVal);
+
+    [id(0x00000004), helpstring("Removes a NPC at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a NPC from the collection. The NPC block is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelNPC* ItemToRemove);
+};
+
+[
+    object,
+    uuid(4F98221F-B297-47C4-8002-042ED7DCA345),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelWarp : IDispatch {
+
+    [propget, id(1), helpstring("The x position of the entrance.")] HRESULT EntranceX([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The x position of the entrance.")] HRESULT EntranceX([in] LONG newVal);
+    [propget, id(2), helpstring("The y position of the entrance.")] HRESULT EntranceY([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The y position of the entrance.")] HRESULT EntranceY([in] LONG newVal);
+    [propget, id(3), helpstring("If the entrance is set.")] HRESULT IsEntranceActive([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(3), helpstring("If the entrance is set.")] HRESULT IsEntranceActive([in] VARIANT_BOOL newVal);
+    [propget, id(4), helpstring("The x position of the exit.")] HRESULT ExitX([out, retval] LONG* pVal);
+    [propput, id(4), helpstring("The x position of the exit.")] HRESULT ExitX([in] LONG newVal);
+    [propget, id(5), helpstring("The y position of the exit.")] HRESULT ExitY([out, retval] LONG* pVal);
+    [propput, id(5), helpstring("The y position of the exit.")] HRESULT ExitY([in] LONG newVal);
+    [propget, id(6), helpstring("If the exit is set.")] HRESULT IsExitActive([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(6), helpstring("If the exit is set.")] HRESULT IsExitActive([in] VARIANT_BOOL newVal);
+    [propget, id(7), helpstring("The direction which the entrance is entered.")] HRESULT EntranceDirection([out, retval] PGEWarpEntrance* pVal);
+    [propput, id(7), helpstring("The direction which the entrance is entered.")] HRESULT EntranceDirection([in] PGEWarpEntrance newVal);
+    [propget, id(8), helpstring("The direction which the warp is exited.")] HRESULT ExitDirection([out, retval] PGEWarpExit* pVal);
+    [propput, id(8), helpstring("The direction which the warp is exited.")] HRESULT ExitDirection([in] PGEWarpExit newVal);
+    [propget, id(9), helpstring("The type of the warp.")] HRESULT Type([out, retval] PGEWarpType* pVal);
+    [propput, id(9), helpstring("The type of the warp.")] HRESULT Type([in] PGEWarpType newVal);
+    [propget, id(10), helpstring("The name of the level, where the warp is connected to.")] HRESULT LevelName([out, retval] BSTR* pVal);
+    [propput, id(10), helpstring("The name of the level, where the warp is connected to.")] HRESULT LevelName([in] BSTR newVal);
+    [propget, id(11), helpstring("The warp id of the target level warp.")] HRESULT LevelWarpID([out, retval] LONG* pVal);
+    [propput, id(11), helpstring("The warp id of the target level warp.")] HRESULT LevelWarpID([in] LONG newVal);
+    [propget, id(12), helpstring("If the warp is the level entrance.")] HRESULT IsLevelEntrance([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(12), helpstring("If the warp is the level entrance.")] HRESULT IsLevelEntrance([in] VARIANT_BOOL newVal);
+    [propget, id(13), helpstring("If the warp is the level exit.")] HRESULT IsLevelExit([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(13), helpstring("If the warp is the level exit.")] HRESULT IsLevelExit([in] VARIANT_BOOL newVal);
+    [propget, id(14), helpstring("The x position on the world map, which the warp is teleporting the player.")] HRESULT WorldX([out, retval] LONG* pVal);
+    [propput, id(14), helpstring("The x position on the world map, which the warp is teleporting the player.")] HRESULT WorldX([in] LONG newVal);
+    [propget, id(15), helpstring("The y position on the world map, which the warp is teleporting the player.")] HRESULT WorldY([out, retval] LONG* pVal);
+    [propput, id(15), helpstring("The y position on the world map, which the warp is teleporting the player.")] HRESULT WorldY([in] LONG newVal);
+    [propget, id(16), helpstring("The required star count for using the warp.")] HRESULT RequiredStars([out, retval] LONG* pVal);
+    [propput, id(16), helpstring("The required star count for using the warp.")] HRESULT RequiredStars([in] LONG newVal);
+    [propget, id(17), helpstring("The name of the layer.")] HRESULT LayerName([out, retval] BSTR* pVal);
+    [propput, id(17), helpstring("The name of the layer.")] HRESULT LayerName([in] BSTR newVal);
+    [propget, id(18), helpstring("If mountable npcs (i.e. yoshis) can goes through the pipe.")] HRESULT NoVehicle([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(18), helpstring("If mountable npcs (i.e. yoshis) can goes through the pipe.")] HRESULT NoVehicle([in] VARIANT_BOOL newVal);
+    [propget, id(19), helpstring("If the player can take a holding npc with him.")] HRESULT AllowNPC([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(19), helpstring("If the player can take a holding npc with him.")] HRESULT AllowNPC([in] VARIANT_BOOL newVal);
+    [propget, id(20), helpstring("If the warp is a locked and requires a key to enter.")] HRESULT IsLocked([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(20), helpstring("If the warp is a locked and requires a key to enter.")] HRESULT IsLocked([in] VARIANT_BOOL newVal);
+    [propget, id(21), helpstring("The warp number.")] HRESULT WarpNumber([out, retval] LONG* pVal);
+    [propput, id(21), helpstring("The warp number.")] HRESULT WarpNumber([in] LONG newVal);
+};
+
+[
+    object,
+    uuid(1A434D4E-89C4-45AA-9F8F-2A026FE8E2F8),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelWarps : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all warps")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a warp at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelWarp** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of warps.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all warps in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new warp. Returns a new warp, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelWarp** pVal);
+
+    [id(0x00000004), helpstring("Removes a warp at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a warp from the collection. The warp block is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelWarp* ItemToRemove);
+};
+
+
+
+
+[
+    object,
+    uuid(0ED59D46-8B12-4B91-BC53-34ED0F5DDDEF),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelPhysicalEnvironment : IDispatch {
+
+
+    [propget, id(1), helpstring("The x position of the physical environment.")] HRESULT X([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The x position of the physical environment.")] HRESULT X([in] LONG newVal);
+    [propget, id(2), helpstring("The y position of the physical environment.")] HRESULT Y([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The y position of the physical environment.")] HRESULT Y([in] LONG newVal);
+    [propget, id(3), helpstring("The width of the physical environment.")] HRESULT Width([out, retval] LONG* pVal);
+    [propput, id(3), helpstring("The width of the physical environment.")] HRESULT Width([in] LONG newVal);
+    [propget, id(4), helpstring("The height of the physical environment.")] HRESULT Height([out, retval] LONG* pVal);
+    [propput, id(4), helpstring("The height of the physical environment.")] HRESULT Height([in] LONG newVal);
+    [propget, id(5), helpstring("The type of the physical environment.")] HRESULT Type([out, retval] PGEPhysicalEnvironmentType* pVal);
+    [propput, id(5), helpstring("The type of the physical environment.")] HRESULT Type([in] PGEPhysicalEnvironmentType newVal);
+    [propget, id(6), helpstring("The layer of the physical environment.")] HRESULT LayerName([out, retval] BSTR* pVal);
+    [propput, id(6), helpstring("The layer of the physical environment.")] HRESULT LayerName([in] BSTR newVal);
+};
+
+
+[
+    object,
+    uuid(23370217-B040-41AD-A295-9FD1E54583FE),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelPhysicalEnvironments : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all physical environment")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a physical environment at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelPhysicalEnvironment** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of physical environments.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all physical environments in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new physical environment. Returns a new physical environment, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelPhysicalEnvironment** pVal);
+
+    [id(0x00000004), helpstring("Removes a physical environment at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a physical environment from the collection. The physical environment block is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelPhysicalEnvironment* ItemToRemove);
+};
+
+
+
+[
+    object,
+    uuid(7D8C267F-B191-4034-94BD-811FFC08AAF3),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelLayer : IDispatch {
+    [propget, id(1), helpstring("The name of the layer.")] HRESULT Name([out, retval] BSTR* pVal);
+    [propput, id(1), helpstring("The name of the layer.")] HRESULT Name([in] BSTR newVal);
+    [propget, id(2), helpstring("If the layer is hidden.")] HRESULT Hidden([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(2), helpstring("If the layer is hidden.")] HRESULT Hidden([in] VARIANT_BOOL newVal);
+    [propget, id(3), helpstring("If the layer is locked.")] HRESULT Locked([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(3), helpstring("If the layer is locked.")] HRESULT Locked([in] VARIANT_BOOL newVal);
+};
+
+
+[
+    object,
+    uuid(ABA6EE42-AF97-490F-B072-44BA2263001D),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelLayers : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all layer")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a layer at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelLayer** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of layers.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all layers in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new layer. Returns a new layer, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelLayer** pVal);
+
+    [id(0x00000004), helpstring("Removes a layer at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a layer from the collection. The layer block is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelLayer* ItemToRemove);
+};
+
+
+
+[
+    object,
+    uuid(E5672954-C9D6-4AD7-90B5-5D6A4106D88B),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelSectionModifier : IDispatch {
+    [propget, id(1), helpstring("The music id which the music should change to.")] HRESULT MusicID([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The music id which the music should change to.")] HRESULT MusicID([in] LONG newVal);
+    [propget, id(2), helpstring("The background id which the background should change to.")] HRESULT BackgroundID([out, retval] LONG* pVal);
+    [propput, id(2), helpstring("The background id which the background should change to.")] HRESULT BackgroundID([in] LONG newVal);
+    [propget, id(3), helpstring("The new left position of the section.")] HRESULT Left([out, retval] LONG* pVal);
+    [propput, id(3), helpstring("The new left position of the section.")] HRESULT Left([in] LONG newVal);
+    [propget, id(4), helpstring("The new top position of the section.")] HRESULT Top([out, retval] LONG* pVal);
+    [propput, id(4), helpstring("The new top position of the section.")] HRESULT Top([in] LONG newVal);
+    [propget, id(5), helpstring("The new bottom position of the section.")] HRESULT Bottom([out, retval] LONG* pVal);
+    [propput, id(5), helpstring("The new bottom position of the section.")] HRESULT Bottom([in] LONG newVal);
+    [propget, id(6), helpstring("The new right position of the section.")] HRESULT Right([out, retval] LONG* pVal);
+    [propput, id(6), helpstring("The new right position of the section.")] HRESULT Right([in] LONG newVal);
+};
+
+
+[
+    object,
+    uuid(676722F7-AA40-4FD8-906D-CB153450C80D),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelSectionModifiers : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all section modifiers")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a section modifier at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelSectionModifier** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of section modifiers.")]
+    HRESULT Count([out, retval] long* pVal);
+};
+
+
+[
+    object,
+    uuid(80E125EF-2083-44F3-A36D-7C93B9F21C29),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelEvent : IDispatch {
+
+    [propget, id(1), helpstring("The name of the event.")] HRESULT Name([out, retval] BSTR* pVal);
+    [propput, id(1), helpstring("The name of the event.")] HRESULT Name([in] BSTR newVal);
+    [propget, id(2), helpstring("The talk message which is displayed when the event is executed.")] HRESULT TalkMessage([out, retval] BSTR* pVal);
+    [propput, id(2), helpstring("The talk message which is displayed when the event is executed.")] HRESULT TalkMessage([in] BSTR newVal);
+    [propget, id(3), helpstring("The sound id which plays when the event gets executed.")] HRESULT SoundID([out, retval] LONG* pVal);
+    [propput, id(3), helpstring("The sound id which plays when the event gets executed.")] HRESULT SoundID([in] LONG newVal);
+    [propget, id(4), helpstring("The end game sequence when the event gets executed.")] HRESULT EndGameType([out, retval] PGEEventEndGame* pVal);
+    [propput, id(4), helpstring("The end game sequence when the event gets executed.")] HRESULT EndGameType([in] PGEEventEndGame newVal);
+    [propget, id(5), helpstring("If the smoke is displayed on layer showing/hiding layers.")] HRESULT NoSmoke([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(5), helpstring("If the smoke is displayed on layer showing/hiding layers.")] HRESULT NoSmoke([in] VARIANT_BOOL newVal);
+    [propget, id(6), helpstring("Which event should be executed by this event.")] HRESULT TriggerEventName([out, retval] BSTR* pVal);
+    [propput, id(6), helpstring("Which event should be executed by this event.")] HRESULT TriggerEventName([in] BSTR newVal);
+    [propget, id(7), helpstring("The delay of the event to trigger. (i.e 193 = 19.3s)")] HRESULT TriggerTime([out, retval] LONG* pVal);
+    [propput, id(7), helpstring("The delay of the event to trigger. (i.e 193 = 19.3s)")] HRESULT TriggerTime([in] LONG newVal);
+    [propget, id(8), helpstring("If the up key should be pressed.")] HRESULT KeyUp([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(8), helpstring("If the up key should be pressed.")] HRESULT KeyUp([in] VARIANT_BOOL newVal);
+    [propget, id(9), helpstring("If the down key should be pressed.")] HRESULT KeyDown([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(9), helpstring("If the down key should be pressed.")] HRESULT KeyDown([in] VARIANT_BOOL newVal);
+    [propget, id(10), helpstring("If the left key should be pressed.")] HRESULT KeyLeft([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(10), helpstring("If the left key should be pressed.")] HRESULT KeyLeft([in] VARIANT_BOOL newVal);
+    [propget, id(11), helpstring("If the right key should be pressed.")] HRESULT KeyRight([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(11), helpstring("If the right key should be pressed.")] HRESULT KeyRight([in] VARIANT_BOOL newVal);
+    [propget, id(12), helpstring("If the jump key should be pressed.")] HRESULT KeyJump([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(12), helpstring("If the jump key should be pressed.")] HRESULT KeyJump([in] VARIANT_BOOL newVal);
+    [propget, id(13), helpstring("If the alt jump key should be pressed.")] HRESULT KeyAltJump([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(13), helpstring("If the alt jump key should be pressed.")] HRESULT KeyAltJump([in] VARIANT_BOOL newVal);
+    [propget, id(14), helpstring("If the run key should be pressed.")] HRESULT KeyRun([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(14), helpstring("If the run key should be pressed.")] HRESULT KeyRun([in] VARIANT_BOOL newVal);
+    [propget, id(15), helpstring("If the alt run key should be pressed.")] HRESULT KeyAltRun([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(15), helpstring("If the alt run key should be pressed.")] HRESULT KeyAltRun([in] VARIANT_BOOL newVal);
+    [propget, id(16), helpstring("If the start key should be pressed.")] HRESULT KeyStart([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(16), helpstring("If the start key should be pressed.")] HRESULT KeyStart([in] VARIANT_BOOL newVal);
+    [propget, id(17), helpstring("If the drop key should be pressed.")] HRESULT KeyDrop([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(17), helpstring("If the drop key should be pressed.")] HRESULT KeyDrop([in] VARIANT_BOOL newVal);
+    [propget, id(18), helpstring("If the event should autostart on the beginning of the level.")] HRESULT Autostart([out, retval] VARIANT_BOOL* pVal);
+    [propput, id(18), helpstring("If the event should autostart on the beginning of the level.")] HRESULT Autostart([in] VARIANT_BOOL newVal);
+    [propget, id(19), helpstring("The layer which should be moved.")] HRESULT MoveLayerName([out, retval] BSTR* pVal);
+    [propput, id(19), helpstring("The layer which should be moved.")] HRESULT MoveLayerName([in] BSTR newVal);
+    [propget, id(20), helpstring("The X speed of the layer.")] HRESULT LayerSpeedX([out, retval] FLOAT* pVal);
+    [propput, id(20), helpstring("The X speed of the layer.")] HRESULT LayerSpeedX([in] FLOAT newVal);
+    [propget, id(21), helpstring("The Y speed of the layer.")] HRESULT LayerSpeedY([out, retval] FLOAT* pVal);
+    [propput, id(21), helpstring("The Y speed of the layer.")] HRESULT LayerSpeedY([in] FLOAT newVal);
+    [propget, id(22), helpstring("The X speed of the camera.")] HRESULT CameraSpeedX([out, retval] FLOAT* pVal);
+    [propput, id(22), helpstring("The X speed of the camera.")] HRESULT CameraSpeedX([in] FLOAT newVal);
+    [propget, id(23), helpstring("The Y speed of the camera.")] HRESULT CameraSpeedY([out, retval] FLOAT* pVal);
+    [propput, id(23), helpstring("The Y speed of the camera.")] HRESULT CameraSpeedY([in] FLOAT newVal);
+    [propget, id(24), helpstring("The section to apply the scroll movement (camera movement).")] HRESULT SectionToScroll([out, retval] LONG* pVal);
+    [propput, id(24), helpstring("The section to apply the scroll movement (camera movement).")] HRESULT SectionToScroll([in] LONG newVal);
+    [propget, id(25), helpstring("The layers to hide.")] HRESULT LayersToHide([out, retval] IPGEStringCollection** pVal);
+    [propget, id(26), helpstring("The layers to show.")] HRESULT LayersToShow([out, retval] IPGEStringCollection** pVal);
+    [propget, id(27), helpstring("The layers to toggle.")] HRESULT LayersToToggle([out, retval] IPGEStringCollection** pVal);
+    [propget, id(28), helpstring("A fixed-size collection of section modifiers. (From Section 1 to 21)")] HRESULT SectionModifiers([out, retval] IPGELevelSectionModifiers** pVal);
+};
+
+[
+    object,
+    uuid(C2A6AFD9-06AC-4955-8F9E-5B3EC4D040DF),
+    dual,
+    nonextensible,
+    pointer_default(unique)
+]
+interface IPGELevelEvents : IDispatch {
+    [id(DISPID_NEWENUM), propget, helpstring("The enumerator over all events")]
+    HRESULT _NewEnum([out, retval] IUnknown** ppUnk);
+
+    [id(DISPID_VALUE), propget, helpstring("Get a event at a specific Index.")]
+    HRESULT Item([in] long Index, [out, retval] IPGELevelEvent** pVal);
+
+    [id(0x00000001), propget, helpstring("Returns the number of events.")]
+    HRESULT Count([out, retval] long* pVal);
+
+    [id(0x00000002), helpstring("Clears all events in the collections.")]
+    HRESULT Clear();
+
+    [id(0x00000003), helpstring("Adds a new event. Returns a new event, which is directly bound to this collection.")]
+    HRESULT Add([out, retval] IPGELevelEvent** pVal);
+
+    [id(0x00000004), helpstring("Removes a event at a specific index.")]
+    HRESULT Remove([in] long Index);
+
+    [id(0x00000005), helpstring("Removes a event from the collection. The event block is the no longer bound to this collection.")]
+    HRESULT RemoveItem([in] IPGELevelEvent* ItemToRemove);
+};
+
+
+
+[
+    object,
+    uuid(8E4D4B02-1827-4517-B585-079BBBAF8E55),
+    dual,
+    nonextensible,
+    pointer_default(unique),
+    helpstring("Represents all data which makes up a level.")
+]
+interface IPGELevelData : IDispatch{
+    [propget, id(1), helpstring("The number of stars of the level.")] HRESULT Stars([out, retval] LONG* pVal);
+    [propput, id(1), helpstring("The number of stars of the level.")] HRESULT Stars([in] LONG newVal);
+    [propget, id(2), helpstring("The name of the level.")] HRESULT LevelName([out, retval] BSTR* pVal);
+    [propput, id(2), helpstring("The name of the level.")] HRESULT LevelName([in] BSTR newVal);
+    [propget, id(3), helpstring("The blocks of the level.")] HRESULT Blocks([out, retval] IPGELevelBlocks** pVal);
+    [propget, id(4), helpstring("The BGOs of the level.")] HRESULT BGOs([out, retval] IPGELevelBGOs** pVal);
+    [propget, id(5), helpstring("The sections of the level.")] HRESULT Sections([out, retval] IPGELevelSections** pVal);
+    [propget, id(6), helpstring("The player points of the level.")] HRESULT PlayerPoints([out, retval] IPGELevelPlayerPoints** pVal);
+    [propget, id(7), helpstring("The NPCs of the level.")] HRESULT NPCs([out, retval] IPGELevelNPCs** pVal);
+    [propget, id(8), helpstring("The warps of the level.")] HRESULT Warps([out, retval] IPGELevelWarps** pVal);
+    [propget, id(9), helpstring("The events of the level.")] HRESULT Events([out, retval] IPGELevelEvents** pVal);
+    [propget, id(10), helpstring("The physical environments of the level.")] HRESULT PhysicalEnvironments([out, retval] IPGELevelPhysicalEnvironments** pVal);
+    [propget, id(11), helpstring("The layers of the level.")] HRESULT Layers([out, retval] IPGELevelLayers** pVal);
+};
+
+
+[
+    object,
+    uuid(E377D360-21D2-403C-8928-79A075EE5C30),
+    dual,
+    nonextensible,
+    pointer_default(unique),
+    helpstring("The main factory class. This is needed to create, save and load PGE/SMBX data.")
+]
+interface IPGEFileFactory : IDispatch {
+    [id(1), helpstring("Create a new LevelData object.")] HRESULT CreateNewLevelData([out, retval] IPGELevelData** pVal);
+    [id(2), helpstring("Loads a LevelData object from a level file.")] HRESULT LoadLevelDataByFilename([in] BSTR filename, [in, defaultvalue(LVLFORMAT_DETECT)] PGELevelFormats formatType, [out, retval] IPGELevelData** pVal);
+    [id(3), helpstring("Saves a LevelData object in a level file.")] HRESULT SaveLevelDataByFilename([in] BSTR filename, [in] IPGELevelData* input, [in, defaultvalue(LVLFORMAT_DETECT)] PGELevelFormats formatType);
+};
+
+
+
+
+
+
+[
+    uuid(C1D4D123-A764-4385-A2BB-9D9D2D776057),
+    version(1.0),
+    helpstring("PGE/SMBX File Library")
+]
+library PGEFileLib
+{
+    importlib("stdole2.tlb");
+
+
+    [
+        uuid(348D97E0-F6B3-49EB-A1B9-8E96A82F44BB),
+        helpstring("The main factory class. This is needed to create, save and load PGE/SMBX data.")
+    ]
+    coclass PGEFileFactory
+    {
+        [default] interface IPGEFileFactory;
+    };
+
+    [
+        uuid(3CD0B26A-E304-4E07-BFAF-7A65086C8E38),
+        noncreatable,
+        helpstring("Represents all data which makes up a level.")
+    ]
+    coclass PGELevelData
+    {
+        [default] interface IPGELevelData;
+    };
+    [
+
+        uuid(113BD366-D438-4E78-9579-D1E727C07A5A),
+        noncreatable,
+        helpstring("A collection of blocks of a level. The collection is index 1-based.")
+    ]
+    coclass PGELevelBlocks
+    {
+        [default] interface IPGELevelBlocks;
+    };
+
+    [
+        uuid(256EF156-8FD2-4AAA-B12A-C332DBF206D3),
+        noncreatable,
+        helpstring("Represents a SMBX Block object.")
+    ]
+    coclass PGELevelBlock
+    {
+        [default] interface IPGELevelBlock;
+    };
+
+    [
+        uuid(5FB4035C-B3AD-409A-954D-F3BB0685DD02),
+        noncreatable,
+        helpstring("A collection of blocks of a level. The collection is index 1-based.")
+    ]
+    coclass PGELevelBGO
+    {
+        [default] interface IPGELevelBGO;
+    };
+
+    [
+        uuid(85394BF6-6CA7-49B9-8F49-F66153A9F5E1),
+        noncreatable,
+        helpstring("Represents a SMBX BGO.")
+    ]
+    coclass PGELevelBGOs
+    {
+        [default] interface IPGELevelBGOs;
+    };
+
+	[
+		uuid(9231610E-F41F-4BBD-80EB-CDD42843FCE9),
+        noncreatable,
+        helpstring("Represents a SMBX Section.")
+	]
+	coclass PGELevelSection
+	{
+		[default] interface IPGELevelSection;
+	};
+	[
+		uuid(5D6727FD-09F8-4D96-B9DE-69D0D3396EE7),
+        noncreatable,
+        helpstring("A collection of sections of a level. The collection is index 1-based.")
+	]
+	coclass PGELevelSections
+	{
+		[default] interface IPGELevelSections;
+	};
+
+
+	[
+		uuid(F30E435D-F26C-49F4-AFCC-84D172197B18),
+        noncreatable,
+        helpstring("Represents a SMBX player point")
+	]
+	coclass PGELevelPlayerPoint
+	{
+		[default] interface IPGELevelPlayerPoint;
+	};
+
+    [
+        uuid(EF83F47D-58FA-4C4E-A2CD-010952E2F817),
+        noncreatable,
+        helpstring("A collection of player points of a level. The collection is index 1-based.")
+    ]
+    coclass PGELevelPlayerPoints
+    {
+        [default] interface IPGELevelPlayerPoints;
+    };
+
+	[
+		uuid(8D0DD3AF-357F-4597-AB9E-E7E5584C0B32),
+        noncreatable,
+        helpstring("Represents a SMBX NPC")
+	]
+	coclass PGELevelNPC
+	{
+		[default] interface IPGELevelNPC;
+	};
+	[
+		uuid(76878454-23B5-4ED0-A0DA-7E02963A500F),
+        noncreatable,
+        helpstring("A collection of NPCs of a level. The collection is index 1-based.")
+	]
+	coclass PGELevelNPCs
+	{
+		[default] interface IPGELevelNPCs;
+	};
+	[
+		uuid(D494CD04-0025-4B72-A8D8-F1B3EACE5D70),
+        noncreatable,
+        helpstring("Represents a SMBX Warp")
+	]
+	coclass PGELevelWarp
+	{
+		[default] interface IPGELevelWarp;
+	};
+	[
+		uuid(1621663B-D945-48E9-99F5-8CEEEDAF5931),
+        noncreatable,
+        helpstring("A collection of warps of a level. The collection is index 1-based.")
+	]
+	coclass PGELevelWarps
+	{
+		[default] interface IPGELevelWarps;
+	};
+	[
+		uuid(FAD9E773-0641-4E6F-9B17-4BE14FF28892),
+        noncreatable,
+        helpstring("A collection of events of a level. The collection is index 1-based.")
+	]
+	coclass PGELevelEvents
+	{
+		[default] interface IPGELevelEvents;
+	};
+	[
+		uuid(509CD9AF-E8B9-4530-94B6-C6A916F5608D),
+        noncreatable,
+        helpstring("Represents a SMBX Event")
+	]
+	coclass PGELevelEvent
+	{
+		[default] interface IPGELevelEvent;
+	};
+	[
+		uuid(E2E55984-CB94-4522-9079-CA6FAD005BBD),
+        noncreatable,
+        helpstring("Represents a SMBX physical environments (water/quicksand)")
+	]
+	coclass PGELevelPhysicalEnvironment
+	{
+		[default] interface IPGELevelPhysicalEnvironment;
+	};
+	[
+		uuid(A517A7DA-0002-40B7-8C7A-0985AAB139E6),
+        noncreatable,
+        helpstring("A collection of physical environments of a level. The collection is index 1-based.")
+	]
+	coclass PGELevelPhysicalEnvironments
+	{
+		[default] interface IPGELevelPhysicalEnvironments;
+	};
+	[
+		uuid(2DD0D194-DE25-4C30-995B-F57AD18929B1),
+        noncreatable,
+        helpstring("Represents a SMBX layer")
+	]
+	coclass PGELevelLayer
+	{
+		[default] interface IPGELevelLayer;
+	};
+	[
+		uuid(04B1CA9F-369F-475D-970D-04BCF3D5EA3C),
+        noncreatable,
+        helpstring("A collection of layers of a level. The collection is index 1-based.")
+	]
+	coclass PGELevelLayers
+	{
+		[default] interface IPGELevelLayers;
+	};
+	[
+		uuid(73A1093B-58BA-495F-88A2-B0E4C5BAE820),
+        noncreatable,
+        helpstring("A section modifier of an event.")
+	]
+	coclass PGELevelSectionModifier
+	{
+		[default] interface IPGELevelSectionModifier;
+	};
+	[
+		uuid(14705721-74B7-4585-9D2A-DE70805190DA),
+        noncreatable,
+        helpstring("A collection of section modifiers of a level. The collection is index 1-based.")
+	]
+	coclass PGELevelSectionModifiers
+	{
+		[default] interface IPGELevelSectionModifiers;
+	};
+	[
+		uuid(194D606D-1F69-4CC9-9816-FA4B1B98A7CC),
+        helpstring("A collection of string.")
+	]
+	coclass PGEStringCollection
+	{
+		[default] interface IPGEStringCollection;
+	};
+};
+

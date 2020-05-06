@@ -1,0 +1,26 @@
+HKCR
+{
+	PGE.FileLib.1 = s 'PGEFileFactory Class'
+	{
+		CLSID = s '{348D97E0-F6B3-49EB-A1B9-8E96A82F44BB}'
+	}
+	PGE.FileLib = s 'PGEFileFactory Class'
+	{		
+		CurVer = s 'PGE.FileLib.1'
+	}
+    NoRemove CLSID
+    {
+        ForceRemove {348D97E0-F6B3-49EB-A1B9-8E96A82F44BB} = s 'PGEFileFactory Class'
+        {
+			ProgID = s 'PGE.FileLib.1'
+			VersionIndependentProgID = s 'PGE.FileLib'
+            ForceRemove Programmable
+            InprocServer32 = s '%MODULE%'
+            {
+                val ThreadingModel = s 'Apartment'
+            }
+            TypeLib = s '{C1D4D123-A764-4385-A2BB-9D9D2D776057}'
+            Version = s '1.0'
+        }
+    }
+}

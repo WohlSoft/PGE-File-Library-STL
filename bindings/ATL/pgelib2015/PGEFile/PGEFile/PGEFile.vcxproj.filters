@@ -1,0 +1,459 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Quelldateien">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headerdateien">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Generierte Dateien">
+      <UniqueIdentifier>{7040b19d-ba2e-4fe3-bd77-0e633e6e7f90}</UniqueIdentifier>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Headerdateien\ErrorHelper">
+      <UniqueIdentifier>{5402253b-b863-4e32-b407-e74eebba56af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\ErrorHelper">
+      <UniqueIdentifier>{450d641d-0e29-437d-a9b8-890eff9d887e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headerdateien\Utils">
+      <UniqueIdentifier>{1f408681-a85c-4d11-a3ff-d0dc93ad7d79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Quelldateien\Utils">
+      <UniqueIdentifier>{0fb501c6-ff27-4f3d-96e1-2b64679e3474}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGEFile.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="xdlldata.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGEFile_i.c">
+      <Filter>Generierte Dateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGEFileFactory.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorHelper\Error.cpp">
+      <Filter>Quelldateien\ErrorHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelData.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelBlock.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelBlocks.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelBGO.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelBGOs.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelSection.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\ComUtils.cpp">
+      <Filter>Quelldateien\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelSections.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelPlayerPoint.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelPlayerPoints.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelNPC.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelNPCs.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelWarp.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelWarps.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelEvents.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelEvent.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelPhysicalEnvironment.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelPhysicalEnvironments.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelLayer.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelLayers.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelSectionModifier.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGELevelSectionModifiers.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGEStringCollection.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\ConvertUTF_PGEFF.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_formats.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvl.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvl_38a.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvl_38a_old.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_lvlx.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_meta.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_npc_txt.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_sav.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_savx.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_smbx64_cnf.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_wld.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_wld_38a.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rw_wldx.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_rwopen.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\file_strlist.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\lvl_filedata.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\npc_filedata.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\pge_file_lib_globs.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\pge_x.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\save_filedata.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\smbx64.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\smbx64_cnf_filedata.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="PGE-File-Library-STL\wld_filedata.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="dllmain.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="xdlldata.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGEFile_i.h">
+      <Filter>Generierte Dateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGEFileFactory.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorHelper\Error.h">
+      <Filter>Headerdateien\ErrorHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelData.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\GenericCopyPolicy.h">
+      <Filter>Headerdateien\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\ComUtils.h">
+      <Filter>Headerdateien\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelBlock.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelBlocks.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelBGO.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelBGOs.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelSection.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelSections.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelPlayerPoint.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelPlayerPoints.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelNPC.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelNPCs.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelWarp.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelWarps.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelEvents.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelEvent.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelPhysicalEnvironment.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelPhysicalEnvironments.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelLayer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelLayers.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelSectionModifier.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGELevelSectionModifiers.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGEStringCollection.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\PGEStringUtils.h">
+      <Filter>Headerdateien\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\charsetconvert.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\ConvertUTF.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\CSVReader.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\CSVReaderPGE.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\CSVUtils.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\file_formats.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\file_strlist.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\invoke_default.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\lvl_filedata.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\meta_filedata.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\npc_filedata.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\pge_ff_units.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\pge_file_lib_globs.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\pge_file_lib_sys.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\pge_x.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\pge_x_macro.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\save_filedata.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\smbx38a_private.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\smbx64.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\smbx64_cnf_filedata.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\smbx64_macro.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="PGE-File-Library-STL\wld_filedata.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PGEFile.rc">
+      <Filter>Ressourcendateien</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PGEFile.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGEFile.def">
+      <Filter>Quelldateien</Filter>
+    </None>
+    <None Include="PGEFileFactory.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelData.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelBlock.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelBlocks.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelBGO.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelBGOs.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelSection.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelSections.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelPlayerPoint.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelPlayerPoints.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelNPC.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelNPCs.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelWarp.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelWarps.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelEvents.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelEvent.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelPhysicalEnvironment.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelPhysicalEnvironments.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelLayer.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelLayers.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelSectionModifier.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGELevelSectionModifiers.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGEStringCollection.rgs">
+      <Filter>Ressourcendateien</Filter>
+    </None>
+    <None Include="PGE-File-Library-STL\.gitignore" />
+    <None Include="PGE-File-Library-STL\File_FormatsQT.pri" />
+    <None Include="PGE-File-Library-STL\File_FormatsSTL.pri" />
+    <None Include="PGE-File-Library-STL\LICENSE" />
+    <None Include="PGE-File-Library-STL\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="PGEFile.idl">
+      <Filter>Quelldateien</Filter>
+    </Midl>
+  </ItemGroup>
+</Project>
