@@ -194,6 +194,13 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
                 else
                     goto badfile;
             }
+            else if(data[i][0] == "CPID") //Config pack ID string
+            {
+                if(PGEFile::IsQoutedString(data[i][1]))
+                    FileData.meta.configPackId = PGEFile::X2STRING(data[i][1]);
+                else
+                    goto badfile;
+            }
         }
     }
 
@@ -296,6 +303,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                     PGEX_StrVal("CD", FileData.authors)     //Credits list
                     PGEX_StrVal("CM", FileData.authors_music)     //Credits scene background music
                     PGEX_StrVal("XTRA", FileData.custom_params)     //World-wide Extra settings
+                    PGEX_StrVal("CPID", FileData.meta.configPackId)//Config pack ID string
                 }
             }
         }//head
@@ -564,6 +572,8 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
             outHeader += PGEFile::value("CM", PGEFile::WriteStr(FileData.authors_music));   // Credits scene background music
         if(!IsEmpty(FileData.custom_params))
             outHeader += PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));   // World-wide extra settings
+        if(!IsEmpty(FileData.meta.configPackId))
+            outHeader += PGEFile::value("CPID", PGEFile::WriteStr(FileData.meta.configPackId));
 
         if(!IsEmpty(outHeader))
             out << "HEAD\n" << outHeader << "\n" << "HEAD_END\n";

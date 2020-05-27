@@ -107,6 +107,8 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     FileData.meta.path = in_1.dirpath();
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     FileData.meta.RecentFormatVersion = latest_version_38a;
+    // Mark all 38A levels with a "SMBX-38A" key
+    FileData.meta.configPackId = "SMBX-38A";
 
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
 
@@ -246,7 +248,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     CreateLevelData(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     FileData.meta.RecentFormatVersion = latest_version_38a;
-    #if !defined(_MSC_VER) || _MSC_VER > 1800
+#if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.LevelName = "" ;
     FileData.stars = 0;
     FileData.CurSection = 0;
@@ -263,6 +265,10 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     FileData.events_array_id = 1;
     FileData.layers.clear();
     FileData.events.clear();
+
+    // Mark all 38A levels with a "SMBX-38A" key
+    FileData.meta.configPackId = "SMBX-38A";
+
     LevelSection section;
     PlayerPoint playerdata;
     LevelBlock blockdata;
@@ -1281,11 +1287,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     FileData.playmusic = 0;
     FileData.meta.ReadFileValid = true;
     return true;
-    #else
+#else // MSVC2015+
     FileData.meta.ReadFileValid = false;
     FileData.meta.ERROR_info = "Unsupported on MSVC2013";
     return false;
-    #endif
+#endif // MSVC2015+
 }
 
 

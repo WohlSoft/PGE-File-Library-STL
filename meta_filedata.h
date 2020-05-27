@@ -72,6 +72,11 @@ struct FileFormatMeta
     PGESTRING filename;
     //! Recent file path where file was located since it was opened
     PGESTRING path;
+    //! A config pack identify string.
+    PGESTRING configPackId;
+    // Missmatching of a config pack identify string with a same string at
+    // the currently loaded config pack will lead a warning of possible
+    // incompatibility.
 };
 
 /**
