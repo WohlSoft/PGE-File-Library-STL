@@ -85,6 +85,8 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
     FileData.meta.path = in_1.dirpath();
     FileData.meta.RecentFormat = LevelData::PGEX;
 
+    FileData.nocharacter.clear();
+
     //Find level header part
     do
     {

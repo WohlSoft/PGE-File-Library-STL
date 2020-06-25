@@ -76,6 +76,8 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     FileData.meta.path = in_1.dirpath();
     FileData.meta.RecentFormat = WorldData::SMBX38A;
     FileData.meta.RecentFormatVersion = latest_version_38a;
+    FileData.nocharacter.clear();
+
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
 
     try

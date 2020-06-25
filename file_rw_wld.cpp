@@ -86,6 +86,7 @@ bool FileFormats::ReadSMBX64WldFileHeaderT(PGE_FileFormats_misc::TextInput &inf,
 
     //Enable strict mode for SMBX WLD file format
     FileData.meta.smbx64strict = true;
+    FileData.nocharacter.clear();
 
     try
     {
