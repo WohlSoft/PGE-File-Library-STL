@@ -77,6 +77,8 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     FileData.meta.RecentFormat = WorldData::SMBX38A;
     FileData.meta.RecentFormatVersion = latest_version_38a;
     FileData.nocharacter.clear();
+    // Mark all 38A levels with a "SMBX-38A" key
+    FileData.meta.configPackId = "SMBX-38A";
 
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
 
@@ -281,6 +283,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     FileData.path_array_id = 1;
     FileData.level_array_id = 1;
     FileData.musicbox_array_id = 1;
+
+    // Mark all 38A levels with a "SMBX-38A" key
+    FileData.meta.configPackId = "SMBX-38A";
 
     WorldTerrainTile    tile;
     WorldScenery        scen;

@@ -91,6 +91,10 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
     FileData.events_array_id = 1;
     FileData.layers.clear();
     FileData.events.clear();
+
+    // Mark all 38A levels with a "SMBX-38A" key
+    FileData.meta.configPackId = "SMBX-38A";
+
     LevelSection section;
     PlayerPoint playerdata;
     LevelBlock blockdata;
