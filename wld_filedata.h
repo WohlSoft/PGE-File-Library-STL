@@ -513,6 +513,8 @@ struct WorldData
 
     //! SMBX-38A specific custom configs
     PGELIST<WorldItemSetup38A> custom38A_configs;
+    //! 38A: Lines, usnsupported by PGE-FL, reminded for a future restore
+    PGELIST<PGESTRING>         unsupported_38a_lines;
 
     //! Meta-data: Position bookmarks, Auto-Script configuration, etc., Crash meta-data, etc.
     MetaData metaData;

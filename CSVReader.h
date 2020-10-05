@@ -821,6 +821,20 @@ namespace CSVReader
             return *this;
         }
 
+        template<typename T>
+        CSVReader &ReadRawLine(T && value)
+        {
+            this->_lineTracker++;
+            this->_currentCharIndex = 0;
+            _currentTotalFields = sizeof(value);
+            this->_fieldTracker = 0; // We need the tracker at 0 (because of out of range exception)
+            if(_requireReadLine)
+                this->_currentLine = _reader->read_line();
+            value = this->_currentLine;
+            _requireReadLine = true;
+
+            return *this;
+        }
 
         /*!
          * \brief Read the next data line and calls iteration function with passing every field.

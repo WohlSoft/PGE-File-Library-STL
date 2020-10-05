@@ -763,7 +763,12 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 FileData.custom38A_configs.push_back(customcfg);
             }
             else
-                dataReader.ReadDataLine();
+            {
+                // Unsupported line, just keep it
+                PGESTRING str;
+                dataReader.ReadRawLine(str);
+                FileData.unsupported_38a_lines.push_back(str);
+            }
         }//while is not EOF
     }
     catch(const std::exception &err)

@@ -1224,7 +1224,12 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 });
             }
             else
-                dataReader.ReadDataLine();
+            {
+                // Unsupported line, just keep it
+                PGESTRING str;
+                dataReader.ReadRawLine(str);
+                FileData.unsupported_38a_lines.push_back(str);
+            }
         }//while is not EOF
     }
     catch(const std::exception &err)
@@ -2275,6 +2280,12 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         {
             out << "|" << fromNum(mo.id) << "," << PGE_URLENC(mo.fileName);
         }
+        out << "\n";
+    }
+
+    for(auto &l : FileData.unsupported_38a_lines)
+    {
+        out << l;
         out << "\n";
     }
 

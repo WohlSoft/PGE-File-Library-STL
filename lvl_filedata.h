@@ -1078,6 +1078,8 @@ struct LevelData
     PGELIST<LevelScript>   scripts;
     //! 38A: Array entries
     PGELIST<LevelArray>    arrays;
+    //! 38A: Lines, usnsupported by PGE-FL, reminded for a future restore
+    PGELIST<PGESTRING>     unsupported_38a_lines;
 
     //! SMBX-38A specific custom configs
     PGELIST<LevelItemSetup38A> custom38A_configs;
