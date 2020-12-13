@@ -78,6 +78,11 @@ CrashData::CrashData() : used(false), untitled(false), modifyed(false), strictMo
 
 CrashData::CrashData(const CrashData &_cd)
 {
+    operator=(_cd);
+}
+
+CrashData &CrashData::operator=(const CrashData &_cd)
+{
     this->used = _cd.used;
     this->untitled = _cd.untitled;
     this->modifyed = _cd.modifyed;
@@ -87,6 +92,7 @@ CrashData::CrashData(const CrashData &_cd)
     this->fullPath = _cd.fullPath;
     this->filename = _cd.filename;
     this->path = _cd.path;
+    return *this;
 }
 
 void CrashData::reset()

@@ -124,6 +124,7 @@ public:
      * \param _cd another CrashData object
      */
     CrashData(const CrashData &_cd);
+    CrashData &operator=(const CrashData &_cd);
     /*!
      * \brief Sets default preferences
      */
