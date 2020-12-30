@@ -892,9 +892,9 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                                 if(PGEFile::IsIntArray(param[1]))
                                 {
-                                    bool valid = false;
-                                    PGELIST<long> arr = PGEFile::X2IntArr(param[1], &valid);
-                                    if(!valid)
+                                    bool valid2 = false;
+                                    PGELIST<long> arr = PGEFile::X2IntArr(param[1], &valid2);
+                                    if(!valid2)
                                         goto badfile;
                                     if(arr.size() % 4)
                                     {
