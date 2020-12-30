@@ -90,6 +90,12 @@ if(MSVC)
         string(REGEX REPLACE "/showIncludes" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     endif()
 
+    # Enable unwind for ARM builds
+    if(${MSVC_C_ARCHITECTURE_ID} MATCHES "ARM")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /EHsc")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+    endif()
+
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     # Update if necessary
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -Wno-variadic-macros")
