@@ -151,4 +151,4 @@ Boolean PGEFF_isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 #endif
 
 /* --------------------------------------------------------------------- */
-#endif //CONVERT_UTF_H
+#endif /*CONVERT_UTF_H*/
