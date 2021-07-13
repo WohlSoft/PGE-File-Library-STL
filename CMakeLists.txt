@@ -1,23 +1,22 @@
 cmake_minimum_required (VERSION 2.8.12)
 
 if(Vita OR VITA)
+    message("VITASDK Defined!")
+    message("VITA BUILD!")
+    #set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+    set(CMAKE_TOOLCHAIN_FILE "/usr/local/vitasdk/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
 
-message("VITASDK Defined!")
-message("VITA BUILD!")
-#set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-set(CMAKE_TOOLCHAIN_FILE "/usr/local/vitasdk/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+    #include("${VITASDK}/share/vita.cmake" REQUIRED)
+    include("/usr/local/vitasdk/share/vita.cmake" REQUIRED)
 
-#include("${VITASDK}/share/vita.cmake" REQUIRED)
-include ("/usr/local/vitasdk/share/vita.cmake" REQUIRED)
+    set(VITA 1)
+    # set(VITA_APP_NAME "TheXTech Vita Edition")
+    # set(VITA_TITLEID  "THEXTECH00001")
+    # set(VITA_VERSION  "01.00")
 
-set(VITA 1)
-# set(VITA_APP_NAME "TheXTech Vita Edition")
-# set(VITA_TITLEID  "THEXTECH00001")
-# set(VITA_VERSION  "01.00")
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second -std=gnu11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion")
-set(PGEFL_QT_SUPPORT OFF)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second -std=gnu11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion")
+    set(PGEFL_QT_SUPPORT OFF)
 endif()
 
 project(PGEFileLibrary C CXX)
