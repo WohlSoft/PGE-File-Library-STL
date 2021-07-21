@@ -1343,7 +1343,7 @@ void FileInfo::rebuildData()
 
 #ifdef PGE_FILES_QT
     m_filePath = QFileInfo(m_filePath).absoluteFilePath();
-#elif defined(__3DS__)
+#elif defined(__3DS__) || defined(VITA)
     // all paths are absolute on 3DS
 #elif !defined(_WIN32)
     char *rez = NULL;
