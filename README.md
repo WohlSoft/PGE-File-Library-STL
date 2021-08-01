@@ -1,6 +1,6 @@
-# PGE File Library v 0.3.1.14
+# Moondust File Library (PGE-FL) v0.3.2
 ----
-This library is a part of Moondust (PGE Project).
+This library is a part of Moondust Project (formerly PGE Project).
 ----
 Supported file formats:
 
@@ -50,7 +50,7 @@ you must prepare your data structures until you will save it:
 FileFormats::smbx64LevelPrepare(YourLevelData);
 ```
 
-3) If you trying to use PGE File data in the LunaLUA, before filling internal arrays, need to apply the next set of the functions:
+3) If you trying to use Moondust File data in the LunaLUA, before filling internal arrays, need to apply the next set of the functions:
 
 ```C++
 //To initialize order priorities fields and mark all star NPCs
@@ -60,4 +60,3 @@ FileFormats::smbx64LevelSortBlocks(YourLevelData);
 //Order BGO's
 FileFormats::smbx64LevelSortBGOs(YourLevelData);
 ```
-
