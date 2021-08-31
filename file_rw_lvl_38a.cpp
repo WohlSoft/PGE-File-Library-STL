@@ -1992,6 +1992,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
                 SMBX38A_Num2Exp_URLEN(evt.sets[j].position_bottom - evt.sets[j].position_top, expression_h);
             }
 
+            //FIXME: Add the conversion code from legacy auto-scrolling code into modern while saving 38a files, otherwise, autoscroll settings will be lost
+
             if(evt.sets[j].autoscrol)
             {
                 SMBX38A_Num2Exp_URLEN(evt.sets[j].autoscrol_x, expression_as_x);

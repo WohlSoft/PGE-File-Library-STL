@@ -882,16 +882,17 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
                     nextLine();
                     SMBX64::ReadSInt(&events.scroll_section, line); //Scroll section x, (in file value is x-1)
 
-                    if(((events.move_camera_x != 0.0) || (events.move_camera_y != 0.0)) && (events.scroll_section < static_cast<long>(events.sets.size())))
-                    {
-                        pge_size_t scroll_section = static_cast<pge_size_t>(events.scroll_section);
-                        LevelEvent_Sets &set = events.sets[scroll_section];
-                        set.autoscrol = true;
-                        set.autoscrol_x = static_cast<float>(events.move_camera_x);
-                        set.autoscrol_y = static_cast<float>(events.move_camera_y);
-                        set.expression_autoscrool_x = fromNum(events.move_camera_x);
-                        set.expression_autoscrool_y = fromNum(events.move_camera_y);
-                    }
+// !!!This code intended to convert old autoscroll into new, but, this is a source of the bug, so, don't do that!!!
+//                    if(((events.move_camera_x != 0.0) || (events.move_camera_y != 0.0)) && (events.scroll_section < static_cast<long>(events.sets.size())))
+//                    {
+//                        pge_size_t scroll_section = static_cast<pge_size_t>(events.scroll_section);
+//                        LevelEvent_Sets &set = events.sets[scroll_section];
+//                        set.autoscrol = true;
+//                        set.autoscrol_x = static_cast<float>(events.move_camera_x);
+//                        set.autoscrol_y = static_cast<float>(events.move_camera_y);
+//                        set.expression_autoscrool_x = fromNum(events.move_camera_x);
+//                        set.expression_autoscrool_y = fromNum(events.move_camera_y);
+//                    }
                 }
 
                 events.meta.array_id = FileData.events_array_id++;
