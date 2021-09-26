@@ -215,7 +215,7 @@ struct WorldLevelTile
         PGELIST<Line> paths;
     } movement;
 
-    enum StarsCount
+    enum StarsShowPolicy
     {
         //! Prefer global settings
         STARS_UNSPECIFIED = -1,
@@ -227,7 +227,7 @@ struct WorldLevelTile
         STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
     };
     //! The policy of per-level stars count displaying
-    int starsCount = STARS_UNSPECIFIED;
+    int starsShowPolicy = STARS_UNSPECIFIED;
 
     /*
      * Editor-only parameters which are not saving into file
@@ -478,7 +478,7 @@ struct WorldData
     //! 38A Inventory limit
     unsigned long   inventoryLimit = 0;
 
-    enum StarsCountPerLevel
+    enum StarsShowPolicy
     {
         //! Prefer global settings
         STARS_UNSPECIFIED = -1,
@@ -490,7 +490,7 @@ struct WorldData
         STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
     };
     //! World map wide policy of per-level stars count displaying
-    int starsCountPerLevel = STARS_UNSPECIFIED;
+    int starsShowPolicy = STARS_UNSPECIFIED;
 
     //! Episode credits (full text area)
     PGESTRING authors;
