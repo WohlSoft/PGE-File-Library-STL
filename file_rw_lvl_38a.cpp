@@ -1861,6 +1861,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     for(i = 0; i < FileData.events.size(); i++)
     {
         LevelSMBX64Event &evt = FileData.events[i];
+        bool isLevelStart = (evt.name == "Level - Start");
         //    E|name|msg|ea|el|elm|epy|eps|eef|ecn|evc|ene
         out << "E";
         //    name=event name[***urlencode!***]
@@ -1976,6 +1977,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
                 section_pos = 2;
                 break;
             }
+
             //Convert floats into expressions if there are empty
             PGESTRING expression_x = evt.sets[j].expression_pos_x;
             PGESTRING expression_y = evt.sets[j].expression_pos_y;
@@ -1992,7 +1994,16 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
                 SMBX38A_Num2Exp_URLEN(evt.sets[j].position_bottom - evt.sets[j].position_top, expression_h);
             }
 
-            //FIXME: Add the conversion code from legacy auto-scrolling code into modern while saving 38a files, otherwise, autoscroll settings will be lost
+            //Convert legacy autoscroll into modern
+            bool legacyAutoScroll = false;
+
+            if(isLevelStart && j == (size_t)evt.scroll_section && !evt.sets[j].autoscrol
+               && (evt.move_camera_x != 0.0 || evt.move_camera_y != 0.0))
+            {
+                legacyAutoScroll = true;
+                expression_as_x = fromNum(evt.move_camera_x);
+                expression_as_y = fromNum(evt.move_camera_y);
+            }
 
             if(evt.sets[j].autoscrol)
             {
@@ -2022,7 +2033,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             //                h=height for section [id][***urlencode!***][syntax]
             out << "," << expression_h;
             //                auto=enable autoscroll controls[0=false !0=tru
-            out << "," << fromNum((int)evt.sets[j].autoscrol);
+            out << "," << fromNum((int)(evt.sets[j].autoscrol || legacyAutoScroll));
             //                sx=move screen horizontal syntax[***urlencode!***][syntax]
             out << "," << expression_as_x;
             //                sy=move screen vertical syntax[***urlencode!***][syntax]
