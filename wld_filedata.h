@@ -215,6 +215,20 @@ struct WorldLevelTile
         PGELIST<Line> paths;
     } movement;
 
+    enum StarsCount
+    {
+        //! Prefer global settings
+        STARS_UNSPECIFIED = -1,
+        //! Never show stars counter
+        STARS_DONT_SHOW = 0,
+        //! Show collected only
+        STARS_SHOW_COLLECTED_ONLY = 1,
+        //! Show collected and available
+        STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
+    };
+    //! The policy of per-level stars count displaying
+    int starsCount = STARS_UNSPECIFIED;
+
     /*
      * Editor-only parameters which are not saving into file
      */
@@ -383,7 +397,7 @@ struct WorldData
     };
 
     //! Title of the episode
-    PGESTRING EpisodeTitle = "";
+    PGESTRING EpisodeTitle;
     //! Disable SMBX64 Character 1
     bool nocharacter1 = false;
     //! Disable SMBX64 Character 2
@@ -417,8 +431,8 @@ struct WorldData
         nocharacter5 = nocharacter.size() > 4 ? nocharacter[4] : false;
     }
 
-    PGESTRING IntroLevel_file = "";
-    PGESTRING GameOverLevel_file = "";
+    PGESTRING IntroLevel_file;
+    PGESTRING GameOverLevel_file;
     bool HubStyledWorld = false;
     bool restartlevel = false;
 
@@ -441,7 +455,8 @@ struct WorldData
     //! List of cheat codes (granted or forbidden dependent on restrictNoCheats flag state)
     PGESTRINGList cheatsList;
 
-    enum SaveMode{
+    enum SaveMode
+    {
         SAVE_RESUME_AT_INTRO = -1,
         SAVE_RESUME_AT_WORLD_MAP = 0,
         SAVE_RESUME_AT_RECENT_LEVEL = 1,
@@ -453,9 +468,9 @@ struct WorldData
     //! Enable save locker
     bool    saveLocker = false;
     //! Save locker expression
-    PGESTRING saveLockerEx = "";
+    PGESTRING saveLockerEx;
     //! Message box shown on save locking
-    PGESTRING saveLockerMsg = "";
+    PGESTRING saveLockerMsg;
     //! Always show any closed cells (overwise closed cells are will be hidden until player will open them)
     bool    showEverything = false;
     //! Cached total number of available stars on this episode
@@ -463,21 +478,35 @@ struct WorldData
     //! 38A Inventory limit
     unsigned long   inventoryLimit = 0;
 
+    enum StarsCountPerLevel
+    {
+        //! Prefer global settings
+        STARS_UNSPECIFIED = -1,
+        //! Never show stars counter
+        STARS_DONT_SHOW = 0,
+        //! Show collected only
+        STARS_SHOW_COLLECTED_ONLY = 1,
+        //! Show collected and available
+        STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
+    };
+    //! World map wide policy of per-level stars count displaying
+    int starsCountPerLevel = STARS_UNSPECIFIED;
+
     //! Episode credits (full text area)
-    PGESTRING authors = "";
+    PGESTRING authors;
     //! Episode credits (SMBX64 single-line field 1)
-    PGESTRING author1 = "";
+    PGESTRING author1;
     //! Episode credits (SMBX64 single-line field 2)
-    PGESTRING author2 = "";
+    PGESTRING author2;
     //! Episode credits (SMBX64 single-line field 3)
-    PGESTRING author3 = "";
+    PGESTRING author3;
     //! Episode credits (SMBX64 single-line field 4)
-    PGESTRING author4 = "";
+    PGESTRING author4;
     //! Episode credits (SMBX64 single-line field 5)
-    PGESTRING author5 = "";
+    PGESTRING author5;
 
     //! Credits scene background music
-    PGESTRING authors_music = "";
+    PGESTRING authors_music;
 
     //! JSON-like string with a custom properties (without master brackets, like "param":"value,["subparam":value])
     PGESTRING custom_params;

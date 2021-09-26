@@ -189,6 +189,13 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
                 else
                     goto badfile;
             }
+            else if(data[i][0] == "SSS") //Per-level stars count showing policy
+            {
+                if(PGEFile::IsIntS(data[i][1]))
+                    FileData.starsCountPerLevel = toInt(data[i][1]);
+                else
+                    goto badfile;
+            }
             else if(data[i][0] == "XTRA") //Extra settings
             {
                 if(PGEFile::IsQoutedString(data[i][1]))
@@ -304,6 +311,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                     PGEX_UIntVal("SZ", FileData.stars)              //Starz number
                     PGEX_StrVal("CD", FileData.authors)     //Credits list
                     PGEX_StrVal("CM", FileData.authors_music)     //Credits scene background music
+                    PGEX_SIntVal("SSS", FileData.starsCountPerLevel) //Per-level stars count showing policy
                     PGEX_StrVal("XTRA", FileData.custom_params)     //World-wide Extra settings
                     PGEX_StrVal("CPID", FileData.meta.configPackId)//Config pack ID string
                 }
@@ -478,6 +486,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                     PGEX_BoolVal("SP", lvlitem.gamestart) //Is Game start point
                     PGEX_BoolVal("BP", lvlitem.pathbg) //Path background
                     PGEX_BoolVal("BG", lvlitem.bigpathbg) //Big path background
+                    PGEX_SIntVal("SSS", lvlitem.starsCount) // Stars count showing policy
                     PGEX_StrVal("XTRA", lvlitem.meta.custom_params)//Custom JSON data tree
                 }
                 lvlitem.meta.array_id = FileData.level_array_id++;
@@ -572,6 +581,8 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
             outHeader += PGEFile::value("CD", PGEFile::WriteStr(FileData.authors));   // Credits
         if(!IsEmpty(FileData.authors_music))
             outHeader += PGEFile::value("CM", PGEFile::WriteStr(FileData.authors_music));   // Credits scene background music
+        if(FileData.starsCountPerLevel != WorldData::STARS_UNSPECIFIED)
+            outHeader += PGEFile::value("SSS", PGEFile::WriteInt(FileData.starsCountPerLevel));
         if(!IsEmpty(FileData.custom_params))
             outHeader += PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));   // World-wide extra settings
         if(!IsEmpty(FileData.meta.configPackId))
@@ -727,6 +738,8 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
                 out << PGEFile::value("BP", PGEFile::WriteBool(lt.pathbg));
             if(lt.bigpathbg)
                 out << PGEFile::value("BG", PGEFile::WriteBool(lt.bigpathbg));
+            if(lt.starsCount != WorldLevelTile::STARS_UNSPECIFIED)
+                out << PGEFile::value("SSS", PGEFile::WriteInt(lt.starsCount));
             if(!IsEmpty(lt.meta.custom_params))
                 out << PGEFile::value("XTRA", PGEFile::WriteStr(lt.meta.custom_params));
             out << "\n";
