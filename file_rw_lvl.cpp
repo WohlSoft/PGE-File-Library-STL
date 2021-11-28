@@ -364,6 +364,14 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
                     xnpcID = 1035;
                     break;//Shoe
 
+                case 105:
+                    xnpcID = 1095;
+                    break;//Green Yoshi
+
+                case 201:
+                    xnpcID = 1186;
+                    break;//Life mushroom
+
                 default:
                     break;
                 }
@@ -1117,6 +1125,14 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
 
                 case 1035://Shoe
                     xnpcID = 104;
+                    break;
+
+                case 1095://Green Yoshi
+                    xnpcID = 105;
+                    break;
+
+                case 1186://Life mushroom
+                    xnpcID = 201;
                     break;
 
                 default:
