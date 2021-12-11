@@ -171,7 +171,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFi
     {
     case LVL_PGEX:
     {
-        smbx64CountStars(FileData);
+        FileData.stars = smbx64CountStars(FileData);
         if(!FileFormats::WriteExtendedLvlFileF(filePath, FileData))
         {
             FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
@@ -225,7 +225,7 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
     {
     case LVL_PGEX:
     {
-        smbx64CountStars(FileData);
+        FileData.stars = smbx64CountStars(FileData);
         WriteExtendedLvlFileRaw(FileData, RawData);
         return true;
     }
