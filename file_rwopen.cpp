@@ -35,6 +35,7 @@
 bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
 {
     PGE_FileFormats_misc::TextFileInput file;
+
     if(!file.open(filePath, true))
     {
         FileData.meta.ReadFileValid = false;
@@ -43,12 +44,14 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
         FileData.meta.ERROR_linenum = -1;
         return false;
     }
+
     return OpenLevelFileT(file, FileData);
 }
 
 bool FileFormats::OpenLevelRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
+
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ReadFileValid = false;
@@ -57,12 +60,14 @@ bool FileFormats::OpenLevelRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData
         FileData.meta.ERROR_linenum = -1;
         return false;
     }
+
     return OpenLevelFileT(file, FileData);
 }
 
 bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelData &FileData)
 {
     PGESTRING firstLine;
+    CreateLevelData(FileData);
 
     FileData.meta.ERROR_info.clear();
     firstLine = file.read(8);
@@ -137,6 +142,9 @@ bool FileFormats::OpenLevelFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath,
 bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, LevelData &data)
 {
     PGESTRING firstLine;
+
+    CreateLevelHeader(data);
+
     firstLine = file.readLine();
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
@@ -254,6 +262,7 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
 bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
 {
     PGE_FileFormats_misc::TextFileInput file;
+
     if(!file.open(filePath, true))
     {
         data.meta.ReadFileValid = false;
@@ -262,12 +271,14 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
         data.meta.ERROR_linenum = -1;
         return false;
     }
+
     return OpenWorldFileT(file, data);
 }
 
 bool FileFormats::OpenWorldRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
+
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ReadFileValid = false;
@@ -276,12 +287,15 @@ bool FileFormats::OpenWorldRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData
         FileData.meta.ERROR_linenum = -1;
         return false;
     }
+
     return OpenWorldFileT(file, FileData);
 }
 
 bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldData &data)
 {
     PGESTRING firstLine;
+
+    CreateWorldData(data);
 
     data.meta.ERROR_info.clear();
     firstLine = file.read(8);
@@ -334,6 +348,7 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
         data.meta.ERROR_linenum = -1;
         return false;
     }
+
     return OpenWorldFileHeaderT(file, data);
 }
 
@@ -350,12 +365,16 @@ bool FileFormats::OpenWorldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath,
         data.meta.ERROR_linenum = -1;
         return false;
     }
+
     return OpenWorldFileHeaderT(file, data);
 }
 
 bool FileFormats::OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, WorldData &data)
 {
     PGESTRING firstLine;
+
+    CreateWorldHeader(data);
+
     firstLine = file.readLine();
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
