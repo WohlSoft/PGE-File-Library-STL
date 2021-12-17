@@ -69,7 +69,7 @@ public:
      * \param [__out] FileData Meta-data structure
      * \return true if file successfully opened and parsed, false if error occouped
      */
-    static bool ReadNonSMBX64MetaDataF(PGESTRING  filePath, MetaData &FileData);
+    static bool ReadNonSMBX64MetaDataF(const PGESTRING &filePath, MetaData &FileData);
     /*!
      * \brief Parses non-SMBX64 meta-data from additional *.meta files
      *        there are contains data which impossible to save into SMBX64 LVL file
@@ -79,7 +79,7 @@ public:
      * \param [__out] FileData Meta-data structure
      * \return true if file successfully opened and parsed, false if error occouped
      */
-    static bool ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, PGESTRING  filePath, MetaData &FileData);
+    static bool ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, const PGESTRING &filePath, MetaData &FileData);
     /*!
      * \brief Parses non-SMBX64 meta-data from additional *.meta files
      *        there are contains data which impossible to save into SMBX64 LVL file
@@ -95,7 +95,7 @@ public:
      * \param [__in] metaData Meta-data structure
      * \return true if file successfully opened and parsed, false if error occouped
      */
-    static bool WriteNonSMBX64MetaDataF(PGESTRING  filePath, MetaData &metaData);
+    static bool WriteNonSMBX64MetaDataF(const PGESTRING &filePath, MetaData &metaData);
     /*!
      * \brief Generates raw data of non-SMBX meta-data from level data structure
      * \param [__in] metaData Meta-data structure
@@ -131,7 +131,7 @@ public:
      * \param [__out] FileData Level data structure
      * \return true if file successfully opened and parsed, false if error occouped
      */
-    static bool OpenLevelFile(PGESTRING filePath, LevelData &FileData);
+    static bool OpenLevelFile(const PGESTRING &filePath, LevelData &FileData);
     /**
      * @brief Parses a level file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] rawdata Raw data of the supported level file
@@ -139,7 +139,7 @@ public:
      * @param [__out] FileData Level data structure
      * @return true if file successfully opened and parsed, false if error occouped
      */
-    static bool OpenLevelRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    static bool OpenLevelRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
     /**
      * @brief Parses a level file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] file Input file descriptor
@@ -153,7 +153,7 @@ public:
      * \param [__out] data Level data structure (with initialized header data only)
      * \return true if file successfully opened and parsed, false if error occouped
      */
-    static bool OpenLevelFileHeader(PGESTRING filePath, LevelData &data);
+    static bool OpenLevelFileHeader(const PGESTRING &filePath, LevelData &data);
     /**
      * @brief Parses a level file data header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] rawdata Input raw data
@@ -161,7 +161,7 @@ public:
      * @param [__out] data Level data structure (with initialized header data only)
      * @return true if file successfully opened and parsed, false if error occouped
      */
-    static bool OpenLevelFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &data);
+    static bool OpenLevelFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &data);
     /**
      * @brief Parses a level file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] file Input file descriptor
@@ -177,7 +177,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFileFormat format, unsigned int FormatVersion = 64);
+    static bool SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, LevelFileFormat format, unsigned int FormatVersion = 64);
     /*!
      * \brief Save a level file to the raw string
      * \param FileData Level data structure
@@ -195,7 +195,7 @@ public:
      * \param [__out] FileData Level data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64LvlFileHeader(PGESTRING filePath, LevelData &FileData);
+    static bool ReadSMBX64LvlFileHeader(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX1...64 level file header and skips other part of a file
      * \param [__in] rawdata Raw data of the supported level file
@@ -203,7 +203,7 @@ public:
      * \param [__out]  FileData Level data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64LvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    static bool ReadSMBX64LvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX1...64 level file header and skips other part of a file
      * \param [__in] inf Input file descriptor
@@ -217,7 +217,7 @@ public:
      * \param [__out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64LvlFileF(PGESTRING  filePath, LevelData &FileData);
+    static bool ReadSMBX64LvlFileF(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX1...64 level file data
      * \param [__in] rawdata Raw data of the SMBX1...64 level file
@@ -225,7 +225,7 @@ public:
      * \param [__Out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64LvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath, LevelData &FileData);
+    static bool ReadSMBX64LvlFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX1...64 level file data
      * \param [__in] in Input file descriptor
@@ -240,7 +240,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64LvlFileF(PGESTRING  filePath, LevelData &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64LvlFileF(const PGESTRING &filePath, LevelData &FileData, unsigned int file_format = 64);
     /*!
      * \brief Generates SMBX1...64 Level file data and saves into raw string
      * \param [__in] FileData Target file path
@@ -265,7 +265,7 @@ public:
      * \param [__out] FileData Level data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38ALvlFileHeader(PGESTRING filePath, LevelData &FileData);
+    static bool ReadSMBX38ALvlFileHeader(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX-38A level file header and skips other part of a file
      * \param [__in] rawdata Raw data of the supported level file
@@ -273,7 +273,7 @@ public:
      * \param FileData Level data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38ALvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    static bool ReadSMBX38ALvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX-38A level file header and skips other part of a file
      * \param [__in] inf Input file descriptor
@@ -288,7 +288,7 @@ public:
      * \param [__out] FileData
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData);
+    static bool ReadSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX-38A level file data from raw data string
      * \param [__in] rawdata Raw-data string contains SMBX-38A Level file data
@@ -296,7 +296,7 @@ public:
      * \param [__out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath, LevelData &FileData);
+    static bool ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses SMBX-38A level file data from raw data string
      * \param [__in] in File input descriptor
@@ -317,7 +317,7 @@ public:
      * \param [__in] FileData Level data structure
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38ALvlFileF(PGESTRING  filePath, LevelData &FileData);
+    static bool WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Generates SMBX-38A Level file data and saves into raw string
      * \param [__in] FileData Target file path
@@ -342,7 +342,7 @@ public:
      * \param FileData Level data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedLvlFileHeader(PGESTRING filePath, LevelData &FileData);
+    static bool ReadExtendedLvlFileHeader(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses PGE-X Level file header from the file
      * \param [__in] rawdata Raw data of the supported level file
@@ -350,7 +350,7 @@ public:
      * \param [__out]  FileData Level data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData);
+    static bool ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses PGE-X Level file header from the file
      * \param [__in] inf Input file descriptor
@@ -364,7 +364,7 @@ public:
      * \param [__out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedLvlFileF(PGESTRING  filePath, LevelData &FileData);
+    static bool ReadExtendedLvlFileF(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses PGE-X level file data from raw data string
      * \param [__in] rawdata Raw data string in the PGE-X level format
@@ -372,7 +372,7 @@ public:
      * \param [__out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedLvlFileRaw(PGESTRING &rawdata, PGESTRING  filePath, LevelData &FileData);
+    static bool ReadExtendedLvlFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Parses PGE-X level file data from file input descriptor
      * \param [__in] in File Input descriptor
@@ -386,7 +386,7 @@ public:
      * \param [__in] FileData Level data structure
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteExtendedLvlFileF(PGESTRING  filePath, LevelData &FileData);
+    static bool WriteExtendedLvlFileF(const PGESTRING &filePath, LevelData &FileData);
     /*!
      * \brief Generates PGE-X Level raw data string
      * \param [__in] FileData Level data structure
@@ -468,14 +468,14 @@ public:
      * \param vname name of variable
      * \return Initialized with default properties level specific Variable entry
      */
-    static LevelVariable    CreateLvlVariable(PGESTRING vname);
+    static LevelVariable    CreateLvlVariable(const PGESTRING &vname);
     /*!
      * \brief Initalizes Level specific Script Entry
      * \param name name of script
      * \param lang language code of script (Lua, Luna-Autocode or Tea-Script)
      * \return Initialized with default properties level specific Script entry
      */
-    static LevelScript      CreateLvlScript(PGESTRING name, int lang = LevelScript::LANG_LUA);
+    static LevelScript      CreateLvlScript(const PGESTRING &name, int lang = LevelScript::LANG_LUA);
 
     /*!
      * \brief Appends internal layers and events if not exists
@@ -539,7 +539,7 @@ public:
      * \param [__out] data World data structure
      * \return true on success file reading, false if error was occouped
      */
-    static bool OpenWorldFile(PGESTRING filePath, WorldData &data);
+    static bool OpenWorldFile(const PGESTRING &filePath, WorldData &data);
     /**
      * @brief Parses a world map file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] rawdata Raw data of the supported level file
@@ -547,7 +547,7 @@ public:
      * @param [__out] FileData World data structure
      * @return true if file successfully opened and parsed, false if error occouped
      */
-    static bool OpenWorldRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    static bool OpenWorldRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
     /**
      * @brief Parses a level world map data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] file Input file descriptor
@@ -561,7 +561,7 @@ public:
      * \param [__out] data World data structure (with initialized header data only)
      * \return true on success file reading, false if error was occouped
      */
-    static bool OpenWorldFileHeader(PGESTRING filePath, WorldData &data);
+    static bool OpenWorldFileHeader(const PGESTRING &filePath, WorldData &data);
     /**
      * @brief Parses a level file data header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] rawdata Input raw data
@@ -569,7 +569,7 @@ public:
      * @param [__out] data Level data structure (with initialized header data only)
      * @return true if file successfully opened and parsed, false if error occouped
      */
-    static bool OpenWorldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &data);
+    static bool OpenWorldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &data);
     /**
      * @brief Parses a level file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] file Input file descriptor
@@ -585,7 +585,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveWorldFile(WorldData &FileData, PGESTRING filePath, WorldFileFormat format, unsigned int FormatVersion = 64);
+    static bool SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, WorldFileFormat format, unsigned int FormatVersion = 64);
     /*!
      * \brief Save a world map file to the raw string
      * \param [__in] FileData World data structure
@@ -604,7 +604,7 @@ public:
      * \param [__out] Filedata World data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileData);
+    static bool ReadSMBX64WldFileHeader(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX1...64 world map  file header and skips other part of a file
      * \param [__in] rawdata Raw data of the supported level file
@@ -612,7 +612,7 @@ public:
      * \param [__out]  FileData World map data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64WldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    static bool ReadSMBX64WldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX1...64 world map file header and skips other part of a file
      * \param [__in] inf Input file descriptor
@@ -626,7 +626,7 @@ public:
      * \param [__out] FileData World data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData);
+    static bool ReadSMBX64WldFileF(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX1...64 World map file from raw data from raw-data string
      * \param [__in] rawdata Raw-data string which contains SMBX1...64 World map data
@@ -634,7 +634,7 @@ public:
      * \param [__out] FileData World data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64WldFileRaw(PGESTRING &rawdata, PGESTRING  filePath, WorldData &FileData);
+    static bool ReadSMBX64WldFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX1...64 World map file from raw data from file input descriptor
      * \param [__in] in File Input descriptor
@@ -649,7 +649,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64WldFileF(const PGESTRING &filePath, WorldData &FileData, unsigned int file_format = 64);
     /*!
      * \brief Generates raw data string in SMBX1...64 World map format
      * \param [__in] FileData World map data structure
@@ -674,7 +674,7 @@ public:
      * \param [__out] FileData Level data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData &FileData);
+    static bool ReadSMBX38AWldFileHeader(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX-38A world map file header and skips other part of a file
      * \param [__in] rawdata Raw data of the supported level file
@@ -682,7 +682,7 @@ public:
      * \param FileData World data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38AWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    static bool ReadSMBX38AWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX-38A world map file header and skips other part of a file
      * \param [__in] inf Input file descriptor
@@ -696,7 +696,7 @@ public:
      * \param [__out] FileData
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38AWldFileF(PGESTRING  filePath, WorldData &FileData);
+    static bool ReadSMBX38AWldFileF(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX-38A world map file data from raw data string
      * \param [__in] rawdata Raw-data string contains SMBX-38A Level file data
@@ -704,7 +704,7 @@ public:
      * \param [__out] FileData Level data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX38AWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath, WorldData &FileData);
+    static bool ReadSMBX38AWldFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses SMBX-38A world map file data from raw data string
      * \param [__in] in File input descriptor
@@ -718,7 +718,7 @@ public:
      * \param [__in] FileData Level data structure
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38AWldFileF(PGESTRING  filePath, WorldData &FileData);
+    static bool WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Generates SMBX-38A Level file data and saves into raw string
      * \param [__in] FileData Target file path
@@ -741,7 +741,7 @@ public:
      * \param FileData World data structure (with initialized header data only)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileData);
+    static bool ReadExtendedWldFileHeader(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses PGE-X World map file header from the file
      * \param [__in] rawdata Raw data of the supported level file
@@ -749,7 +749,7 @@ public:
      * \param [__out]  FileData World data structure (with initialized header data only)
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData);
+    static bool ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses PGE-X World map file header from the file
      * \param [__in] inf Input file descriptor
@@ -763,7 +763,7 @@ public:
      * \param [__out] FileData World map data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedWldFileF(PGESTRING  filePath, WorldData &FileData);
+    static bool ReadExtendedWldFileF(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses PGE-X World map file from raw data string
      * \param [__in] rawdata Raw data strign with PGE-X World map data
@@ -771,7 +771,7 @@ public:
      * \param [__out] FileData World map data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath, WorldData &FileData);
+    static bool ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Parses PGE-X World map file from file input descriptor
      * \param [__in] in File Input descriptor
@@ -785,7 +785,7 @@ public:
      * \param [__in] FileData World map data structure
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteExtendedWldFileF(PGESTRING  filePath, WorldData &FileData);
+    static bool WriteExtendedWldFileF(const PGESTRING &filePath, WorldData &FileData);
     /*!
      * \brief Generates raw data string in PGE-X World map format
      * \param [__in] FileData World map data structure
@@ -859,7 +859,7 @@ public:
      * \param [__out] FileData Game save data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64SavFileF(PGESTRING  filePath, GamesaveData &FileData);
+    static bool ReadSMBX64SavFileF(const PGESTRING &filePath, GamesaveData &FileData);
     /*!
      * \brief Parses SMBX1...64 Game save data from raw data string
      * \param [__in] rawdata raw data string in SMBX1..64 game save format
@@ -867,7 +867,7 @@ public:
      * \param [__out] FileData Game save data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64SavFileRaw(PGESTRING &rawdata, PGESTRING  filePath, GamesaveData &FileData);
+    static bool ReadSMBX64SavFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, GamesaveData &FileData);
     /*!
      * \brief Parses SMBX1...64 Game save data from input descriptor
      * \param [__in] in File Input descriptor
@@ -883,7 +883,7 @@ public:
      * \param [__out] FileData Game save data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedSaveFileF(PGESTRING  filePath, GamesaveData &FileData);
+    static bool ReadExtendedSaveFileF(const PGESTRING &filePath, GamesaveData &FileData);
     /*!
      * \brief Parses PGE-X level file data from raw data string
      * \param [__in] rawdata Raw data string in the PGE-X Game save format
@@ -891,7 +891,7 @@ public:
      * \param [__out] FileData Game save data structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadExtendedSaveFileRaw(PGESTRING &rawdata, PGESTRING  filePath, GamesaveData &FileData);
+    static bool ReadExtendedSaveFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, GamesaveData &FileData);
     /*!
      * \brief Parses PGE-X level file data from file input descriptor
      * \param [__in] in File Input descriptor
@@ -905,7 +905,7 @@ public:
      * \param [__in] FileData Game save data structure
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteExtendedSaveFileF(PGESTRING  filePath, GamesaveData &FileData);
+    static bool WriteExtendedSaveFileF(const PGESTRING &filePath, GamesaveData &FileData);
     /*!
      * \brief Generates raw data string in PGE-X Game save format
      * \param [__in] FileData World map data structure
@@ -949,7 +949,7 @@ public:
      * \param [__out] FileData SMBX Engine specific config structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64ConfigFileF(PGESTRING  filePath, SMBX64_ConfigFile &FileData);
+    static bool ReadSMBX64ConfigFileF(const PGESTRING &filePath, SMBX64_ConfigFile &FileData);
     /*!
      * \brief Parses SMBX Engine config data from raw data string
      * \param [__in] rawdata Raw data string contains SMBX Engine config data
@@ -957,7 +957,7 @@ public:
      * \param [__out] FileData SMBX Engine specific config structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadSMBX64ConfigFileRaw(PGESTRING &rawdata, PGESTRING  filePath, SMBX64_ConfigFile &FileData);
+    static bool ReadSMBX64ConfigFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, SMBX64_ConfigFile &FileData);
     /*!
      * \brief Parses SMBX Engine config data from file input descriptor
      * \param [__in] in File Input descriptor
@@ -984,7 +984,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64ConfigFileF(PGESTRING  filePath, SMBX64_ConfigFile &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64ConfigFileF(const PGESTRING &filePath, SMBX64_ConfigFile &FileData, unsigned int file_format = 64);
     /*!
      * \brief Generates raw data string in SMBX1...64 SMBX Engine specific config format
      * \param [__in] FileData World map data structure
@@ -1011,7 +1011,7 @@ public:
      * \param [__out] FileData SMBX Engine specific config structure
      * \return true if file successfully parsed, false if error occouped
      */
-    static bool ReadNpcTXTFileF(PGESTRING  filePath, NPCConfigFile &FileData, bool IgnoreBad = false);
+    static bool ReadNpcTXTFileF(const PGESTRING &filePath, NPCConfigFile &FileData, bool IgnoreBad = false);
     /*!
      * \brief Parses SMBX64 NPC.txt config data from raw data string
      * \param [__in] rawdata Raw data string contains SMBX Engine config data
@@ -1033,7 +1033,7 @@ public:
      * \param [__in] FileData SMBX64 NPC.txt config data structure
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteNPCTxtFileF(PGESTRING  filePath, NPCConfigFile &FileData);
+    static bool WriteNPCTxtFileF(const PGESTRING &filePath, NPCConfigFile &FileData);
     /*!
      * \brief Generates raw data string in SMBX64 NPC.txt config data format
      * \param [__in] FileData SMBX64 NPC.txt config data structure

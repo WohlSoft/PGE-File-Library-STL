@@ -43,7 +43,7 @@
 //****************READ FILE FORMAT*************************
 //*********************************************************
 
-bool FileFormats::ReadSMBX64SavFileF(PGESTRING  filePath, GamesaveData &FileData)
+bool FileFormats::ReadSMBX64SavFileF(const PGESTRING &filePath, GamesaveData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
@@ -58,7 +58,7 @@ bool FileFormats::ReadSMBX64SavFileF(PGESTRING  filePath, GamesaveData &FileData
     return ReadSMBX64SavFile(file, FileData);
 }
 
-bool FileFormats::ReadSMBX64SavFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  GamesaveData &FileData)
+bool FileFormats::ReadSMBX64SavFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  GamesaveData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextInput file;

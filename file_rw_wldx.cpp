@@ -43,7 +43,7 @@
 //    return ReadExtendedWldFile( in.readAll(), inf.fileName() );
 //}
 
-bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileData)
+bool FileFormats::ReadExtendedWldFileHeader(const PGESTRING &filePath, WorldData &FileData)
 {
     CreateWorldHeader(FileData);
     FileData.meta.RecentFormat = LevelData::PGEX;
@@ -59,7 +59,7 @@ bool FileFormats::ReadExtendedWldFileHeader(PGESTRING filePath, WorldData &FileD
     return ReadExtendedWldFileHeaderT(inf, FileData);
 }
 
-bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData)
 {
     CreateWorldHeader(FileData);
     FileData.meta.RecentFormat = LevelData::PGEX;
@@ -228,7 +228,7 @@ badfile:
     return false;
 }
 
-bool FileFormats::ReadExtendedWldFileF(PGESTRING  filePath, WorldData &FileData)
+bool FileFormats::ReadExtendedWldFileF(const PGESTRING &filePath, WorldData &FileData)
 {
     PGE_FileFormats_misc::TextFileInput file;
     FileData.meta.ERROR_info.clear();
@@ -245,7 +245,7 @@ bool FileFormats::ReadExtendedWldFileF(PGESTRING  filePath, WorldData &FileData)
     return ReadExtendedWldFile(file, FileData);
 }
 
-bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  WorldData &FileData)
+bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  WorldData &FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
     FileData.meta.ERROR_info.clear();
@@ -327,7 +327,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 str_count++;
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
                 Bookmark meta_bookmark;
-                meta_bookmark.bookmarkName = "";
+                meta_bookmark.bookmarkName.clear();
                 meta_bookmark.x = 0;
                 meta_bookmark.y = 0;
                 PGEX_Values() //Look markers and values
@@ -515,7 +515,7 @@ badfile:    //If file format not corrects
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteExtendedWldFileF(PGESTRING filePath, WorldData &FileData)
+bool FileFormats::WriteExtendedWldFileF(const PGESTRING &filePath, WorldData &FileData)
 {
     PGE_FileFormats_misc::TextFileOutput file;
     FileData.meta.ERROR_info.clear();

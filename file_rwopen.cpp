@@ -32,7 +32,7 @@
 #include "file_formats.h"
 #include "pge_file_lib_private.h"
 
-bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
+bool FileFormats::OpenLevelFile(const PGESTRING &filePath, LevelData &FileData)
 {
     PGE_FileFormats_misc::TextFileInput file;
 
@@ -48,7 +48,7 @@ bool FileFormats::OpenLevelFile(PGESTRING filePath, LevelData &FileData)
     return OpenLevelFileT(file, FileData);
 }
 
-bool FileFormats::OpenLevelRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &FileData)
+bool FileFormats::OpenLevelRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
 
@@ -107,7 +107,7 @@ bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelDat
     return true;
 }
 
-bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData &data)
+bool FileFormats::OpenLevelFileHeader(const PGESTRING &filePath, LevelData &data)
 {
     PGE_FileFormats_misc::TextFileInput file;
     data.meta.ERROR_info.clear();
@@ -123,7 +123,7 @@ bool FileFormats::OpenLevelFileHeader(PGESTRING filePath, LevelData &data)
     return OpenLevelFileHeaderT(file, data);
 }
 
-bool FileFormats::OpenLevelFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, LevelData &data)
+bool FileFormats::OpenLevelFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &data)
 {
     PGE_FileFormats_misc::RawTextInput file;
     data.meta.ERROR_info.clear();
@@ -172,7 +172,7 @@ bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, Le
 }
 
 
-bool FileFormats::SaveLevelFile(LevelData &FileData, PGESTRING filePath, LevelFileFormat format, unsigned int FormatVersion)
+bool FileFormats::SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, LevelFileFormat format, unsigned int FormatVersion)
 {
     FileData.meta.ERROR_info.clear();
     switch(format)
@@ -259,7 +259,7 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
 
 
 
-bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
+bool FileFormats::OpenWorldFile(const PGESTRING &filePath, WorldData &data)
 {
     PGE_FileFormats_misc::TextFileInput file;
 
@@ -275,7 +275,7 @@ bool FileFormats::OpenWorldFile(PGESTRING filePath, WorldData &data)
     return OpenWorldFileT(file, data);
 }
 
-bool FileFormats::OpenWorldRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+bool FileFormats::OpenWorldRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
 
@@ -335,7 +335,7 @@ bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldDat
     return true;
 }
 
-bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
+bool FileFormats::OpenWorldFileHeader(const PGESTRING &filePath, WorldData &data)
 {
     PGE_FileFormats_misc::TextFileInput file;
     data.meta.ERROR_info.clear();
@@ -352,7 +352,7 @@ bool FileFormats::OpenWorldFileHeader(PGESTRING filePath, WorldData &data)
     return OpenWorldFileHeaderT(file, data);
 }
 
-bool FileFormats::OpenWorldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &data)
+bool FileFormats::OpenWorldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &data)
 {
     PGE_FileFormats_misc::RawTextInput file;
     data.meta.ERROR_info.clear();
@@ -401,7 +401,7 @@ bool FileFormats::OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, Wo
     }
 }
 
-bool FileFormats::SaveWorldFile(WorldData &FileData, PGESTRING filePath, FileFormats::WorldFileFormat format, unsigned int FormatVersion)
+bool FileFormats::SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, FileFormats::WorldFileFormat format, unsigned int FormatVersion)
 {
     FileData.meta.ERROR_info.clear();
     switch(format)

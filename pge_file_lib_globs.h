@@ -69,6 +69,7 @@
 #include <QString>
 #include <QStringList>
 #include <QList>
+#include <QVector>
 #include <QPair>
 #include <QFile>
 #include <QMap>
@@ -80,6 +81,7 @@ typedef QString PGESTRING;
 typedef QStringList PGESTRINGList;
 typedef QChar   PGEChar;
 #define PGELIST QList
+#define PGEVECTOR QVector
 #define PGEPAIR QPair
 #define PGEMAP QMap
 #define PGEMAPKEY(it) (it.key())
@@ -99,6 +101,7 @@ typedef std::string                 PGESTRING;
 typedef std::vector<std::string>    PGESTRINGList;
 typedef char PGEChar;
 #define PGELIST std::vector
+#define PGEVECTOR std::vector
 #define PGEPAIR std::pair
 #define PGEMAP std::map
 #define PGEMAPKEY(it) (it->first)
@@ -132,12 +135,12 @@ public:
      * \brief Constructor with pre-opening of a file
      * \param filepath relative or absolute file path
      */
-    FileInfo(PGESTRING filepath);
+    FileInfo(const PGESTRING &filepath);
     /*!
      * \brief Sets file which will be used to calculate file information
      * \param filepath
      */
-    void setFile(PGESTRING filepath);
+    void setFile(const PGESTRING &filepath);
     /*!
      * \brief Returns file extension (last part of filename after last dot)
      * \return file suffix or name extension (last part of filename after last dot)
@@ -217,7 +220,7 @@ public:
     virtual int64_t tell();
     virtual int seek(int64_t pos, positions relativeTo);
     virtual PGESTRING getFilePath();
-    virtual void setFilePath(PGESTRING path);
+    virtual void setFilePath(const PGESTRING &path);
     virtual long getCurrentLineNumber();
     virtual bool reOpen(bool utf8);
 
@@ -254,7 +257,7 @@ public:
     virtual int64_t tell();
     virtual int seek(int64_t pos, positions relativeTo);
     virtual PGESTRING getFilePath();
-    virtual void setFilePath(PGESTRING path);
+    virtual void setFilePath(const PGESTRING &path);
     virtual long getCurrentLineNumber();
     TextOutput &operator<<(const PGESTRING &s);
     TextOutput &operator<<(const char *s);
@@ -269,9 +272,9 @@ class RawTextInput: public TextInput
 {
 public:
     RawTextInput();
-    RawTextInput(PGESTRING *rawString, PGESTRING filepath = "");
+    RawTextInput(PGESTRING *rawString, const PGESTRING &filepath = PGESTRING());
     virtual ~RawTextInput();
-    bool open(PGESTRING *rawString, PGESTRING filepath = "");
+    bool open(PGESTRING *rawString, const PGESTRING &filepath = PGESTRING());
     void close();
     virtual PGESTRING read(int64_t len);
     virtual PGESTRING readLine();

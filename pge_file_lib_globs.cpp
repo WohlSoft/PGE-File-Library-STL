@@ -535,7 +535,7 @@ PGESTRING TextInput::getFilePath()
 {
     return m_filePath;
 }
-void TextInput::setFilePath(PGESTRING path)
+void TextInput::setFilePath(const PGESTRING &path)
 {
     m_filePath = path;
 }
@@ -569,7 +569,7 @@ PGESTRING TextOutput::getFilePath()
 {
     return m_filePath;
 }
-void TextOutput::setFilePath(PGESTRING path)
+void TextOutput::setFilePath(const PGESTRING &path)
 {
     m_filePath = path;
 }
@@ -583,7 +583,11 @@ long TextOutput::getCurrentLineNumber()
 /*****************RAW TEXT I/O CLASS***************************/
 RawTextInput::RawTextInput() : TextInput(), m_pos(0), m_data(nullptr), m_isEOF(true) {}
 
-RawTextInput::RawTextInput(PGESTRING *rawString, PGESTRING filepath) : TextInput(), m_pos(0), m_data(nullptr), m_isEOF(true)
+RawTextInput::RawTextInput(PGESTRING *rawString, const PGESTRING &filepath) :
+    TextInput(),
+    m_pos(0),
+    m_data(nullptr),
+    m_isEOF(true)
 {
     if(!open(rawString, filepath))
         m_data = nullptr;
@@ -591,7 +595,7 @@ RawTextInput::RawTextInput(PGESTRING *rawString, PGESTRING filepath) : TextInput
 
 RawTextInput::~RawTextInput() {}
 
-bool RawTextInput::open(PGESTRING *rawString, PGESTRING filepath)
+bool RawTextInput::open(PGESTRING *rawString, const PGESTRING &filepath)
 {
     if(!rawString)
         return false;
@@ -1214,8 +1218,7 @@ int TextFileOutput::write(PGESTRING buffer)
             {
                 //Force writing CRLF to prevent fakse damage of file on SMBX in Windows
                 static const char bytes[2] = {0x0D, 0x0A};
-                size_t bytesNum = 2;
-                bytesNum = fwrite(&bytes, 1, 2, stream);
+                size_t bytesNum = fwrite(&bytes, 1, 2, stream);
                 if(bytesNum == 0)
                     return -1;
                 writtenBytes += bytesNum;
@@ -1287,15 +1290,14 @@ int TextFileOutput::seek(int64_t pos, TextOutput::positions relativeTo)
 
 
 
-FileInfo::FileInfo()
-{}
+FileInfo::FileInfo() = default;
 
-FileInfo::FileInfo(PGESTRING filepath)
+FileInfo::FileInfo(const PGESTRING &filepath)
 {
     setFile(filepath);
 }
 
-void FileInfo::setFile(PGESTRING filepath)
+void FileInfo::setFile(const PGESTRING &filepath)
 {
     m_filePath = filepath;
     rebuildData();
@@ -1346,7 +1348,7 @@ void FileInfo::rebuildData()
 #elif defined(__3DS__) || defined(VITA)
     // all paths are absolute on 3DS
 #elif !defined(_WIN32)
-    char *rez = NULL;
+    char *rez = nullptr;
     char buf[PATH_MAXLEN + 1];
     rez = realpath(m_filePath.c_str(), buf);
     if(rez)

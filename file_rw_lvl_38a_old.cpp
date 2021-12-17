@@ -526,7 +526,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 //    layer=layer name["" == "Default"][***urlencode!***]
                 case 1:
                 {
-                    bgodata.layer = (cLine == "" ? "Default" : PGE_URLDEC(cLine));
+                    bgodata.layer = (IsEmpty(cLine) ? "Default" : PGE_URLDEC(cLine));
                 }
                 break;
 
@@ -577,7 +577,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 //layer=layer name["" == "Default"][***urlencode!***]
                 case 1:
                 {
-                    npcdata.layer = (cLine == "" ? "Default" : PGE_URLDEC(cLine));
+                    npcdata.layer = (IsEmpty(cLine) ? "Default" : PGE_URLDEC(cLine));
                 }
                 break;
 
@@ -633,12 +633,12 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
 
                         //b2=friendly npc
                         case 1:
-                            npcdata.friendly = ((dLine != "") && (dLine != "0"));
+                            npcdata.friendly = ((!IsEmpty(dLine)) && (dLine != "0"));
                             break;
 
                         //b3=don't move npc
                         case 2:
-                            npcdata.nomove = ((dLine != "") && (dLine != "0"));
+                            npcdata.nomove = ((!IsEmpty(dLine)) && (dLine != "0"));
                             break;
 
                         //b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300]
@@ -657,6 +657,10 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
 
                             switch(contID)
                             {
+                            default: // UNEXPECTED
+                                npcdata.id = 0;
+                                break;
+
                             case 1:
                                 npcdata.id = 91;
                                 break;
@@ -856,7 +860,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                                     break;
 
                                 case 1:
-                                    npcdata.generator_type   = LevelNPC::NPC_GENERATOR_WARP;
+                                    npcdata.generator_type   = LevelNPC::NPC_GENERATOR_WARP; //-V1048
                                     break;
 
                                 case 4:
@@ -933,7 +937,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 //    layer=layer name["" == "Default"][***urlencode!***]
                 case 1:
                 {
-                    waters.layer = (cLine == "" ? "Default" : PGE_URLDEC(cLine));
+                    waters.layer = (IsEmpty(cLine) ? "Default" : PGE_URLDEC(cLine));
                 }
                 break;
 
@@ -1038,7 +1042,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                             if(!SMBX64::IsFloat(dLine))
                                 goto badfile;
-                            else waters.accel = toFloat(dLine);
+                            else waters.max_velocity = toFloat(dLine);
                         }
                         break;
                         }
@@ -1071,7 +1075,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                 {
                 case 1:
                 {
-                    doordata.layer = (cLine == "" ? "Default" : PGE_URLDEC(cLine));
+                    doordata.layer = (IsEmpty(cLine) ? "Default" : PGE_URLDEC(cLine));
                 }
                 break;
 
@@ -1463,8 +1467,8 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                             PGESTRINGList showlayers;
                             old38a_SplitCSVStr(showlayers, dLine);
 
-                            for(int k = 0; k < (signed)showlayers.size(); k++)
-                                eventdata.layers_show.push_back(PGE_URLDEC(showlayers[k]));
+                            for(auto &showlayer : showlayers)
+                                eventdata.layers_show.push_back(PGE_URLDEC(showlayer));
                         }
                         break;
 
@@ -1474,8 +1478,8 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                             PGESTRINGList hidelayers;
                             old38a_SplitCSVStr(hidelayers, dLine);
 
-                            for(int k = 0; k < (signed)hidelayers.size(); k++)
-                                eventdata.layers_hide.push_back(PGE_URLDEC(hidelayers[k]));
+                            for(auto &hidelayer : hidelayers)
+                                eventdata.layers_hide.push_back(PGE_URLDEC(hidelayer));
                         }
                         break;
 
@@ -1485,8 +1489,8 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                             PGESTRINGList togglelayers;
                             old38a_SplitCSVStr(togglelayers, dLine);
 
-                            for(int k = 0; k < (signed)togglelayers.size(); k++)
-                                eventdata.layers_toggle.push_back(PGE_URLDEC(togglelayers[k]));
+                            for(auto &togglelayer : togglelayers)
+                                eventdata.layers_toggle.push_back(PGE_URLDEC(togglelayer));
                         }
                         break;
                         }
@@ -1504,10 +1508,9 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                     PGESTRINGList EvMvLayers;
                     SMBX38A_SplitSubLine(EvMvLayers, cLine);
 
-                    for(int j = 0; j < (signed)EvMvLayers.size(); j++)
+                    for(auto & dLine : EvMvLayers)
                     {
                         LevelEvent_MoveLayer ml;
-                        PGESTRING &dLine = EvMvLayers[j];
                         PGESTRINGList movelayers;
                         old38a_SplitCSVStr(movelayers, dLine);
 

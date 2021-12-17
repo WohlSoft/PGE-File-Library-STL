@@ -37,7 +37,7 @@
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
-bool FileFormats::ReadExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileData)
+bool FileFormats::ReadExtendedSaveFileF(const PGESTRING &filePath, GamesaveData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
@@ -54,7 +54,7 @@ bool FileFormats::ReadExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileDa
     return ReadExtendedSaveFile(file, FileData);
 }
 
-bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, PGESTRING filePath, GamesaveData &FileData)
+bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, GamesaveData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextInput file;
@@ -285,7 +285,7 @@ badfile:    //If file format not corrects
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteExtendedSaveFileF(PGESTRING filePath, GamesaveData &FileData)
+bool FileFormats::WriteExtendedSaveFileF(const PGESTRING &filePath, GamesaveData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileOutput file;

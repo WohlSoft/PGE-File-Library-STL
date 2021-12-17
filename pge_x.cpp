@@ -44,13 +44,17 @@ namespace PGEExtendedFormat
         return ((c >= '0') && (c <= '9'));
     }
 
-    bool isValid(PGESTRING &s, const char *valid_chars, const pge_size_t &valid_chars_len)
+    bool isValid(const PGESTRING &s, const char *valid_chars, const pge_size_t &valid_chars_len)
     {
-        if(IsEmpty(s)) return false;
+        if(IsEmpty(s))
+            return false;
+
         pge_size_t i, j;
+
         for(i = 0; i < s.size(); i++)
         {
             bool found = false;
+
             for(j = 0; j < valid_chars_len; j++)
             {
                 if(PGEGetChar(s[i]) == valid_chars[j])
@@ -59,7 +63,9 @@ namespace PGEExtendedFormat
                     break;
                 }
             }
-            if(!found) return false;
+
+            if(!found)
+                return false;
         }
         return true;
     }
@@ -81,7 +87,7 @@ PGEFile::PGEFile()
 PGEFile::PGEFile(const PGEFile &pgeFile, QObject *parent)
     : QObject(parent)
 #else
-PGEFile::PGEFile(const PGEFile & pgeFile)
+PGEFile::PGEFile(const PGEFile &pgeFile)
 #endif
 {
     m_rawData = pgeFile.m_rawData;
@@ -89,11 +95,9 @@ PGEFile::PGEFile(const PGEFile & pgeFile)
     m_lastError = pgeFile.m_lastError;
 }
 
-PGEFile::PGEFile(const PGESTRING &_rawData)
-{
-    m_rawData = _rawData;
-    m_lastError = "";
-}
+PGEFile::PGEFile(const PGESTRING &_rawData) :
+    m_rawData(_rawData)
+{}
 
 PGESTRING PGEFile::removeQuotes(PGESTRING str)
 {
@@ -344,15 +348,15 @@ PGESTRING PGEFile::lastError()
 }
 
 
-bool PGEFile::IsSectionTitle(PGESTRING in)
+bool PGEFile::IsSectionTitle(const PGESTRING &in)
 {
     for(pge_size_t i = 0; i < in.size(); i++)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         char cc = in[i].toLatin1();
-        #else
-        char &cc = in[i];
-        #endif
+#else
+        const char &cc = in[i];
+#endif
         if(
             ((cc < 'A') || (cc > 'Z')) &&
             ((cc < '0') || (cc > '9')) &&
@@ -365,7 +369,7 @@ bool PGEFile::IsSectionTitle(PGESTRING in)
 
 
 //validatos
-bool PGEFile::IsQoutedString(PGESTRING in) // QUOTED STRING
+bool PGEFile::IsQoutedString(const PGESTRING &in) // QUOTED STRING
 {
     //return QRegExp("^\"(?:[^\"\\\\]|\\\\.)*\"$").exactMatch(in);
     pge_size_t i = 0;
@@ -401,55 +405,60 @@ bool PGEFile::IsQoutedString(PGESTRING in) // QUOTED STRING
     return true;
 }
 
-bool PGEFile::IsHex(PGESTRING in) // Heximal string
+bool PGEFile::IsHex(const PGESTRING &in) // Heximal string
 {
     using namespace PGEExtendedFormat;
     return isValid(in, heximal_valid_chars, heximal_valid_chars_len);
 }
 
-bool PGEFile::IsBool(PGESTRING in) // Boolean
+bool PGEFile::IsBool(const PGESTRING &in) // Boolean
 {
     if((in.size() != 1) || (IsEmpty(in)))
         return false;
     return ((PGEGetChar(in[0]) == '1') || (PGEGetChar(in[0]) == '0'));
 }
 
-bool PGEFile::IsIntU(PGESTRING in) // Unsigned Int
+bool PGEFile::IsIntU(const PGESTRING &in) // Unsigned Int
 {
     using namespace PGEExtendedFormat;
-    #ifdef PGE_FILES_QT
-    PGEChar *data = in.data();
-    #else
-    PGEChar *data = (char *)in.data();
-    #endif
+#ifdef PGE_FILES_QT
+    const PGEChar *data = in.data();
+#else
+    const PGEChar *data = in.data();
+#endif
     pge_size_t strSize = in.size();
+
     for(pge_size_t i = 0; i < strSize; i++)
     {
         PGEChar c = *data++;
         if((c < '0') || (c > '9')) return false;
     }
+
     return true;
 }
 
-bool PGEFile::IsIntS(PGESTRING in) // Signed Int
+bool PGEFile::IsIntS(const PGESTRING &in) // Signed Int
 {
     using namespace PGEExtendedFormat;
 
-    if(IsEmpty(in)) return false;
+    if(IsEmpty(in))
+        return false;
 
     if((in.size() == 1) && (!isDegit(in[0])))           return false;
     if((!isDegit(in[0])) && (PGEGetChar(in[0]) != '-')) return false;
 
-    #ifdef PGE_FILES_QT
-    PGEChar *data = in.data() + 1;
-    #else
-    PGEChar *data = (char *)in.data() + 1;
-    #endif
+#ifdef PGE_FILES_QT
+    const PGEChar *data = in.data() + 1;
+#else
+    const PGEChar *data = in.data() + 1;
+#endif
+
     pge_size_t strSize = in.size();
     for(pge_size_t i = 1; i < strSize; i++)
     {
         PGEChar c = *data++;
-        if((c < '0') || (c > '9')) return false;
+        if((c < '0') || (c > '9'))
+            return false;
     }
 
     return true;
@@ -476,7 +485,7 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
         {
             if((PGEGetChar(in[i]) == '.') || (PGEGetChar(in[i]) == ','))
             {
-                in[i] = '.'; //replace comma with a dot
+                in[i] = '.'; //replace comma with a dot.empty()
                 decimal = true;
                 if(i == (in.size() - 1))
                     return false;
@@ -511,25 +520,25 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
     return true;
 }
 
-bool PGEFile::IsBoolArray(PGESTRING in) // Boolean array
+bool PGEFile::IsBoolArray(const PGESTRING &in) // Boolean array
 {
     using namespace PGEExtendedFormat;
     return isValid(in, "01", 2);
 }
 
-bool PGEFile::IsIntArray(PGESTRING in) // Boolean array
+bool PGEFile::IsIntArray(const PGESTRING &in) // Boolean array
 {
     using namespace PGEExtendedFormat;
-    #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
     return QRegExp("^\\[(\\-?\\d+,?)*\\]$").exactMatch(in);
-    #else
+#else
     //FIXME
     std::regex rx("^\\[(\\-?\\d+,?)*\\]$");
     return std::regex_match(in, rx);
-    #endif
+#endif
 }
 
-bool PGEFile::IsStringArray(PGESTRING in) // String array
+bool PGEFile::IsStringArray(const PGESTRING &in) // String array
 {
     bool valid = true;
     pge_size_t i = 0, depth = 0, comma = 0;
@@ -713,10 +722,12 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(PGESTRING src_data, bool *_valid)
         STATE_VALUE = 1,
         STATE_ERROR = 2
     };
+
     pge_size_t state = 0, size = src_data.size(), tail = src_data.size() - 1;
     PGESTRING marker;
     PGESTRING value;
     int escape = 0;
+
     for(pge_size_t i = 0; i < size; i++)
     {
         if(state == STATE_ERROR)
@@ -724,18 +735,25 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(PGESTRING src_data, bool *_valid)
             valid = false;
             break;
         }
+
         PGEChar c = src_data[i];
         if(escape > 0)
         {
             escape--;
         }
+
         if((c == '\\') && (escape == 0))
         {
             //Skip escape sequence
             escape = 2;
         }
+
         switch(state)
         {
+        default:
+            abort(); // unexpected behavior!
+            break;
+
         case STATE_MARKER:
             if((c == ';') && (escape == 0))
             {
@@ -749,6 +767,7 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(PGESTRING src_data, bool *_valid)
             }
             marker.push_back(c);
             break;
+
         case STATE_VALUE:
             if((c == ':') && (escape == 0))
             {
@@ -773,20 +792,24 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(PGESTRING src_data, bool *_valid)
             //break;
         }
     }
-    if(_valid) * _valid = valid;
+
+    if(_valid)
+        *_valid = valid;
+
     return entryData;
 }
 
-PGESTRING PGEFile::hStrS(PGESTRING input)
+PGESTRING PGEFile::hStrS(const PGESTRING &input)
 {
     return PGEGetChar(input);
 }
 
-PGESTRING PGEFile::WriteStrArr(PGESTRINGList &input)
+PGESTRING PGEFile::WriteStrArr(const PGESTRINGList &input)
 {
     PGESTRING output;
     if(IsEmpty(input))
-        return PGESTRING("");
+        return PGESTRING();
+
     output.append("[");
     for(pge_size_t i = 0; i < input.size(); i++)
     {
@@ -794,42 +817,47 @@ PGESTRING PGEFile::WriteStrArr(PGESTRINGList &input)
         output.append(i < input.size() - 1 ? "," : "");
     }
     output.append("]");
+
     return output;
 }
 
-PGESTRING PGEFile::WriteIntArr(PGELIST<int> input)
+PGESTRING PGEFile::WriteIntArr(const PGELIST<int> &input)
 {
     PGESTRING output;
-    if(input.empty()) return PGESTRING("");
+    if(input.empty())
+        return PGESTRING();
+
     output.append("[");
     for(pge_size_t i = 0; i < input.size(); i++)
     {
         output.append(fromNum(input[i]) + (i < input.size() - 1 ? "," : ""));
     }
     output.append("]");
+
     return output;
 }
 
-PGESTRING PGEFile::WriteIntArr(PGELIST<long> input)
+PGESTRING PGEFile::WriteIntArr(const PGELIST<long> &input)
 {
     PGESTRING output;
-    if(input.empty()) return PGESTRING("");
+    if(input.empty())
+        return PGESTRING();
+
     output.append("[");
     for(pge_size_t i = 0; i < input.size(); i++)
     {
         output.append(fromNum(input[i]) + (i < input.size() - 1 ? "," : ""));
     }
     output.append("]");
+
     return output;
 }
 
-PGESTRING PGEFile::WriteBoolArr(PGELIST<bool> input)
+PGESTRING PGEFile::WriteBoolArr(const PGELIST<bool> &input)
 {
     PGESTRING output;
-    for(pge_size_t i = 0; i < input.size(); i++)
-    {
-        output.append(input[i] ? "1" : "0");
-    }
+    for(bool i : input)
+        output.append(i ? "1" : "0");
     return output;
 }
 

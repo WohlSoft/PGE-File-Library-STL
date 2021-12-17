@@ -49,21 +49,21 @@ GamesaveData FileFormats::CreateGameSaveData()
 {
     GamesaveData newData;
 
-    newData.meta.RecentFormatVersion = 0;
-
     newData.lives = 3;
-    newData.coins = 0;
-    newData.points = 0;
-    newData.totalStars = 0;
 
-    newData.last_hub_warp = 0;
-
-    newData.musicID = 0;
-    newData.musicFile = "";
-
-    newData.worldPosX = 0;
-    newData.worldPosY = 0;
-    newData.gameCompleted = false;
+//    newData.meta.RecentFormatVersion = 0;
+//    newData.coins = 0;
+//    newData.points = 0;
+//    newData.totalStars = 0;
+//
+//    newData.last_hub_warp = 0;
+//
+//    newData.musicID = 0;
+//    newData.musicFile = "";
+//
+//    newData.worldPosX = 0;
+//    newData.worldPosY = 0;
+//    newData.gameCompleted = false;
 
     newData.characterStates.push_back(CreateSavCharacterState());
     newData.currentCharacter.push_back(1);

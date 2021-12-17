@@ -33,7 +33,7 @@
 //****************READ FILE FORMAT*************************
 //*********************************************************
 
-bool FileFormats::ReadNonSMBX64MetaDataF(PGESTRING filePath, MetaData &FileData)
+bool FileFormats::ReadNonSMBX64MetaDataF(const PGESTRING &filePath, MetaData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
@@ -50,7 +50,7 @@ bool FileFormats::ReadNonSMBX64MetaDataF(PGESTRING filePath, MetaData &FileData)
     return ReadNonSMBX64MetaDataFile(file, FileData);
 }
 
-bool FileFormats::ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, PGESTRING filePath, MetaData &FileData)
+bool FileFormats::ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, const PGESTRING &filePath, MetaData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextInput file;
@@ -105,13 +105,12 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
 
                 PGEFile::PGEX_Item x = f_section.data[sdata];
                 Bookmark meta_bookmark;
-                meta_bookmark.bookmarkName = "";
+                meta_bookmark.bookmarkName.clear();
                 meta_bookmark.x = 0;
                 meta_bookmark.y = 0;
 
-                for(pge_size_t sval = 0; sval < x.values.size(); sval++) //Look markers and values
+                for(const auto &v : x.values) //Look markers and values
                 {
-                    PGEFile::PGEX_Val v = x.values[sval];
                     errorString = PGESTRING("Wrong value syntax\nSection [") +
                                   f_section.name + "]\nData line " +
                                   fromNum(sdata) + "\nMarker " +
@@ -150,6 +149,7 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
     errorString.clear(); //If no errors, clear string;
     FileData.meta.ReadFileValid = true;
     return true;
+
 badfile:    //If file format is not correct
     //BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
     FileData.meta.ERROR_info = errorString;
@@ -169,7 +169,7 @@ badfile:    //If file format is not correct
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteNonSMBX64MetaDataF(PGESTRING filePath, MetaData &metaData)
+bool FileFormats::WriteNonSMBX64MetaDataF(const PGESTRING &filePath, MetaData &metaData)
 {
     metaData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileOutput file;

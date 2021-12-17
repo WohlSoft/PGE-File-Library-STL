@@ -33,7 +33,7 @@
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
-bool FileFormats::ReadNpcTXTFileF(PGESTRING filePath, NPCConfigFile &FileData, bool IgnoreBad)
+bool FileFormats::ReadNpcTXTFileF(const PGESTRING &filePath, NPCConfigFile &FileData, bool IgnoreBad)
 {
     FileData.errorString.clear();
     PGE_FileFormats_misc::TextFileInput file;
@@ -61,22 +61,22 @@ bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData,
 
 
 
-static inline PGESTRING invalidLine_SINT(long line, PGESTRING data)
+static inline PGESTRING invalidLine_SINT(long line, const PGESTRING &data)
 {
     return fromNum(line) + ": " + data + " <Should be signed intger number!>\n";
 }
 
-static inline PGESTRING invalidLine_UINT(long line, PGESTRING data)
+static inline PGESTRING invalidLine_UINT(long line, const PGESTRING &data)
 {
     return fromNum(line) + ": " + data + " <Should be unsigned intger number!>\n";
 }
 
-static inline PGESTRING invalidLine_FLT(long line, PGESTRING data)
+static inline PGESTRING invalidLine_FLT(long line, const PGESTRING &data)
 {
     return fromNum(line) + ": " + data + " <Should be floating point number!>\n";
 }
 
-static inline PGESTRING invalidLine_BOOL(long line, PGESTRING data)
+static inline PGESTRING invalidLine_BOOL(long line, const PGESTRING &data)
 {
     return fromNum(line) + ": " + data + " <Should be 1 or 0!>\n";
 }
@@ -255,8 +255,8 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
                 fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
             continue;
         }
-        params.push_back(line.substr(0, splitSign));
-        params.push_back(line.substr(splitSign + 1, std::string::npos));
+        params.emplace_back(line.substr(0, splitSign));
+        params.emplace_back(line.substr(splitSign + 1, std::string::npos));
 #endif
 
 // Note: This whole condition is always false
@@ -275,7 +275,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
 
         params[1] = PGESTR_Trim(params[1]); // Trim it!
 
-        NpcCfgHandlerMap::iterator hand = paramsHandler.find(params[0]);
+        auto hand = paramsHandler.find(params[0]);
         if(hand != paramsHandler.end())
         {
             PGEMAPVAL(hand)(params[1]);
@@ -300,7 +300,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
 //*********************************************************
 //****************WRITE FILE*******************************
 //*********************************************************
-bool FileFormats::WriteNPCTxtFileF(PGESTRING filePath, NPCConfigFile &FileData)
+bool FileFormats::WriteNPCTxtFileF(const PGESTRING &filePath, NPCConfigFile &FileData)
 {
     PGE_FileFormats_misc::TextFileOutput file;
     FileData.errorString.clear();
@@ -416,7 +416,7 @@ bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConf
         out << "gridalign=" + fromNum(fileData.gridalign) + "\n";
 
     // Custom values
-    for(NPCConfigFile::EntriesMap::iterator it = fileData.entries.begin(); it != fileData.entries.end(); ++it)
+    for(auto it = fileData.entries.begin(); it != fileData.entries.end(); ++it)
     {
         out << PGEMAPKEY(it) << "=" << PGEMAPVAL(it) + "\n";
     }

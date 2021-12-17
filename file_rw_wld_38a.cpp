@@ -35,7 +35,7 @@
 //****************READ FILE FORMAT*************************
 //*********************************************************
 
-bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileData)
+bool FileFormats::ReadSMBX38AWldFileHeader(const PGESTRING &filePath, WorldData& FileData)
 {
     FileData.meta.ERROR_info.clear();
     CreateWorldHeader(FileData);
@@ -51,7 +51,7 @@ bool FileFormats::ReadSMBX38AWldFileHeader(PGESTRING filePath, WorldData& FileDa
     return ReadSMBX38AWldFileHeaderT(inf, FileData);
 }
 
-bool FileFormats::ReadSMBX38AWldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+bool FileFormats::ReadSMBX38AWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     CreateWorldHeader(FileData);
@@ -223,7 +223,7 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
 #endif
 }
 
-bool FileFormats::ReadSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
+bool FileFormats::ReadSMBX38AWldFileF(const PGESTRING &filePath, WorldData& FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
@@ -240,7 +240,7 @@ bool FileFormats::ReadSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
     return ReadSMBX38AWldFile(file, FileData);
 }
 
-bool FileFormats::ReadSMBX38AWldFileRaw(PGESTRING& rawdata, PGESTRING filePath, WorldData& FileData)
+bool FileFormats::ReadSMBX38AWldFileRaw(PGESTRING& rawdata, const PGESTRING &filePath, WorldData& FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
     FileData.meta.ERROR_info.clear();
@@ -841,7 +841,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteSMBX38AWldFileF(PGESTRING filePath, WorldData& FileData)
+bool FileFormats::WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData& FileData)
 {
     PGE_FileFormats_misc::TextFileOutput file;
     FileData.meta.ERROR_info.clear();

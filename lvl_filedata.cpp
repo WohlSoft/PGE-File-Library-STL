@@ -50,15 +50,15 @@ static const int _smbx64_bgo_sort_priorities[190] =
 void FileFormats::smbx64LevelPrepare(LevelData &lvl)
 {
     //Set SMBX64 specific option to BGO
-    for(pge_size_t q = 0; q < lvl.bgo.size(); q++)
+    for(auto &bgo : lvl.bgo)
     {
-        if(lvl.bgo[q].smbx64_sp < 0)
+        if(bgo.smbx64_sp < 0)
         {
-            if((lvl.bgo[q].id > 0u) && (lvl.bgo[q].id <= 190u))
-                lvl.bgo[q].smbx64_sp_apply = _smbx64_bgo_sort_priorities[lvl.bgo[q].id - 1];
+            if((bgo.id > 0u) && (bgo.id <= 190u))
+                bgo.smbx64_sp_apply = _smbx64_bgo_sort_priorities[bgo.id - 1];
         }
         else
-            lvl.bgo[q].smbx64_sp_apply = lvl.bgo[q].smbx64_sp;
+            bgo.smbx64_sp_apply = bgo.smbx64_sp;
     }
 
     //Mark & Count Stars
@@ -296,70 +296,62 @@ LevelSMBX64Event FileFormats::CreateLvlEvent()
 {
     LevelSMBX64Event dummyEvent;
 
-    dummyEvent.name = "";
-    dummyEvent.msg = "";
-    dummyEvent.sound_id = 0;
-    dummyEvent.end_game = 0;
-    dummyEvent.trigger = "";
-    dummyEvent.trigger_timer = 0;
-    dummyEvent.nosmoke = false;
-    dummyEvent.ctrls_enable = false;
-    dummyEvent.ctrl_altjump = false;
-    dummyEvent.ctrl_altrun = false;
-    dummyEvent.ctrl_down = false;
-    dummyEvent.ctrl_drop = false;
-    dummyEvent.ctrl_jump = false;
-    dummyEvent.ctrl_left = false;
-    dummyEvent.ctrl_right = false;
-    dummyEvent.ctrl_run = false;
-    dummyEvent.ctrl_start = false;
-    dummyEvent.ctrl_up = false;
-    dummyEvent.ctrl_lock_keyboard = false;
-    dummyEvent.autostart = LevelSMBX64Event::AUTO_None;
-    dummyEvent.autostart_condition = "";
-    dummyEvent.movelayer = "";
-    dummyEvent.layer_speed_x = 0.0;
-    dummyEvent.layer_speed_y = 0.0;
-    dummyEvent.move_camera_x = 0.0;
-    dummyEvent.move_camera_y = 0.0;
-    dummyEvent.scroll_section = 0;
-    dummyEvent.trigger_api_id = 0;
-    dummyEvent.layers_hide.clear();
-    dummyEvent.layers_show.clear();
-    dummyEvent.layers_toggle.clear();
-
-    LevelEvent_Sets events_sets;
-    dummyEvent.sets.clear();
+    // !! The rest of fields were initialized by constructor !!
+//    dummyEvent.name = "";
+//    dummyEvent.msg = "";
+//    dummyEvent.sound_id = 0;
+//    dummyEvent.end_game = 0;
+//    dummyEvent.trigger = "";
+//    dummyEvent.trigger_timer = 0;
+//    dummyEvent.nosmoke = false;
+//    dummyEvent.ctrls_enable = false;
+//    dummyEvent.ctrl_altjump = false;
+//    dummyEvent.ctrl_altrun = false;
+//    dummyEvent.ctrl_down = false;
+//    dummyEvent.ctrl_drop = false;
+//    dummyEvent.ctrl_jump = false;
+//    dummyEvent.ctrl_left = false;
+//    dummyEvent.ctrl_right = false;
+//    dummyEvent.ctrl_run = false;
+//    dummyEvent.ctrl_start = false;
+//    dummyEvent.ctrl_up = false;
+//    dummyEvent.ctrl_lock_keyboard = false;
+//    dummyEvent.autostart = LevelSMBX64Event::AUTO_None;
+//    dummyEvent.autostart_condition = "";
+//    dummyEvent.movelayer = "";
+//    dummyEvent.layer_speed_x = 0.0;
+//    dummyEvent.layer_speed_y = 0.0;
+//    dummyEvent.move_camera_x = 0.0;
+//    dummyEvent.move_camera_y = 0.0;
+//    dummyEvent.scroll_section = 0;
+//    dummyEvent.trigger_api_id = 0;
+//    dummyEvent.layers_hide.clear();
+//    dummyEvent.layers_show.clear();
+//    dummyEvent.layers_toggle.clear();
+#ifdef PGE_FILES_QT
     for(int j = 0; j < 21; j++)
-    {
-        events_sets.id = j;
-        events_sets.music_id = -1;
-        events_sets.background_id = -1;
-        events_sets.position_left = -1;
-        events_sets.position_top = 0;
-        events_sets.position_bottom = 0;
-        events_sets.position_right = 0;
-        dummyEvent.sets.push_back(events_sets);
-    }
+        dummyEvent.sets.push_back(LevelEvent_Sets());
+#else
+    dummyEvent.sets.resize(21, LevelEvent_Sets());
+#endif
+    for(int j = 0; j < 21; j++)
+        dummyEvent.sets[j].id = j;
 
     return dummyEvent;
 }
 
-LevelVariable FileFormats::CreateLvlVariable(PGESTRING vname)
+LevelVariable FileFormats::CreateLvlVariable(const PGESTRING &vname)
 {
     LevelVariable var;
     var.name = vname;
-    var.value = "";
-    var.is_global = false;
     return var;
 }
 
-LevelScript FileFormats::CreateLvlScript(PGESTRING name, int lang)
+LevelScript FileFormats::CreateLvlScript(const PGESTRING &name, int lang)
 {
     LevelScript scr;
     scr.language = lang;
     scr.name = name;
-    scr.script = "";
     return scr;
 }
 
@@ -402,9 +394,8 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
     //Append system layers if not exist
     bool def = false, desb = false, spawned = false;
 
-    for(pge_size_t lrID = 0; lrID < FileData.layers.size(); lrID++)
+    for(auto &lr : FileData.layers)
     {
-        LevelLayer &lr = FileData.layers[lrID];
         if(lr.name == "Default") def = true;
         else if(lr.name == "Destroyed Blocks") desb = true;
         else if(lr.name == "Spawned NPCs") spawned = true;
@@ -416,12 +407,14 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
         layers.name = "Default";
         FileData.layers.push_back(layers);
     }
+
     if(!desb)
     {
         layers.hidden = true;
         layers.name = "Destroyed Blocks";
         FileData.layers.push_back(layers);
     }
+
     if(!spawned)
     {
         layers.hidden = false;
@@ -434,9 +427,8 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
     //P Switch - Start
     //P Switch - End
     bool lstart = false, pstart = false, pend = false;
-    for(pge_size_t evID = 0; evID < FileData.events.size(); evID++)
+    for(auto &ev : FileData.events)
     {
-        LevelSMBX64Event &ev = FileData.events[evID];
         if(ev.name == "Level - Start") lstart = true;
         else if(ev.name == "P Switch - Start") pstart = true;
         else if(ev.name == "P Switch - End") pend = true;
@@ -452,6 +444,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
         events.name = "Level - Start";
         FileData.events.push_back(events);
     }
+
     if(!pstart)
     {
         events.meta.array_id = FileData.events_array_id;
@@ -460,6 +453,7 @@ void FileFormats::LevelAddInternalEvents(LevelData &FileData)
         events.name = "P Switch - Start";
         FileData.events.push_back(events);
     }
+
     if(!pend)
     {
         events.meta.array_id = FileData.events_array_id;
@@ -527,19 +521,16 @@ void FileFormats::CreateLevelData(LevelData &NewFileData)
 
     LevelLayer layers;
     layers.hidden = false;
-    layers.locked = false;
     layers.name = "Default";
     layers.meta.array_id = NewFileData.layers_array_id++;
     NewFileData.layers.push_back(layers);
 
     layers.hidden = true;
-    layers.locked = false;
     layers.name = "Destroyed Blocks";
     layers.meta.array_id = NewFileData.layers_array_id++;
     NewFileData.layers.push_back(layers);
 
     layers.hidden = false;
-    layers.locked = false;
     layers.name = "Spawned NPCs";
     layers.meta.array_id = NewFileData.layers_array_id++;
     NewFileData.layers.push_back(layers);
@@ -580,7 +571,7 @@ LevelData FileFormats::CreateLevelData()
 
 
 
-bool LevelData::eventIsExist(PGESTRING title)
+bool LevelData::eventIsExist(const PGESTRING &title)
 {
     for(auto &e : events)
     {
@@ -590,7 +581,7 @@ bool LevelData::eventIsExist(PGESTRING title)
     return false;
 }
 
-bool LevelData::layerIsExist(PGESTRING title)
+bool LevelData::layerIsExist(const PGESTRING &title)
 {
     for(auto &l : layers)
     {
@@ -600,7 +591,7 @@ bool LevelData::layerIsExist(PGESTRING title)
     return false;
 }
 
-bool LevelSMBX64Event::ctrlKeyPressed()
+bool LevelSMBX64Event::ctrlKeyPressed() const
 {
     return ctrl_up ||
            ctrl_down ||

@@ -36,7 +36,7 @@
 //****************READ FILE FORMAT*************************
 //*********************************************************
 
-bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileData)
+bool FileFormats::ReadSMBX64WldFileHeader(const PGESTRING &filePath, WorldData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     CreateWorldHeader(FileData);
@@ -53,7 +53,7 @@ bool FileFormats::ReadSMBX64WldFileHeader(PGESTRING filePath, WorldData &FileDat
     return ReadSMBX64WldFileHeaderT(inf, FileData);
 }
 
-bool FileFormats::ReadSMBX64WldFileHeaderRaw(PGESTRING &rawdata, PGESTRING filePath, WorldData &FileData)
+bool FileFormats::ReadSMBX64WldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     CreateWorldHeader(FileData);
@@ -172,7 +172,7 @@ bool FileFormats::ReadSMBX64WldFileHeaderT(PGE_FileFormats_misc::TextInput &inf,
         FileData.meta.ERROR_info += exception_to_pretty_string(err);
 #endif
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = line;
+        FileData.meta.ERROR_linedata = std::move(line);
         FileData.meta.ReadFileValid = false;
         PGE_CutLength(FileData.meta.ERROR_linedata, 50);
         PGE_FilterBinary(FileData.meta.ERROR_linedata);
@@ -183,7 +183,7 @@ bool FileFormats::ReadSMBX64WldFileHeaderT(PGE_FileFormats_misc::TextInput &inf,
 
 
 
-bool FileFormats::ReadSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData)
+bool FileFormats::ReadSMBX64WldFileF(const PGESTRING &filePath, WorldData &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
@@ -198,7 +198,7 @@ bool FileFormats::ReadSMBX64WldFileF(PGESTRING  filePath, WorldData &FileData)
     return ReadSMBX64WldFile(file, FileData);
 }
 
-bool FileFormats::ReadSMBX64WldFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  WorldData &FileData)
+bool FileFormats::ReadSMBX64WldFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  WorldData &FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
     FileData.meta.ERROR_info.clear();
@@ -436,7 +436,7 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
 
         ////////////MusicBox Data//////////
         nextLine();
-        while((line != "next") && (line != "") && (!in.eof()))
+        while((line != "next") && (!IsEmpty(line)) && (!in.eof()))
         {
             musicbox = CreateWldMusicbox();
             SMBX64::ReadSIntFromFloat(&musicbox.x, line);//MusicBox x
@@ -470,7 +470,7 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
         FileData.meta.ERROR_info += exception_to_pretty_string(err);
 #endif
         FileData.meta.ERROR_linenum  = in.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = line;
+        FileData.meta.ERROR_linedata = std::move(line);
         FileData.meta.ReadFileValid  = false;
         PGE_CutLength(FileData.meta.ERROR_linedata, 50);
         PGE_FilterBinary(FileData.meta.ERROR_linedata);
@@ -483,7 +483,7 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteSMBX64WldFileF(PGESTRING filePath, WorldData &FileData, unsigned int file_format)
+bool FileFormats::WriteSMBX64WldFileF(const PGESTRING &filePath, WorldData &FileData, unsigned int file_format)
 {
     PGE_FileFormats_misc::TextFileOutput file;
     FileData.meta.ERROR_info.clear();
@@ -586,36 +586,36 @@ bool FileFormats::WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, Worl
     }
     out << "\"next\"\n";//Separator
 
-    for(i = 0; i < FileData.levels.size(); i++)
+    for(const auto &lvl : FileData.levels)
     {
-        out << SMBX64::WriteSInt(FileData.levels[i].x);
-        out << SMBX64::WriteSInt(FileData.levels[i].y);
-        out << SMBX64::WriteSInt(FileData.levels[i].id);
-        out << SMBX64::WriteStr(FileData.levels[i].lvlfile);
-        out << SMBX64::WriteStr(FileData.levels[i].title);
-        out << SMBX64::WriteSInt(FileData.levels[i].top_exit);
-        out << SMBX64::WriteSInt(FileData.levels[i].left_exit);
-        out << SMBX64::WriteSInt(FileData.levels[i].bottom_exit);
-        out << SMBX64::WriteSInt(FileData.levels[i].right_exit);
+        out << SMBX64::WriteSInt(lvl.x);
+        out << SMBX64::WriteSInt(lvl.y);
+        out << SMBX64::WriteSInt(lvl.id);
+        out << SMBX64::WriteStr(lvl.lvlfile);
+        out << SMBX64::WriteStr(lvl.title);
+        out << SMBX64::WriteSInt(lvl.top_exit);
+        out << SMBX64::WriteSInt(lvl.left_exit);
+        out << SMBX64::WriteSInt(lvl.bottom_exit);
+        out << SMBX64::WriteSInt(lvl.right_exit);
         if(file_format >= 4)
-            out << SMBX64::WriteSInt(FileData.levels[i].entertowarp);
+            out << SMBX64::WriteSInt(lvl.entertowarp);
         if(file_format >= 22)
         {
-            out << SMBX64::WriteCSVBool(FileData.levels[i].alwaysVisible);
-            out << SMBX64::WriteCSVBool(FileData.levels[i].pathbg);
-            out << SMBX64::WriteCSVBool(FileData.levels[i].gamestart);
-            out << SMBX64::WriteSInt(FileData.levels[i].gotox);
-            out << SMBX64::WriteSInt(FileData.levels[i].gotoy);
-            out << SMBX64::WriteCSVBool(FileData.levels[i].bigpathbg);
+            out << SMBX64::WriteCSVBool(lvl.alwaysVisible);
+            out << SMBX64::WriteCSVBool(lvl.pathbg);
+            out << SMBX64::WriteCSVBool(lvl.gamestart);
+            out << SMBX64::WriteSInt(lvl.gotox);
+            out << SMBX64::WriteSInt(lvl.gotoy);
+            out << SMBX64::WriteCSVBool(lvl.bigpathbg);
         }
     }
     out << "\"next\"\n";//Separator
 
-    for(i = 0; i < FileData.music.size(); i++)
+    for(const auto &mus : FileData.music)
     {
-        out << SMBX64::WriteSInt(FileData.music[i].x);
-        out << SMBX64::WriteSInt(FileData.music[i].y);
-        out << SMBX64::WriteSInt(FileData.music[i].id);
+        out << SMBX64::WriteSInt(mus.x);
+        out << SMBX64::WriteSInt(mus.y);
+        out << SMBX64::WriteSInt(mus.id);
     }
     out << "\"next\"\n";//Separator
 

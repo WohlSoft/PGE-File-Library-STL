@@ -664,8 +664,8 @@ struct LevelEvent_Sets
      */
     struct AutoScrollStopPoint
     {
-        long x;
-        long y;
+        long x = 0;
+        long y = 0;
         enum
         {
             TYPE_LINE = 0,
@@ -840,7 +840,7 @@ struct LevelSMBX64Event
      * \brief Check is one of control keys pressed
      * \return true if one of keys is pressed
      */
-    bool ctrlKeyPressed();
+    bool ctrlKeyPressed() const;
     //! Hold "Up" key controllers
     bool ctrl_up = false;
     //! Hold "Down" key controllers
@@ -922,7 +922,7 @@ struct LevelVariable
     //! Value of variable
     PGESTRING value;
     //! Is variable global
-    bool is_global;
+    bool is_global = false;
 };
 
 /*!
@@ -1103,13 +1103,13 @@ struct LevelData
      * \param title Event name which need to check for existsing
      * \return true if requested event is exists
      */
-    bool eventIsExist(PGESTRING title);
+    bool eventIsExist(const PGESTRING &title);
     /*!
      * \brief Checks is layer with specified title exist in this level
      * \param title Layer name which need to check for existsing
      * \return true if requested event is exists
      */
-    bool layerIsExist(PGESTRING title);
+    bool layerIsExist(const PGESTRING &title);
 };
 
 

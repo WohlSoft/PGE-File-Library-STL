@@ -34,7 +34,7 @@
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
-bool FileFormats::ReadSMBX64ConfigFileF(PGESTRING  filePath, SMBX64_ConfigFile &FileData)
+bool FileFormats::ReadSMBX64ConfigFileF(const PGESTRING &filePath, SMBX64_ConfigFile &FileData)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileInput file;
@@ -51,7 +51,7 @@ bool FileFormats::ReadSMBX64ConfigFileF(PGESTRING  filePath, SMBX64_ConfigFile &
     return ReadSMBX64ConfigFile(file, FileData);
 }
 
-bool FileFormats::ReadSMBX64ConfigFileRaw(PGESTRING &rawdata, PGESTRING  filePath,  SMBX64_ConfigFile &FileData)
+bool FileFormats::ReadSMBX64ConfigFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  SMBX64_ConfigFile &FileData)
 {
     PGE_FileFormats_misc::RawTextInput file;
     FileData.meta.ERROR_info.clear();
@@ -158,13 +158,13 @@ bool FileFormats::ReadSMBX64ConfigFile(PGE_FileFormats_misc::TextInput &in, SMBX
         else
             FileData.meta.ERROR_info = "It is not an SMBX game settings file\n";
 
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         FileData.meta.ERROR_info += QString::fromStdString(exception_to_pretty_string(err));
-        #else
+#else
         FileData.meta.ERROR_info += exception_to_pretty_string(err);
-        #endif
+#endif
         FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = line;
+        FileData.meta.ERROR_linedata = std::move(line);
         FileData.meta.ReadFileValid = false;
         PGE_CutLength(FileData.meta.ERROR_linedata, 50);
         PGE_FilterBinary(FileData.meta.ERROR_linedata);
@@ -175,7 +175,7 @@ bool FileFormats::ReadSMBX64ConfigFile(PGE_FileFormats_misc::TextInput &in, SMBX
 //*********************************************************
 //****************WRITE FILE FORMAT************************
 //*********************************************************
-bool FileFormats::WriteSMBX64ConfigFileF(PGESTRING filePath, SMBX64_ConfigFile &FileData, unsigned int file_format)
+bool FileFormats::WriteSMBX64ConfigFileF(const PGESTRING &filePath, SMBX64_ConfigFile &FileData, unsigned int file_format)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileOutput file;
@@ -230,31 +230,32 @@ bool FileFormats::WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, S
 
     for(i = 0; i < FileData.players.size(); i++)
     {
-        out << SMBX64::WriteSInt(FileData.players[i].controllerType);
-        out << SMBX64::WriteSInt(FileData.players[i].k_up);
-        out << SMBX64::WriteSInt(FileData.players[i].k_down);
-        out << SMBX64::WriteSInt(FileData.players[i].k_left);
-        out << SMBX64::WriteSInt(FileData.players[i].k_right);
-        out << SMBX64::WriteSInt(FileData.players[i].k_run);
-        out << SMBX64::WriteSInt(FileData.players[i].k_jump);
-        out << SMBX64::WriteSInt(FileData.players[i].k_drop);
-        out << SMBX64::WriteSInt(FileData.players[i].k_pause);
+        const auto &p = FileData.players[i];
+        out << SMBX64::WriteSInt(p.controllerType);
+        out << SMBX64::WriteSInt(p.k_up);
+        out << SMBX64::WriteSInt(p.k_down);
+        out << SMBX64::WriteSInt(p.k_left);
+        out << SMBX64::WriteSInt(p.k_right);
+        out << SMBX64::WriteSInt(p.k_run);
+        out << SMBX64::WriteSInt(p.k_jump);
+        out << SMBX64::WriteSInt(p.k_drop);
+        out << SMBX64::WriteSInt(p.k_pause);
 
         if(file_format >= 19)
         {
-            out << SMBX64::WriteSInt(FileData.players[i].k_altjump);
-            out << SMBX64::WriteSInt(FileData.players[i].k_altrun);
+            out << SMBX64::WriteSInt(p.k_altjump);
+            out << SMBX64::WriteSInt(p.k_altrun);
         }
 
-        out << SMBX64::WriteSInt(FileData.players[i].j_run);
-        out << SMBX64::WriteSInt(FileData.players[i].j_jump);
-        out << SMBX64::WriteSInt(FileData.players[i].j_drop);
-        out << SMBX64::WriteSInt(FileData.players[i].j_pause);
+        out << SMBX64::WriteSInt(p.j_run);
+        out << SMBX64::WriteSInt(p.j_jump);
+        out << SMBX64::WriteSInt(p.j_drop);
+        out << SMBX64::WriteSInt(p.j_pause);
 
         if(file_format >= 19)
         {
-            out << SMBX64::WriteSInt(FileData.players[i].j_altjump);
-            out << SMBX64::WriteSInt(FileData.players[i].j_altrun);
+            out << SMBX64::WriteSInt(p.j_altjump);
+            out << SMBX64::WriteSInt(p.j_altrun);
         }
     }
 
