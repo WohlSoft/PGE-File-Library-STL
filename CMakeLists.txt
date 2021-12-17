@@ -33,7 +33,9 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_DEBUG_POSTFIX "d")
+if(NOT CMAKE_DEBUG_POSTFIX)
+    set(CMAKE_DEBUG_POSTFIX "d")
+endif()
 
 find_package(Qt5Core QUIET)
 
@@ -107,4 +109,3 @@ if(WITH_UNIT_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()
-
