@@ -30,9 +30,10 @@
 #include "file_formats.h"
 
 
-PGESTRING FileFormats::removeQuotes(PGESTRING str)
+PGESTRING FileFormats::removeQuotes(const PGESTRING &str)
 {
     PGESTRING target = str;
+
 #ifdef PGE_FILES_QT
     if(target.isEmpty())
         return target;
@@ -48,6 +49,7 @@ PGESTRING FileFormats::removeQuotes(PGESTRING str)
     if((!target.empty()) && (target[target.size() - 1] == '\"'))
         target.erase(target.begin() + (std::string::difference_type)target.size() - 1);
 #endif
+
     return target;
 }
 

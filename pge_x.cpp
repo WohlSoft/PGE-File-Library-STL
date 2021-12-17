@@ -391,13 +391,13 @@ bool PGEFile::IsQoutedString(PGESTRING in) // QUOTED STRING
         {
             return false;
         }
-        else if((in[i] == '"') && !escape)
-        {
-            return false;
-        }
+
         escape = false;
     }
-    if(i == 0) return false;
+
+    if(i == 0)
+        return false;
+
     return true;
 }
 
@@ -667,7 +667,7 @@ PGELIST<long> PGEFile::X2IntArr(PGESTRING in, bool *_valid)
 {
     PGELIST<long> intArr;
     PGESTRINGList strArr;
-    PGESTRING entry;
+
     if((in[0] != '[') || (in[in.size() - 1] != ']'))
     {
         if(_valid)
@@ -678,6 +678,7 @@ PGELIST<long> PGEFile::X2IntArr(PGESTRING in, bool *_valid)
     PGE_RemStrRng(in, 0, 1);
     PGE_RemStrRng(in, in.size() - 1, 1);
     PGE_SPLITSTRING(strArr, in, ",");
+
     for(auto &s : strArr)
     {
         if(!IsIntS(s))
@@ -688,7 +689,9 @@ PGELIST<long> PGEFile::X2IntArr(PGESTRING in, bool *_valid)
         intArr.push_back(toLong(s));
     }
 
-    if(_valid) *_valid = true;
+    if(_valid)
+        *_valid = true;
+
     return intArr;
 }
 

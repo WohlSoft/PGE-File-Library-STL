@@ -1141,7 +1141,7 @@ public:
      * \return String with removed double quotes at edges.
      *         If string has no double quotes at edges, input string will be retured with no changes
      */
-    static PGESTRING        removeQuotes(PGESTRING str);
+    static PGESTRING        removeQuotes(const PGESTRING &str);
 };
 
 #endif // FILE_FORMATS_H

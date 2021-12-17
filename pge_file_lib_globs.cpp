@@ -66,10 +66,10 @@ bool PGE_DetectSMBXFile(PGESTRING src)
        (src[1] != '\r') && (src[2] != '\r'))
         return false;//If line contains no line feeds (also possible CRLF)
 
-    if((src[0] < '0') && (src[0] > '9'))
+    if(src[0] < '0' || src[0] > '9')
         return false;//If first character is not numeric
 
-    if((src[1] != '\r') && (src[1] != '\n') && (src[1] < '0') && (src[1] > '9'))
+    if((src[1] != '\r') && (src[1] != '\n') && (src[1] < '0' || src[1] > '9'))
         return false;//If second character is not numeric and is not line feed
 
     PGESTRING number;

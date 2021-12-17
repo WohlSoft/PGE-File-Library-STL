@@ -259,13 +259,14 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         params.push_back(line.substr(splitSign + 1, std::string::npos));
 #endif
 
-        if(params.size() != 2) // If string does not contain strings with "=" as separator
-        {
-            if(doLog)
-                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
-            if(doLog || (params.size() < 2))
-                continue;
-        }
+// Note: This whole condition is always false
+//        if(params.size() != 2) // If string does not contain strings with "=" as separator
+//        {
+//            if(doLog)
+//                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
+//            if(doLog || (params.size() < 2))
+//                continue;
+//        }
 
         params[0] = PGESTR_Trim(params[0]);
         params[0] = PGESTR_Simpl(params[0]);

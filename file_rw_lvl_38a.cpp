@@ -1997,7 +1997,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             //Convert legacy autoscroll into modern
             bool legacyAutoScroll = false;
 
-            if(isLevelStart && j == (size_t)evt.scroll_section && !evt.sets[j].autoscrol
+            if(isLevelStart && j == (pge_size_t)evt.scroll_section && !evt.sets[j].autoscrol
                && (evt.move_camera_x != 0.0 || evt.move_camera_y != 0.0))
             {
                 legacyAutoScroll = true;

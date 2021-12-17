@@ -251,7 +251,7 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
 
 pgeFfConversionResult PGEFF_ConvertUTF16toUTF8(
     const UTF16 **sourceStart, const UTF16 *sourceEnd,
-    UTF8 **targetStart, UTF8 *targetEnd, pgeFfConversionFlags flags)
+    UTF8 **targetStart, const UTF8 *targetEnd, pgeFfConversionFlags flags)
 {
     pgeFfConversionResult result = conversionOK;
     const UTF16 *source = *sourceStart;
@@ -264,6 +264,7 @@ pgeFfConversionResult PGEFF_ConvertUTF16toUTF8(
         const UTF32 byteMark = 0x80;
         const UTF16 *oldSource = source; /* In case we have to back up because of target overflow. */
         ch = *source++;
+
         /* If we have a surrogate pair, convert to UTF32 first. */
         if(ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_HIGH_END)
         {
@@ -302,6 +303,7 @@ pgeFfConversionResult PGEFF_ConvertUTF16toUTF8(
                 break;
             }
         }
+
         /* Figure out how many bytes the result will require */
         if(ch < (UTF32)0x80)
         {
@@ -315,7 +317,7 @@ pgeFfConversionResult PGEFF_ConvertUTF16toUTF8(
         {
             bytesToWrite = 3;
         }
-        else if(ch < (UTF32)0x110000)
+        else if(ch < (UTF32)0x110000) //-V547
         {
             bytesToWrite = 4;
         }

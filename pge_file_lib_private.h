@@ -83,7 +83,7 @@ inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
 {
     return src.replace(from, to);
 }
-inline PGESTRING PGE_RemSubSTRING(const PGESTRING &src, PGESTRING substr)
+inline PGESTRING PGE_RemSubSTRING(const PGESTRING &src, const PGESTRING &substr)
 {
     return QString(src).remove(substr);
 }
@@ -113,7 +113,7 @@ inline void PGE_FilterBinary(PGESTRING &str)
             str[i] = PGEChar('?');
     }
 }
-inline bool      IsNULL(const PGESTRING str)
+inline bool      IsNULL(const PGESTRING &str)
 {
     return str.isNull();
 }
@@ -125,27 +125,27 @@ inline bool      IsEmpty(const PGESTRINGList &str)
 {
     return str.isEmpty();
 }
-inline int       toInt(PGESTRING str)
+inline int       toInt(const PGESTRING &str)
 {
     return str.toInt();
 }
-inline unsigned int toUInt(PGESTRING str)
+inline unsigned int toUInt(const PGESTRING &str)
 {
     return str.toUInt();
 }
-inline long      toLong(PGESTRING str)
+inline long      toLong(const PGESTRING &str)
 {
     return str.toLong();
 }
-inline unsigned long toULong(PGESTRING str)
+inline unsigned long toULong(const PGESTRING &str)
 {
     return str.toULong();
 }
-inline float     toFloat(PGESTRING str)
+inline float     toFloat(const PGESTRING &str)
 {
     return str.toFloat();
 }
-inline double    toDouble(PGESTRING str)
+inline double    toDouble(const PGESTRING &str)
 {
     return str.toDouble();
 }
@@ -284,13 +284,13 @@ inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGES
     dst.clear();
     PGE_FileFormats_misc::split(dst, src, sep);
 }
-inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
+inline PGESTRING PGE_ReplSTRING(PGESTRING src, const PGESTRING &from, const PGESTRING &to)
 {
     PGE_FileFormats_misc::replaceAll(src, from, to);
     return src;
 }
 
-inline PGESTRING PGE_RemSubSTRING(PGESTRING src, PGESTRING substr)
+inline PGESTRING PGE_RemSubSTRING(PGESTRING src, const PGESTRING &substr)
 {
     PGE_FileFormats_misc::RemoveSub(src, substr);
     return src;
@@ -322,7 +322,7 @@ inline void PGE_FilterBinary(PGESTRING &str)
             c = '?';
     }
 }
-inline bool IsNULL(const PGESTRING str)
+inline bool IsNULL(const PGESTRING &str)
 {
     return (str.empty());
 }
@@ -334,31 +334,31 @@ inline bool IsEmpty(const PGESTRINGList &str)
 {
     return str.empty();
 }
-inline int toInt(PGESTRING str)
+inline int toInt(const PGESTRING &str)
 {
     return std::atoi(str.c_str());
 }
-inline unsigned int toUInt(PGESTRING str)
+inline unsigned int toUInt(const PGESTRING &str)
 {
-    return static_cast<unsigned int>(std::stoul(str.c_str(), NULL, 10));
+    return static_cast<unsigned int>(std::stoul(str, nullptr, 10));
 }
-inline long toLong(PGESTRING str)
+inline long toLong(const PGESTRING &str)
 {
     return std::atol(str.c_str());
 }
-inline unsigned long toULong(PGESTRING str)
+inline unsigned long toULong(const PGESTRING &str)
 {
     return static_cast<unsigned long>(std::atoll(str.c_str()));
 }
-inline float toFloat(PGESTRING str)
+inline float toFloat(const PGESTRING &str)
 {
     return static_cast<float>(std::atof(str.c_str()));
 }
-inline double toDouble(PGESTRING str)
+inline double toDouble(const PGESTRING &str)
 {
     return std::atof(str.c_str());
 }
-inline PGESTRING removeSpaces(PGESTRING src)
+inline PGESTRING removeSpaces(const PGESTRING &src)
 {
     return PGE_RemSubSTRING(src, " ");
 }
@@ -399,7 +399,7 @@ inline bool PGE_floatEqual(float l, float r, float precission)
            static_cast<long long>(r * std::pow(10.0f, precission));
 }
 
-inline bool PGE_StartsWith(PGESTRING src, PGESTRING with)
+inline bool PGE_StartsWith(const PGESTRING &src, const PGESTRING &with)
 {
 #ifdef PGE_FILES_QT
     return src.startsWith(with, Qt::CaseSensitive);
@@ -409,4 +409,4 @@ inline bool PGE_StartsWith(PGESTRING src, PGESTRING with)
 }
 
 
-#endif // PGE_FILE_LIB_GLOBS_H_
+#endif // PGE_FILE_LIB_PRIVATE_H_
