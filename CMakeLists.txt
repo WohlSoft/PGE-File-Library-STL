@@ -66,6 +66,8 @@ include(pge_file_library.cmake)
 
 pge_cxx_standard(11)
 
+pgefl_disable_cxx_warning_flag("deprecated-copy" NO_DEPRECATED_COPY)
+
 set(PGEFL_INSTALLS)
 
 add_library(pgefl STATIC
