@@ -75,7 +75,7 @@ typedef int pge_size_t;
 #define PGEMAP  QMap
 #define PGEHASH QHash
 typedef QFile PGEFILE;
-inline void PGE_SPLITSTRING(PGESTRINGList &dst, PGESTRING &src, PGESTRING sep)
+inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, PGESTRING sep)
 {
     dst = src.split(sep);
 }
@@ -91,7 +91,7 @@ inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
     return str.remove(pos, len);
 }
-inline PGESTRING PGE_SubStr(PGESTRING &str, int pos, int len = -1)
+inline PGESTRING PGE_SubStr(const PGESTRING &str, int pos, int len = -1)
 {
     return str.mid(pos, len);
 }
@@ -300,7 +300,7 @@ inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
     str.erase(static_cast<size_t>(pos), static_cast<size_t>(len));
     return str;
 }
-inline PGESTRING PGE_SubStr(PGESTRING &str, int pos, int len = -1)
+inline PGESTRING PGE_SubStr(const PGESTRING &str, int pos, int len = -1)
 {
     return str.substr(static_cast<std::string::size_type>(pos), static_cast<std::string::size_type>(len));
 }

@@ -378,7 +378,7 @@ PlayerPoint FileFormats::CreateLvlPlayerPoint(unsigned int id)
         dummyPlayer.h = 60;
         break;
     default:
-        dummyPlayer.h = 32; //-V112
+        dummyPlayer.h = 32; //-V112 //-V1048
     }
 
     return dummyPlayer;
@@ -520,7 +520,7 @@ void FileFormats::CreateLevelData(LevelData &NewFileData)
     //Spawned NPCs
 
     LevelLayer layers;
-    layers.hidden = false;
+    layers.hidden = false; //-V1048
     layers.name = "Default";
     layers.meta.array_id = NewFileData.layers_array_id++;
     NewFileData.layers.push_back(layers);

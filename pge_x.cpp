@@ -227,10 +227,10 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                 PGEX_Val dataValue;
                 dataItem.type = PGEX_PlainText;
 
-                dataValue.marker = nameOfTree;
+                dataValue.marker = nameOfTree; //-V820
                 //foreach(PGESTRING x, rawSubTree) dataValue.value += x+"\n";
-                for(pge_size_t i = 0; i < rawSubTree.size(); i++)
-                    dataValue.value += rawSubTree[i] + "\n";
+                for(auto &st : rawSubTree)
+                    dataValue.value += st + "\n";
                 dataItem.values.push_back(dataValue);
                 subTree.data.push_back(dataItem);
                 entryData.subTree.push_back(subTree);
@@ -555,6 +555,7 @@ bool PGEFile::IsStringArray(const PGESTRING &in) // String array
             }
             else valid = false;
             break;
+
         case 1://between entries
             switch(comma)
             {
@@ -563,26 +564,25 @@ bool PGEFile::IsStringArray(const PGESTRING &in) // String array
                 else if(in[i] == ',') comma++; //Close array
                 else valid = false;
                 break;
+
             case 1:
                 if(in[i] == '"')     depth = 2; //Open value
                 else valid = false;
+                break;
+
+            default:
+                valid = false;
+                break;
             }
             break;
+
         case 2://Inside entry
             if((in[i] == '"') && (!escape))
             {
                 depth = 1;    //Close value
                 comma = 0;
             }
-            else if((in[i] == '[') && (!escape))
-            {
-                valid = false;
-            }
-            else if((in[i] == ']') && (!escape))
-            {
-                valid = false;
-            }
-            else if((in[i] == ',') && (!escape))
+            else if(!escape && (in[i] == '[' || in[i] == ']' || in[i] == ','))
             {
                 valid = false;
             }
@@ -593,21 +593,28 @@ bool PGEFile::IsStringArray(const PGESTRING &in) // String array
             }
             escape = false;
             break;
+
+        default:
+            valid = false;
+            break;
         }
-        if(!valid) break;//Stop parsing on invalid
+
+        if(!valid)
+            break;//Stop parsing on invalid
         i++;
     }
     return valid;
 }
 
 
-PGESTRINGList PGEFile::X2STRArr(PGESTRING in, bool *_valid)
+PGESTRINGList PGEFile::X2STRArr(const PGESTRING &in, bool *_valid)
 {
     PGESTRINGList strArr;
     PGESTRING entry;
     bool valid = true;
     pge_size_t i = 0, depth = 0, comma = 0;
     bool escape = false;
+
     while(i < in.size())
     {
         switch(depth)
@@ -618,8 +625,10 @@ PGESTRINGList PGEFile::X2STRArr(PGESTRING in, bool *_valid)
                 depth = 1;
                 comma++;
             }
-            else valid = false;
+            else
+                valid = false;
             break;
+
         case 1://between entries
             switch(comma)
             {
@@ -628,30 +637,27 @@ PGESTRINGList PGEFile::X2STRArr(PGESTRING in, bool *_valid)
                 else if(in[i] == ',') comma++; //Close array
                 else valid = false;
                 break;
+
             case 1:
                 if(in[i] == '"')     depth = 2; //Open value
                 else valid = false;
+                break;
+
+            default:
+                valid = false;
+                break;
             }
             break;
+
         case 2://Inside entry
             if((in[i] == '"') && (!escape))
             {
-                strArr.push_back(X2STRING(entry));    //Close value
+                strArr.push_back(X2STRING(entry));    //Close value //-V823
                 entry.clear();
                 depth = 1;
                 comma = 0;
             }
-            else if((in[i] == '[') && (!escape))
-            {
-                valid = false;
-                break;
-            }
-            else if((in[i] == ']') && (!escape))
-            {
-                valid = false;
-                break;
-            }
-            else if((in[i] == ',') && (!escape))
+            else if((!escape) && (in[i] == '[' || in[i] == ']' || in[i] == ','))
             {
                 valid = false;
                 break;
@@ -661,32 +667,42 @@ PGESTRINGList PGEFile::X2STRArr(PGESTRING in, bool *_valid)
                 escape = true;
                 break;
             }
+
             entry.push_back(in[i]);
             escape = false;
             break;
+
+        default:
+            valid = false;
+            break;
         }
-        if(!valid) break;//Stop parsing on invalid
+
+        if(!valid)
+            break;//Stop parsing on invalid
         i++;
     }
-    if(_valid) *_valid = valid;
+
+    if(_valid)
+        *_valid = valid;
+
     return strArr;
 }
 
-PGELIST<long> PGEFile::X2IntArr(PGESTRING in, bool *_valid)
+PGELIST<long> PGEFile::X2IntArr(const PGESTRING &in, bool *_valid)
 {
     PGELIST<long> intArr;
     PGESTRINGList strArr;
 
-    if((in[0] != '[') || (in[in.size() - 1] != ']'))
+    if(in.size() < 2 || in[0] != '[' || in[in.size() - 1] != ']')
     {
         if(_valid)
             *_valid = false;
         return intArr;
     }
 
-    PGE_RemStrRng(in, 0, 1);
-    PGE_RemStrRng(in, in.size() - 1, 1);
-    PGE_SPLITSTRING(strArr, in, ",");
+//    PGE_RemStrRng(in, 0, 1);
+//    PGE_RemStrRng(in, in.size() - 1, 1);
+    PGE_SPLITSTRING(strArr, PGE_SubStr(in, 1, (int)in.size() - 2), ",");
 
     for(auto &s : strArr)
     {
@@ -704,15 +720,15 @@ PGELIST<long> PGEFile::X2IntArr(PGESTRING in, bool *_valid)
     return intArr;
 }
 
-PGELIST<bool > PGEFile::X2BollArr(PGESTRING src)
+PGELIST<bool > PGEFile::X2BollArr(const PGESTRING &src)
 {
     PGELIST<bool > arr;
-    for(pge_size_t i = 0; i < src.size(); i++)
-        arr.push_back(src[i] == '1');
+    for(PGEChar i : src)
+        arr.push_back(i == '1');
     return arr;
 }
 
-PGELIST<PGESTRINGList > PGEFile::splitDataLine(PGESTRING src_data, bool *_valid)
+PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *_valid)
 {
     PGELIST<PGESTRINGList > entryData;
     bool valid = true;
@@ -1008,8 +1024,10 @@ void PGEFile::escapeString(PGESTRING &output, const PGESTRING &input, bool addQu
             break;
         }
     }
+
     if(addQuotes)
         output[j++] = '\"';
+
     output.resize(j);
 }
 

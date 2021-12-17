@@ -65,7 +65,7 @@ GamesaveData FileFormats::CreateGameSaveData()
 //    newData.worldPosY = 0;
 //    newData.gameCompleted = false;
 
-    newData.characterStates.push_back(CreateSavCharacterState());
+    newData.characterStates.push_back(CreateSavCharacterState()); //-V823
     newData.currentCharacter.push_back(1);
 
     return newData;

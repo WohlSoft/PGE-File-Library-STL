@@ -229,7 +229,7 @@ public:
     static bool IsStringArray(const PGESTRING &in);//String array
 
     //Split string into data values
-    static PGELIST<PGESTRINGList> splitDataLine(PGESTRING src_data, bool *valid = nullptr);
+    static PGELIST<PGESTRINGList> splitDataLine(const PGESTRING &src_data, bool *valid = nullptr);
 
     //PGE Extended File parameter string generators
     /*!
@@ -333,19 +333,19 @@ public:
      * \param src Encoded PGE-X string value
      * \return List of plain text strings
      */
-    static PGESTRINGList X2STRArr(PGESTRING in, bool *_valid = nullptr);
+    static PGESTRINGList X2STRArr(const PGESTRING &in, bool *_valid = nullptr);
     /*!
      * \brief Decodes PGE-X String array into array of plain text strings
      * \param src Encoded PGE-X string value
      * \return List of plain text strings
      */
-    static PGELIST<long> X2IntArr(PGESTRING in, bool *_valid = nullptr);
+    static PGELIST<long> X2IntArr(const PGESTRING &in, bool *_valid = nullptr);
     /*!
      * \brief Decodes PGE-X Boolean array into array of boolean flags
      * \param src Encoded PGE-X boolean array
      * \return List of boolean flags
      */
-    static PGELIST<bool> X2BollArr(PGESTRING src);
+    static PGELIST<bool> X2BollArr(const PGESTRING &src);
 
     /*!
      * \brief Applies PGE-X escape sequensions to the plain text string

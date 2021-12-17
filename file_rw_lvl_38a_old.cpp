@@ -805,7 +805,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                         {
                         //c1=generator enable
                         case 0:
-                            npcdata.generator = ((dLine != "") && (dLine != "0"));
+                            npcdata.generator = (!IsEmpty(dLine) && (dLine != "0"));
                             break;
 
                         //[if c1!=0]
@@ -1468,7 +1468,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                             old38a_SplitCSVStr(showlayers, dLine);
 
                             for(auto &showlayer : showlayers)
-                                eventdata.layers_show.push_back(PGE_URLDEC(showlayer));
+                                eventdata.layers_show.push_back(PGE_URLDEC(showlayer)); //-V823
                         }
                         break;
 
@@ -1479,7 +1479,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                             old38a_SplitCSVStr(hidelayers, dLine);
 
                             for(auto &hidelayer : hidelayers)
-                                eventdata.layers_hide.push_back(PGE_URLDEC(hidelayer));
+                                eventdata.layers_hide.push_back(PGE_URLDEC(hidelayer)); //-V823
                         }
                         break;
 
@@ -1490,7 +1490,7 @@ bool FileFormats::ReadSMBX38ALvlFile_OLD(PGE_FileFormats_misc::TextInput &in, Le
                             old38a_SplitCSVStr(togglelayers, dLine);
 
                             for(auto &togglelayer : togglelayers)
-                                eventdata.layers_toggle.push_back(PGE_URLDEC(togglelayer));
+                                eventdata.layers_toggle.push_back(PGE_URLDEC(togglelayer)); //-V823
                         }
                         break;
                         }

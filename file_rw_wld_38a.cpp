@@ -774,8 +774,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     catch(const std::exception &err)
     {
         // First we try to extract the line number out of the nested exception.
-        const std::exception *curErr = &err;
-        const std::nested_exception *possibleNestedException = dynamic_cast<const std::nested_exception *>(curErr);
+        auto *possibleNestedException = dynamic_cast<const std::nested_exception *>(&err); //-V641
 
         if(possibleNestedException)
         {
