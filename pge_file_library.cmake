@@ -26,7 +26,10 @@ list(APPEND PGE_FILE_LIBRARY_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/wld_filedata.cpp
     ${CMAKE_CURRENT_LIST_DIR}/pge_file_lib_globs.cpp
     ${CMAKE_CURRENT_LIST_DIR}/file_rw_savx.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/file_rw_lvl_38a_old.cpp
+#    ${CMAKE_CURRENT_LIST_DIR}/file_rw_lvl_38a_old.cpp
     ${CMAKE_CURRENT_LIST_DIR}/file_rw_wld_38a.cpp
 )
 
+# Make headers being visible in the tree
+file(GLOB HEAD_FILES *.hpp *.h)
+list(APPEND PGE_FILE_LIBRARY_SRCS ${HEAD_FILES})

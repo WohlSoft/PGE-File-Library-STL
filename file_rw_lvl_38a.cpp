@@ -773,8 +773,19 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                             );
                 // type%100=[0=instant][1=pipe][2=door][3=loop]
                 doordata.type = type % 100;
-                // type/100=[0=none][1=Scroll][2=Fade]
-                doordata.transition_effect = type / 100;
+                //type/100=[0=none][1=Scroll][2=Fade][3=FlipH][4=FlipV]
+                {
+                    int te = type / 100;
+                    switch(te)
+                    {
+                    default:
+                    case 0: doordata.transition_effect = LevelDoor::TRANSIT_NONE; break;
+                    case 1: doordata.transition_effect = LevelDoor::TRANSIT_SCROLL; break;
+                    case 2: doordata.transition_effect = LevelDoor::TRANSIT_FADE; break;
+                    case 3: doordata.transition_effect = LevelDoor::TRANSIT_FLIP_H; break;
+                    case 4: doordata.transition_effect = LevelDoor::TRANSIT_FLIP_V; break;
+                    }
+                }
                 doordata.length_o = doordata.length_i;
                 doordata.isSetIn = (doordata.lvl_i ? false : true);
                 doordata.isSetOut = (doordata.lvl_o ? false : true) || doordata.lvl_i;
@@ -1743,13 +1754,23 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|" << fromNum(door.ox);
         //    ey=exit position y
         out << "|" << fromNum(door.oy);
-        //    type=[1=pipe][2=door][0=instant]
+        //    type=[1=pipe][2=door][0=instant][3=loop]
         {
             //type%100=[0=instant][1=pipe][2=door]
             int type = door.type;
-                //type/100=[0=none][1=Scroll][2=Fade]
-                type += door.transition_effect * 100;
-                // FIXME: Flip-H and Flip-V are invalid here !!!
+            int te;
+
+            switch(door.transition_effect)
+            {
+            default:
+            case LevelDoor::TRANSIT_NONE:   te = 0; break;
+            case LevelDoor::TRANSIT_SCROLL: te = 1; break;
+            case LevelDoor::TRANSIT_FADE:   te = 2; break;
+            case LevelDoor::TRANSIT_FLIP_H: te = 3; break;
+            case LevelDoor::TRANSIT_FLIP_V: te = 4; break;
+            }
+            //type/100=[0=none][1=Scroll][2=Fade][3=FlipH][4=FlipV]
+            type += te * 100;
             out << "|" << fromNum(type);
         }
         //    enterd=entrance direction[1=up 2=left 3=down 4=right]
@@ -1784,6 +1805,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             out << "," << fromNum((int)door.two_way);
             //    cannon = Pipe Cannon Force
             out << "," << fromNum(door.cannon_exit ? door.cannon_exit_speed : 0.0);
+            if(door.stood_state_required)
+                out << "," << fromNum((int)door.stood_state_required);
         }
         //    lik=warp to level[***urlencode!***]
         out << "|" << PGE_URLENC(door.lname);
