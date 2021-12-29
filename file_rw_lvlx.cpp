@@ -590,7 +590,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("AL", door.allownpc_interlevel) //Allow NPC's inter-level
                     PGEX_BoolVal("SR", door.special_state_required) //Required a special state to enter
                     PGEX_BoolVal("STR", door.stood_state_required) //Required a stood state to enter
-                    PGEX_BoolVal("TE", door.transition_effect) //Transition effect
+                    PGEX_SIntVal("TE", door.transition_effect) //Transition effect
                     PGEX_BoolVal("PT", door.cannon_exit) //Cannon exit
                     PGEX_FloatVal("PS", door.cannon_exit_speed) //Cannon exit speed
                     PGEX_StrVal("LR", door.layer)  //Layer
