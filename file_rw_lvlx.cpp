@@ -590,6 +590,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("AL", door.allownpc_interlevel) //Allow NPC's inter-level
                     PGEX_BoolVal("SR", door.special_state_required) //Required a special state to enter
                     PGEX_BoolVal("STR", door.stood_state_required) //Required a stood state to enter
+                    PGEX_BoolVal("TE", door.transition_effect) //Transition effect
                     PGEX_BoolVal("PT", door.cannon_exit) //Cannon exit
                     PGEX_FloatVal("PS", door.cannon_exit_speed) //Cannon exit speed
                     PGEX_StrVal("LR", door.layer)  //Layer
@@ -2062,6 +2063,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("SR", PGEFile::WriteBool(warp.special_state_required));//Special state required
             if(warp.stood_state_required)
                 out << PGEFile::value("STR", PGEFile::WriteBool(warp.stood_state_required));//Stood state required
+            if(warp.transition_effect != LevelDoor::TRANSIT_NONE)
+                out << PGEFile::value("TE", PGEFile::WriteBool(warp.transition_effect));//Transition effect
             if(warp.cannon_exit)
             {
                 out << PGEFile::value("PT", PGEFile::WriteBool(warp.cannon_exit));//cannon exit
