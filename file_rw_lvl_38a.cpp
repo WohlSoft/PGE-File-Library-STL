@@ -786,6 +786,13 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     case 4: doordata.transition_effect = LevelDoor::TRANSIT_FLIP_V; break;
                     }
                 }
+
+                if(doordata.type == LevelDoor::WARP_DOOR) // Workaround to make sure door direction is always up
+                {
+                    doordata.idirect = LevelDoor::ENTRANCE_UP;
+                    doordata.odirect = LevelDoor::EXIT_DOWN;
+                }
+
                 doordata.length_o = doordata.length_i;
                 doordata.isSetIn = (doordata.lvl_i ? false : true);
                 doordata.isSetOut = (doordata.lvl_o ? false : true) || doordata.lvl_i;
