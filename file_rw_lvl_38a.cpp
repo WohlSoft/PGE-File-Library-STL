@@ -1749,6 +1749,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             int type = door.type;
                 //type/100=[0=none][1=Scroll][2=Fade]
                 type += door.transition_effect * 100;
+                // FIXME: Flip-H and Flip-V are invalid here !!!
             out << "|" << fromNum(type);
         }
         //    enterd=entrance direction[1=up 2=left 3=down 4=right]
