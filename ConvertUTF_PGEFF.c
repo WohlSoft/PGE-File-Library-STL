@@ -317,7 +317,7 @@ pgeFfConversionResult PGEFF_ConvertUTF16toUTF8(
         {
             bytesToWrite = 3;
         }
-        else if(ch < (UTF32)0x110000) //-V547
+        else if(ch < (UTF32)0x110000) /*-V547*/
         {
             bytesToWrite = 4;
         }
