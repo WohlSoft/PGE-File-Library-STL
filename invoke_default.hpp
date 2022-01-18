@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2022 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
