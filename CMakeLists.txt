@@ -18,7 +18,9 @@ if(NOT CMAKE_DEBUG_POSTFIX)
     set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 
-find_package(Qt5Core QUIET)
+if(NOT VITA)
+    find_package(Qt5Core QUIET)
+endif()
 
 if(VITA OR Qt5Core_FOUND)
     set(OPT_DEF_PGEFL_QT_SUPPORT OFF)
