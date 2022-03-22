@@ -157,6 +157,10 @@ struct LevelBlock
     bool slippery = false;
     //! Use the special AI to make block be movable
     uint32_t    motion_ai_id = 0;
+    //! User-data integer #1 used for configuring some block algorithm
+    long special_data = 0;
+    //! User-data integer #2 used for configuring some block algorithm
+    long special_data2 = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING   layer = DEFAULT_LAYER_NAME;
     //! 38A: Custom graphic file base name (default is empty)

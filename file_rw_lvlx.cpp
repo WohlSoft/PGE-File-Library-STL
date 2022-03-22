@@ -432,6 +432,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_BoolVal("IV", block.invisible) //Invisible
                     PGEX_BoolVal("SL", block.slippery) //Slippery
                     PGEX_UIntVal("MA", block.motion_ai_id) //Motion AI type
+                    PGEX_SLongVal("S1", block.special_data) //Special value 1
+                    PGEX_SLongVal("S2", block.special_data2) //Special value 2
                     PGEX_StrVal("LR", block.layer) //Layer name
                     PGEX_StrVal("ED", block.event_destroy) //Destroy event slot
                     PGEX_StrVal("EH", block.event_hit) //Hit event slot
@@ -1808,6 +1810,12 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             if(blk.motion_ai_id != 0)
                 out << PGEFile::value("MA", PGEFile::WriteInt(blk.motion_ai_id));  // Motion AI type
+
+            if(blk.special_data != 0)
+                out << PGEFile::value("S1", PGEFile::WriteInt(blk.special_data));  // Special value 1
+
+            if(blk.special_data2 != 0)
+                out << PGEFile::value("S2", PGEFile::WriteInt(blk.special_data2));  // Special value 2
 
             //Layer
             if(blk.layer != defBlock.layer) //Write only if not default
