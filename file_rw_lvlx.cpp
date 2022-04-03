@@ -2077,7 +2077,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             if(warp.stood_state_required)
                 out << PGEFile::value("STR", PGEFile::WriteBool(warp.stood_state_required));//Stood state required
             if(warp.transition_effect != LevelDoor::TRANSIT_NONE)
-                out << PGEFile::value("TE", PGEFile::WriteBool(warp.transition_effect));//Transition effect
+                out << PGEFile::value("TE", PGEFile::WriteInt(warp.transition_effect));//Transition effect
             if(warp.cannon_exit)
             {
                 out << PGEFile::value("PT", PGEFile::WriteBool(warp.cannon_exit));//cannon exit
