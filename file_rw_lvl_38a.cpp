@@ -1806,7 +1806,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "," << fromNum((int)door.special_state_required);
         //    size=Warp Size(pixel)
         out << "," << fromNum(door.length_i);
-        if(door.two_way || door.cannon_exit)
+        if(door.two_way || door.cannon_exit || door.stood_state_required)
         {
             //    ts = two-way
             out << "," << fromNum((int)door.two_way);
