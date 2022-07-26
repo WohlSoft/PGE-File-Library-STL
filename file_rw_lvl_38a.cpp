@@ -165,7 +165,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     catch(const std::exception &err)
     {
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
@@ -178,7 +178,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
          * and possible, on some other platforms too
          */
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by unknown exception\n";
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
         FileData.meta.ERROR_linedata = "";
@@ -744,22 +744,22 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  //sn=need stars for enter
                                  &doordata.stars,
                                  //msg=a message when you have not enough stars
-                                 MakeCSVPostProcessor(&doordata.stars_msg, PGEUrlDecodeFunc),
+                                 MakeCSVOptional(&doordata.stars_msg, PGESTRING(""), nullptr, PGEUrlDecodeFunc),
                                  //hide=hide the star number in this warp
-                                 &doordata.star_num_hide),
+                                 MakeCSVOptional(&doordata.star_num_hide, false)),
                 MakeCSVSubReader(dataReader, ',',
                                  //locked=locked
-                                 &doordata.locked,
+                                 MakeCSVOptional(&doordata.locked, false),
                                  //noyoshi=no yoshi
-                                 &doordata.novehicles,
+                                 MakeCSVOptional(&doordata.novehicles, false),
                                  //canpick=allow npc
-                                 &doordata.allownpc,
+                                 MakeCSVOptional(&doordata.allownpc, false),
                                  //bomb=need a bomb
-                                 &doordata.need_a_bomb,
+                                 MakeCSVOptional(&doordata.need_a_bomb, false),
                                  //hide=hide the entry scene
-                                 &doordata.hide_entering_scene,
+                                 MakeCSVOptional(&doordata.hide_entering_scene, false),
                                  //anpc=allow npc interlevel
-                                 &doordata.allownpc_interlevel,
+                                 MakeCSVOptional(&doordata.allownpc_interlevel, false),
                                  //mini=Mini-Only
                                  MakeCSVOptional(&doordata.special_state_required, false),
                                  //size=Warp Size(pixel)
@@ -1286,7 +1286,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
         if(!IsEmpty(identifier))
             FileData.meta.ERROR_info += "\n Field type " + identifier;
@@ -1306,7 +1306,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
          */
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
+        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by unknown exception\n";
         if(!IsEmpty(identifier))
             FileData.meta.ERROR_info += "\n Field type " + identifier;
