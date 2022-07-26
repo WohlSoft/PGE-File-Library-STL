@@ -553,7 +553,19 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                         MakeCSVSubReader(dataReader, ',',
                                                 MakeCSVPostProcessor(&npcdata.direct, [](int &value)
                 {
-                    value = value * -1;
+                    switch(value)
+                    {
+                    case 1:
+                        value = -1;
+                        break;
+                    default:
+                    case -1:
+                        value = 0;
+                        break;
+                    case 0:
+                        value = 1;
+                        break;
+                    }
                 }),
                 &npcdata.friendly,
                 &npcdata.nomove,
@@ -1573,6 +1585,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         long npcID = (long)npc.id;
         long containerType = 0;
         long specialData = npc.special_data;
+        int direct = npc.direct;
         switch(npcID)//Convert npcID and contents ID into container type
         {
         case 91:
@@ -1601,6 +1614,20 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         {
             //Set NPC-ID of contents as main NPC-ID for this NPC
             npcID = npc.contents;
+        }
+
+        switch(direct)
+        {
+        case -1:
+            direct = 1;
+            break;
+        default:
+        case 0:
+            direct = -1;
+            break;
+        case 1:
+            direct = 0;
+            break;
         }
 
         //Convert "Is Boss" flag into special ID
@@ -1655,7 +1682,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    y=npc position y
         out << "|" << fromNum(npc.y);
         //    b1=[1]left [0]random [-1]right
-        out << "|" << fromNum(-1 * npc.direct);
+        out << "|" << fromNum(direct);
         //    b2=friendly npc
         out << "," << fromNum((int)npc.friendly);
         //    b3=don't move npc
