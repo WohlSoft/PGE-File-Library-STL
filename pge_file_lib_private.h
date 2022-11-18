@@ -54,6 +54,12 @@ typedef int pge_size_t;
 #define PGEHASH QHash
 typedef QFile PGEFILE;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#   define QSTR_SKIP_EMPTY_PARTS Qt::SkipEmptyParts
+#else
+#   define QSTR_SKIP_EMPTY_PARTS QString::SkipEmptyParts
+#endif
+
 inline PGESTRING PGESTR_Simpl(const PGESTRING &str)
 {
     return str.simplified();

@@ -45,11 +45,11 @@ FileStringList::~FileStringList()
 void FileStringList::addData(const PGESTRING &fileData)
 {
     buffer.clear();
-    #ifdef PGE_FILES_QT
-    buffer = fileData.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
-    #else
+#ifdef PGE_FILES_QT
+    buffer = fileData.split(QRegExp("[\r\n]"), QSTR_SKIP_EMPTY_PARTS);
+#else
     PGE_SPLITSTRING(buffer, fileData, "\n");
-    #endif
+#endif
     lineID = 0;
 }
 
