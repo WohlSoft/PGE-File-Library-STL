@@ -474,13 +474,13 @@ void FileFormats::CreateLevelData(LevelData &NewFileData)
 {
     CreateLevelHeader(NewFileData);
 
-    NewFileData.bgo_array_id = 1;
-    NewFileData.blocks_array_id = 1;
+    NewFileData.bgo_array_id = 0;
+    NewFileData.blocks_array_id = 0;
     NewFileData.doors_array_id = 1;
-    NewFileData.events_array_id = 1;
-    NewFileData.layers_array_id = 1;
-    NewFileData.npc_array_id = 1;
-    NewFileData.physenv_array_id = 1;
+    NewFileData.events_array_id = 0;
+    NewFileData.layers_array_id = 0;
+    NewFileData.npc_array_id = 0;
+    NewFileData.physenv_array_id = 0;
 
     NewFileData.sections.clear();
     //Create Section array
