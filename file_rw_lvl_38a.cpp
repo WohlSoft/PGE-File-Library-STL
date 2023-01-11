@@ -841,7 +841,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 }
 
                 // Temp Field 11
-                double timer_def_interval_raw;
+                double timer_def_interval_raw = 0.0;
                 // This variable is used for the spawn npc section.
                 // The first two values are static ones, after that they come in packages (see below)
                 int spawnNpcReaderCurrentIndex = 0;

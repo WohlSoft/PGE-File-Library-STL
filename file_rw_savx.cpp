@@ -441,7 +441,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
             {
                 PGESTRING key   = PGE_ReplSTRING(d.key, "=", "\\q"),
                           value = PGE_ReplSTRING(d.value, "=", "\\q");
-                data.push_back( PGEFile::WriteStr(key) + "=" + PGEFile::WriteStr(value));
+                data.emplace_back( PGEFile::WriteStr(key) + "=" + PGEFile::WriteStr(value));
             }
             out << PGEFile::value("D", PGEFile::WriteStrArr(data));
             out << "\n";

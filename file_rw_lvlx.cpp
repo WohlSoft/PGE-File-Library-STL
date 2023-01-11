@@ -2597,7 +2597,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("ID", PGEFile::WriteInt(cfg.id));
                 PGESTRINGList data;
                 for(auto &e : cfg.data)
-                    data.push_back(PGEFile::WriteInt(e.key) + "=" + PGEFile::WriteInt(e.value));
+                    data.emplace_back(PGEFile::WriteInt(e.key) + "=" + PGEFile::WriteInt(e.value));
                 out << PGEFile::value("D", PGEFile::WriteStrArr(data));
                 out << "\n";
             }
