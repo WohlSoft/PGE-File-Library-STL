@@ -220,7 +220,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
             PGEX_Items()
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                star_level.first = "";
+                star_level.first.clear();
                 star_level.second = 0;
                 PGEX_Values() //Look markers and values
                 {

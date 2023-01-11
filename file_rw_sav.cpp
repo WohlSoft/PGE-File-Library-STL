@@ -200,7 +200,7 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
             while((line != "next") && (!IsNULL(line)))
             {
                 starOnLevel gottenStar;
-                gottenStar.first = "";
+                gottenStar.first.clear();
                 gottenStar.second = 0;
 
                 SMBX64::ReadStr(&gottenStar.first, line);//Level file
