@@ -1953,7 +1953,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("EG", PGEFile::WriteStr(npc.event_grab));
             if(!IsEmpty(npc.event_touch))
                 out << PGEFile::value("EO", PGEFile::WriteStr(npc.event_touch));
-            if(!IsEmpty(npc.event_touch))
+            if(!IsEmpty(npc.event_nextframe))
                 out << PGEFile::value("EF", PGEFile::WriteStr(npc.event_nextframe));
             if(!IsEmpty(npc.meta.custom_params))
                 out << PGEFile::value("XTRA", PGEFile::WriteStr(npc.meta.custom_params));
