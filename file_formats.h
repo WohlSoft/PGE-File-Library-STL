@@ -40,12 +40,12 @@
 #include "smbx64_cnf_filedata.h"
 
 #ifdef __GNUC__
-#define DEPRECATED(func) func __attribute__ ((deprecated))
+#   define PGEFL_DEPRECATED(func) func __attribute__ ((deprecated))
 #elif defined(_MSC_VER)
-#define DEPRECATED(func) __declspec(deprecated) func
+#   define PGEFL_DEPRECATED(func) __declspec(deprecated) func
 #else
-#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
-#define DEPRECATED(func) func
+#   pragma message("WARNING: You need to implement PGEFL_DEPRECATED for this compiler")
+#   define PGEFL_DEPRECATED(func) func
 #endif
 
 /*!
@@ -942,7 +942,7 @@ public:
      * \param [__in] RawData raw data string in SMBX Engine config file format
      * \return SMBX Engine specific config structure
      */
-    DEPRECATED(static SMBX64_ConfigFile ReadSMBX64ConfigFile(PGESTRING RawData));
+    PGEFL_DEPRECATED(static SMBX64_ConfigFile ReadSMBX64ConfigFile(PGESTRING RawData));
 
 
     /*!
@@ -976,7 +976,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64)
      * \return raw data string in SMBX Engine config file format
      */
-    DEPRECATED(static PGESTRING WriteSMBX64ConfigFile(SMBX64_ConfigFile &FileData, unsigned int file_format));
+    PGEFL_DEPRECATED(static PGESTRING WriteSMBX64ConfigFile(SMBX64_ConfigFile &FileData, unsigned int file_format));
 
 
     /*!
