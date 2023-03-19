@@ -391,7 +391,7 @@ inline PGESTRING fromBoolToNum(bool num)
 #define PGE_BASE64DEC_W(src) PGE_FileFormats_misc::base64_decodeW(src)
 #define PGE_BASE64ENC_A(src) PGE_FileFormats_misc::base64_encodeA(src)
 #define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
-#endif
+#endif /* ------ PGE_FILES_QT ------ */
 
 inline bool PGE_floatEqual(double l, double r, double precission)
 {
@@ -414,5 +414,23 @@ inline bool PGE_StartsWith(const PGESTRING &src, const PGESTRING &with)
 #endif
 }
 
+static inline uint32_t PGE_toNearestU(double o)
+{
+    if(uint32_t(o) % 2 == 0 && (uint32_t(o * 100000.0) == uint32_t((uint32_t(o) * 100000) + 50000)))
+        return uint32_t(o);
+    else if(uint32_t(o) % 2 != 0 && (uint32_t(o * 100000.0) == uint32_t((uint32_t(o) * 100000) + 50000)))
+        return uint32_t(o + 1.0);
+    else
+        return uint32_t(o + 0.5);
+}
+
+static inline int PGE_toNearestS(double o)
+{
+    int sign = o >= 0 ? +1 : -1;
+    if(o < 0)
+        o = -o;
+
+    return int(PGE_toNearestU(o)) * sign;
+}
 
 #endif // PGE_FILE_LIB_PRIVATE_H_

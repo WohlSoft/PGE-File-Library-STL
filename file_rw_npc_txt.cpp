@@ -96,6 +96,12 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         {
             if(doLog)
                 fileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
+
+            if(SMBX64::IsFloat(input))
+            {
+                dest = PGE_toNearestS(toDouble(input));
+                dest_en = true;
+            }
         }
         else
         {
@@ -117,6 +123,15 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         {
             if(doLog)
                 fileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
+
+            if(SMBX64::IsFloat(input))
+            {
+                double o = toDouble(input);
+                if(o < 0)
+                    o = -o;
+                dest = PGE_toNearestU(o);
+                dest_en = true;
+            }
         }
         else
         {
@@ -138,6 +153,12 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         {
             if(doLog)
                 fileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
+
+            if(SMBX64::IsFloat(input))
+            {
+                dest = int(toDouble(input)) != 0;
+                dest_en = true;
+            }
         }
         else
         {
