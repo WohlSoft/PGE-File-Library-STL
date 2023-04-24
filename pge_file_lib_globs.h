@@ -87,6 +87,9 @@ typedef QChar   PGEChar;
 #define PGEMAPKEY(it) (it.key())
 #define PGEMAPVAL(it) (it.value())
 
+#define PGESTRING_EMPLACE(x) push_back(x)
+
+
 #else /* PGE_FILES_QT */
 
 #include <string>
@@ -106,6 +109,8 @@ typedef char PGEChar;
 #define PGEMAP std::map
 #define PGEMAPKEY(it) (it->first)
 #define PGEMAPVAL(it) (it->second)
+
+#define PGESTRING_EMPLACE(x) emplace_back(x)
 
 #endif /* PGE_FILES_QT */
 
