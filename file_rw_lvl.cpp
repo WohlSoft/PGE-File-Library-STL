@@ -864,9 +864,9 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
                     nextLine();
                     SMBX64::ReadStr(&events.movelayer, line);  //Layer for movement
                     nextLine();
-                    SMBX64::ReadFloat(&events.layer_speed_x, line); //Layer moving speed – horizontal
+                    SMBX64::ReadFloat(&events.layer_speed_x, line); //Layer moving speed - horizontal
                     nextLine();
-                    SMBX64::ReadFloat(&events.layer_speed_y, line); //Layer moving speed – vertical
+                    SMBX64::ReadFloat(&events.layer_speed_y, line); //Layer moving speed - vertical
 
                     if(!IsEmpty(events.movelayer))
                     {

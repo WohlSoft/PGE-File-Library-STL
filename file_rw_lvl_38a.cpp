@@ -1372,19 +1372,19 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 #define layerNotDef(lr) ( ((lr) != "Default") ? PGE_URLENC(lr) : "" )
     //========================================================
     //Data type markers:
-    //A         – Level header settings
-    //P1, P2    – Player spawn points
-    //M       – Section settings
-    //B       – blocks
-    //T       – Background objects
-    //N       – Non-playable characters
-    //Q       – Liquid/Environment boxes
-    //W       – Warp entries
-    //L       – Layers
-    //E       – Events
-    //V       – Local level variables
-    //S       – UTF-8 encoded local level scripts
-    //Su      – ASCII-encoded local level scripts
+    //A         - Level header settings
+    //P1, P2    - Player spawn points
+    //M       - Section settings
+    //B       - blocks
+    //T       - Background objects
+    //N       - Non-playable characters
+    //Q       - Liquid/Environment boxes
+    //W       - Warp entries
+    //L       - Layers
+    //E       - Events
+    //V       - Local level variables
+    //S       - UTF-8 encoded local level scripts
+    //Su      - ASCII-encoded local level scripts
     //--------------------------------------------------------
     //line 1:
     //    SMBXFile??
