@@ -1202,7 +1202,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                        );
                 FileData.scripts.push_back(scriptdata);
             }
-            else if(identifier == "Su")
+            else if(identifier == "Su" || identifier == "SU")
             {
                 // Su|name|scriptu
                 scriptdata = CreateLvlScript("doScript", LevelScript::LANG_TEASCRIPT);
