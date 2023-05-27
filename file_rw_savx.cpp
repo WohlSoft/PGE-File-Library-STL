@@ -226,7 +226,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 {
                     PGEX_ValueBegin()
                     PGEX_StrVal("L", star_level.first)
-                    PGEX_USIntVal("S", star_level.second)
+                    PGEX_SIntVal("S", star_level.second)
                 }
                 FileData.gottenStars.push_back(star_level);
             }
