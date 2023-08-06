@@ -44,10 +44,10 @@ namespace PGEExtendedFormat
         return ((c >= '0') && (c <= '9'));
     }
 
-    bool isValid(const PGESTRING &s, const char *valid_chars, const pge_size_t &valid_chars_len)
+    bool isValid(const PGESTRING &s, const char *valid_chars, const pge_size_t &valid_chars_len, bool allow_empty = false)
     {
         if(IsEmpty(s))
-            return false;
+            return allow_empty;
 
         pge_size_t i, j;
 
@@ -67,6 +67,7 @@ namespace PGEExtendedFormat
             if(!found)
                 return false;
         }
+
         return true;
     }
 }
@@ -523,7 +524,7 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
 bool PGEFile::IsBoolArray(const PGESTRING &in) // Boolean array
 {
     using namespace PGEExtendedFormat;
-    return isValid(in, "01", 2);
+    return isValid(in, "01", 2, true);
 }
 
 bool PGEFile::IsIntArray(const PGESTRING &in) // Boolean array
