@@ -79,6 +79,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
     saveCharState plr_state;
     visibleItem        vz_item;
     starOnLevel        star_level;
+    saveLevelInfo      level_info;
     saveUserData::DataSection user_data_entry;
     //Add path data
     PGESTRING fPath = in.getFilePath();
@@ -231,6 +232,26 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 FileData.gottenStars.push_back(star_level);
             }
         }//STARS
+        ///////////////////LEVEL INFO//////////////////////
+        PGEX_Section("LEVEL_INFO")
+        {
+            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_Items()
+            {
+                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                level_info = saveLevelInfo();
+                PGEX_Values() //Look markers and values
+                {
+                    PGEX_ValueBegin()
+                    PGEX_StrVal("L", level_info.level_filename)
+                    PGEX_UIntVal("S", level_info.max_stars)
+                    PGEX_UIntVal("M", level_info.max_medals)
+                    PGEX_BoolArrVal("MG", level_info.medals_got)
+                    PGEX_BoolArrVal("MB", level_info.medals_best)
+                }
+                FileData.levelInfo.push_back(level_info);
+            }
+        }//LEVEL_INFO
         ///////////////////USERDATA//////////////////////
         PGEX_Section("USERDATA")
         {
@@ -420,6 +441,24 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
         }
 
         out << "STARS_END\n";
+    }
+
+    if(!FileData.levelInfo.empty())
+    {
+        out << "LEVEL_INFO\n";
+
+        for(i = 0; i < FileData.levelInfo.size(); i++)
+        {
+            saveLevelInfo &slinfo = FileData.levelInfo[i];
+            out << PGEFile::value("L", PGEFile::WriteStr(slinfo.level_filename));
+            out << PGEFile::value("S", PGEFile::WriteInt(slinfo.max_stars));
+            out << PGEFile::value("M", PGEFile::WriteInt(slinfo.max_medals));
+            out << PGEFile::value("MG", PGEFile::WriteBoolArr(slinfo.medals_got));
+            out << PGEFile::value("MB", PGEFile::WriteBoolArr(slinfo.medals_best));
+            out << "\n";
+        }
+
+        out << "LEVEL_INFO_END\n";
     }
 
     if(!FileData.userData.store.empty())

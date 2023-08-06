@@ -107,6 +107,17 @@ struct saveUserData
     PGELIST<DataSection> store;
 };
 
+/**
+ * @brief Per-level cached counters
+ */
+struct saveLevelInfo
+{
+    PGESTRING level_filename;
+    unsigned int max_stars;
+    unsigned int max_medals;
+    PGELIST<bool> medals_best;
+    PGELIST<bool> medals_got;
+};
 
 /*!
  * \brief Game save data structure
@@ -151,7 +162,10 @@ struct GamesaveData
     PGELIST<visibleItem > visibleLevels;
     PGELIST<visibleItem > visiblePaths;
     PGELIST<visibleItem > visibleScenery;
+    //! Registry of taken per-level stars
     PGELIST<starOnLevel > gottenStars;
+    //! Cached per-level information and medals registry
+    PGELIST<saveLevelInfo > levelInfo;
 };
 
 #endif // SAVE_FILEDATA_H
