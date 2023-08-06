@@ -453,8 +453,13 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
             out << PGEFile::value("L", PGEFile::WriteStr(slinfo.level_filename));
             out << PGEFile::value("S", PGEFile::WriteInt(slinfo.max_stars));
             out << PGEFile::value("M", PGEFile::WriteInt(slinfo.max_medals));
-            out << PGEFile::value("MG", PGEFile::WriteBoolArr(slinfo.medals_got));
-            out << PGEFile::value("MB", PGEFile::WriteBoolArr(slinfo.medals_best));
+
+            if(!slinfo.medals_got.empty())
+                out << PGEFile::value("MG", PGEFile::WriteBoolArr(slinfo.medals_got));
+
+            if(!slinfo.medals_best.empty())
+                out << PGEFile::value("MB", PGEFile::WriteBoolArr(slinfo.medals_best));
+
             out << "\n";
         }
 
