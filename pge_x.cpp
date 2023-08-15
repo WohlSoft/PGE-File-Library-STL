@@ -27,6 +27,17 @@
 #ifdef PGE_FILES_QT
 #include <QMutex>
 #include <QMutexLocker>
+#ifndef PGEFL_QRegExp
+#   if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#       include <QRegularExpression>
+#       define PGEFL_QRegExp QRegularExpression
+#       define PGEFL_Match(x) match(x).hasMatch()
+#   else
+#       include <QRegExp>
+#       define PGEFL_QRegExp QRegExp
+#       define PGEFL_Match(x) exactMatch(x)
+#   endif
+#endif
 #else
 #include <regex>
 #endif
@@ -531,7 +542,7 @@ bool PGEFile::IsIntArray(const PGESTRING &in) // Boolean array
 {
     using namespace PGEExtendedFormat;
 #ifdef PGE_FILES_QT
-    return QRegExp("^\\[(\\-?\\d+,?)*\\]$").exactMatch(in);
+    return PGEFL_QRegExp("^\\[(\\-?\\d+,?)*\\]$").PGEFL_Match(in);
 #else
     //FIXME
     std::regex rx("^\\[(\\-?\\d+,?)*\\]$");

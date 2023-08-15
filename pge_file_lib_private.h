@@ -35,7 +35,11 @@
 #include <QStringList>
 #include <QFile>
 #include <QTextStream>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QStringConverter>
+#else
 #include <QTextCodec>
+#endif
 #include <QVector>
 #include <QPair>
 #include <QMap>

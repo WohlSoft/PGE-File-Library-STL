@@ -890,6 +890,17 @@ bool TextFileInput::open(PGESTRING filePath, bool utf8)
     state = file.open(QIODevice::ReadOnly | QIODevice::Text);
     if(!state) return false;
     stream.setDevice(&file);
+
+#   if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if(utf8)
+        stream.setEncoding(QStringConverter::Utf8);
+    else
+    {
+        stream.setAutoDetectUnicode(true);
+        stream.setLocale(QLocale::system());
+        stream.setEncoding(QStringConverter::System);
+    }
+#   else
     if(utf8)
         stream.setCodec("UTF-8");
     else
@@ -898,6 +909,8 @@ bool TextFileInput::open(PGESTRING filePath, bool utf8)
         stream.setLocale(QLocale::system());
         stream.setCodec(QTextCodec::codecForLocale());
     }
+#   endif
+
     return true;
 #else
     (void)utf8;
@@ -1165,6 +1178,17 @@ bool TextFileOutput::open(PGESTRING filePath, bool utf8, bool forceCRLF, TextOut
     if(!m_forceCRLF)
     {
         stream.setDevice(&file);
+
+#   if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        if(utf8)
+            stream.setEncoding(QStringConverter::Utf8);
+        else
+        {
+            stream.setAutoDetectUnicode(true);
+            stream.setLocale(QLocale::system());
+            stream.setEncoding(QStringConverter::System);
+        }
+#   else
         if(utf8)
             stream.setCodec("UTF-8");
         else
@@ -1173,6 +1197,8 @@ bool TextFileOutput::open(PGESTRING filePath, bool utf8, bool forceCRLF, TextOut
             stream.setLocale(QLocale::system());
             stream.setCodec(QTextCodec::codecForLocale());
         }
+#   endif
+
     }
     return true;
 #else
