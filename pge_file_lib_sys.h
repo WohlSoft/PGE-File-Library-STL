@@ -35,7 +35,16 @@
  */
 
 #ifdef PGE_FILES_QT
-#include <QRegExp>
+#include <QtGlobal>
+#ifndef PGEFL_QRegExp
+#   if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#       include <QRegularExpression>
+#       define PGEFL_QRegExp QRegularExpression
+#   else
+#       include <QRegExp>
+#       define PGEFL_QRegExp QRegExp
+#   endif
+#endif
 #include <QFileInfo>
 #include <QFile>
 #include <QFileInfo>

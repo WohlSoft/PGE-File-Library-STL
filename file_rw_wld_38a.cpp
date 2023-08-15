@@ -567,25 +567,25 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         //        c4=condidtion expression[***urlencode!***][syntax]
                                         //        exit = (c1 || c2 || c3) && c4
                                         MakeCSVSubReader(dataReader, '\\',
-                                                        MakeCSVSubReader(dataReader, ','
+                                                        MakeCSVSubReader(dataReader, PGEChar(','),
                                                                          &lvlitem.top_exit,
                                                                          &lvlitem.top_exit_extra.exit_codes[0],
                                                                          &lvlitem.top_exit_extra.exit_codes[1],
                                                                          MakeCSVPostProcessor(&lvlitem.top_exit_extra.expression, PGEUrlDecodeFunc)
                                                                          ),
-                                                        MakeCSVSubReader(dataReader, ','
+                                                        MakeCSVSubReader(dataReader, PGEChar(','),
                                                                          &lvlitem.left_exit,
                                                                          &lvlitem.left_exit_extra.exit_codes[0],
                                                                          &lvlitem.left_exit_extra.exit_codes[1],
                                                                          MakeCSVPostProcessor(&lvlitem.left_exit_extra.expression, PGEUrlDecodeFunc)
                                                                          ),
-                                                        MakeCSVSubReader(dataReader, ','
+                                                        MakeCSVSubReader(dataReader, PGEChar(','),
                                                                          &lvlitem.bottom_exit,
                                                                          &lvlitem.bottom_exit_extra.exit_codes[0],
                                                                          &lvlitem.bottom_exit_extra.exit_codes[1],
                                                                          MakeCSVPostProcessor(&lvlitem.bottom_exit_extra.expression, PGEUrlDecodeFunc)
                                                                          ),
-                                                        MakeCSVSubReader(dataReader, ','
+                                                        MakeCSVSubReader(dataReader, PGEChar(','),
                                                                          &lvlitem.right_exit,
                                                                          &lvlitem.right_exit_extra.exit_codes[0],
                                                                          &lvlitem.right_exit_extra.exit_codes[1],

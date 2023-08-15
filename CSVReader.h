@@ -979,7 +979,8 @@ namespace CSVReader
      * \see CSVSubReader
      */
     template<class Reader, class StrT, class CharT, class StrTUtils, class Converter, class SubChar, class... RestValues>
-    constexpr CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...> MakeCSVSubReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, RestValues &&... values)
+    constexpr CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...>
+    MakeCSVSubReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, RestValues &&... values)
     {
         return CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...>(sep, false, std::forward<RestValues>(values)...);
     }
@@ -990,7 +991,8 @@ namespace CSVReader
      * \see CSVOptional
      */
     template<class Reader, class StrT, class CharT, class StrTUtils, class Converter, class SubChar, class... RestValues>
-    constexpr CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...> MakeCSVOptionalSubReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, RestValues &&... values)
+    constexpr CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...>
+    MakeCSVOptionalSubReader(const CSVReader<Reader, StrT, CharT, StrTUtils, Converter> &, SubChar sep, RestValues &&... values)
     {
         return CSVSubReader<Reader, StrT, CharT, StrTUtils, Converter, RestValues...>(sep, true, std::forward<RestValues>(values)...);
     }
