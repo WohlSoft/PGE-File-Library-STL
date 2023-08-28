@@ -284,6 +284,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
     WorldScenery scen;
     WorldPathTile pathitem;
     WorldMusicBox musicbox;
+    WorldAreaRect arearect;
     WorldLevelTile lvlitem;
     ///////////////////////////////////////Begin file///////////////////////////////////////
     PGEX_FileParseTree(in.readAll());
@@ -457,6 +458,41 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 FileData.music.push_back(musicbox);
             }
         }//MUSICBOXES
+        ///////////////////AREARECTS//////////////////////
+        PGEX_Section("AREARECTS")
+        {
+            str_count++;
+            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_Items()
+            {
+                str_count++;
+                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                arearect = WorldAreaRect();
+                PGEX_Values() //Look markers and values
+                {
+                    PGEX_ValueBegin()
+                    PGEX_USIntVal("F", arearect.flags)  //Flags
+                    PGEX_SIntVal("X", arearect.x) //X Position
+                    PGEX_SIntVal("Y", arearect.y) //X Position
+                    PGEX_USIntVal("W", arearect.w) //Width
+                    PGEX_USIntVal("H", arearect.h) //Height
+
+                    // unused stuff
+                    PGEX_UIntVal("MI", arearect.music_id) //MUSICBOX ID
+                    PGEX_StrVal("MF", arearect.music_file)  //Custom music file
+                    PGEX_StrVal("LR", arearect.layer)
+                    PGEX_StrVal("EB", arearect.eventBreak)
+                    PGEX_StrVal("EW", arearect.eventWarp)
+                    PGEX_StrVal("EA", arearect.eventAnchor)
+                    PGEX_StrVal("ET", arearect.eventTouch)
+                    PGEX_SIntVal("TP", arearect.eventTouchPolicy)
+                    PGEX_StrVal("XTRA", arearect.meta.custom_params)//Custom JSON data tree
+                }
+                arearect.meta.array_id = FileData.arearect_array_id++;
+                arearect.meta.index =  static_cast<unsigned int>(FileData.arearects.size());
+                FileData.arearects.push_back(arearect);
+            }
+        }//AREARECTS
         ///////////////////LEVELS//////////////////////
         PGEX_Section("LEVELS")
         {
@@ -699,6 +735,46 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
         }
 
         out << "MUSICBOXES_END\n";
+    }
+
+    if(!FileData.arearects.empty())
+    {
+        out << "AREARECTS\n";
+
+        WorldAreaRect defA;
+
+        for(i = 0; i < FileData.arearects.size(); i++)
+        {
+            WorldAreaRect &a = FileData.arearects[i];
+            out << PGEFile::value("F", PGEFile::WriteInt(a.flags));
+            out << PGEFile::value("X", PGEFile::WriteInt(a.x));
+            out << PGEFile::value("Y", PGEFile::WriteInt(a.y));
+            out << PGEFile::value("W", PGEFile::WriteInt(a.w));
+            out << PGEFile::value("H", PGEFile::WriteInt(a.h));
+
+            // unused stuff
+            if(a.music_id)
+                out << PGEFile::value("MI", PGEFile::WriteInt(a.music_id));
+            if(!IsEmpty(a.music_file))
+                out << PGEFile::value("MF", PGEFile::WriteStr(a.music_file));
+            if(!IsEmpty(a.layer) && a.layer != defA.layer)
+                out << PGEFile::value("LR", PGEFile::WriteStr(a.layer));
+            if(!IsEmpty(a.eventBreak))
+                out << PGEFile::value("EB", PGEFile::WriteStr(a.eventBreak));
+            if(!IsEmpty(a.eventWarp))
+                out << PGEFile::value("EW", PGEFile::WriteStr(a.eventWarp));
+            if(!IsEmpty(a.eventAnchor))
+                out << PGEFile::value("EA", PGEFile::WriteStr(a.eventAnchor));
+            if(!IsEmpty(a.eventTouch))
+                out << PGEFile::value("ET", PGEFile::WriteStr(a.eventTouch));
+            if(a.eventTouchPolicy != defA.eventTouchPolicy)
+                out << PGEFile::value("TP", PGEFile::WriteInt(a.eventTouchPolicy));
+            if(!IsEmpty(a.meta.custom_params))
+                out << PGEFile::value("XTRA", PGEFile::WriteStr(a.meta.custom_params));
+            out << "\n";
+        }
+
+        out << "AREARECTS_END\n";
     }
 
     if(!FileData.levels.empty())
