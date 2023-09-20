@@ -95,6 +95,8 @@ struct LevelSection
     bool underwater = false;
     //! Custom music file which will be playd if music ID defined to "Custom" music id
     PGESTRING music_file;
+    //! Level-wide music bank index (-1, the section-local path will be used, or 0..N-1 - use level-wide bank)
+    int music_file_idx = -1;
 
     /*
      * Editor-only parameters which are not saving into file
@@ -627,8 +629,10 @@ struct LevelEvent_Sets
 
     //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
     long music_id = LESet_Nothing;
-    //! Set new Custom Music File path
+    //! Set new Custom Music File path (if empty - don't change)
     PGESTRING music_file;
+    //! Set new level-wide music bank index (-1 - don't change, -2 reset default, -3 - set to section-local music, 0..N - switch to any level-wide music bank entry)
+    int music_file_idx = LESet_Nothing;
     //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
     long background_id = LESet_Nothing;
 
@@ -1031,6 +1035,9 @@ struct LevelData
     PGELIST<MusicOverrider > music_overrides;
     //! Override default sound effects
     PGELIST<MusicOverrider > sound_overrides;
+
+    //! Level-wide bank of custom music files
+    PGESTRINGList music_files;
 
     /*
      * Level data
