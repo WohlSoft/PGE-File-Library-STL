@@ -188,7 +188,20 @@ public:
      */
     static bool SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion = 64);
 
+
     // SMBX64 LVL File
+    enum SMBX64LvlFlags
+    {
+        //! Keep default behavkour
+        F_SMBX64_NO_FLAGS = 0,
+        //! Don't convert NPC codes in blocks into modern format: keep them as-is (as -100, -101, -102, etc.)
+        F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES = 0x01
+    };
+    /*!
+     * \brief Changes the behaviour of reading and writing SMBX64 level files
+     * \param flags Bitwise flags that affects reading and writing of SMBX64 level files
+     */
+    static void SetSMBX64LvlFlags(int flags);
     /*!
      * \brief Parses SMBX1...64 level file header and skips other part of a file
      * \param [__in] filePath Full path to level file
