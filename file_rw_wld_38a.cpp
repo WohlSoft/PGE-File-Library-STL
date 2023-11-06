@@ -207,9 +207,9 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     {
         FileData.meta.ReadFileValid = false;
         FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
-                                   "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
+                                   "Caused by: \n" + toPgeString(exception_to_pretty_string(err));
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         return false;
     }
 
@@ -231,7 +231,7 @@ bool FileFormats::ReadSMBX38AWldFileF(const PGESTRING &filePath, WorldData& File
     if(!file.open(filePath, false))
     {
         FileData.meta.ERROR_info = "Failed to open file for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -248,7 +248,7 @@ bool FileFormats::ReadSMBX38AWldFileRaw(PGESTRING& rawdata, const PGESTRING &fil
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Failed to open raw string for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -269,10 +269,10 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     FileData.meta.RecentFormatVersion = latest_version_38a;
 
 #if !defined(_MSC_VER) || _MSC_VER > 1800
-    FileData.EpisodeTitle = "" ;
+    FileData.EpisodeTitle.clear();
     FileData.stars = 0;
     FileData.CurSection = 0;
-    FileData.playmusic = 0;
+    FileData.playmusic = false;
 
     //Enable strict mode for SMBX LVL file format
     FileData.meta.smbx64strict = false;
@@ -544,7 +544,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 lvlitem.top_exit_extra.exit_codes = {0, 0};
                 lvlitem.right_exit_extra.exit_codes = {0, 0};
                 lvlitem.bottom_exit_extra.exit_codes = {0, 0};
-                dataReader.ReadDataLine(CSVDiscard(),
+                dataReader.ReadDataLine(CSVDiscard(), //-V681
                                         MakeCSVSubReader(dataReader, ',',
                                                          //id=level id
                                                          &lvlitem.id,
@@ -644,7 +644,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                                         //            Node=x,y,chance
                                         //        PathInfo=Path1:Path2:...:PathN
                                         //            Path=NodeID1,NodeID2
-                                        MakeCSVOptionalSubReader(dataReader, '\\',
+                                        MakeCSVOptionalSubReader(dataReader, '\\', //-V681
                                                                  MakeCSVOptionalIterator(dataReader, ':', [&lvlitem](const PGESTRING & nextFieldStr)
                                                                  {
                                                                      WorldLevelTile::Movement::Node node;
@@ -787,7 +787,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 FileData.meta.ERROR_linenum = static_cast<long>(parseErr.get_line_number());
             }
             catch(...)
-            {
+            {   //-V565
                 // Do Nothing
             }
         }
@@ -795,13 +795,13 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
         // Now fill in the error data.
         FileData.meta.ReadFileValid = false;
         FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
-                                   "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
+                                   "Caused by: \n" + toPgeString(exception_to_pretty_string(err));
 
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
         if(FileData.meta.ERROR_linenum == 0)
             FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
 
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         return false;
     }
     catch(...)
@@ -819,7 +819,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
         if(FileData.meta.ERROR_linenum == 0)
             FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         return false;
     }
 
@@ -872,7 +872,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
 {
     (void)out;
     FileData.meta.ERROR_info = "Not implemented yet. Comming soon!";
-    FileData.meta.ERROR_linedata = "";
+    FileData.meta.ERROR_linedata.clear();
     FileData.meta.ERROR_linenum = -1;
     FileData.meta.ReadFileValid = false;
     FileData.meta.RecentFormat = WorldData::SMBX38A;

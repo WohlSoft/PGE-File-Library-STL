@@ -168,7 +168,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
         FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by: \n" + PGESTRING(exception_to_pretty_string(err).c_str());
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         return false;
     }
     catch(...)
@@ -181,7 +181,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
         FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
                                    "Caused by unknown exception\n";
         FileData.meta.ERROR_linenum = inf.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         return false;
     }
 
@@ -204,7 +204,7 @@ bool FileFormats::ReadSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &File
     if(!file.open(filePath, false))
     {
         FileData.meta.ERROR_info = "Failed to open file for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -221,7 +221,7 @@ bool FileFormats::ReadSMBX38ALvlFileRaw(PGESTRING &rawdata, const PGESTRING &fil
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Failed to open raw string for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -249,7 +249,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     FileData.meta.RecentFormat = LevelData::SMBX38A;
     FileData.meta.RecentFormatVersion = latest_version_38a;
 #if !defined(_MSC_VER) || _MSC_VER > 1800
-    FileData.LevelName = "" ;
+    FileData.LevelName.clear();
     FileData.stars = 0;
     FileData.CurSection = 0;
     FileData.playmusic = 0;
@@ -432,7 +432,10 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 section.lock_up_scroll =    (scroll_lock_y == "1");
                 section.lock_down_scroll =  (scroll_lock_y == "2");
 
-                if((x != 0.0) || (y != 0.0) || (w != 0.0) || (h != 0.0))
+                if(!PGE_floatEqual(x, 0.0, 5) ||
+                   !PGE_floatEqual(y, 0.0, 5) ||
+                   !PGE_floatEqual(w, 0.0, 5) ||
+                   !PGE_floatEqual(h, 0.0, 5))
                 {
                     section.size_left = static_cast<long>(round(x));
                     section.size_top = static_cast<long>(round(y));
@@ -536,8 +539,8 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 // N|layer[,name]|id[,dx,dy]|x|y|b1,b2,b3,b4,b5,b6|sp|[e1,e2,e3,e4,e5,e6,e7]|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|[wi,hi]
                 npcdata = CreateLvlNpc();
                 npcdata.generator_period_orig_unit = PGE_FileLibrary::TimeUnit::FrameOneOf65sec;
-                double specialData;
-                int genType; // We have to handle that later :(
+                double specialData = 0.0;
+                int genType = 0; // We have to handle that later :(
                 dataReader.ReadDataLine(CSVDiscard(),
                                         MakeCSVSubReader(dataReader, ',',
                                                 MakeCSVPostProcessor(&npcdata.layer, PGELayerOrDefault),
@@ -787,8 +790,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 doordata.type = type % 100;
                 //type/100=[0=none][1=Scroll][2=Fade][3=FlipH][4=FlipV]
                 {
-                    int te = type / 100;
-                    switch(te)
+                    switch(type / 100) //-V785
                     {
                     default:
                     case 0: doordata.transition_effect = LevelDoor::TRANSIT_NONE; break;
@@ -799,15 +801,15 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     }
                 }
 
-                if(doordata.type == LevelDoor::WARP_DOOR) // Workaround to make sure door direction is always up
+                if(doordata.type == LevelDoor::WARP_DOOR) // Workaround to make sure door direction is always up //-V547
                 {
                     doordata.idirect = LevelDoor::ENTRANCE_UP;
                     doordata.odirect = LevelDoor::EXIT_DOWN;
                 }
 
                 doordata.length_o = doordata.length_i;
-                doordata.isSetIn = (doordata.lvl_i ? false : true);
-                doordata.isSetOut = (doordata.lvl_o ? false : true) || doordata.lvl_i;
+                doordata.isSetIn = !doordata.lvl_i;
+                doordata.isSetOut = !doordata.lvl_o || doordata.lvl_i;
                 doordata.cannon_exit = (doordata.cannon_exit_speed > 0.0);
                 if(doordata.cannon_exit_speed <= 0)
                     doordata.cannon_exit_speed = 10.0;
@@ -845,7 +847,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 // This variable is used for the spawn npc section.
                 // The first two values are static ones, after that they come in packages (see below)
                 int spawnNpcReaderCurrentIndex = 0;
-                dataReader.ReadDataLine(CSVDiscard(),
+                dataReader.ReadDataLine(CSVDiscard(), //-V681
                                         // name=event name[***urlencode!***]
                                         MakeCSVPostProcessor(&eventdata.name, PGEUrlDecodeFunc),
                                         // msg=show message after start event[***urlencode!***]
@@ -896,7 +898,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                  &eventdata.ctrl_lock_keyboard
                                 ),
                 // eps=esection/ebackground/emusic
-                MakeCSVSubReader(dataReader, '/',
+                MakeCSVSubReader(dataReader, '/', //-V681
                                  MakeCSVIterator(dataReader, ':', [&eventdata](const PGESTRING & nextFieldStr)
                 {
                     auto fieldReader = MakeDirectReader(nextFieldStr);
@@ -1037,7 +1039,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     int sectionID = fullReader.ReadField<int>(1) - 1;
                     LevelEvent_Sets &nextSet = eventdata.sets[static_cast<pge_size_t>(sectionID)];
                     bool customMusic = false;
-                    long music_id;
+                    long music_id = 0;
                     fullReader.ReadDataLine(CSVDiscard(),
                                             MakeCSVPostProcessor(&nextSet.music_id, [&customMusic](long & value)
                     {
@@ -1279,7 +1281,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 FileData.meta.ERROR_linenum = static_cast<long>(parseErr.get_line_number());
             }
             catch(...)
-            {
+            {   //-V565
                 // Do Nothing
             }
         }
@@ -1295,7 +1297,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
         if(FileData.meta.ERROR_linenum == 0)
             FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
 
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         return false;
     }
     catch(...)
@@ -1310,16 +1312,18 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                                    "Caused by unknown exception\n";
         if(!IsEmpty(identifier))
             FileData.meta.ERROR_info += "\n Field type " + identifier;
+
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
         if(FileData.meta.ERROR_linenum == 0)
             FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = "";
+
+        FileData.meta.ERROR_linedata.clear();
         return false;
     }
 
     LevelAddInternalEvents(FileData);
     FileData.CurSection = 0;
-    FileData.playmusic = 0;
+    FileData.playmusic = false;
     FileData.meta.ReadFileValid = true;
     return true;
 #else // MSVC2015+
@@ -2059,7 +2063,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             bool legacyAutoScroll = false;
 
             if(isLevelStart && j == (pge_size_t)evt.scroll_section && !set.autoscrol
-               && (evt.move_camera_x != 0.0 || evt.move_camera_y != 0.0))
+               && (!PGE_floatEqual(evt.move_camera_x, 0.0, 5) ||
+                   !PGE_floatEqual(evt.move_camera_y, 0.0, 5)))
             {
                 legacyAutoScroll = true;
                 expression_as_x = fromNum(evt.move_camera_x);

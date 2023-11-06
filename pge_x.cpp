@@ -50,12 +50,12 @@ namespace PGEExtendedFormat
     static const char *heximal_valid_chars    = "0123456789ABCDEFabcdef";
     static const pge_size_t heximal_valid_chars_len = 22;
 
-    bool isDegit(PGEChar c)
+    static bool isDegit(PGEChar c)
     {
         return ((c >= '0') && (c <= '9'));
     }
 
-    bool isValid(const PGESTRING &s, const char *valid_chars, const pge_size_t &valid_chars_len, bool allow_empty = false)
+    static bool isValid(const PGESTRING &s, const char *valid_chars, const pge_size_t valid_chars_len, bool allow_empty = false)
     {
         if(IsEmpty(s))
             return allow_empty;
@@ -91,8 +91,8 @@ PGEFile::PGEFile(QObject *parent)
 PGEFile::PGEFile()
 #endif
 {
-    m_lastError = "";
-    m_rawData = "";
+    m_lastError.clear();
+    m_rawData.clear();
 }
 
 #ifdef PGE_FILES_QT
@@ -105,6 +105,14 @@ PGEFile::PGEFile(const PGEFile &pgeFile)
     m_rawData = pgeFile.m_rawData;
     m_rawDataTree = pgeFile.m_rawDataTree;
     m_lastError = pgeFile.m_lastError;
+}
+
+PGEFile &PGEFile::operator=(const PGEFile &other)
+{
+    m_rawData = other.m_rawData;
+    m_rawDataTree = other.m_rawDataTree;
+    m_lastError = other.m_lastError;
+    return *this;
 }
 
 PGEFile::PGEFile(const PGESTRING &_rawData) :

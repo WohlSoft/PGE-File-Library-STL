@@ -116,27 +116,38 @@ public:
      * \brief Constructor
      */
     PGEFile();
+
     /*!
      * \brief Copy Constructor
      * \param pgeFile Another PGEFile object
      */
     PGEFile(const PGEFile &pgeFile);
 #endif
+
+    /*!
+     * \brief Assignment operator
+     * \param other Another PGEFile object
+     */
+    PGEFile &operator=(const PGEFile &other);
+
     /*!
      * \brief Constructor with pre-storing of raw data
      * \param _rawData
      */
-    PGEFile(const PGESTRING &_rawData);
+    explicit PGEFile(const PGESTRING &_rawData);
+
     /*!
      * \brief Stores raw data string
      * \param _rawData String contains raw data of entire file
      */
     void setRawData(const PGESTRING &_rawData);
+
     /*!
      * \brief Parses stored raw data into the data tree
      * \return
      */
     bool buildTreeFromRaw();
+
     /*!
      * \brief Returns last occouped error
      * \return Last occouped error
@@ -257,7 +268,7 @@ public:
      * \param input boolean flag
      * \return Encoded PGE-X raw string
      */
-    static inline PGESTRING WriteBool(const bool &input)
+    static inline PGESTRING WriteBool(bool input)
     {
         return PGESTRING((input) ? "1" : "0");
     }

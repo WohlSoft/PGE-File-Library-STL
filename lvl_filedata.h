@@ -114,8 +114,6 @@ struct LevelSection
  */
 struct PlayerPoint
 {
-    //! Defined ID of player
-    unsigned int id = 0;
     //! X-position of player spawn point
     long x = 0;
     //! Y-position of player spawn point
@@ -124,6 +122,8 @@ struct PlayerPoint
     long h = 32;
     //! Wodth of player spawn point (used to calculate position of bottom to place playable character correctly)
     long w = 24;
+    //! Defined ID of player
+    unsigned int id = 0;
     //! Initial direction of playable character (-1 is left, 1 is right, 0 is right by default)
     int direction = 1;
     //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
@@ -792,21 +792,26 @@ struct LevelEvent_UpdateVariable
 
 struct LevelEvent_SetTimer
 {
-    //! Enable timer
-    bool  enable = false;
-    //! Time left (ticks)
-    long  count = 0;
     //! Lenght of every tick (miliseconds per every tick)
     double interval = 1000.0;
+    //! Time left (ticks)
+    long  count = 0;
+    /**
+     * \brief Direction of the timer counting
+     */
     enum CountDirection
     {
+        //! Backward timer count direction: Time value will be gradually decreased
         DIR_REVERSE = 0,
+        //! Forward timer count direction: Time value will be gradually increased
         DIR_FORWARD = 1
     };
     //! Count direction
     int count_dir = DIR_REVERSE;
     //! Show timer
     bool show = false;
+    //! Enable timer
+    bool enable = false;
 };
 
 /*!

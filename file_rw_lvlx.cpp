@@ -1004,39 +1004,44 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                     for(q = 0; q < event.sets.size() && q < musicSets.size(); q++)
                     {
-                        event.sets[q].id = static_cast<long>(q);
+                        auto &s = event.sets[q];
+                        s.id = static_cast<long>(q);
+
                         if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
-                        event.sets[q].music_id = toLong(musicSets[q]);
+                        s.music_id = toLong(musicSets[q]);
                     }
 
                     //Apply Background sets
                     for(q = 0; q < event.sets.size() && q < bgSets.size(); q++)
                     {
-                        event.sets[q].id = static_cast<long>(q);
+                        auto &s = event.sets[q];
+                        s.id = static_cast<long>(q);
+
                         if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
-                        event.sets[q].background_id = toLong(bgSets[q]);
+                        s.background_id = toLong(bgSets[q]);
                     }
 
                     //Apply section sets
                     for(q = 0; q < event.sets.size() && q < ssSets.size(); q++)
                     {
-                        event.sets[q].id = static_cast<long>(q);
+                        auto &s = event.sets[q];
+                        s.id = static_cast<long>(q);
                         PGESTRINGList sizes;
                         PGE_SPLITSTRING(sizes, ssSets[q], ",");
 
                         if(sizes.size() != 4) goto badfile; //-V112
 
                         if(!PGEFile::IsIntS(sizes[0])) goto badfile;
-                        event.sets[q].position_left = toLong(sizes[0]);
+                        s.position_left = toLong(sizes[0]);
 
                         if(!PGEFile::IsIntS(sizes[1])) goto badfile;
-                        event.sets[q].position_top = toLong(sizes[1]);
+                        s.position_top = toLong(sizes[1]);
 
                         if(!PGEFile::IsIntS(sizes[2])) goto badfile;
-                        event.sets[q].position_bottom = toLong(sizes[2]);
+                        s.position_bottom = toLong(sizes[2]);
 
                         if(!PGEFile::IsIntS(sizes[3])) goto badfile;
-                        event.sets[q].position_right = toLong(sizes[3]);
+                        s.position_right = toLong(sizes[3]);
                     }
                 }
 
@@ -2007,9 +2012,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("FR", PGEFile::WriteFloat(physEnv.friction)); //Friction
             if(physEnv.accel_direct >= 0.0)
                 out << PGEFile::value("AD", PGEFile::WriteFloat(physEnv.accel_direct)); //Acceleration direction
-            if(physEnv.accel != 0.0)
+            if(!PGE_floatEqual(physEnv.accel, 0.0, 5))
                 out << PGEFile::value("AC", PGEFile::WriteFloat(physEnv.accel)); //Acceleration
-            if(physEnv.max_velocity != 0.0)
+            if(!PGE_floatEqual(physEnv.max_velocity, 0.0, 5))
                 out << PGEFile::value("MV", PGEFile::WriteFloat(physEnv.max_velocity)); //Max-velocity
             if(physEnv.layer != defPhys.layer) //Write only if not default
                 out << PGEFile::value("LR", PGEFile::WriteStr(physEnv.layer));  // Layer
@@ -2334,13 +2339,13 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                     hasParams = true;
                 }
 
-                if(x.autoscrol_x != 0.0f)
+                if(!PGE_floatEqual(x.autoscrol_x, 0.0f, 5))
                 {
                     sectionSettings += PGEFile::value("AX", PGEFile::WriteFloat(x.autoscrol_x));
                     hasParams = true;
                 }
 
-                if(x.autoscrol_y != 0.0f)
+                if(!PGE_floatEqual(x.autoscrol_y, 0.0f, 5))
                 {
                     sectionSettings += PGEFile::value("AY", PGEFile::WriteFloat(x.autoscrol_y));
                     hasParams = true;
@@ -2431,13 +2436,13 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
                     moveLayer += PGEFile::value("LN", PGEFile::WriteStr(mvl.name));
 
-                    if(mvl.speed_x != 0.0)
+                    if(!PGE_floatEqual(mvl.speed_x, 0.0, 5))
                         moveLayer += PGEFile::value("SX", PGEFile::WriteFloat(mvl.speed_x));
 
                     if(!IsEmpty(mvl.expression_x) && (mvl.expression_x != "0"))
                         moveLayer += PGEFile::value("SXX", PGEFile::WriteStr(mvl.expression_x));
 
-                    if(mvl.speed_y != 0.0)
+                    if(!PGE_floatEqual(mvl.speed_y, 0.0, 5))
                         moveLayer += PGEFile::value("SY", PGEFile::WriteFloat(mvl.speed_y));
 
                     if(!IsEmpty(mvl.expression_y) && (mvl.expression_y != "0"))
@@ -2474,13 +2479,13 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                     if(!IsEmpty(npc.expression_y) && (npc.expression_y != "0"))
                         spawnNPC += PGEFile::value("SYX", PGEFile::WriteStr(npc.expression_y));
 
-                    if(npc.speed_x != 0.0)
+                    if(!PGE_floatEqual(npc.speed_x, 0.0, 5))
                         spawnNPC += PGEFile::value("SSX", PGEFile::WriteFloat(npc.speed_x));
 
                     if(!IsEmpty(npc.expression_sx)  && (npc.expression_sx != "0"))
                         spawnNPC += PGEFile::value("SSXX", PGEFile::WriteStr(npc.expression_sx));
 
-                    if(npc.speed_y != 0.0)
+                    if(!PGE_floatEqual(npc.speed_y, 0.0, 5))
                         spawnNPC += PGEFile::value("SSY", PGEFile::WriteFloat(npc.speed_y));
 
                     if(!IsEmpty(npc.expression_sy) && (npc.expression_sy != "0"))
@@ -2513,11 +2518,11 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                         spawnEffect += PGEFile::value("SY", PGEFile::WriteInt(effect.y));
                     if(!IsEmpty(effect.expression_y) && (effect.expression_y != "0"))
                         spawnEffect += PGEFile::value("SYX", PGEFile::WriteStr(effect.expression_y));
-                    if(effect.speed_x != 0.0)
+                    if(!PGE_floatEqual(effect.speed_x, 0.0, 5))
                         spawnEffect += PGEFile::value("SSX", PGEFile::WriteFloat(effect.speed_x));
                     if(!IsEmpty(effect.expression_sx) && (effect.expression_sx != "0"))
                         spawnEffect += PGEFile::value("SSXX", PGEFile::WriteStr(effect.expression_sx));
-                    if(effect.speed_y != 0.0)
+                    if(!PGE_floatEqual(effect.speed_y, 0.0, 5))
                         spawnEffect += PGEFile::value("SSY", PGEFile::WriteFloat(effect.speed_y));
                     if(!IsEmpty(effect.expression_sy) && (effect.expression_sy != "0"))
                         spawnEffect += PGEFile::value("SSYX", PGEFile::WriteStr(effect.expression_sy));

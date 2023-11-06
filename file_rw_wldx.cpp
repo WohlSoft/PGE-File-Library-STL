@@ -236,7 +236,7 @@ bool FileFormats::ReadExtendedWldFileF(const PGESTRING &filePath, WorldData &Fil
     if(!file.open(filePath, true))
     {
         FileData.meta.ERROR_info = "Failed to open file for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -253,7 +253,7 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &fi
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Failed to open raw string for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;

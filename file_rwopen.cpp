@@ -40,7 +40,7 @@ bool FileFormats::OpenLevelFile(const PGESTRING &filePath, LevelData &FileData)
     {
         FileData.meta.ReadFileValid = false;
         FileData.meta.ERROR_info = "Can't open file";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         return false;
     }
@@ -56,7 +56,7 @@ bool FileFormats::OpenLevelRaw(PGESTRING &rawdata, const PGESTRING &filePath, Le
     {
         FileData.meta.ReadFileValid = false;
         FileData.meta.ERROR_info = "Can't open file";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         return false;
     }
@@ -116,7 +116,7 @@ bool FileFormats::OpenLevelFileHeader(const PGESTRING &filePath, LevelData &data
     {
         data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
-        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linedata.clear();
         data.meta.ERROR_linenum = -1;
         return false;
     }
@@ -132,7 +132,7 @@ bool FileFormats::OpenLevelFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &fi
     {
         data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
-        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linedata.clear();
         data.meta.ERROR_linenum = -1;
         return false;
     }
@@ -267,7 +267,7 @@ bool FileFormats::OpenWorldFile(const PGESTRING &filePath, WorldData &data)
     {
         data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
-        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linedata.clear();
         data.meta.ERROR_linenum = -1;
         return false;
     }
@@ -283,7 +283,7 @@ bool FileFormats::OpenWorldRaw(PGESTRING &rawdata, const PGESTRING &filePath, Wo
     {
         FileData.meta.ReadFileValid = false;
         FileData.meta.ERROR_info = "Can't open file";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         return false;
     }
@@ -344,7 +344,7 @@ bool FileFormats::OpenWorldFileHeader(const PGESTRING &filePath, WorldData &data
     {
         data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
-        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linedata.clear();
         data.meta.ERROR_linenum = -1;
         return false;
     }
@@ -361,7 +361,7 @@ bool FileFormats::OpenWorldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &fi
     {
         data.meta.ReadFileValid = false;
         data.meta.ERROR_info = "Can't open file";
-        data.meta.ERROR_linedata = "";
+        data.meta.ERROR_linedata.clear();
         data.meta.ERROR_linenum = -1;
         return false;
     }

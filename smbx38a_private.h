@@ -77,7 +77,7 @@ static auto PGEBase64DecodeFuncA = [](PGESTRING &data)
 };
 static auto PGELayerOrDefault = [](PGESTRING &data)
 {
-    data = (data == "" ? "Default" : PGE_URLDEC(data));
+    data = (IsEmpty(data) ? "Default" : PGE_URLDEC(data));
 };
 static auto PGEFilpBool = [](bool &value)
 {
@@ -199,20 +199,22 @@ static inline void SMBX38A_CC_decode(int32_t &destKey, int64_t &destValue, const
         destKey = 0;
         destValue = 0;
     }
-    #ifdef PGE_FILES_QT
+
+#ifdef PGE_FILES_QT
     std::string skey = key.toStdString();
-    #else
+#else
     const std::string &skey = key;
-    #endif
+#endif
+
     std::string k = skey.substr(0, 4);
-    destKey = std::strtol(k.c_str(), NULL, 16);
+    destKey = std::strtol(k.c_str(), nullptr, 16);
 
     std::string v = skey.substr(4);
     if(!v.empty())
-        destValue = std::strtol(v.c_str(), NULL, 16);
+        destValue = std::strtol(v.c_str(), nullptr, 16);
 }
 
-static inline PGESTRING SMBX38A_CC_encode(const int32_t &srcKey, const int64_t &srcValue)
+static inline PGESTRING SMBX38A_CC_encode(int32_t srcKey, int64_t srcValue)
 {
     char keyBuf[6] = {0};
     char valueBuf[52] = {0};
@@ -220,11 +222,11 @@ static inline PGESTRING SMBX38A_CC_encode(const int32_t &srcKey, const int64_t &
     keyBuf[kb_l] = '\0';
     int kv_l = std::snprintf(valueBuf, 51, "%X", static_cast<unsigned int>(srcValue));
     valueBuf[kv_l] = '\0';
-    #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
     return QString::fromUtf8(keyBuf, 4) + QString::fromUtf8(valueBuf, kv_l);
-    #else
+#else
     return PGESTRING(keyBuf, 4) + PGESTRING(valueBuf, kv_l);
-    #endif
+#endif
 }
 
 #endif // SMBX38A_PRIVATE_H

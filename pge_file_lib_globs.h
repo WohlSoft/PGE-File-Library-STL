@@ -216,7 +216,7 @@ public:
     };
 
     TextInput();
-    virtual ~TextInput();
+    virtual ~TextInput() = default;
     virtual PGESTRING read(int64_t len);
     virtual PGESTRING readLine();
     virtual PGESTRING readCVSLine();
@@ -257,7 +257,7 @@ public:
     };
 
     TextOutput();
-    virtual ~TextOutput();
+    virtual ~TextOutput() = default;
     virtual int write(PGESTRING buffer);
     virtual int64_t tell();
     virtual int seek(int64_t pos, positions relativeTo);
@@ -278,7 +278,7 @@ class RawTextInput: public TextInput
 public:
     RawTextInput();
     RawTextInput(PGESTRING *rawString, const PGESTRING &filepath = PGESTRING());
-    virtual ~RawTextInput();
+    virtual ~RawTextInput() = default;
     bool open(PGESTRING *rawString, const PGESTRING &filepath = PGESTRING());
     void close();
     virtual PGESTRING read(int64_t len);
@@ -324,17 +324,20 @@ public:
      * \param filePath Full or relative path to the file
      * \return true if file exists
      */
-    static bool exists(PGESTRING filePath);
+    static bool exists(const PGESTRING &filePath);
+
     /*!
      * \brief Constructor
      */
     TextFileInput();
+
     /*!
      * \brief Constructor with pre-opening of the file
      * \param filePath Full or relative path to the file
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
-    TextFileInput(PGESTRING filePath, bool utf8 = false);
+    TextFileInput(const PGESTRING &filePath, bool utf8 = false);
+
     /*!
      * \brief Destructor
      */
@@ -344,47 +347,56 @@ public:
      * \param filePath Full or relative path to the file
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
-    bool open(PGESTRING filePath, bool utf8 = false);
+    bool open(const PGESTRING &filePath, bool utf8 = false);
+
     /*!
      * \brief Re-open opened file with or without UTF8 mode enabled
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
     bool reOpen(bool utf8 = false);
+
     /*!
      * \brief Close currently opened file
      */
     void close();
+
     /*!
      * \brief Reads requested number of characters from a file
      * \param Maximal lenght of characters to read from file
      * \return string contains requested line of characters
      */
     PGESTRING read(int64_t len);
+
     /*!
      * \brief Reads whole line before line feed character
      * \return string contains gotten line
      */
     PGESTRING readLine();
+
     /*!
      * \brief Reads whole line before line feed character or before first unquoted comma
      * \return string contains gotten line
      */
     PGESTRING readCVSLine();
+
     /*!
      * \brief Reads all data from a file at current position of carriage
      * \return
      */
     PGESTRING readAll();
+
     /*!
      * \brief Is carriage position at end of file
      * \return true if carriage position at end of file
      */
     bool eof();
+
     /*!
      * \brief Returns current position of carriage relative to begin of file
      * \return current position of carriage relative to begin of file
      */
     int64_t tell();
+
     /*!
      * \brief Changes position of carriage to specific file position
      * \param pos Target position of carriage
@@ -415,7 +427,7 @@ public:
      * \param filePath Full or relative path to the file
      * \return true if file exists
      */
-    static bool exists(PGESTRING filePath);
+    static bool exists(const PGESTRING &filePath);
     /*!
      * \brief Constructor
      */

@@ -50,7 +50,7 @@ bool FileFormats::ReadSMBX64SavFileF(const PGESTRING &filePath, GamesaveData &Fi
     if(!file.open(filePath, false))
     {
         FileData.meta.ERROR_info = "Failed to open file for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -65,7 +65,7 @@ bool FileFormats::ReadSMBX64SavFileRaw(PGESTRING &rawdata, const PGESTRING &file
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Failed to open raw string for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -143,7 +143,7 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
         nextLine();
         SMBX64::ReadUInt(&FileData.musicID, line);//ID of music
         nextLine();
-        if(line == "" || in.eof())
+        if(IsEmpty(line) || in.eof())
             goto successful;
 
         if(ge(56))
@@ -218,7 +218,7 @@ bool FileFormats::ReadSMBX64SavFile(PGE_FileFormats_misc::TextInput &in, Gamesav
         if(ge(21))
         {
             nextLine();
-            if(line == "" || in.eof())
+            if(IsEmpty(line) || in.eof())
                 goto successful;
             SMBX64::ReadUInt(&FileData.totalStars, line);//Total Number of stars
         }

@@ -44,10 +44,9 @@
 #define nextLine() line = in.readCVSLine()
 
 //Version comparison
-#define ge(v) file_format>=v
-#define gt(v) file_format>v
-#define le(v) file_format<=v
-#define lt(v) file_format<v
+#define ge(v) file_format>=(v)
+#define gt(v) file_format>(v)
+#define le(v) file_format<=(v)
+#define lt(v) file_format<(v)
 
 #endif // SMBX64_MACRO_H
-

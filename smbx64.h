@@ -162,7 +162,7 @@ namespace SMBX64
 
     inline void ReadBool(bool*out, PGESTRING &input)
     {
-        if(input == "0" || input == "") // FIXME: Is it correct? Or too hackish?
+        if(input == "0" || IsEmpty(input)) // FIXME: Is it correct? Or too hackish?
             *out = false;
         else if(input != "0") // FIXME: Is it correct? Or too hackish?
             *out = true;
@@ -180,9 +180,9 @@ namespace SMBX64
             *out = false;
         else if(input == "true")
             *out = true;
-        else if( input == "0" || input == "" )
+        else if(input == "0" || IsEmpty(input))
             *out = false;
-        else if( input == "!0" || input == "1" )
+        else if(input == "!0" || input == "1")
             *out = true;
         else
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
@@ -198,7 +198,7 @@ namespace SMBX64
             *out = 0;
         else if(input == "true")
             *out = 1;
-        else if( input == "0" || input == "" )
+        else if( input == "0" || IsEmpty(input))
             *out = 0;
         else if( input == "!0" || input == "1"  )
             *out = 1;
@@ -216,9 +216,9 @@ namespace SMBX64
             *out = 0;
         else if(input == "true")
             *out = 1;
-        else if( input == "0" || input == "" )
+        else if(input == "0" || IsEmpty(input))
             *out = 0;
-        else if( input == "!0" || input == "1" )
+        else if(input == "!0" || input == "1")
             *out = 1;
         else
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));

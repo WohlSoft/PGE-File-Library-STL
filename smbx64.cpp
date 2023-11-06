@@ -31,15 +31,17 @@ namespace smbx64Format
     //const char *uint_vc = "0123456789";
     //const int   uint_vc_len = 10;
 
-    bool isDegit(PGEChar c)
+    static bool isDegit(PGEChar c)
     {
         return ((c >= '0') && (c <= '9'));
     }
 
-    bool isValid(PGESTRING &s, const char *valid_chars, const pge_size_t &valid_chars_len)
+#if 0
+    static bool isValid(PGESTRING &s, const char *valid_chars, pge_size_t valid_chars_len)
     {
         if(IsEmpty(s)) return false;
         pge_size_t i, j;
+
         for(i = 0; i < s.size(); i++)
         {
             bool found = false;
@@ -51,10 +53,14 @@ namespace smbx64Format
                     break;
                 }
             }
-            if(!found) return false;
+
+            if(!found)
+                return false;
         }
+
         return true;
     }
+#endif
 }
 
 // /////////////Validators///////////////

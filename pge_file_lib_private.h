@@ -163,15 +163,20 @@ inline PGESTRING removeSpaces(PGESTRING src)
 {
     return src.remove(' ');
 }
+
+#define toPgeString(x) QString::fromStdString(x)
+
 template<typename T>
 PGESTRING fromNum(T num)
 {
     return QString::number(num);
 }
+
 inline PGESTRING fromBoolToNum(bool num)
 {
     return QString::number(static_cast<int>(num));
 }
+
 namespace PGE_FileFormats_misc
 {
     PGESTRING    url_encode(const PGESTRING &sSrc);
@@ -273,6 +278,7 @@ typedef size_t pge_size_t;
 #define PGEMAP  std::map
 #define PGEHASH std::unordered_map
 typedef std::fstream PGEFILE;
+
 namespace PGE_FileFormats_misc
 {
     void split(std::vector<std::string> &dest, const std::string &str, const std::string& separator);
@@ -289,11 +295,13 @@ namespace PGE_FileFormats_misc
     std::string base64_encodeA(std::string &source, bool no_padding = false);
     std::string base64_decodeA(std::string &source);
 }
+
 inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGESTRING &sep)
 {
     dst.clear();
     PGE_FileFormats_misc::split(dst, src, sep);
 }
+
 inline PGESTRING PGE_ReplSTRING(PGESTRING src, const PGESTRING &from, const PGESTRING &to)
 {
     PGE_FileFormats_misc::replaceAll(src, from, to);
@@ -305,6 +313,7 @@ inline PGESTRING PGE_RemSubSTRING(PGESTRING src, const PGESTRING &substr)
     PGE_FileFormats_misc::RemoveSub(src, substr);
     return src;
 }
+
 inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
     str.erase(static_cast<size_t>(pos), static_cast<size_t>(len));
@@ -314,16 +323,17 @@ inline PGESTRING PGE_SubStr(const PGESTRING &str, int pos, int len = -1)
 {
     return str.substr(static_cast<std::string::size_type>(pos), static_cast<std::string::size_type>(len));
 }
+
 inline void PGE_CutLength(PGESTRING &str, int maxlength)
 {
     if(str.size() > size_t(maxlength))
         str.resize(size_t(maxlength));
 }
+
 inline void PGE_FilterBinary(PGESTRING &str)
 {
-    for(size_t i = 0; i < str.size(); i++)
+    for(PGEChar &c : str)
     {
-        PGEChar &c = str[i];
         if(c == '\r')
             c = 'r';
         else if(c == '\n')
@@ -332,46 +342,59 @@ inline void PGE_FilterBinary(PGESTRING &str)
             c = '?';
     }
 }
+
 inline bool IsNULL(const PGESTRING &str)
 {
     return (str.empty());
 }
+
 inline bool IsEmpty(const PGESTRING &str)
 {
     return str.empty();
 }
+
 inline bool IsEmpty(const PGESTRINGList &str)
 {
     return str.empty();
 }
+
 inline int toInt(const PGESTRING &str)
 {
     return std::atoi(str.c_str());
 }
+
 inline unsigned int toUInt(const PGESTRING &str)
 {
     return static_cast<unsigned int>(std::stoul(str, nullptr, 10));
 }
+
 inline long toLong(const PGESTRING &str)
 {
     return std::atol(str.c_str());
 }
+
 inline unsigned long toULong(const PGESTRING &str)
 {
     return static_cast<unsigned long>(std::atoll(str.c_str()));
 }
+
 inline float toFloat(const PGESTRING &str)
 {
     return static_cast<float>(std::atof(str.c_str()));
 }
+
 inline double toDouble(const PGESTRING &str)
 {
     return std::atof(str.c_str());
 }
+
 inline PGESTRING removeSpaces(const PGESTRING &src)
 {
     return PGE_RemSubSTRING(src, " ");
 }
+
+#define toPgeString(x) (x)
+
 template<typename T>
 PGESTRING fromNum(T num)
 {

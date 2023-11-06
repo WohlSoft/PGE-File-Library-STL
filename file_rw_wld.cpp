@@ -190,7 +190,7 @@ bool FileFormats::ReadSMBX64WldFileF(const PGESTRING &filePath, WorldData &FileD
     if(!file.open(filePath, false))
     {
         FileData.meta.ERROR_info = "Failed to open file for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -205,7 +205,7 @@ bool FileFormats::ReadSMBX64WldFileRaw(PGESTRING &rawdata, const PGESTRING &file
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Failed to open raw string for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -509,8 +509,6 @@ bool FileFormats::WriteSMBX64WldFileRaw(WorldData &FileData, PGESTRING &rawdata,
 
 bool FileFormats::WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData, unsigned int file_format)
 {
-    pge_size_t i;
-
     //Prevent out of range: 0....64
     if(file_format > 64)
         file_format = 64;
@@ -547,11 +545,12 @@ bool FileFormats::WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, Worl
 
     PGESTRINGList credits;
     PGE_SPLITSTRING(credits, FileData.authors, "\n");
-    FileData.author1 = (credits.size() > 0) ? credits[0] : "";
-    FileData.author2 = (credits.size() > 1) ? credits[1] : "";
-    FileData.author3 = (credits.size() > 2) ? credits[2] : "";
-    FileData.author4 = (credits.size() > 3) ? credits[3] : "";
-    FileData.author5 = (credits.size() > 4) ? credits[4] : "";
+    pge_size_t credits_size = credits.size();
+    FileData.author1 = (credits_size > 0) ? credits[0] : PGESTRING();
+    FileData.author2 = (credits_size > 1) ? credits[1] : PGESTRING();
+    FileData.author3 = (credits_size > 2) ? credits[2] : PGESTRING();
+    FileData.author4 = (credits_size > 3) ? credits[3] : PGESTRING();
+    FileData.author5 = (credits_size > 4) ? credits[4] : PGESTRING();
 
     if(file_format >= 17)
     {
@@ -562,27 +561,27 @@ bool FileFormats::WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, Worl
         out << SMBX64::WriteStr(FileData.author5);
     }
 
-    for(i = 0; i < FileData.tiles.size(); i++)
+    for(const auto &t : FileData.tiles)
     {
-        out << SMBX64::WriteSInt(FileData.tiles[i].x);
-        out << SMBX64::WriteSInt(FileData.tiles[i].y);
-        out << SMBX64::WriteSInt(FileData.tiles[i].id);
+        out << SMBX64::WriteSInt(t.x);
+        out << SMBX64::WriteSInt(t.y);
+        out << SMBX64::WriteSInt(t.id);
     }
     out << "\"next\"\n";//Separator
 
-    for(i = 0; i < FileData.scenery.size(); i++)
+    for(const auto &s : FileData.scenery)
     {
-        out << SMBX64::WriteSInt(FileData.scenery[i].x);
-        out << SMBX64::WriteSInt(FileData.scenery[i].y);
-        out << SMBX64::WriteSInt(FileData.scenery[i].id);
+        out << SMBX64::WriteSInt(s.x);
+        out << SMBX64::WriteSInt(s.y);
+        out << SMBX64::WriteSInt(s.id);
     }
     out << "\"next\"\n";//Separator
 
-    for(i = 0; i < FileData.paths.size(); i++)
+    for(const auto &p : FileData.paths)
     {
-        out << SMBX64::WriteSInt(FileData.paths[i].x);
-        out << SMBX64::WriteSInt(FileData.paths[i].y);
-        out << SMBX64::WriteSInt(FileData.paths[i].id);
+        out << SMBX64::WriteSInt(p.x);
+        out << SMBX64::WriteSInt(p.y);
+        out << SMBX64::WriteSInt(p.id);
     }
     out << "\"next\"\n";//Separator
 

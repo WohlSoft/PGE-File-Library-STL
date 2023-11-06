@@ -106,14 +106,16 @@ bool FileFormats::ReadSMBX64LvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf,
             nextLineH();                                //Read second Line
             SMBX64::ReadUInt(&FileData.stars, line);    //Number of stars
         }
-        else FileData.stars = 0;
+        else
+            FileData.stars = 0;
 
         if(file_format >= 60)
         {
             nextLineH();   //Read third line
             SMBX64::ReadStr(&FileData.LevelName, line); //LevelTitle
         }
-        else FileData.LevelName = "";
+        else
+            FileData.LevelName.clear();
 
         FileData.CurSection = 0;
         FileData.playmusic = false;
@@ -150,7 +152,7 @@ bool FileFormats::ReadSMBX64LvlFileF(const PGESTRING &filePath, LevelData &FileD
     if(!file.open(filePath, false))
     {
         FileData.meta.ERROR_info = "Failed to open file for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -166,7 +168,7 @@ bool FileFormats::ReadSMBX64LvlFileRaw(PGESTRING &rawdata, const PGESTRING &file
     if(!file.open(&rawdata, filePath))
     {
         FileData.meta.ERROR_info = "Failed to open raw string for read";
-        FileData.meta.ERROR_linedata = "";
+        FileData.meta.ERROR_linedata.clear();
         FileData.meta.ERROR_linenum = -1;
         FileData.meta.ReadFileValid = false;
         return false;
@@ -184,7 +186,7 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelDa
     CreateLevelData(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX64;
     FileData.meta.RecentFormatVersion = 64;
-    FileData.LevelName = "";
+    FileData.LevelName.clear();
     FileData.stars = 0;
     FileData.CurSection = 0;
     FileData.playmusic = false;
