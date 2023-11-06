@@ -326,8 +326,8 @@ inline PGESTRING PGE_SubStr(const PGESTRING &str, int pos, int len = -1)
 
 inline void PGE_CutLength(PGESTRING &str, int maxlength)
 {
-    if(str.size() > size_t(maxlength))
-        str.resize(size_t(maxlength));
+    if(str.size() > static_cast<size_t>(maxlength))
+        str.resize(static_cast<size_t>(maxlength));
 }
 
 inline void PGE_FilterBinary(PGESTRING &str)

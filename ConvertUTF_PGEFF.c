@@ -47,8 +47,8 @@
 
 static const int halfShift  = 10; /* used for shifting by 10 bits */
 
-static const UTF32 halfBase = 0x0010000UL;
-static const UTF32 halfMask = 0x3FFUL;
+static const UTF32 halfBase = 0x0010000U;
+static const UTF32 halfMask = 0x3FFU;
 
 #define UNI_SUR_HIGH_START  (UTF32)0xD800
 #define UNI_SUR_HIGH_END    (UTF32)0xDBFF
@@ -59,13 +59,13 @@ static const UTF32 halfMask = 0x3FFUL;
 
 /* --------------------------------------------------------------------- */
 
-pgeFfConversionResult PGEFF_ConvertUTF32toUTF16(
-    const UTF32 **sourceStart, const UTF32 *sourceEnd,
-    UTF16 **targetStart, UTF16 *targetEnd, pgeFfConversionFlags flags)
+pgeFfConversionResult PGEFF_ConvertUTF32toUTF16(const UTF32 **sourceStart, const UTF32* const sourceEnd,
+    UTF16 **targetStart, const UTF16 *targetEnd, pgeFfConversionFlags flags)
 {
     pgeFfConversionResult result = conversionOK;
     const UTF32 *source = *sourceStart;
     UTF16 *target = *targetStart;
+
     while(source < sourceEnd)
     {
         UTF32 ch;
@@ -74,6 +74,7 @@ pgeFfConversionResult PGEFF_ConvertUTF32toUTF16(
             result = targetExhausted;
             break;
         }
+
         ch = *source++;
         if(ch <= UNI_MAX_BMP)    /* Target is a character <= 0xFFFF */
         {
@@ -116,11 +117,13 @@ pgeFfConversionResult PGEFF_ConvertUTF32toUTF16(
                 result = targetExhausted;
                 break;
             }
+
             ch -= halfBase;
             *target++ = (UTF16)((ch >> halfShift) + UNI_SUR_HIGH_START);
             *target++ = (UTF16)((ch & halfMask) + UNI_SUR_LOW_START);
         }
     }
+
     *sourceStart = source;
     *targetStart = target;
     return result;
@@ -128,9 +131,8 @@ pgeFfConversionResult PGEFF_ConvertUTF32toUTF16(
 
 /* --------------------------------------------------------------------- */
 
-pgeFfConversionResult PGEFF_ConvertUTF16toUTF32(
-    const UTF16 **sourceStart, const UTF16 *sourceEnd,
-    UTF32 **targetStart, UTF32 *targetEnd, pgeFfConversionFlags flags)
+pgeFfConversionResult PGEFF_ConvertUTF16toUTF32(const UTF16 **sourceStart, const UTF16* const sourceEnd,
+    UTF32 **targetStart, const UTF32* targetEnd, pgeFfConversionFlags flags)
 {
     pgeFfConversionResult result = conversionOK;
     const UTF16 *source = *sourceStart;
@@ -249,8 +251,7 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
 
 /* --------------------------------------------------------------------- */
 
-pgeFfConversionResult PGEFF_ConvertUTF16toUTF8(
-    const UTF16 **sourceStart, const UTF16 *sourceEnd,
+pgeFfConversionResult PGEFF_ConvertUTF16toUTF8(const UTF16 **sourceStart, const UTF16* const sourceEnd,
     UTF8 **targetStart, const UTF8 *targetEnd, pgeFfConversionFlags flags)
 {
     pgeFfConversionResult result = conversionOK;
@@ -414,9 +415,8 @@ Boolean PGEFF_isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd)
 
 /* --------------------------------------------------------------------- */
 
-pgeFfConversionResult PGEFF_ConvertUTF8toUTF16(
-    const UTF8 **sourceStart, const UTF8 *sourceEnd,
-    UTF16 **targetStart, UTF16 *targetEnd, pgeFfConversionFlags flags)
+pgeFfConversionResult PGEFF_ConvertUTF8toUTF16(const UTF8 **sourceStart, const UTF8* const sourceEnd,
+    UTF16 **targetStart, const UTF16* targetEnd, pgeFfConversionFlags flags)
 {
     pgeFfConversionResult result = conversionOK;
     const UTF8 *source = *sourceStart;
@@ -430,12 +430,14 @@ pgeFfConversionResult PGEFF_ConvertUTF8toUTF16(
             result = sourceExhausted;
             break;
         }
+
         /* Do this check whether lenient or strict */
         if(! isLegalUTF8(source, extraBytesToRead + 1))
         {
             result = sourceIllegal;
             break;
         }
+
         /*
          * The cases all fall through. See "Note A" below.
          */
@@ -457,6 +459,7 @@ pgeFfConversionResult PGEFF_ConvertUTF8toUTF16(
             result = targetExhausted;
             break;
         }
+
         if(ch <= UNI_MAX_BMP)    /* Target is a character <= 0xFFFF */
         {
             /* UTF-16 surrogate values are illegal in UTF-32 */
@@ -500,6 +503,7 @@ pgeFfConversionResult PGEFF_ConvertUTF8toUTF16(
                 result = targetExhausted;
                 break;
             }
+
             ch -= halfBase;
             *target++ = (UTF16)((ch >> halfShift) + UNI_SUR_HIGH_START);
             *target++ = (UTF16)((ch & halfMask) + UNI_SUR_LOW_START);
@@ -512,9 +516,8 @@ pgeFfConversionResult PGEFF_ConvertUTF8toUTF16(
 
 /* --------------------------------------------------------------------- */
 
-pgeFfConversionResult PGEFF_ConvertUTF32toUTF8(
-    const UTF32 **sourceStart, const UTF32 *sourceEnd,
-    UTF8 **targetStart, UTF8 *targetEnd, pgeFfConversionFlags flags)
+pgeFfConversionResult PGEFF_ConvertUTF32toUTF8(const UTF32 **sourceStart, const UTF32* const sourceEnd,
+    UTF8 **targetStart, const UTF8* targetEnd, pgeFfConversionFlags flags)
 {
     pgeFfConversionResult result = conversionOK;
     const UTF32 *source = *sourceStart;
@@ -525,7 +528,9 @@ pgeFfConversionResult PGEFF_ConvertUTF32toUTF8(
         unsigned short bytesToWrite = 0;
         const UTF32 byteMask = 0xBF;
         const UTF32 byteMark = 0x80;
+
         ch = *source++;
+
         if(flags == strictConversion)
         {
             /* UTF-16 surrogate values are illegal in UTF-32 */
@@ -589,9 +594,8 @@ pgeFfConversionResult PGEFF_ConvertUTF32toUTF8(
 
 /* --------------------------------------------------------------------- */
 
-pgeFfConversionResult PGEFF_ConvertUTF8toUTF32(
-    const UTF8 **sourceStart, const UTF8 *sourceEnd,
-    UTF32 **targetStart, UTF32 *targetEnd, pgeFfConversionFlags flags)
+pgeFfConversionResult PGEFF_ConvertUTF8toUTF32(const UTF8 **sourceStart, const UTF8* const sourceEnd,
+    UTF32 **targetStart, const UTF32* targetEnd, pgeFfConversionFlags flags)
 {
     pgeFfConversionResult result = conversionOK;
     const UTF8 *source = *sourceStart;
@@ -600,17 +604,20 @@ pgeFfConversionResult PGEFF_ConvertUTF8toUTF32(
     {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = (unsigned short)trailingBytesForUTF8[*source];
+
         if(source + extraBytesToRead >= sourceEnd)
         {
             result = sourceExhausted;
             break;
         }
+
         /* Do this check whether lenient or strict */
         if(! isLegalUTF8(source, extraBytesToRead + 1))
         {
             result = sourceIllegal;
             break;
         }
+
         /*
          * The cases all fall through. See "Note A" below.
          */
@@ -632,6 +639,7 @@ pgeFfConversionResult PGEFF_ConvertUTF8toUTF32(
             result = targetExhausted;
             break;
         }
+
         if(ch <= UNI_MAX_LEGAL_UTF32)
         {
             /*

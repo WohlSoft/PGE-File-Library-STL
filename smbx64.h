@@ -160,7 +160,7 @@ namespace SMBX64
 #endif
     }
 
-    inline void ReadBool(bool*out, PGESTRING &input)
+    inline void ReadBool(bool*out, const PGESTRING &input)
     {
         if(input == "0" || IsEmpty(input)) // FIXME: Is it correct? Or too hackish?
             *out = false;
@@ -170,7 +170,7 @@ namespace SMBX64
             throw std::invalid_argument(std::string("Could not convert to bool (must be empty, \"0\", \"!0\" or \"1\")"));
     }
 
-    inline void ReadCSVBool(bool*out, PGESTRING &input)
+    inline void ReadCSVBool(bool*out, const PGESTRING &input)
     {
         if(input == "#FALSE#")
             *out = false;
@@ -206,7 +206,7 @@ namespace SMBX64
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
     }
 
-    inline void ReadCSVBool(long*out, PGESTRING &input)
+    inline void ReadCSVBool(long*out, const PGESTRING &input)
     {
         if(input == "#FALSE#")
             *out = 0;
