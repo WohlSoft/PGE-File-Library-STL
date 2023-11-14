@@ -1398,7 +1398,7 @@ void FileInfo::rebuildData()
 
 #ifdef PGE_FILES_QT
     m_filePath = QFileInfo(m_filePath).absoluteFilePath();
-#elif defined(PGE_NO_REALPATH) || defined(PGE_MIN_PORT) || defined(__3DS__) || defined(VITA) || defined(__SWITCH__)
+#elif defined(PGE_NO_REALPATH) || defined(PGE_MIN_PORT) || defined(__3DS__) || defined(VITA) || defined(__SWITCH__) || defined(__WII__) || defined(__WIIU__)
     // all paths are absolute on minimal target platforms
 #elif !defined(_WIN32)
     char *rez = nullptr;
