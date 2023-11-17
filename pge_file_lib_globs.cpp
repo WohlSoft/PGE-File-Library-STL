@@ -351,7 +351,7 @@ std::string  base64_encodeW(std::string &source, bool no_padding)
 std::string base64_decodeW(std::string &source)
 {
     std::string out = base64_decode(source);
-#ifdef DEBUG_BUILD
+#if 0 // def DEBUG_BUILD // Clunky debug code
     if(!out.empty())
     {
         FILE *x = utf8_fopen("test.txt", "ab");
