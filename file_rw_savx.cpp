@@ -117,6 +117,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                     PGEX_SIntVal("WX", FileData.worldPosX)
                     PGEX_SIntVal("WY", FileData.worldPosY)
                     PGEX_ULongVal("HW", FileData.last_hub_warp)
+                    PGEX_StrVal("HL", FileData.last_hub_level_file)
                     PGEX_UIntVal("MI", FileData.musicID)
                     PGEX_StrVal("MF", FileData.musicFile)
                     PGEX_BoolVal("GC", FileData.gameCompleted)
@@ -345,6 +346,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     out << PGEFile::value("WX", PGEFile::WriteInt(FileData.worldPosX));
     out << PGEFile::value("WY", PGEFile::WriteInt(FileData.worldPosY));
     out << PGEFile::value("HW", PGEFile::WriteInt(FileData.last_hub_warp));
+    out << PGEFile::value("HL", PGEFile::WriteStr(FileData.last_hub_level_file));
     out << PGEFile::value("MI", PGEFile::WriteInt(FileData.musicID));
     out << PGEFile::value("MF", PGEFile::WriteStr(FileData.musicFile));
     out << PGEFile::value("GC", PGEFile::WriteBool(FileData.gameCompleted));

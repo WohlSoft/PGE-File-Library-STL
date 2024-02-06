@@ -143,6 +143,8 @@ struct GamesaveData
 
     //! Last entered/exited warp Array-ID on the HUB-based episodes.
     unsigned long last_hub_warp = 0;
+    //! Last visited sub-hub level file
+    PGESTRING last_hub_level_file;
 
     //! Current world music ID
     unsigned int musicID = 0;
