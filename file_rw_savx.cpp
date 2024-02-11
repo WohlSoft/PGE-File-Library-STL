@@ -110,7 +110,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_USIntVal("LV", FileData.lives)
+                    PGEX_SIntVal("LV", FileData.lives)
                     PGEX_SIntVal("HN", FileData.hundreds)
                     PGEX_UIntVal("CN", FileData.coins)
                     PGEX_UIntVal("PT", FileData.points)
