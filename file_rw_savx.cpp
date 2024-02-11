@@ -111,6 +111,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 {
                     PGEX_ValueBegin()
                     PGEX_USIntVal("LV", FileData.lives)
+                    PGEX_SIntVal("HN", FileData.hundreds)
                     PGEX_UIntVal("CN", FileData.coins)
                     PGEX_UIntVal("PT", FileData.points)
                     PGEX_UIntVal("TS", FileData.totalStars)
@@ -340,6 +341,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     pge_size_t i;
     out << "SAVE_HEADER\n";
     out << PGEFile::value("LV", PGEFile::WriteInt(FileData.lives));
+    out << PGEFile::value("HN", PGEFile::WriteInt(FileData.hundreds));
     out << PGEFile::value("CN", PGEFile::WriteInt(FileData.coins));
     out << PGEFile::value("PT", PGEFile::WriteInt(FileData.points));
     out << PGEFile::value("TS", PGEFile::WriteInt(FileData.totalStars));

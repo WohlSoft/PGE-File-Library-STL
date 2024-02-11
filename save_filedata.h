@@ -129,6 +129,8 @@ struct GamesaveData
 
     //! Number of lives
     int lives = 0;
+    //! Hundreds of coins, used in TheXTech to replace the legacy lives system. In the file format, 0 is reserved as "unspecified", and 1 is the first non-negative value.
+    int hundreds = 0;
     //! Number of coins
     unsigned int coins = 0;
     //! Number of points
