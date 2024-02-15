@@ -256,6 +256,11 @@ struct NPCConfigFile
     //! Custom grid align style field
     uint32_t gridalign = 0;
 
+    //! Is the "usedefaultcam" flag set?
+    bool en_usedefaultcam = false;
+    //! At player-set resolutions, should the NPC still activate based on the content's default resolution?
+    bool usedefaultcam = false;
+
 };
 
 #endif // NPC_FILEDATA_H

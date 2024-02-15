@@ -244,6 +244,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
         SINT_ENTRY(gridoffsetx),
         SINT_ENTRY(gridoffsety),
         UINT_ENTRY(gridalign),
+        BOOL_ENTRY(usedefaultcam),
     };
 
     //Read NPC.TXT File config
@@ -435,6 +436,8 @@ bool FileFormats::WriteNPCTxtFile(PGE_FileFormats_misc::TextOutput &out, NPCConf
         out << "gridoffsety=" + fromNum(fileData.gridoffsety) + "\n";
     if(fileData.en_gridalign)
         out << "gridalign=" + fromNum(fileData.gridalign) + "\n";
+    if(fileData.en_usedefaultcam)
+        out << "usedefaultcam=" + fromBoolToNum(fileData.usedefaultcam) + "\n";
 
     // Custom values
     for(auto it = fileData.entries.begin(); it != fileData.entries.end(); ++it)
