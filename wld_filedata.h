@@ -340,12 +340,113 @@ struct WorldLayer
     ElementMeta meta;
 };
 
+/*!
+ * \brief Layer move command
+ */
+struct WorldEvent38A_LayerMove
+{
+    //! Layer to move
+    PGESTRING layer;
+
+    //! Type of move
+    enum MoveType
+    {
+        Move_Speed = 0,
+        Move_Coordinate = 1,
+        Move_MoveTo = 2,
+        Move_Rorate = 3,
+        Move_Spin = 4
+    } type = Move_Speed;
+
+    //! Horizontal parameter
+    double param_h = 0.0;
+    //! Vertical parameter
+    double param_v = 0.0;
+    //! Additional parameter
+    double param_extra = 0.0;
+
+    //! Expression to compute the horizontal parameter
+    PGESTRING expression_param_h;
+    //! Expression to compute the vertical parameter
+    PGESTRING expression_param_v;
+    //! Exrpression to compute the additional parameter
+    PGESTRING expression_param_extra;
+};
+
+/*!
+ * \brief World map specific event entry structure
+ */
 struct WorldEvent38A
 {
     //! Name of the event
     PGESTRING name;
 
-    //TODO: Implement other fields!!!
+    //! Disable the smoke effect
+    bool nosmoke = false;
+    //! List of layers to hide
+    PGELIST<PGESTRING> layers_hide;
+    //! List of layers to show
+    PGELIST<PGESTRING> layers_show;
+    //! List of layers to toggle
+    PGELIST<PGESTRING> layers_toggle;
+
+    enum LayersMode
+    {
+        LM_StateLayers = 0,
+        LM_StateObjects = 1
+    } layers_mode = LM_StateLayers;
+
+    //! List of per-event layer move commands
+    PGELIST<WorldEvent38A_LayerMove> layers_move;
+
+    //! Autostart event
+    enum AutoStart
+    {
+        AutoStart_None = 0,
+        AutoStart_OnFirstLoad = 1,
+        AutoStart_OnEveryLoad = 2,
+        AutoStart_OnLevelExit = 3
+    } autostart = AutoStart_None;
+
+    //! Start event when all given conditions match
+    bool start_on_condition = false;
+    //! Condition to start this event
+    PGESTRING autostart_condition;
+
+    bool is_level_enter_exit = false;
+    //! Allow interruption of event when `false` returned by script
+    bool interrupt_on_false = false;
+    //! Message box to show when interruption occured
+    PGESTRING interrupt_message;
+
+    //! Message box to show when event executed
+    PGESTRING msg;
+    //! Sound ID to play if not zero
+    long sound_id = 0;
+
+    //! Number of 1/65 seconds to lock the player's input
+    int lock_keyboard_delay = 0;
+    //! Number of milliseconds to lock the player's input
+    int lock_keyboard_delay_ms = 0;
+
+    //! Trigger another event if not empty
+    PGESTRING trigger;
+    //! Trigger another event after time in 1/65 of second
+    long tirgger_timer = 0;
+
+    //! Trigger script by name
+    PGESTRING trigger_script;
+
+    //! Message box to show after event had been started
+    PGESTRING msg_after;
+
+    //! Move player to X position (-1 - don't move) and play the animation
+    long move_to_x = -1;
+    //! Move player to Y position (-1 - don't move) and play the animation
+    long move_to_y = -1;
+
+    //! Anchored level id
+    long level_anchor_id = 0;
 
     /*
      * Editor-only parameters which are not saving into file
