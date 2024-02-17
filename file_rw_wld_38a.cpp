@@ -109,49 +109,49 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
                                         MakeCSVPostProcessor(&FileData.EpisodeTitle, PGEUrlDecodeFunc),
                                         //  bp(n)=don't use player(n) as player's character
                                         MakeCSVSubReader(dataReader, ',',
-                                                    MakeCSVOptional(&FileData.nocharacter1, false),
-                                                    MakeCSVOptional(&FileData.nocharacter2, false),
-                                                    MakeCSVOptional(&FileData.nocharacter3, false),
-                                                    MakeCSVOptional(&FileData.nocharacter4, false),
-                                                    MakeCSVOptional(&FileData.nocharacter5, false)
+                                            MakeCSVOptional(&FileData.nocharacter1, false),
+                                            MakeCSVOptional(&FileData.nocharacter2, false),
+                                            MakeCSVOptional(&FileData.nocharacter3, false),
+                                            MakeCSVOptional(&FileData.nocharacter4, false),
+                                            MakeCSVOptional(&FileData.nocharacter5, false)
                                         ),
                                         MakeCSVSubReader(dataReader, ',',
-                                                        //  asn=auto start level file name[***urlencode!***]
-                                                        MakeCSVPostProcessor(&FileData.IntroLevel_file, PGEUrlDecodeFunc),
-                                                        //  gon=game over level file name[***urlencode!***]
-                                                        MakeCSVOptional(&FileData.GameOverLevel_file, "", nullptr, PGEUrlDecodeFunc)
-                                                        ),
+                                            //  asn=auto start level file name[***urlencode!***]
+                                            MakeCSVPostProcessor(&FileData.IntroLevel_file, PGEUrlDecodeFunc),
+                                            //  gon=game over level file name[***urlencode!***]
+                                            MakeCSVOptional(&FileData.GameOverLevel_file, "", nullptr, PGEUrlDecodeFunc)
+                                        ),
                                         MakeCSVSubReader(dataReader, ',',
-                                                        //  dtp=disable two player[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.restrictSinglePlayer, false),
-                                                        //  nwm=no world map[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.HubStyledWorld, false),
-                                                        //  rsd=restart last level on player's character death[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.restartlevel, false),
-                                                        //  dcp=disable change player[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.restrictCharacterSwitch, false),
-                                                        //  sc=save machine code to sav file[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.restrictSecureGameSave, false),
-                                                        //  sm=save mode
-                                                        MakeCSVOptional(&FileData.saveResumePolicy, 0),
-                                                        //  asg=auto save game[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.saveAuto, false),
-                                                        //  smb3=smb3 style world map[0=false !0=true]
-                                                        MakeCSVOptional(&FileData.showEverything, false),
-                                                        //  dss=No Entry Scene
-                                                        MakeCSVOptional(&FileData.disableEnterScreen, false)
-                                                    ),
+                                            //  dtp=disable two player[0=false !0=true]
+                                            MakeCSVOptional(&FileData.restrictSinglePlayer, false),
+                                            //  nwm=no world map[0=false !0=true]
+                                            MakeCSVOptional(&FileData.HubStyledWorld, false),
+                                            //  rsd=restart last level on player's character death[0=false !0=true]
+                                            MakeCSVOptional(&FileData.restartlevel, false),
+                                            //  dcp=disable change player[0=false !0=true]
+                                            MakeCSVOptional(&FileData.restrictCharacterSwitch, false),
+                                            //  sc=save machine code to sav file[0=false !0=true]
+                                            MakeCSVOptional(&FileData.restrictSecureGameSave, false),
+                                            //  sm=save mode
+                                            MakeCSVOptional(&FileData.saveResumePolicy, 0),
+                                            //  asg=auto save game[0=false !0=true]
+                                            MakeCSVOptional(&FileData.saveAuto, false),
+                                            //  smb3=smb3 style world map[0=false !0=true]
+                                            MakeCSVOptional(&FileData.showEverything, false),
+                                            //  dss=No Entry Scene
+                                            MakeCSVOptional(&FileData.disableEnterScreen, false)
+                                        ),
                                         MakeCSVSubReader(dataReader, ',',
-                                                        //  sn=star number
-                                                        MakeCSVOptional(&FileData.stars, 0),
-                                                        //  mis=max item number in world inventory
-                                                        MakeCSVOptional(&FileData.inventoryLimit, 0)
-                                                        ),
-                                                        //  acm=anti cheat mode[0=don't allow in list !0=allow in list]
-                                                        &FileData.cheatsPolicy,
-                                                        //  sc=enable save locker[0=false !0=true]
-                                                        &FileData.saveLocker
-                                        );
+                                            //  sn=star number
+                                            MakeCSVOptional(&FileData.stars, 0),
+                                            //  mis=max item number in world inventory
+                                            MakeCSVOptional(&FileData.inventoryLimit, 0)
+                                        ),
+                                        //  acm=anti cheat mode[0=don't allow in list !0=allow in list]
+                                        &FileData.cheatsPolicy,
+                                        //  sc=enable save locker[0=false !0=true]
+                                        &FileData.saveLocker
+                                    );
                 FileData.charactersFromS64();
             }
             else if(identifier == "WS2")
@@ -164,12 +164,29 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
                                         //  [2]
                                         //  #CUST#xxxxxx[***base64encode!***]
                                         //  xxxxxx=any string
-                                        MakeCSVPostProcessor(&FileData.authors, [](PGESTRING& value)
+                                        MakeCSVPostProcessor(&FileData.authors, [&FileData](PGESTRING& value)
                                         {
                                             PGESTRING prefix = PGE_SubStr(value, 0, 6);
+                                            bool isCustom = (prefix == "#CUST#");
+
                                             if((prefix == "#DEFT#") || (prefix == "#CUST#"))
                                                 PGE_RemStrRng(value, 0, 6);
+
                                             value = PGE_BASE64DEC(value);
+                                            // Convert into LF
+                                            PGE_ReplSTRING(value, "\r\n", "\n");
+
+                                            // Do fill SMBX64 authors too
+                                            if(!isCustom)
+                                            {
+                                                PGESTRINGList authors;
+                                                PGE_SPLITSTRING(authors, value, "\n");
+                                                if(authors.size() > 0) FileData.author1 = authors[0];
+                                                if(authors.size() > 1) FileData.author2 = authors[1];
+                                                if(authors.size() > 2) FileData.author3 = authors[2];
+                                                if(authors.size() > 3) FileData.author4 = authors[3];
+                                                if(authors.size() > 4) FileData.author5 = authors[4];
+                                            }
                                         }),
                                         MakeCSVOptionalEmpty(&FileData.authors_music, "", nullptr, PGEUrlDecodeFunc)
                 );
@@ -840,7 +857,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData& FileData, unsigned int file_format)
+bool FileFormats::WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData& FileData, unsigned int format_version)
 {
     PGE_FileFormats_misc::TextFileOutput file;
     FileData.meta.ERROR_info.clear();
@@ -851,10 +868,10 @@ bool FileFormats::WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData& Fil
         return false;
     }
 
-    return WriteSMBX38AWldFile(file, FileData, file_format);
+    return WriteSMBX38AWldFile(file, FileData, format_version);
 }
 
-bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata, unsigned int file_format)
+bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata, unsigned int format_version)
 {
     PGE_FileFormats_misc::RawTextOutput file;
     FileData.meta.ERROR_info.clear();
@@ -865,18 +882,245 @@ bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata
         return false;
     }
 
-    return WriteSMBX38AWldFile(file, FileData, file_format);
+    return WriteSMBX38AWldFile(file, FileData, format_version);
 }
 
-bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, WorldData& FileData, unsigned int file_format)
+bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, WorldData& FileData, unsigned int format_version)
 {
     (void)out;
-    FileData.meta.ERROR_info = "Not implemented yet. Comming soon!";
-    FileData.meta.ERROR_linedata.clear();
-    FileData.meta.ERROR_linenum = -1;
-    FileData.meta.ReadFileValid = false;
     FileData.meta.RecentFormat = WorldData::SMBX38A;
-    FileData.meta.RecentFormatVersion = file_format;
-    return false;
+    FileData.meta.RecentFormatVersion = format_version;
+
+    out << "SMBXFile" << fromNum(FileData.meta.RecentFormatVersion) << "\n";
+
+
+    out << "WS1";
+    out << "|" << PGE_URLENC(FileData.EpisodeTitle);
+    out << "|"
+        << fromNum((int)FileData.nocharacter1)
+        << ","
+        << fromNum((int)FileData.nocharacter2)
+        << ","
+        << fromNum((int)FileData.nocharacter3)
+        << ","
+        << fromNum((int)FileData.nocharacter4)
+        << ","
+        << fromNum((int)FileData.nocharacter5);
+
+    out << "|" << PGE_URLENC(FileData.IntroLevel_file)
+        << "," << PGE_URLENC(FileData.GameOverLevel_file);
+
+    out << "|" << fromNum((int)FileData.restrictSinglePlayer)
+        << "," << fromNum((int)FileData.HubStyledWorld)
+        << "," << fromNum((int)FileData.restartlevel)
+        << "," << fromNum((int)FileData.restrictCharacterSwitch)
+        << "," << fromNum((int)FileData.restrictSecureGameSave)
+        << "," << fromNum(FileData.saveResumePolicy)
+        << "," << fromNum((int)FileData.saveAuto)
+        << "," << fromNum((int)FileData.showEverything)
+        << "," << fromNum((int)FileData.disableEnterScreen);
+
+    out << "|" << fromNum(FileData.stars)
+        << "," << fromNum(FileData.inventoryLimit);
+
+    out << "|" << fromNum((int)FileData.cheatsPolicy);
+    out << "|" << fromNum((int)FileData.saveLocker);
+
+    out << "\n";
+
+
+    out << "WS2";
+    out << "|";
+    if(IsEmpty(FileData.authors))
+    {
+        out << "#DEFT#";
+        PGESTRING out_authors;
+
+        if(!IsEmpty(FileData.author1))
+            out_authors += FileData.author1;
+
+        if(!IsEmpty(FileData.author2))
+        {
+            if(IsEmpty(out_authors))
+                out_authors += "\r\n";
+            out_authors += FileData.author2;
+        }
+
+        if(!IsEmpty(FileData.author3))
+        {
+            if(IsEmpty(out_authors))
+                out_authors += "\r\n";
+            out_authors += FileData.author3;
+        }
+
+        if(!IsEmpty(FileData.author4))
+        {
+            if(IsEmpty(out_authors))
+                out_authors += "\r\n";
+            out_authors += FileData.author4;
+        }
+
+        if(!IsEmpty(FileData.author5))
+        {
+            if(IsEmpty(out_authors))
+                out_authors += "\r\n";
+            out_authors += FileData.author5;
+        }
+
+        out << PGE_BASE64ENC_nopad(out_authors);
+    }
+
+    out << "|" << PGE_URLENC(FileData.authors_music);
+    out << "\n";
+
+
+
+    out << "WS3";
+    out << "|";
+    if(!FileData.cheatsList.empty())
+    {
+        PGESTRING cheatsList;
+        for(auto &cheat : FileData.cheatsList)
+        {
+            if(IsEmpty(cheatsList))
+                cheatsList += ",";
+            cheatsList += cheat;
+        }
+        out << PGE_URLENC(cheatsList);
+    }
+    out << "\n";
+
+
+    out << "WS4"
+        << "|" << PGE_URLENC(FileData.saveLockerEx)
+        << "|" << PGE_URLENC(FileData.saveLockerMsg)
+        << "\n";
+
+
+
+
+    for(auto &tile : FileData.tiles)
+    {
+        out << "T";
+        out << "|" << fromNum(tile.id);
+
+        if(tile.gfx_dx > 0 || tile.gfx_dy > 0)
+        {
+            out << "," << fromNum(tile.gfx_dx);
+            out << "," << fromNum(tile.gfx_dy);
+        }
+
+        out << "|" << fromNum(tile.x);
+        out << "|" << fromNum(tile.y);
+        out << "|" << PGE_URLENC(tile.layer);
+        out << "\n";
+    }
+
+
+
+    for(auto &scene : FileData.scenery)
+    {
+        out << "S";
+        out << "|" << fromNum(scene.id);
+
+        if(scene.gfx_dx >= 0 || scene.gfx_dy >= 0)
+        {
+            out << "," << fromNum(scene.gfx_dx);
+            out << "," << fromNum(scene.gfx_dy);
+        }
+
+        out << "|" << fromNum(scene.x);
+        out << "|" << fromNum(scene.y);
+        out << "|" << PGE_URLENC(scene.layer);
+        out << "\n";
+    }
+
+
+    for(auto &path : FileData.paths)
+    {
+        out << "P";
+        out << "|" << fromNum(path.id);
+
+        if(path.gfx_dx >= 0 || path.gfx_dy >= 0)
+        {
+            out << "," << fromNum(path.gfx_dx);
+            out << "," << fromNum(path.gfx_dy);
+        }
+
+        out << "|" << fromNum(path.x);
+        out << "|" << fromNum(path.y);
+        out << "|" << PGE_URLENC(path.layer);
+        out << "\n";
+    }
+
+
+
+    // areas/musicboxes
+
+
+
+    // levels
+
+
+
+
+    for(auto &layer : FileData.layers)
+    {
+        out << "WL";
+        out << "|" << PGE_URLENC(layer.name);
+        out << "|" << fromNum((int)layer.hidden);
+        out << "\n";
+    }
+
+
+
+    // events
+
+
+
+
+
+    //next line: Custom block
+    if(format_version >= 67)
+    {
+        for(const WorldItemSetup38A &is : FileData.custom38A_configs)
+        {
+            //    V|name|value
+            switch(is.type)
+            {
+            case WorldItemSetup38A::TERRAIN:
+                out << "WCT";
+                break;
+            case WorldItemSetup38A::SCENERY:
+                out << "WCS";
+                break;
+            case WorldItemSetup38A::LEVEL:
+                out << "WCL";
+                break;
+            default:
+                out << "CUnk";
+                break;
+            }
+            //    id = object id
+            out << "|" << fromNum(is.id);
+
+            for(pge_size_t j = 0; j < is.data.size(); j++)
+            {
+                const WorldItemSetup38A::Entry &e = is.data[j];
+                out << ((j == 0) ? "|" : ",");
+                out << SMBX38A_CC_encode(e.key, e.value);
+            }
+            out << "\n";
+        }
+    }
+
+
+    for(auto &l : FileData.unsupported_38a_lines)
+    {
+        out << l;
+        out << "\n";
+    }
+
+    return true;
 }
 
