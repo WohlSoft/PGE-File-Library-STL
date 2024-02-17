@@ -416,11 +416,11 @@ struct WorldEvent38A
     bool is_level_enter_exit = false;
     //! Allow interruption of event when `false` returned by script
     bool interrupt_on_false = false;
+    //! Show message on interrupt
+    bool show_msg_on_interrupt = false;
     //! Message box to show when interruption occured
     PGESTRING interrupt_message;
 
-    //! Message box to show when event executed
-    PGESTRING msg;
     //! Sound ID to play if not zero
     long sound_id = 0;
 
@@ -437,8 +437,8 @@ struct WorldEvent38A
     //! Trigger script by name
     PGESTRING trigger_script;
 
-    //! Message box to show after event had been started
-    PGESTRING msg_after;
+    //! Message box to show when event executed
+    PGESTRING msg;
 
     //! Move player to X position (-1 - don't move) and play the animation
     long move_to_x = -1;
