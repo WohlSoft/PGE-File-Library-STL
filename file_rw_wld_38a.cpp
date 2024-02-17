@@ -104,114 +104,123 @@ bool FileFormats::ReadSMBX38AWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf
             if(identifier == "WS1")
             {
                 // ws1|wn|bp1,bp2,bp3,bp4,bp5|asn,gvn|dtp,nwm,rsd,dcp,sc,sm,asg,smb3,dss|sn,mis|acm|sc
-                dataReader.ReadDataLine(CSVDiscard(), // Skip the first field (this is already "identifier")
-                                        //  wn=episode name[***urlencode!***]
-                                        MakeCSVPostProcessor(&FileData.EpisodeTitle, PGEUrlDecodeFunc),
-                                        //  bp(n)=don't use player(n) as player's character
-                                        MakeCSVSubReader(dataReader, ',',
-                                            MakeCSVOptional(&FileData.nocharacter1, false),
-                                            MakeCSVOptional(&FileData.nocharacter2, false),
-                                            MakeCSVOptional(&FileData.nocharacter3, false),
-                                            MakeCSVOptional(&FileData.nocharacter4, false),
-                                            MakeCSVOptional(&FileData.nocharacter5, false)
-                                        ),
-                                        MakeCSVSubReader(dataReader, ',',
-                                            //  asn=auto start level file name[***urlencode!***]
-                                            MakeCSVPostProcessor(&FileData.IntroLevel_file, PGEUrlDecodeFunc),
-                                            //  gon=game over level file name[***urlencode!***]
-                                            MakeCSVOptional(&FileData.GameOverLevel_file, "", nullptr, PGEUrlDecodeFunc)
-                                        ),
-                                        MakeCSVSubReader(dataReader, ',',
-                                            //  dtp=disable two player[0=false !0=true]
-                                            MakeCSVOptional(&FileData.restrictSinglePlayer, false),
-                                            //  nwm=no world map[0=false !0=true]
-                                            MakeCSVOptional(&FileData.HubStyledWorld, false),
-                                            //  rsd=restart last level on player's character death[0=false !0=true]
-                                            MakeCSVOptional(&FileData.restartlevel, false),
-                                            //  dcp=disable change player[0=false !0=true]
-                                            MakeCSVOptional(&FileData.restrictCharacterSwitch, false),
-                                            //  sc=save machine code to sav file[0=false !0=true]
-                                            MakeCSVOptional(&FileData.restrictSecureGameSave, false),
-                                            //  sm=save mode
-                                            MakeCSVOptional(&FileData.saveResumePolicy, 0),
-                                            //  asg=auto save game[0=false !0=true]
-                                            MakeCSVOptional(&FileData.saveAuto, false),
-                                            //  smb3=smb3 style world map[0=false !0=true]
-                                            MakeCSVOptional(&FileData.showEverything, false),
-                                            //  dss=No Entry Scene
-                                            MakeCSVOptional(&FileData.disableEnterScreen, false)
-                                        ),
-                                        MakeCSVSubReader(dataReader, ',',
-                                            //  sn=star number
-                                            MakeCSVOptional(&FileData.stars, 0),
-                                            //  mis=max item number in world inventory
-                                            MakeCSVOptional(&FileData.inventoryLimit, 0)
-                                        ),
-                                        //  acm=anti cheat mode[0=don't allow in list !0=allow in list]
-                                        &FileData.cheatsPolicy,
-                                        //  sc=enable save locker[0=false !0=true]
-                                        &FileData.saveLocker
-                                    );
+                dataReader.ReadDataLine(
+                    CSVDiscard(), // Skip the first field (this is already "identifier")
+                    //  wn=episode name[***urlencode!***]
+                    MakeCSVPostProcessor(&FileData.EpisodeTitle, PGEUrlDecodeFunc),
+                    //  bp(n)=don't use player(n) as player's character
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        MakeCSVOptional(&FileData.nocharacter1, false),
+                        MakeCSVOptional(&FileData.nocharacter2, false),
+                        MakeCSVOptional(&FileData.nocharacter3, false),
+                        MakeCSVOptional(&FileData.nocharacter4, false),
+                        MakeCSVOptional(&FileData.nocharacter5, false)
+                    ),
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        //  asn=auto start level file name[***urlencode!***]
+                        MakeCSVPostProcessor(&FileData.IntroLevel_file, PGEUrlDecodeFunc),
+                        //  gon=game over level file name[***urlencode!***]
+                        MakeCSVOptional(&FileData.GameOverLevel_file, "", nullptr, PGEUrlDecodeFunc)
+                    ),
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        //  dtp=disable two player[0=false !0=true]
+                        MakeCSVOptional(&FileData.restrictSinglePlayer, false),
+                        //  nwm=no world map[0=false !0=true]
+                        MakeCSVOptional(&FileData.HubStyledWorld, false),
+                        //  rsd=restart last level on player's character death[0=false !0=true]
+                        MakeCSVOptional(&FileData.restartlevel, false),
+                        //  dcp=disable change player[0=false !0=true]
+                        MakeCSVOptional(&FileData.restrictCharacterSwitch, false),
+                        //  sc=save machine code to sav file[0=false !0=true]
+                        MakeCSVOptional(&FileData.restrictSecureGameSave, false),
+                        //  sm=save mode
+                        MakeCSVOptional(&FileData.saveResumePolicy, 0),
+                        //  asg=auto save game[0=false !0=true]
+                        MakeCSVOptional(&FileData.saveAuto, false),
+                        //  smb3=smb3 style world map[0=false !0=true]
+                        MakeCSVOptional(&FileData.showEverything, false),
+                        //  dss=No Entry Scene
+                        MakeCSVOptional(&FileData.disableEnterScreen, false)
+                    ),
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        //  sn=star number
+                        MakeCSVOptional(&FileData.stars, 0),
+                        //  mis=max item number in world inventory
+                        MakeCSVOptional(&FileData.inventoryLimit, 0)
+                    ),
+                    //  acm=anti cheat mode[0=don't allow in list !0=allow in list]
+                    &FileData.cheatsPolicy,
+                    //  sc=enable save locker[0=false !0=true]
+                    &FileData.saveLocker
+                );
+
                 FileData.charactersFromS64();
             }
             else if(identifier == "WS2")
             {
                 // ws2|credits|creditsmusic
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        //  credits=[1]
-                                        //  #DEFT#xxxxxx[***base64encode!***]
-                                        //  xxxxxx=name1 /n name2 /n ...
-                                        //  [2]
-                                        //  #CUST#xxxxxx[***base64encode!***]
-                                        //  xxxxxx=any string
-                                        MakeCSVPostProcessor(&FileData.authors, [&FileData](PGESTRING& value)
-                                        {
-                                            PGESTRING prefix = PGE_SubStr(value, 0, 6);
-                                            bool isCustom = (prefix == "#CUST#");
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    //  credits=[1]
+                    //  #DEFT#xxxxxx[***base64encode!***]
+                    //  xxxxxx=name1 /n name2 /n ...
+                    //  [2]
+                    //  #CUST#xxxxxx[***base64encode!***]
+                    //  xxxxxx=any string
+                    MakeCSVPostProcessor(&FileData.authors, [&FileData](PGESTRING& value)
+                    {
+                        PGESTRING prefix = PGE_SubStr(value, 0, 6);
+                        bool isCustom = (prefix == "#CUST#");
 
-                                            if((prefix == "#DEFT#") || (prefix == "#CUST#"))
-                                                PGE_RemStrRng(value, 0, 6);
+                        if((prefix == "#DEFT#") || (prefix == "#CUST#"))
+                            PGE_RemStrRng(value, 0, 6);
 
-                                            value = PGE_BASE64DEC(value);
-                                            // Convert into LF
-                                            PGE_ReplSTRING(value, "\r\n", "\n");
+                        value = PGE_BASE64DEC(value);
+                        // Convert into LF
+                        PGE_ReplSTRING(value, "\r\n", "\n");
 
-                                            // Do fill SMBX64 authors too
-                                            if(!isCustom)
-                                            {
-                                                PGESTRINGList authors;
-                                                PGE_SPLITSTRING(authors, value, "\n");
-                                                if(authors.size() > 0) FileData.author1 = authors[0];
-                                                if(authors.size() > 1) FileData.author2 = authors[1];
-                                                if(authors.size() > 2) FileData.author3 = authors[2];
-                                                if(authors.size() > 3) FileData.author4 = authors[3];
-                                                if(authors.size() > 4) FileData.author5 = authors[4];
-                                            }
-                                        }),
-                                        MakeCSVOptionalEmpty(&FileData.authors_music, "", nullptr, PGEUrlDecodeFunc)
+                        // Do fill SMBX64 authors too
+                        if(!isCustom)
+                        {
+                            PGESTRINGList authors;
+                            PGE_SPLITSTRING(authors, value, "\n");
+                            if(authors.size() > 0) FileData.author1 = authors[0];
+                            if(authors.size() > 1) FileData.author2 = authors[1];
+                            if(authors.size() > 2) FileData.author3 = authors[2];
+                            if(authors.size() > 3) FileData.author4 = authors[3];
+                            if(authors.size() > 4) FileData.author5 = authors[4];
+                        }
+                    }),
+                    MakeCSVOptionalEmpty(&FileData.authors_music, "", nullptr, PGEUrlDecodeFunc)
                 );
             }
             else if(identifier == "WS3")
             {
                 PGESTRING cheatsList;
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        //  list=xxxxxx[***base64encode!***] (list of forbidden)
-                                        //          xxxxxx=string1,string2...stringn
-                                        MakeCSVPostProcessor(&cheatsList, [&](PGESTRING& value)
-                                        {
-                                            PGESTRING list = PGE_URLDEC(value);
-                                            PGE_SPLITSTRING(FileData.cheatsList, list, ",");
-                                        })
-                                        );
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    //  list=xxxxxx[***base64encode!***] (list of forbidden)
+                    //          xxxxxx=string1,string2...stringn
+                    MakeCSVPostProcessor(&cheatsList, [&](PGESTRING& value)
+                    {
+                        PGESTRING list = PGE_URLDEC(value);
+                        PGE_SPLITSTRING(FileData.cheatsList, list, ",");
+                    })
+                );
             }
             else if(identifier == "WS4")
             {
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        //    se=save locker syntax[***urlencode!***][syntax]
-                                        MakeCSVPostProcessor(&FileData.saveLockerEx, PGEUrlDecodeFunc),
-                                        //    msg=message when save was locked[***urlencode!***]
-                                        MakeCSVPostProcessor(&FileData.saveLockerMsg, PGEUrlDecodeFunc)
-                                        );
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    //    se=save locker syntax[***urlencode!***][syntax]
+                    MakeCSVPostProcessor(&FileData.saveLockerEx, PGEUrlDecodeFunc),
+                    //    msg=message when save was locked[***urlencode!***]
+                    MakeCSVPostProcessor(&FileData.saveLockerMsg, PGEUrlDecodeFunc)
+                );
             }
             else
             {
@@ -457,32 +466,40 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
             else if(identifier == "S")
             {
                 scen = WorldScenery();
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        MakeCSVSubReader(dataReader, ',',
-                                                         &scen.id,
-                                                         MakeCSVOptional(&scen.gfx_dx, 0),
-                                                         MakeCSVOptional(&scen.gfx_dy, 0)
-                                                         ),
-                                        &scen.x,
-                                        &scen.y,
-                                        MakeCSVPostProcessor(&scen.layer, PGELayerOrDefault)
-                                        );
+
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        &scen.id,
+                        MakeCSVOptional(&scen.gfx_dx, 0),
+                        MakeCSVOptional(&scen.gfx_dy, 0)
+                    ),
+                    &scen.x,
+                    &scen.y,
+                    MakeCSVPostProcessor(&scen.layer, PGELayerOrDefault)
+                );
+
                 scen.meta.array_id = FileData.scene_array_id++;
                 FileData.scenery.push_back(scen);
             }
             else if(identifier == "P")
             {
                 pathitem = WorldPathTile();
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        MakeCSVSubReader(dataReader, ',',
-                                                         &pathitem.id,
-                                                         MakeCSVOptional(&pathitem.gfx_dx, 0),
-                                                         MakeCSVOptional(&pathitem.gfx_dy, 0)
-                                                         ),
-                                        &pathitem.x,
-                                        &pathitem.y,
-                                        MakeCSVPostProcessor(&pathitem.layer, PGELayerOrDefault)
-                                        );
+
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        &pathitem.id,
+                        MakeCSVOptional(&pathitem.gfx_dx, 0),
+                        MakeCSVOptional(&pathitem.gfx_dy, 0)
+                    ),
+                    &pathitem.x,
+                    &pathitem.y,
+                    MakeCSVPostProcessor(&pathitem.layer, PGELayerOrDefault)
+                );
+
                 pathitem.meta.array_id = FileData.path_array_id++;
                 FileData.paths.push_back(pathitem);
             }
@@ -491,49 +508,54 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 musicbox = WorldMusicBox();
                 arearect = WorldAreaRect();
                 arearect.flags = WorldAreaRect::SETUP_CHANGE_MUSIC;
+
                 //M|10|416|1312|    |     |32|32|1   |,0
                 //M|1 |384|384 |    |     |32|32|1   |%66%61%72%74,1
                 //M|id|x  |y   |name|layer|w |h |flag|te,eflag      |ie1,ie2,ie3
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        //id=music id
-                                        &arearect.music_id,
-                                        //x=Area position x
-                                        &arearect.x,
-                                        //y=Area position y
-                                        &arearect.y,
-                                        //name=custom music name[***urlencode!***]
-                                        MakeCSVPostProcessor(&arearect.music_file, PGEUrlDecodeFunc),
-                                        //layer=layer name["" == "Default"][***urlencode!***]
-                                        MakeCSVOptional(&arearect.layer, "Default", nullptr, PGELayerOrDefault),
-                                        //w=width
-                                        MakeCSVOptional(&arearect.w, 32),
-                                        //h=height
-                                        MakeCSVOptional(&arearect.h, 32),
-                                        //flag=area settings[***Bitwise operation***]
-                                        //    0=False !0=True
-                                        //    b1=(flag & 1) World Music
-                                        //    b2=(flag & 2) Set Viewport
-                                        //    b3=(flag & 4) Ship Route
-                                        //    b4=(flag & 8) Forced Walking
-                                        //    b5=(flag & 16) Item-triggered events
-                                        MakeCSVOptional(&arearect.flags, WorldAreaRect::SETUP_CHANGE_MUSIC),
-                                        MakeCSVOptionalSubReader(dataReader, ',',
-                                                                 //te:Touch Event[***urlencode!***]
-                                                                 MakeCSVOptional(&arearect.eventTouch, "", nullptr, PGELayerOrDefault),
-                                                                 //eflag:    0=Triggered every time entering
-                                                                 //          1=Triggered on entrance and level completion
-                                                                 //          2=Triggered only once
-                                                                 MakeCSVOptional(&arearect.eventTouchPolicy, 0)
-                                                                 ),
-                                        MakeCSVOptionalSubReader(dataReader, ',',
-                                                                 //ie1=Hammer Event[***urlencode!***]
-                                                                 MakeCSVOptional(&arearect.eventBreak, "", nullptr, PGELayerOrDefault),
-                                                                 //ie2=Warp Whistle Event[***urlencode!***]
-                                                                 MakeCSVOptional(&arearect.eventWarp, "", nullptr, PGELayerOrDefault),
-                                                                 //ie3=Anchor Event[***urlencode!***]
-                                                                 MakeCSVOptional(&arearect.eventAnchor, "", nullptr, PGELayerOrDefault)
-                                                                 )
-                                        );
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    //id=music id
+                    &arearect.music_id,
+                    //x=Area position x
+                    &arearect.x,
+                    //y=Area position y
+                    &arearect.y,
+                    //name=custom music name[***urlencode!***]
+                    MakeCSVPostProcessor(&arearect.music_file, PGEUrlDecodeFunc),
+                    //layer=layer name["" == "Default"][***urlencode!***]
+                    MakeCSVOptional(&arearect.layer, "Default", nullptr, PGELayerOrDefault),
+                    //w=width
+                    MakeCSVOptional(&arearect.w, 32),
+                    //h=height
+                    MakeCSVOptional(&arearect.h, 32),
+                    //flag=area settings[***Bitwise operation***]
+                    //    0=False !0=True
+                    //    b1=(flag & 1) World Music
+                    //    b2=(flag & 2) Set Viewport
+                    //    b3=(flag & 4) Ship Route
+                    //    b4=(flag & 8) Forced Walking
+                    //    b5=(flag & 16) Item-triggered events
+                    MakeCSVOptional(&arearect.flags, WorldAreaRect::SETUP_CHANGE_MUSIC),
+                    MakeCSVOptionalSubReader(
+                        dataReader, ',',
+                        //te:Touch Event[***urlencode!***]
+                        MakeCSVOptional(&arearect.eventTouch, "", nullptr, PGELayerOrDefault),
+                        //eflag:    0=Triggered every time entering
+                        //          1=Triggered on entrance and level completion
+                        //          2=Triggered only once
+                        MakeCSVOptional(&arearect.eventTouchPolicy, 0)
+                    ),
+                    MakeCSVOptionalSubReader(
+                        dataReader, ',',
+                        //ie1=Hammer Event[***urlencode!***]
+                        MakeCSVOptional(&arearect.eventBreak, "", nullptr, PGELayerOrDefault),
+                        //ie2=Warp Whistle Event[***urlencode!***]
+                        MakeCSVOptional(&arearect.eventWarp, "", nullptr, PGELayerOrDefault),
+                        //ie3=Anchor Event[***urlencode!***]
+                        MakeCSVOptional(&arearect.eventAnchor, "", nullptr, PGELayerOrDefault)
+                    )
+                );
+
                 if((arearect.flags == WorldAreaRect::SETUP_CHANGE_MUSIC) &&
                    (arearect.w == 32) && (arearect.h == 32))
                 {
@@ -561,191 +583,274 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 lvlitem.top_exit_extra.exit_codes = {0, 0};
                 lvlitem.right_exit_extra.exit_codes = {0, 0};
                 lvlitem.bottom_exit_extra.exit_codes = {0, 0};
-                dataReader.ReadDataLine(CSVDiscard(), //-V681
-                                        MakeCSVSubReader(dataReader, ',',
-                                                         //id=level id
-                                                         &lvlitem.id,
-                                                         //dx=graphics extend x
-                                                         MakeCSVOptional(&lvlitem.gfx_dx, 0),
-                                                         //dx=graphics extend y
-                                                         MakeCSVOptional(&lvlitem.gfx_dy, 0)
-                                                         ),
-                                        //x=level position x
-                                        &lvlitem.x,
-                                        //x=level position y
-                                        &lvlitem.y,
-                                        //fn=level file name[***urlencode!***]
-                                        MakeCSVPostProcessor(&lvlitem.lvlfile,  PGEUrlDecodeFunc),
-                                        //n=level name[***urlencode!***]
-                                        MakeCSVPostProcessor(&lvlitem.title,    PGEUrlDecodeFunc),
-                                        //eu\el\ed\er=e[up\left\down\right]
-                                        //        e=c1,c2,c3,c4
-                                        //        c1,c2,c3=level exit type
-                                        //        c4=condidtion expression[***urlencode!***][syntax]
-                                        //        exit = (c1 || c2 || c3) && c4
-                                        MakeCSVSubReader(dataReader, '\\',
-                                                        MakeCSVSubReader(dataReader, PGEChar(','),
-                                                                         &lvlitem.top_exit,
-                                                                         &lvlitem.top_exit_extra.exit_codes[0],
-                                                                         &lvlitem.top_exit_extra.exit_codes[1],
-                                                                         MakeCSVPostProcessor(&lvlitem.top_exit_extra.expression, PGEUrlDecodeFunc)
-                                                                         ),
-                                                        MakeCSVSubReader(dataReader, PGEChar(','),
-                                                                         &lvlitem.left_exit,
-                                                                         &lvlitem.left_exit_extra.exit_codes[0],
-                                                                         &lvlitem.left_exit_extra.exit_codes[1],
-                                                                         MakeCSVPostProcessor(&lvlitem.left_exit_extra.expression, PGEUrlDecodeFunc)
-                                                                         ),
-                                                        MakeCSVSubReader(dataReader, PGEChar(','),
-                                                                         &lvlitem.bottom_exit,
-                                                                         &lvlitem.bottom_exit_extra.exit_codes[0],
-                                                                         &lvlitem.bottom_exit_extra.exit_codes[1],
-                                                                         MakeCSVPostProcessor(&lvlitem.bottom_exit_extra.expression, PGEUrlDecodeFunc)
-                                                                         ),
-                                                        MakeCSVSubReader(dataReader, PGEChar(','),
-                                                                         &lvlitem.right_exit,
-                                                                         &lvlitem.right_exit_extra.exit_codes[0],
-                                                                         &lvlitem.right_exit_extra.exit_codes[1],
-                                                                         MakeCSVPostProcessor(&lvlitem.right_exit_extra.expression, PGEUrlDecodeFunc)
-                                                                         )
-                                                         ),
-                                        //wx=go to world map position x
-                                        &lvlitem.gotox,
-                                        //wx=go to world map position y
-                                        &lvlitem.gotoy,
-                                        //wlz=nunber of doors to warp
-                                        &lvlitem.entertowarp,
-                                        MakeCSVSubReader(dataReader, ',',
-                                                         //bg=big background
-                                                         MakeCSVOptional(&lvlitem.bigpathbg, false),
-                                                         //pb=path background
-                                                         MakeCSVOptional(&lvlitem.pathbg, false),
-                                                         //av=always visible
-                                                         MakeCSVOptional(&lvlitem.alwaysVisible, false),
-                                                         //ls=is game start point
-                                                         MakeCSVOptional(&lvlitem.gamestart, false),
-                                                         //f=forced
-                                                         MakeCSVOptional(&lvlitem.forceStart, false),
-                                                         //nsc=no star coin count
-                                                         MakeCSVOptional(&lvlitem.disableStarCoinsCount, false),
-                                                         //otl=destory after clear
-                                                         MakeCSVOptional(&lvlitem.destroyOnCompleting, false),
-                                                         //li=level ID
-                                                         MakeCSVOptional(&lvlitem.levelID, 0),
-                                                         //lcm=Affected by Music Box
-                                                         MakeCSVOptional(&lvlitem.controlledByAreaRects, false)
-                                                         ),
-                                        //TODO: Implement this
-                                        //s=entrance syntax
-                                        //        s=ds1/ds2...dsn
-                                        //        ds=ds1,ds2[***urlencode!***][syntax]
-                                        //        ds1=condidtion expression
-                                        //        ds2=index
-                                        MakeCSVOptionalIterator(dataReader, '/', [&lvlitem](const PGESTRING & nextFieldStr)
-                                        {
-                                            WorldLevelTile::EnterCondition e;
-                                            auto fieldReader = MakeDirectReader(nextFieldStr);
-                                            auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
-                                            fullReader.ReadDataLine(
-                                                        MakeCSVPostProcessor(&e.condition,  PGEUrlDecodeFunc),
-                                                        MakeCSVPostProcessor(&e.levelIndex, PGEUrlDecodeFunc)
-                                                        );
-                                            lvlitem.enter_cond.push_back(e);
-                                        }),
-                                        //layer=layer name["" == "Default"][***urlencode!***]
-                                        MakeCSVOptional(&lvlitem.layer, "Default", nullptr, PGELayerOrDefault),
-                                        //TODO: Implement this
-                                        //Lmt=Level Movement Command
-                                        //    lmt=NodeInfo\PathInfo
-                                        //        NodeInfo=Node1:Node2:...:NodeN
-                                        //            Node=x,y,chance
-                                        //        PathInfo=Path1:Path2:...:PathN
-                                        //            Path=NodeID1,NodeID2
-                                        MakeCSVOptionalSubReader(dataReader, '\\', //-V681
-                                                                 MakeCSVOptionalIterator(dataReader, ':', [&lvlitem](const PGESTRING & nextFieldStr)
-                                                                 {
-                                                                     WorldLevelTile::Movement::Node node;
-                                                                     auto fieldReader = MakeDirectReader(nextFieldStr);
-                                                                     auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
-                                                                     fullReader.ReadDataLine(
-                                                                                 &node.x,
-                                                                                 &node.y,
-                                                                                 &node.chance
-                                                                                 );
-                                                                     lvlitem.movement.nodes.push_back(node);
-                                                                 }),
-                                                                 MakeCSVOptionalIterator(dataReader, ':', [&lvlitem](const PGESTRING & nextFieldStr)
-                                                                 {
-                                                                     WorldLevelTile::Movement::Line line;
-                                                                     auto fieldReader = MakeDirectReader(nextFieldStr);
-                                                                     auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
-                                                                     fullReader.ReadDataLine(
-                                                                                 &line.node1,
-                                                                                 &line.node2
-                                                                                 );
-                                                                     lvlitem.movement.paths.push_back(line);
-                                                                 })
-                                                                 )
-                                        );
+
+                dataReader.ReadDataLine(
+                    CSVDiscard(), //-V681
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        //id=level id
+                        &lvlitem.id,
+                        //dx=graphics extend x
+                        MakeCSVOptional(&lvlitem.gfx_dx, 0),
+                        //dx=graphics extend y
+                        MakeCSVOptional(&lvlitem.gfx_dy, 0)
+                    ),
+                    //x=level position x
+                    &lvlitem.x,
+                    //x=level position y
+                    &lvlitem.y,
+                    //fn=level file name[***urlencode!***]
+                    MakeCSVPostProcessor(&lvlitem.lvlfile,  PGEUrlDecodeFunc),
+                    //n=level name[***urlencode!***]
+                    MakeCSVPostProcessor(&lvlitem.title,    PGEUrlDecodeFunc),
+                    //eu\el\ed\er=e[up\left\down\right]
+                    //        e=c1,c2,c3,c4
+                    //        c1,c2,c3=level exit type
+                    //        c4=condidtion expression[***urlencode!***][syntax]
+                    //        exit = (c1 || c2 || c3) && c4
+                    MakeCSVSubReader(
+                        dataReader, '\\',
+                        MakeCSVSubReader(
+                            dataReader, PGEChar(','),
+                            &lvlitem.top_exit,
+                            &lvlitem.top_exit_extra.exit_codes[0],
+                            &lvlitem.top_exit_extra.exit_codes[1],
+                            MakeCSVPostProcessor(&lvlitem.top_exit_extra.expression, PGEUrlDecodeFunc)
+                        ),
+                        MakeCSVSubReader(
+                            dataReader, PGEChar(','),
+                            &lvlitem.left_exit,
+                            &lvlitem.left_exit_extra.exit_codes[0],
+                            &lvlitem.left_exit_extra.exit_codes[1],
+                            MakeCSVPostProcessor(&lvlitem.left_exit_extra.expression, PGEUrlDecodeFunc)
+                        ),
+                        MakeCSVSubReader(
+                            dataReader, PGEChar(','),
+                            &lvlitem.bottom_exit,
+                            &lvlitem.bottom_exit_extra.exit_codes[0],
+                            &lvlitem.bottom_exit_extra.exit_codes[1],
+                            MakeCSVPostProcessor(&lvlitem.bottom_exit_extra.expression, PGEUrlDecodeFunc)
+                        ),
+                        MakeCSVSubReader(
+                            dataReader, PGEChar(','),
+                            &lvlitem.right_exit,
+                            &lvlitem.right_exit_extra.exit_codes[0],
+                            &lvlitem.right_exit_extra.exit_codes[1],
+                            MakeCSVPostProcessor(&lvlitem.right_exit_extra.expression, PGEUrlDecodeFunc)
+                        )
+                    ),
+                    //wx=go to world map position x
+                    &lvlitem.gotox,
+                    //wx=go to world map position y
+                    &lvlitem.gotoy,
+                    //wlz=nunber of doors to warp
+                    &lvlitem.entertowarp,
+                    MakeCSVSubReader(
+                        dataReader, ',',
+                        //bg=big background
+                        MakeCSVOptional(&lvlitem.bigpathbg, false),
+                        //pb=path background
+                        MakeCSVOptional(&lvlitem.pathbg, false),
+                        //av=always visible
+                        MakeCSVOptional(&lvlitem.alwaysVisible, false),
+                        //ls=is game start point
+                        MakeCSVOptional(&lvlitem.gamestart, false),
+                        //f=forced
+                        MakeCSVOptional(&lvlitem.forceStart, false),
+                        //nsc=no star coin count
+                        MakeCSVOptional(&lvlitem.disableStarCoinsCount, false),
+                        //otl=destory after clear
+                        MakeCSVOptional(&lvlitem.destroyOnCompleting, false),
+                        //li=level ID
+                        MakeCSVOptional(&lvlitem.levelID, 0),
+                        //lcm=Affected by Music Box
+                        MakeCSVOptional(&lvlitem.controlledByAreaRects, false)
+                    ),
+                    //TODO: Implement this
+                    //s=entrance syntax
+                    //        s=ds1/ds2...dsn
+                    //        ds=ds1,ds2[***urlencode!***][syntax]
+                    //        ds1=condidtion expression
+                    //        ds2=index
+                    MakeCSVOptionalIterator(dataReader, '/', [&lvlitem](const PGESTRING & nextFieldStr)
+                    {
+                        WorldLevelTile::EnterCondition e;
+                        auto fieldReader = MakeDirectReader(nextFieldStr);
+                        auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                        fullReader.ReadDataLine(
+                            MakeCSVPostProcessor(&e.condition,  PGEUrlDecodeFunc),
+                            MakeCSVPostProcessor(&e.levelIndex, PGEUrlDecodeFunc)
+                        );
+                        lvlitem.enter_cond.push_back(e);
+                    }),
+                    //layer=layer name["" == "Default"][***urlencode!***]
+                    MakeCSVOptional(&lvlitem.layer, "Default", nullptr, PGELayerOrDefault),
+                    //TODO: Implement this
+                    //Lmt=Level Movement Command
+                    //    lmt=NodeInfo\PathInfo
+                    //        NodeInfo=Node1:Node2:...:NodeN
+                    //            Node=x,y,chance
+                    //        PathInfo=Path1:Path2:...:PathN
+                    //            Path=NodeID1,NodeID2
+                    MakeCSVOptionalSubReader(
+                        dataReader, '\\', //-V681
+                        MakeCSVOptionalIterator(dataReader, ':', [&lvlitem](const PGESTRING & nextFieldStr)
+                        {
+                            WorldLevelTile::Movement::Node node;
+                            auto fieldReader = MakeDirectReader(nextFieldStr);
+                            auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                            fullReader.ReadDataLine(
+                                &node.x,
+                                &node.y,
+                                &node.chance
+                            );
+                            lvlitem.movement.nodes.push_back(node);
+                        }),
+                        MakeCSVOptionalIterator(dataReader, ':', [&lvlitem](const PGESTRING & nextFieldStr)
+                        {
+                            WorldLevelTile::Movement::Line line;
+                            auto fieldReader = MakeDirectReader(nextFieldStr);
+                            auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                            fullReader.ReadDataLine(
+                                &line.node1,
+                                &line.node2
+                            );
+                            lvlitem.movement.paths.push_back(line);
+                        })
+                    )
+                );
+
                 lvlitem.meta.array_id = FileData.level_array_id++;
                 FileData.levels.push_back(lvlitem);
             }
             else if(identifier == "WL")
             {
                 layer = WorldLayer();
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        MakeCSVPostProcessor(&layer.name, PGELayerOrDefault),
-                                        &layer.hidden
-                                        );
+
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    MakeCSVPostProcessor(&layer.name, PGELayerOrDefault),
+                    &layer.hidden
+                );
+
                 layer.meta.array_id = FileData.layers_array_id++;
                 FileData.layers.push_back(layer);
             }
             else if(identifier == "WE")
             {
+                int way = 0;
+                int autostrat;
+                PGESTRING list;
                 event = WorldEvent38A();
+
                 //TODO: Implement world map events support
                 //next line: events
                 //    WE|name|layer|layerm|world|other
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        //    name=event name[***urlencode!***]
-                                        MakeCSVPostProcessor(&event.name, PGELayerOrDefault)
-                                        //    layer=way/hidelist/showlist/togglelist
-                                        //        list=name1,name2,name3...namen
-                                        //            name[***urlencode!***]
-                                        //        if (way % 10 == 1) nosmoke = true;
-                                        //        if (way > 10) object_state = true; else layer_state = true;
-                                        //    layerm=movementcommand1\movementcommand2\...\movementcommandn
-                                        //        movementcommand=way,layer,hp,vp,ap
-                                        //            way:0=speed,1=coordinate,2=moveto,4=spin
-                                        //            layer=layer name[***urlencode!***]
-                                        //            hp=Horizontal Parameter[***urlencode!***]
-                                        //            vp=Vertical Parameter[***urlencode!***]
-                                        //            ap=Additional Parameter[***urlencode!***]
-                                        //    world=aw/cs,le,inpc,msgc,syntax,msg
-                                        //        aw=AutoStart Settings
-                                        //            0=Not Auto Start
-                                        //            1=Triggered on loading the world the first time.
-                                        //            2=Triggered every time loading the world.
-                                        //            3=Triggered on level exit.
-                                        //        cs=Start when match all condition[0=false !0=true]
-                                        //        le:0=This is a Normal Event.
-                                        //           1=This is a Level Enter/Exit Event.
-                                        //        inpc=Interrupt the process if 'false' returned
-                                        //        msgc=Show a message if 'false' returned
-                                        //        syntax=Condition expression[***urlencode!***]
-                                        //        msg=message[***urlencode!***]
-                                        //    other=sd/ld/event,delay/script/msg/wwx,wwy,lockl
-                                        //        sd=play sound number
-                                        //        ld=lock keyboard (frames)
-                                        //        event=trigger event name[***urlencode!***]
-                                        //        delay=trigger delay[1 frame]
-                                        //        script=script name[***urlencode!***]
-                                        //        msg=show message after start event[***urlencode!***]
-                                        //        wwx=Warp Whistle: Map Warp Location x
-                                        //        wwy=Warp Whistle: Map Warp Location y
-                                        //            if (wwx == -1 && wwy == -1) [means not moving]
-                                        //        lockl=[Level ID]Affected by Anchor
-                                                            );
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    //    name=event name[***urlencode!***]
+                    MakeCSVPostProcessor(&event.name, PGEUrlDecodeFunc),
+                    //    layer=way/hidelist/showlist/togglelist
+                    //        list=name1,name2,name3...namen
+                    //            name[***urlencode!***]
+                    //        if (way % 10 == 1) nosmoke = true;
+                    //        if (way > 10) object_state = true; else layer_state = true;
+                    MakeCSVSubReader(
+                        dataReader, PGEChar('/'),
+                        MakeCSVPostProcessor(&way, [&event](int way)->void
+                        {
+                            event.nosmoke = (way % 10) == 1;
+                            event.layers_mode = (way > 10) ?
+                                                    WorldEvent38A::LM_StateLayers :
+                                                    WorldEvent38A::LM_StateObjects;
+                        }),
+                        MakeCSVIterator(dataReader, ',', [&event](const PGESTRING &layer)->void
+                        {
+                            event.layers_hide.push_back(PGE_URLDEC(layer));
+                        }),
+                        MakeCSVIterator(dataReader, ',', [&event](const PGESTRING &layer)->void
+                        {
+                            event.layers_show.push_back(PGE_URLDEC(layer));
+                        }),
+                        MakeCSVIterator(dataReader, ',', [&event](const PGESTRING &layer)->void
+                        {
+                            event.layers_toggle.push_back(PGE_URLDEC(layer));
+                        })
+                    ),
+                    //    layerm=movementcommand1\movementcommand2\...\movementcommandn
+                    //        movementcommand=way,layer,hp,vp,ap
+                    //            way:0=speed,1=coordinate,2=moveto,4=spin
+                    //            layer=layer name[***urlencode!***]
+                    //            hp=Horizontal Parameter[***urlencode!***]
+                    //            vp=Vertical Parameter[***urlencode!***]
+                    //            ap=Additional Parameter[***urlencode!***]
+                    MakeCSVIterator(
+                        dataReader, '\\',
+                        [&event](const PGESTRING & nextFieldStr)->void
+                        {
+                            WorldEvent38A_LayerMove mv;
+                            auto fieldReader = MakeDirectReader(nextFieldStr);
+                            auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+                            int type;
+
+                            fullReader.ReadDataLine(
+                                &type,
+                                MakeCSVPostProcessor(&mv.layer, PGEUrlDecodeFunc),
+                                MakeCSVPostProcessor(&mv.expression_param_h, PGEUrlDecodeFunc),
+                                MakeCSVPostProcessor(&mv.expression_param_v, PGEUrlDecodeFunc),
+                                MakeCSVPostProcessor(&mv.expression_param_extra, PGEUrlDecodeFunc)
+                            );
+
+                            mv.type = static_cast<WorldEvent38A_LayerMove::MoveType>(type);
+                            SMBX38A_Num2Exp_URLEN(mv.param_h, mv.expression_param_h);
+                            SMBX38A_Num2Exp_URLEN(mv.param_v, mv.expression_param_v);
+                            SMBX38A_Num2Exp_URLEN(mv.param_extra, mv.expression_param_extra);
+                            event.layers_move.push_back(mv);
+                        }
+                    ),
+                    //    world=aw/cs,le,inpc,msgc,syntax,msg
+                    //        aw=AutoStart Settings
+                    //            0=Not Auto Start
+                    //            1=Triggered on loading the world the first time.
+                    //            2=Triggered every time loading the world.
+                    //            3=Triggered on level exit.
+                    //        cs=Start when match all condition[0=false !0=true]
+                    //        le:0=This is a Normal Event.
+                    //           1=This is a Level Enter/Exit Event.
+                    //        inpc=Interrupt the process if 'false' returned
+                    //        msgc=Show a message if 'false' returned
+                    //        syntax=Condition expression[***urlencode!***]
+                    //        msg=message[***urlencode!***]
+                    MakeCSVSubReader(dataReader, PGEChar('/'),
+                        MakeCSVPostProcessor(&autostrat, [&event](int as)->void
+                        {
+                            event.autostart = static_cast<WorldEvent38A::AutoStart>(as);;
+                        }),
+                        MakeCSVSubReader(dataReader, PGEChar(','),
+                            &event.start_on_condition,
+                            &event.is_level_enter_exit,
+                            &event.interrupt_on_false,
+                            &event.show_msg_on_interrupt,
+                            MakeCSVPostProcessor(&event.autostart_condition, PGEUrlDecodeFunc),
+                            MakeCSVPostProcessor(&event.interrupt_message, PGEUrlDecodeFunc)
+                        )
+                    ),
+                    //    other=sd/ld/event,delay/script/msg/wwx,wwy,lockl
+                    //        sd=play sound number
+                    //        ld=lock keyboard (frames)
+                    //        event=trigger event name[***urlencode!***]
+                    //        delay=trigger delay[1 frame]
+                    //        script=script name[***urlencode!***]
+                    //        msg=show message after start event[***urlencode!***]
+                    //        wwx=Warp Whistle: Map Warp Location x
+                    //        wwy=Warp Whistle: Map Warp Location y
+                    //            if (wwx == -1 && wwy == -1) [means not moving]
+                    //        lockl=[Level ID]Affected by Anchor
+                    MakeCSVSubReader(
+                        dataReader, PGEChar('/'),
+                        &event.sound_id
+                    )
+                );
                 event.meta.array_id = FileData.events38A_array_id++;
                 FileData.events38A.push_back(event);
             }
@@ -768,15 +873,19 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 else
                     customcfg.type = WorldItemSetup38A::LEVEL;
 
-                dataReader.ReadDataLine(CSVDiscard(),
-                                        &customcfg.id,
-                                        MakeCSVIterator(dataReader, ',', [&customcfg](const PGESTRING & nextFieldStr)
-                                                        {
-                                                            WorldItemSetup38A::Entry e;
-                                                            SMBX38A_CC_decode(e.key, e.value, nextFieldStr);
-                                                            customcfg.data.push_back(e);
-                                                        })
-                                       );
+                dataReader.ReadDataLine(
+                    CSVDiscard(),
+                    &customcfg.id,
+                    MakeCSVIterator(
+                        dataReader, ',',
+                        [&customcfg](const PGESTRING & nextFieldStr)
+                        {
+                            WorldItemSetup38A::Entry e;
+                            SMBX38A_CC_decode(e.key, e.value, nextFieldStr);
+                            customcfg.data.push_back(e);
+                        }
+                    )
+                );
                 FileData.custom38A_configs.push_back(customcfg);
             }
             else
