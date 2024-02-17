@@ -933,7 +933,6 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
     out << "|";
     if(IsEmpty(FileData.authors))
     {
-        out << "#DEFT#";
         PGESTRING out_authors;
 
         if(!IsEmpty(FileData.author1))
@@ -967,7 +966,16 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
             out_authors += FileData.author5;
         }
 
-        out << PGE_BASE64ENC_nopad(out_authors);
+        if(!IsEmpty(out_authors))
+        {
+            out << "#DEFT#";
+            out << PGE_BASE64ENC_nopad(out_authors);
+        }
+    }
+    else
+    {
+        PGESTRING out_authors = PGE_ReplSTRING(FileData.authors, "\n", "\r\n");
+        out << "#CUST#" << PGE_BASE64ENC_nopad(out_authors);
     }
 
     out << "|" << PGE_URLENC(FileData.authors_music);
