@@ -840,7 +840,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData& FileData)
+bool FileFormats::WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData& FileData, unsigned int file_format)
 {
     PGE_FileFormats_misc::TextFileOutput file;
     FileData.meta.ERROR_info.clear();
@@ -851,10 +851,10 @@ bool FileFormats::WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData& Fil
         return false;
     }
 
-    return WriteSMBX38AWldFile(file, FileData);
+    return WriteSMBX38AWldFile(file, FileData, file_format);
 }
 
-bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata)
+bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata, unsigned int file_format)
 {
     PGE_FileFormats_misc::RawTextOutput file;
     FileData.meta.ERROR_info.clear();
@@ -865,10 +865,10 @@ bool FileFormats::WriteSMBX38AWldFileRaw(WorldData& FileData, PGESTRING& rawdata
         return false;
     }
 
-    return WriteSMBX38AWldFile(file, FileData);
+    return WriteSMBX38AWldFile(file, FileData, file_format);
 }
 
-bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, WorldData& FileData)
+bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, WorldData& FileData, unsigned int file_format)
 {
     (void)out;
     FileData.meta.ERROR_info = "Not implemented yet. Comming soon!";
@@ -876,7 +876,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
     FileData.meta.ERROR_linenum = -1;
     FileData.meta.ReadFileValid = false;
     FileData.meta.RecentFormat = WorldData::SMBX38A;
-    FileData.meta.RecentFormatVersion = latest_version_38a;
+    FileData.meta.RecentFormatVersion = file_format;
     return false;
 }
 

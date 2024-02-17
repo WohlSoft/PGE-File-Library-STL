@@ -330,23 +330,26 @@ public:
      * \brief Generates SMBX-38A Level file data and saves into file
      * \param [__in] filePath Target file path
      * \param [__in] FileData Level data structure
+     * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData);
+    static bool WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData, unsigned int format_version = 69);
     /*!
      * \brief Generates SMBX-38A Level file data and saves into raw string
      * \param [__in] FileData Target file path
      * \param [__out] rawdata Raw data string in the SMBX-38A level format
+     * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata);
+    static bool WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int format_version = 69);
     /*!
      * \brief Generates SMBX-38A Level file data and saves it through file output descriptor
      * \param [__inout] out Output file descriptor
      * \param [__in] FileData Target file path
+     * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData);
+    static bool WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData, unsigned int format_version = 69);
 
 
 
@@ -731,23 +734,26 @@ public:
      * \brief Generates SMBX-38A Level file data and saves into file
      * \param [__in] filePath Target file path
      * \param [__in] FileData Level data structure
+     * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData &FileData);
+    static bool WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData &FileData, unsigned int file_format = 69);
     /*!
      * \brief Generates SMBX-38A Level file data and saves into raw string
      * \param [__in] FileData Target file path
      * \param [__out] rawdata Raw data string in the SMBX-38A world map format
+     * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38AWldFileRaw(WorldData &FileData, PGESTRING &rawdata);
+    static bool WriteSMBX38AWldFileRaw(WorldData &FileData, PGESTRING &rawdata, unsigned int file_format = 69);
     /*!
      * \brief Generates SMBX-38A Level file data and saves it through file output descriptor
      * \param [__inout] out Output file descriptor
      * \param [__in] FileData Target file path
+     * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData);
+    static bool WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData, unsigned int file_format = 69);
 
     // PGE Extended World map File
     /*!

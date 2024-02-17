@@ -1172,9 +1172,10 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                 vardata = CreateLvlVariable("var");
                 dataReader.ReadDataLine(CSVDiscard(),
                                         MakeCSVPostProcessor(&vardata.name, PGEUrlDecodeFunc),
-                                        &vardata.value /* save variable value as string
+                                        &vardata.value, /* save variable value as string
                                                           because in PGE is planned to have
                                                           variables to be universal */
+                                        MakeCSVOptionalEmpty(&vardata.is_global, false)
                                        );
                 FileData.variables.push_back(vardata);
             }
@@ -1189,7 +1190,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
                     auto fullReader  = MakeCSVReaderForPGESTRING(&fieldReader, ',');
                     LevelArray arr;
                     fullReader.ReadDataLine(
-                            MakeCSVPostProcessor(&arr.name, PGEUrlDecodeFunc)
+                        MakeCSVPostProcessor(&arr.name, PGEUrlDecodeFunc)
                     );
                     FileData.arrays.push_back(arr);
                 });
@@ -1338,7 +1339,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 //****************WRITE FILE FORMAT************************
 //*********************************************************
 
-bool FileFormats::WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData)
+bool FileFormats::WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData, unsigned int format_version)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::TextFileOutput file;
@@ -1349,10 +1350,10 @@ bool FileFormats::WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &Fil
         return false;
     }
 
-    return WriteSMBX38ALvlFile(file, FileData);
+    return WriteSMBX38ALvlFile(file, FileData, format_version);
 }
 
-bool FileFormats::WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata)
+bool FileFormats::WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int format_version)
 {
     FileData.meta.ERROR_info.clear();
     PGE_FileFormats_misc::RawTextOutput file;
@@ -1363,14 +1364,14 @@ bool FileFormats::WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata
         return false;
     }
 
-    return WriteSMBX38ALvlFile(file, FileData);
+    return WriteSMBX38ALvlFile(file, FileData, format_version);
 }
 
-bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData)
+bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData, unsigned int format_version)
 {
     pge_size_t i = 0;
     FileData.meta.RecentFormat = LevelData::SMBX38A;
-    FileData.meta.RecentFormatVersion = 68; // TODO: Make a version choosing
+    FileData.meta.RecentFormatVersion = format_version;
     //Count placed stars on this level
     FileData.stars = smbx64CountStars(FileData);
 #define layerNotDef(lr) ( ((lr) != "Default") ? PGE_URLENC(lr) : "" )
@@ -1386,7 +1387,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     //W       - Warp entries
     //L       - Layers
     //E       - Events
-    //V       - Local level variables
+    //V       - Local level variables (some of them may be global)
+    //R       - Local level arrays
     //S       - UTF-8 encoded local level scripts
     //Su      - ASCII-encoded local level scripts
     //--------------------------------------------------------
@@ -1412,7 +1414,9 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     } else {
         out << "|||";
     }
+
     //Custom special musics
+    if(format_version >= 68)
     {
         //s1=P-Switch Music Filename[***urlencode!***]
         //s2=Stopwatch Music Filename[***urlencode!***]
@@ -1438,6 +1442,17 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     out << "\n";
+
+    if(format_version >= 69 && FileData.player_names_overrides.empty())
+    {
+        PGESTRING plr[5];
+        for(pge_size_t i = 0; i < 5 && i < FileData.player_names_overrides.size(); ++i)
+            plr[i] = FileData.player_names_overrides[i];
+
+        out << "BTNS";
+        for(int i = 0; i < 5; ++i)
+            out << "|" << PGE_URLENC(plr[i]);
+    }
 
     //next line: player start points
     for(i = 0; i < FileData.players.size(); i++)
@@ -1500,6 +1515,11 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|" << fromNum(sct.music_id);
         //    background=background number[same as the filename in 'background2' folder]
         out << "|" << fromNum(SMBX38A_mapBGID_To(sct.background));
+
+        if(format_version >= 69)
+            //[Since 69]lightingvalue=lighting value (-1=not set 0=disable >0=pixels)
+            out << "," << fromNum(sct.lighting_value);
+
         //    musicfile=custom music file[***urlencode!***]
         out << "|" << PGE_URLENC(sct.music_file);
         out << "\n";
@@ -1536,11 +1556,17 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        [0] nothing
         out << "|" << ((blk.npc_id == 0) ? ""
                         : fromNum(blk.npc_id <= 0 ? (-1 * blk.npc_id) : (blk.npc_id + 1000)) );
+
+        if(format_version >= 69) //! [Since 69] sp=advset of npc
+            out << "," << fromNum(blk.npc_special_value);
+
         //    b11=slippery[0=false !0=true]
         out << "|" << fromNum((int)blk.slippery);
-        //    b12=wing type
+
+        if(format_version >= 68) //    b12=wing type
+            out << "," << fromNum(blk.motion_ai_id);
+
         //    b2=invisible[0=false !0=true]
-        out << "," << fromNum(blk.motion_ai_id);
         out << "|" << fromNum((int)blk.invisible);
         //    e1=block destory event name[***urlencode!***]
         out << "|" << PGE_URLENC(blk.event_destroy);
@@ -1548,8 +1574,10 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "," << PGE_URLENC(blk.event_hit);
         //    e3=no more object in layer event name[***urlencode!***]4
         out << "," << PGE_URLENC(blk.event_emptylayer);
-        //    e4=block onscreen event name[***urlencode!***]
-        out << "," << PGE_URLENC(blk.event_on_screen);
+
+        if(format_version >= 68) // e4=block onscreen event name[***urlencode!***]
+            out << "," << PGE_URLENC(blk.event_on_screen);
+
         //    w=width
         out << "|" << fromNum(blk.autoscale ? (-1 * blk.w) : blk.w);
         //    h=height
@@ -1693,6 +1721,15 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "," << fromNum((int)npc.nomove);
         //    b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300]
         out << "," << fromNum(containerType);
+
+        if(format_version >= 69)
+        {
+            // b5=autoscale
+            out << "," << fromNum((int)npc.gfx_autoscale);
+            // b6=style of wings(0=wings 1=propeller)
+            out << "," << fromNum(npc.wings_style);
+        }
+
         //    sp=special option
         out << "|" << fromNum(specialData);
         //        [***urlencode!***]
@@ -1744,6 +1781,15 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
         //    msg=message by this npc talkative[***urlencode!***]
         out << "|" << PGE_URLENC(npc.msg);
+
+        if(format_version >= 69)
+        {
+            // wi=width of this npc
+            out << "|" << fromNum(npc.override_width);
+            // hi=height of this npc
+            out << "," << fromNum(npc.override_height);
+        }
+
         out << "\n";
     }
 
@@ -1796,19 +1842,21 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         {
             //type%100=[0=instant][1=pipe][2=door]
             int type = door.type;
-            int te;
-
-            switch(door.transition_effect)
+            if(format_version >= 68)
             {
-            default:
-            case LevelDoor::TRANSIT_NONE:   te = 0; break;
-            case LevelDoor::TRANSIT_SCROLL: te = 1; break;
-            case LevelDoor::TRANSIT_FADE:   te = 2; break;
-            case LevelDoor::TRANSIT_FLIP_H: te = 3; break;
-            case LevelDoor::TRANSIT_FLIP_V: te = 4; break;
+                int te;
+                switch(door.transition_effect)
+                {
+                default:
+                case LevelDoor::TRANSIT_NONE:   te = 0; break;
+                case LevelDoor::TRANSIT_SCROLL: te = 1; break;
+                case LevelDoor::TRANSIT_FADE:   te = 2; break;
+                case LevelDoor::TRANSIT_FLIP_H: te = 3; break;
+                case LevelDoor::TRANSIT_FLIP_V: te = 4; break;
+                }
+                //type/100=[0=none][1=Scroll][2=Fade][3=FlipH][4=FlipV]
+                type += te * 100;
             }
-            //type/100=[0=none][1=Scroll][2=Fade][3=FlipH][4=FlipV]
-            type += te * 100;
             out << "|" << fromNum(type);
         }
         //    enterd=entrance direction[1=up 2=left 3=down 4=right]
@@ -1837,13 +1885,14 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "," << fromNum((int)door.special_state_required);
         //    size=Warp Size(pixel)
         out << "," << fromNum(door.length_i);
-        if(door.two_way || door.cannon_exit || door.stood_state_required)
+        if(format_version >= 67 && (door.two_way || door.cannon_exit || door.stood_state_required))
         {
             //    ts = two-way
             out << "," << fromNum((int)door.two_way);
             //    cannon = Pipe Cannon Force
             out << "," << fromNum(door.cannon_exit ? door.cannon_exit_speed : 0.0);
-            if(door.stood_state_required)
+
+            if(door.stood_state_required && format_version >= 69)
                 out << "," << fromNum((int)door.stood_state_required);
         }
         //    lik=warp to level[***urlencode!***]
@@ -1894,6 +1943,10 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        11-Click Script
         //        12-Collision Event
         //        13-Air
+        //        14-Event Once(NPC)
+        //        15-Event Always(NPC)
+        //        16-NPC Hurting Field
+        //        17=SubArea
         out << "|" << fromNum((pez.env_type + 1));
         //    b2=friction
         out << "," << fromNum(pez.friction);
@@ -2099,11 +2152,51 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             //                h=height for section [id][***urlencode!***][syntax]
             out << "," << expression_h;
             //                auto=enable autoscroll controls[0=false !0=tru
-            out << "," << fromNum((int)(set.autoscrol || legacyAutoScroll));
-            //                sx=move screen horizontal syntax[***urlencode!***][syntax]
-            out << "," << expression_as_x;
-            //                sy=move screen vertical syntax[***urlencode!***][syntax]
-            out << "," << expression_as_y;
+            if(format_version >= 69)
+            {
+                int as_value = !set.autoscrol ? 0 : set.autoscroll_style + 1;
+
+                if(!as_value && legacyAutoScroll)
+                    as_value = 1;
+
+                out << "," << fromNum(as_value);
+
+                switch(as_value)
+                {
+                case 1: // Simple method
+                    //  sx=move screen horizontal syntax[***urlencode!***][syntax]
+                    out << "," << expression_as_x;
+                    //  sy=move screen vertical syntax[***urlencode!***][syntax]
+                    out << "," << expression_as_y;
+                    break;
+
+                case 2: // Advanced method
+                    expression_as_x.clear();
+
+                    for(auto &stop : set.autoscroll_path)
+                    {
+                        if(!IsEmpty(expression_as_x))
+                            expression_as_x += "_";
+
+                        expression_as_x += fromNum(stop.x);
+                        expression_as_x += "_" + fromNum(stop.y);
+                        expression_as_x += "_" + fromNum(stop.type);
+                        expression_as_x += "_" + fromNum(stop.speed);
+                    }
+
+                    out << "," << expression_as_x;
+
+                    break;
+                }
+            }
+            else // Old method
+            {
+                out << "," << fromNum((int)(set.autoscrol || legacyAutoScroll));
+                //  sx=move screen horizontal syntax[***urlencode!***][syntax]
+                out << "," << expression_as_x;
+                //  sy=move screen vertical syntax[***urlencode!***][syntax]
+                out << "," << expression_as_y;
+            }
         }
 
         out << "/";
@@ -2297,6 +2390,16 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "\n";
     }
 
+    if(format_version >= 69 && !FileData.arrays.empty())
+    {
+        out << "R";
+
+        for(LevelArray &arr : FileData.arrays)
+            out << "|" << PGE_URLENC(arr.name);
+
+        out << "\n";
+    }
+
     //next line: scripts
     for(const LevelScript &script : FileData.scripts)
     {
@@ -2320,38 +2423,41 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     }
 
     //next line: Custom block
-    for(const LevelItemSetup38A &is : FileData.custom38A_configs)
+    if(format_version >= 67)
     {
-        //    V|name|value
-        switch(is.type)
+        for(const LevelItemSetup38A &is : FileData.custom38A_configs)
         {
-        case LevelItemSetup38A::BLOCK:
-            out << "CB";
-            break;
-        case LevelItemSetup38A::BGO:
-            out << "CT";
-            break;
-        case LevelItemSetup38A::EFFECT:
-            out << "CE";
-            break;
-        case LevelItemSetup38A::UNKNOWN:
-        default:
-            out << "CUnk";
-            break;
-        }
-        //    id = object id
-        out << "|" << fromNum(is.id);
+            //    V|name|value
+            switch(is.type)
+            {
+            case LevelItemSetup38A::BLOCK:
+                out << "CB";
+                break;
+            case LevelItemSetup38A::BGO:
+                out << "CT";
+                break;
+            case LevelItemSetup38A::EFFECT:
+                out << "CE";
+                break;
+            case LevelItemSetup38A::UNKNOWN:
+            default:
+                out << "CUnk";
+                break;
+            }
+            //    id = object id
+            out << "|" << fromNum(is.id);
 
-        for(pge_size_t j = 0; j < is.data.size(); j++)
-        {
-            const LevelItemSetup38A::Entry &e = is.data[j];
-            out << ((j == 0) ? "|" : ",");
-            out << SMBX38A_CC_encode(e.key, e.value);
+            for(pge_size_t j = 0; j < is.data.size(); j++)
+            {
+                const LevelItemSetup38A::Entry &e = is.data[j];
+                out << ((j == 0) ? "|" : ",");
+                out << SMBX38A_CC_encode(e.key, e.value);
+            }
+            out << "\n";
         }
-        out << "\n";
     }
 
-    if(!FileData.sound_overrides.empty())
+    if(format_version >= 68 && !FileData.sound_overrides.empty())
     {
         out << "CW";
         for(const LevelData::MusicOverrider &mo : FileData.sound_overrides)
