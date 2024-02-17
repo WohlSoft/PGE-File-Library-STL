@@ -432,7 +432,7 @@ struct WorldEvent38A
     //! Trigger another event if not empty
     PGESTRING trigger;
     //! Trigger another event after time in 1/65 of second
-    long tirgger_timer = 0;
+    long trigger_timer = 0;
 
     //! Trigger script by name
     PGESTRING trigger_script;
