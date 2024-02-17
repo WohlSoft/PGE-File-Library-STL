@@ -1,5 +1,9 @@
-#include <catch.hpp>
+#include <catch_amalgamated.hpp>
 #include "file_formats.h"
+
+#ifndef TEST_WRITEDIR
+#   define TEST_WRITEDIR "."
+#endif
 
 
 TEST_CASE("[UserData] Save and Load data")
@@ -37,7 +41,7 @@ TEST_CASE("[UserData] Save and Load data")
     }
 
     REQUIRE(FileFormats::WriteExtendedSaveFileRaw(origin, rawData));
-    REQUIRE(FileFormats::WriteExtendedSaveFileF("sampleSave.savx", origin));
+    REQUIRE(FileFormats::WriteExtendedSaveFileF(TEST_WRITEDIR "/sampleSave.savx", origin));
 
     REQUIRE(FileFormats::ReadExtendedSaveFileRaw(rawData, "fakePath.savx", target));
 
@@ -118,7 +122,7 @@ TEST_CASE("[UserData] Save and Load data with volatile entry")
     }
 
     REQUIRE(FileFormats::WriteExtendedSaveFileRaw(origin, rawData));
-    REQUIRE(FileFormats::WriteExtendedSaveFileF("sampleSave.savx", origin));
+    REQUIRE(FileFormats::WriteExtendedSaveFileF(TEST_WRITEDIR "/sampleSave.savx", origin));
 
     REQUIRE(FileFormats::ReadExtendedSaveFileRaw(rawData, "fakePath.savx", target));
 

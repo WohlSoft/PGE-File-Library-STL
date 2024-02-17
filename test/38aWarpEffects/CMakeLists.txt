@@ -1,5 +1,5 @@
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../common
@@ -15,4 +15,9 @@ if(PGEFL_QT_SUPPORT)
 else()
     target_link_libraries(38AWarpEffect PRIVATE pgefl)
 endif()
+
+target_compile_definitions(38AWarpEffect PRIVATE
+    -DTEST_WORKDIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
 add_test(NAME 38AWarpEffect COMMAND 38AWarpEffect WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
