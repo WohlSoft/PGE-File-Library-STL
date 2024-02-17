@@ -2,10 +2,12 @@
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../common
-  ${CMAKE_SOURCE_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR}/../common
+    ${CMAKE_SOURCE_DIR}
+)
 
 add_executable(38AWarpEffect 38a_warp_effect.cpp $<TARGET_OBJECTS:Catch-objects>)
+
 if(PGEFL_QT_SUPPORT)
     target_include_directories(38AWarpEffect PUBLIC ${Qt5Core_INCLUDE_DIRS})
     target_compile_definitions(38AWarpEffect PUBLIC ${Qt5Core_DEFINITIONS})
