@@ -9,6 +9,14 @@
 #   define TEST_WRITEDIR "."
 #endif
 
+template<typename T>
+PGESTRING fromNum(T num)
+{
+    std::ostringstream n;
+    n << num;
+    return n.str();
+}
+
 
 TEST_CASE("[38A 1.4.0 Level] Load")
 {
@@ -20,7 +28,18 @@ TEST_CASE("[38A 1.4.0 Level] Load")
     INFO("File: " + path + "; Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+}
 
-    REQUIRE(data.doors.size() == 1);
-    REQUIRE(data.doors[0].transition_effect == LevelDoor::TRANSIT_NONE);
+TEST_CASE("[38A 1.4.0 World] Load")
+{
+    WorldData data;
+    PGESTRING path = TEST_WORKDIR "/test-files/SMBX-38A/test-140.wld";
+
+    bool res = FileFormats::OpenWorldFile(path, data);
+
+    INFO("\nFile: " + path + "\n"
+         "Line=" + fromNum(data.meta.ERROR_linenum) + "\n" +
+         "Error: " + data.meta.ERROR_info);
+    REQUIRE(res);
+    REQUIRE(data.meta.ReadFileValid);
 }

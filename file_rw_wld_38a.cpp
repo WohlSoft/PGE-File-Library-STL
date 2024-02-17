@@ -471,7 +471,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     ),
                     &tile.x,
                     &tile.y,
-                    MakeCSVPostProcessor(&tile.layer, PGELayerOrDefault)
+                    MakeCSVOptional(&tile.layer, "Default", nullptr, PGELayerOrDefault)
                 );
 
                 tile.meta.array_id = FileData.tile_array_id++;
@@ -491,7 +491,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     ),
                     &scen.x,
                     &scen.y,
-                    MakeCSVPostProcessor(&scen.layer, PGELayerOrDefault)
+                    MakeCSVOptional(&tile.layer, "Default", nullptr, PGELayerOrDefault)
                 );
 
                 scen.meta.array_id = FileData.scene_array_id++;
@@ -511,7 +511,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     ),
                     &pathitem.x,
                     &pathitem.y,
-                    MakeCSVPostProcessor(&pathitem.layer, PGELayerOrDefault)
+                    MakeCSVOptional(&tile.layer, "Default", nullptr, PGELayerOrDefault)
                 );
 
                 pathitem.meta.array_id = FileData.path_array_id++;
