@@ -30,6 +30,15 @@ TEST_CASE("[38A 1.4.0 Level] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.blocks.size() == 1);
+    REQUIRE(data.bgo.size() == 1);
+    REQUIRE(data.npc.size() == 1);
+    REQUIRE(data.doors.size() == 1);
+    REQUIRE(data.physez.size() == 1);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events.size() == 4);
 }
 
 TEST_CASE("[38A 1.4.0 World] Load")
@@ -44,6 +53,15 @@ TEST_CASE("[38A 1.4.0 World] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.empty());
+    REQUIRE(data.events38A.empty());
 }
 
 TEST_CASE("[38A 1.4.1 Level] Load")
@@ -58,6 +76,15 @@ TEST_CASE("[38A 1.4.1 Level] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.blocks.size() == 1);
+    REQUIRE(data.bgo.size() == 1);
+    REQUIRE(data.npc.size() == 1);
+    REQUIRE(data.doors.size() == 1);
+    REQUIRE(data.physez.size() == 1);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events.size() == 4);
 }
 
 TEST_CASE("[38A 1.4.1 World] Load")
@@ -72,6 +99,15 @@ TEST_CASE("[38A 1.4.1 World] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.empty());
+    REQUIRE(data.events38A.empty());
 }
 
 
@@ -87,6 +123,15 @@ TEST_CASE("[38A 1.4.2 Level] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.blocks.size() == 1);
+    REQUIRE(data.bgo.size() == 1);
+    REQUIRE(data.npc.size() == 1);
+    REQUIRE(data.doors.size() == 1);
+    REQUIRE(data.physez.size() == 1);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events.size() == 4);
 }
 
 TEST_CASE("[38A 1.4.2 World] Load")
@@ -101,6 +146,15 @@ TEST_CASE("[38A 1.4.2 World] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.size() == 1);
+    REQUIRE(data.events38A.size() == 0);
 }
 
 
@@ -116,6 +170,15 @@ TEST_CASE("[38A 1.4.3 Level] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.blocks.size() == 1);
+    REQUIRE(data.bgo.size() == 1);
+    REQUIRE(data.npc.size() == 1);
+    REQUIRE(data.doors.size() == 1);
+    REQUIRE(data.physez.size() == 1);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events.size() == 4);
 }
 
 TEST_CASE("[38A 1.4.3 World] Load")
@@ -130,6 +193,15 @@ TEST_CASE("[38A 1.4.3 World] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.size() == 1);
+    REQUIRE(data.events38A.size() == 0);
 }
 
 
@@ -143,6 +215,15 @@ TEST_CASE("[38A 1.4.4 Level] Load")
     INFO("File: " + path + "; Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.blocks.size() == 1);
+    REQUIRE(data.bgo.size() == 1);
+    REQUIRE(data.npc.size() == 1);
+    REQUIRE(data.doors.size() == 1);
+    REQUIRE(data.physez.size() == 1);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events.size() == 4);
 }
 
 TEST_CASE("[38A 1.4.4 World] Load")
@@ -157,6 +238,15 @@ TEST_CASE("[38A 1.4.4 World] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.size() == 1);
+    REQUIRE(data.events38A.size() == 0);
 }
 
 
@@ -170,6 +260,15 @@ TEST_CASE("[38A 1.4.5 Level] Load")
     INFO("File: " + path + "; Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.blocks.size() == 1);
+    REQUIRE(data.bgo.size() == 1);
+    REQUIRE(data.npc.size() == 1);
+    REQUIRE(data.doors.size() == 1);
+    REQUIRE(data.physez.size() == 1);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events.size() == 4);
 }
 
 TEST_CASE("[38A 1.4.5 World] Load")
@@ -184,4 +283,13 @@ TEST_CASE("[38A 1.4.5 World] Load")
          "Error: " + data.meta.ERROR_info);
     REQUIRE(res);
     REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.size() == 1);
+    REQUIRE(data.events38A.size() == 0);
 }
