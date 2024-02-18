@@ -553,7 +553,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     MakeCSVOptionalSubReader(
                         dataReader, ',',
                         //te:Touch Event[***urlencode!***]
-                        MakeCSVOptional(&arearect.eventTouch, "", nullptr, PGELayerOrDefault),
+                        MakeCSVOptional(&arearect.eventTouch, "", nullptr, PGEUrlDecodeFunc),
                         //eflag:    0=Triggered every time entering
                         //          1=Triggered on entrance and level completion
                         //          2=Triggered only once
@@ -756,7 +756,6 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
             {
                 int way = 0;
                 int autostrat;
-                PGESTRING list;
                 event = WorldEvent38A();
 
                 //TODO: Implement world map events support
@@ -1031,6 +1030,8 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
     FileData.meta.RecentFormat = WorldData::SMBX38A;
     FileData.meta.RecentFormatVersion = format_version;
 
+#define layerNotDef(lr) ( ((lr) != "Default") ? PGE_URLENC(lr) : "" )
+
     out << "SMBXFile" << fromNum(FileData.meta.RecentFormatVersion) << "\n";
 
 
@@ -1197,19 +1198,147 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
 
         out << "|" << fromNum(path.x);
         out << "|" << fromNum(path.y);
-        out << "|" << PGE_URLENC(path.layer);
+        out << "|" << layerNotDef(path.layer);
+        out << "\n";
+    }
+
+
+    for(auto &mus : FileData.music)
+    {
+        out << "M";
+        out << "|" << fromNum(mus.id);
+        out << "|" << fromNum(mus.x);
+        out << "|" << fromNum(mus.y);
+        out << "|" << PGE_URLENC(mus.music_file);
+        if(format_version >= 66)
+        {
+            out << "|" << layerNotDef(mus.layer);
+            out << "|32|32|1|,0"; // Dummy line
+        }
+        out << "\n";
+    }
+
+    for(auto &mus : FileData.arearects)
+    {
+        out << "M";
+        out << "|" << fromNum(mus.music_id);
+        out << "|" << fromNum(mus.x);
+        out << "|" << fromNum(mus.y);
+        out << "|" << PGE_URLENC(mus.music_file);
+
+        if(format_version >= 66)
+        {
+            out << "|" << layerNotDef(mus.layer);
+            out << "|" << fromNum(mus.w);
+            out << "|" << fromNum(mus.h);
+            out << "|" << fromNum(mus.flags);
+            out << "|" << PGE_URLENC(mus.eventTouch)
+                << "," << fromNum(mus.eventTouchPolicy);
+            if(!IsEmpty(mus.eventBreak) ||
+               !IsEmpty(mus.eventWarp) ||
+               !IsEmpty(mus.eventAnchor))
+            {
+                out << "|" << PGE_URLENC(mus.eventBreak)
+                    << "," << PGE_URLENC(mus.eventWarp)
+                    << "," << PGE_URLENC(mus.eventAnchor);
+            }
+        }
         out << "\n";
     }
 
 
 
-    // areas/musicboxes
+    for(auto &level : FileData.levels)
+    {
+        out << "L";
+        out << "|" << fromNum(level.id);
 
+        if(level.gfx_dx >= 0 || level.gfx_dy >= 0)
+        {
+            out << "," << fromNum(level.gfx_dx);
+            out << "," << fromNum(level.gfx_dy);
+        }
 
+        out << "|" << fromNum(level.x);
+        out << "|" << fromNum(level.y);
+        out << "|" << PGE_URLENC(level.lvlfile);
+        out << "|" << PGE_URLENC(level.title);
 
-    // levels
+        out << "|" << fromNum(level.top_exit);
+        out << "," << fromNum(level.top_exit_extra.exit_codes.size() > 0 ? level.top_exit_extra.exit_codes[0] : 0);
+        out << "," << fromNum(level.top_exit_extra.exit_codes.size() > 1 ? level.top_exit_extra.exit_codes[1] : 0);
+        out << "," << PGE_URLENC(level.top_exit_extra.expression);
 
+        out << "\\" << fromNum(level.left_exit);
+        out << "," << fromNum(level.left_exit_extra.exit_codes.size() > 0 ? level.left_exit_extra.exit_codes[0] : 0);
+        out << "," << fromNum(level.left_exit_extra.exit_codes.size() > 1 ? level.left_exit_extra.exit_codes[1] : 0);
+        out << "," << PGE_URLENC(level.left_exit_extra.expression);
 
+        out << "\\" << fromNum(level.bottom_exit);
+        out << "," << fromNum(level.bottom_exit_extra.exit_codes.size() > 0 ? level.bottom_exit_extra.exit_codes[0] : 0);
+        out << "," << fromNum(level.bottom_exit_extra.exit_codes.size() > 1 ? level.bottom_exit_extra.exit_codes[1] : 0);
+        out << "," << PGE_URLENC(level.bottom_exit_extra.expression);
+
+        out << "\\" << fromNum(level.right_exit);
+        out << "," << fromNum(level.right_exit_extra.exit_codes.size() > 0 ? level.right_exit_extra.exit_codes[0] : 0);
+        out << "," << fromNum(level.right_exit_extra.exit_codes.size() > 1 ? level.right_exit_extra.exit_codes[1] : 0);
+        out << "," << PGE_URLENC(level.right_exit_extra.expression);
+
+        out << "|" << fromNum(level.gotox);
+        out << "," << fromNum(level.gotoy);
+        out << "," << fromNum(level.entertowarp);
+
+        out << "," << fromNum((int)level.bigpathbg);
+        out << "," << fromNum((int)level.pathbg);
+        out << "," << fromNum((int)level.alwaysVisible);
+        out << "," << fromNum((int)level.gamestart);
+        out << "," << fromNum((int)level.forceStart);
+        out << "," << fromNum((int)level.disableStarCoinsCount);
+        out << "," << fromNum((int)level.destroyOnCompleting);
+        out << "," << fromNum(level.levelID);
+        out << "," << fromNum((int)level.controlledByAreaRects);
+
+        bool first = true;
+
+        out << "|";
+        for(auto &cond : level.enter_cond)
+        {
+            if(first)
+                first = true;
+            else
+                out << "/";
+
+            out << PGE_URLENC(cond.condition) << "," << PGE_URLENC(cond.levelIndex);
+        }
+
+        if(format_version >= 66)
+        {
+            out << "|" << layerNotDef(level.layer);
+            out << "|";
+            first = true;
+            for(auto &node : level.movement.nodes)
+            {
+                if(first)
+                    first = true;
+                else
+                    out << "\\";
+
+                out << fromNum(node.x) << ":" << fromNum(node.y) << ":" << fromNum(node.chance);
+            }
+
+            for(auto &path : level.movement.paths)
+            {
+                if(first)
+                    first = true;
+                else
+                    out << "\\";
+
+                out << fromNum(path.node1) << ":" << fromNum(path.node2);
+            }
+        }
+
+        out << "\n";
+    }
 
 
     for(auto &layer : FileData.layers)

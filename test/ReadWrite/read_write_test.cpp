@@ -293,3 +293,26 @@ TEST_CASE("[38A 1.4.5 World] Load")
     REQUIRE(data.layers.size() == 1);
     REQUIRE(data.events38A.size() == 0);
 }
+
+TEST_CASE("[38A 1.4.5 World] Load - Events Test")
+{
+    WorldData data;
+    PGESTRING path = TEST_WORKDIR "/test-files/SMBX-38A/wld-events-test.wld";
+
+    bool res = FileFormats::OpenWorldFile(path, data);
+
+    INFO("\nFile: " + path + "\n"
+                             "Line=" + fromNum(data.meta.ERROR_linenum) + "\n" +
+         "Error: " + data.meta.ERROR_info);
+    REQUIRE(res);
+    REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 0);
+    REQUIRE(data.scenery.size() == 0);
+    REQUIRE(data.paths.size() == 0);
+    REQUIRE(data.levels.size() == 2);
+    REQUIRE(data.music.size() == 0);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events38A.size() == 1);
+}
