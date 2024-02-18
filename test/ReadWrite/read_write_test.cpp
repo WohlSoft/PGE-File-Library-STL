@@ -316,3 +316,100 @@ TEST_CASE("[38A 1.4.5 World] Load - Events Test")
     REQUIRE(data.layers.size() == 4);
     REQUIRE(data.events38A.size() == 1);
 }
+
+
+TEST_CASE("[38A 1.4.5 World] Read/Write/Read test 1")
+{
+    WorldData data;
+    PGESTRING path = TEST_WORKDIR "/test-files/SMBX-38A/test-145.wld";
+
+    // read first file
+    bool res = FileFormats::OpenWorldFile(path, data);
+
+    INFO("\nFile: " + path + "\n"
+                             "Line=" + fromNum(data.meta.ERROR_linenum) + "\n" +
+         "Error: " + data.meta.ERROR_info);
+    REQUIRE(res);
+    REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.size() == 1);
+    REQUIRE(data.events38A.size() == 0);
+
+    // Write
+    path = TEST_WRITEDIR "/smbx38a-test-145.wld";
+    res = FileFormats::WriteSMBX38AWldFileF(path, data, data.meta.RecentFormatVersion);
+    REQUIRE(res);
+
+    // Read it again
+    FileFormats::CreateWorldData(data);
+    res = FileFormats::OpenWorldFile(path, data);
+
+    INFO("\nFile: " + path + "\n"
+                             "Line=" + fromNum(data.meta.ERROR_linenum) + "\n" +
+         "Error: " + data.meta.ERROR_info);
+    REQUIRE(res);
+    REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 1);
+    REQUIRE(data.scenery.size() == 1);
+    REQUIRE(data.paths.size() == 1);
+    REQUIRE(data.levels.size() == 1);
+    REQUIRE(data.music.size() == 1);
+
+    REQUIRE(data.layers.size() == 1);
+    REQUIRE(data.events38A.size() == 0);
+}
+
+TEST_CASE("[38A 1.4.5 World] Read/Write/Read test 2")
+{
+    WorldData data;
+    PGESTRING path = TEST_WORKDIR "/test-files/SMBX-38A/wld-events-test.wld";
+
+    // read first file
+    bool res = FileFormats::OpenWorldFile(path, data);
+
+    INFO("\nFile: " + path + "\n"
+                             "Line=" + fromNum(data.meta.ERROR_linenum) + "\n" +
+         "Error: " + data.meta.ERROR_info);
+    REQUIRE(res);
+    REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 0);
+    REQUIRE(data.scenery.size() == 0);
+    REQUIRE(data.paths.size() == 0);
+    REQUIRE(data.levels.size() == 2);
+    REQUIRE(data.music.size() == 0);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events38A.size() == 1);
+
+    // Write
+    path = TEST_WRITEDIR "/smbx38a-wld-events-test.wld";
+    res = FileFormats::WriteSMBX38AWldFileF(path, data, data.meta.RecentFormatVersion);
+    REQUIRE(res);
+
+    // Read it again
+    FileFormats::CreateWorldData(data);
+    res = FileFormats::OpenWorldFile(path, data);
+
+    INFO("\nFile: " + path + "\n"
+                             "Line=" + fromNum(data.meta.ERROR_linenum) + "\n" +
+         "Error: " + data.meta.ERROR_info);
+    REQUIRE(res);
+    REQUIRE(data.meta.ReadFileValid);
+
+    REQUIRE(data.tiles.size() == 0);
+    REQUIRE(data.scenery.size() == 0);
+    REQUIRE(data.paths.size() == 0);
+    REQUIRE(data.levels.size() == 2);
+    REQUIRE(data.music.size() == 0);
+
+    REQUIRE(data.layers.size() == 4);
+    REQUIRE(data.events38A.size() == 1);
+}

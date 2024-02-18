@@ -1115,8 +1115,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
     }
     else
     {
-        PGESTRING out_authors = PGE_ReplSTRING(FileData.authors, "\n", "\r\n");
-        out << "#CUST#" << PGE_BASE64ENC_nopad(out_authors);
+        out << "#CUST#" << PGE_BASE64ENC_nopad(FileData.authors);
     }
 
     out << "|" << PGE_URLENC(FileData.authors_music);
@@ -1161,7 +1160,8 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
 
         out << "|" << fromNum(tile.x);
         out << "|" << fromNum(tile.y);
-        out << "|" << PGE_URLENC(tile.layer);
+        if(format_version >= 66)
+            out << "|" << layerNotDef(tile.layer);
         out << "\n";
     }
 
@@ -1172,7 +1172,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "S";
         out << "|" << fromNum(scene.id);
 
-        if(scene.gfx_dx >= 0 || scene.gfx_dy >= 0)
+        if(scene.gfx_dx > 0 || scene.gfx_dy > 0)
         {
             out << "," << fromNum(scene.gfx_dx);
             out << "," << fromNum(scene.gfx_dy);
@@ -1180,7 +1180,8 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
 
         out << "|" << fromNum(scene.x);
         out << "|" << fromNum(scene.y);
-        out << "|" << PGE_URLENC(scene.layer);
+        if(format_version >= 66)
+            out << "|" << layerNotDef(scene.layer);
         out << "\n";
     }
 
@@ -1190,7 +1191,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "P";
         out << "|" << fromNum(path.id);
 
-        if(path.gfx_dx >= 0 || path.gfx_dy >= 0)
+        if(path.gfx_dx > 0 || path.gfx_dy > 0)
         {
             out << "," << fromNum(path.gfx_dx);
             out << "," << fromNum(path.gfx_dy);
@@ -1198,7 +1199,8 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
 
         out << "|" << fromNum(path.x);
         out << "|" << fromNum(path.y);
-        out << "|" << layerNotDef(path.layer);
+        if(format_version >= 66)
+            out << "|" << layerNotDef(path.layer);
         out << "\n";
     }
 
@@ -1253,7 +1255,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "L";
         out << "|" << fromNum(level.id);
 
-        if(level.gfx_dx >= 0 || level.gfx_dy >= 0)
+        if(level.gfx_dx > 0 || level.gfx_dy > 0)
         {
             out << "," << fromNum(level.gfx_dx);
             out << "," << fromNum(level.gfx_dy);
@@ -1285,10 +1287,10 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "," << PGE_URLENC(level.right_exit_extra.expression);
 
         out << "|" << fromNum(level.gotox);
-        out << "," << fromNum(level.gotoy);
-        out << "," << fromNum(level.entertowarp);
+        out << "|" << fromNum(level.gotoy);
+        out << "|" << fromNum(level.entertowarp);
 
-        out << "," << fromNum((int)level.bigpathbg);
+        out << "|" << fromNum((int)level.bigpathbg);
         out << "," << fromNum((int)level.pathbg);
         out << "," << fromNum((int)level.alwaysVisible);
         out << "," << fromNum((int)level.gamestart);
@@ -1304,7 +1306,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         for(auto &cond : level.enter_cond)
         {
             if(first)
-                first = true;
+                first = false;
             else
                 out << "/";
 
@@ -1319,21 +1321,22 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
             for(auto &node : level.movement.nodes)
             {
                 if(first)
-                    first = true;
+                    first = false;
                 else
-                    out << "\\";
+                    out << ":";
 
-                out << fromNum(node.x) << ":" << fromNum(node.y) << ":" << fromNum(node.chance);
+                out << fromNum(node.x) << "," << fromNum(node.y) << "," << fromNum(node.chance);
             }
 
+            out << "\\";
             for(auto &path : level.movement.paths)
             {
                 if(first)
-                    first = true;
+                    first = false;
                 else
-                    out << "\\";
+                    out << ":";
 
-                out << fromNum(path.node1) << ":" << fromNum(path.node2);
+                out << fromNum(path.node1) << "," << fromNum(path.node2);
             }
         }
 
@@ -1368,7 +1371,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         for(auto &layer : event.layers_hide)
         {
             if(first)
-                first = true;
+                first = false;
             else
                 out << ",";
 
@@ -1381,7 +1384,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         for(auto &layer : event.layers_show)
         {
             if(first)
-                first = true;
+                first = false;
             else
                 out << ",";
 
@@ -1394,7 +1397,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         for(auto &layer : event.layers_toggle)
         {
             if(first)
-                first = true;
+                first = false;
             else
                 out << ",";
 
@@ -1407,7 +1410,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         for(auto &mv : event.layers_move)
         {
             if(first)
-                first = true;
+                first = false;
             else
                 out << "\\";
 
@@ -1418,7 +1421,9 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
             SMBX38A_Num2Exp_URLEN(mv.param_h, expression_ph);
             SMBX38A_Num2Exp_URLEN(mv.param_v, expression_pv);
             SMBX38A_Num2Exp_URLEN(mv.param_extra, expression_pe);
-            out << expression_ph;
+            out << fromNum(mv.type);
+            out << "," << PGE_URLENC(mv.layer);
+            out << "," << expression_ph;
             out << "," << expression_pv;
             out << "," << expression_pe;
         }
