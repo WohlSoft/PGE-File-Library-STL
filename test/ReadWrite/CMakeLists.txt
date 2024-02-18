@@ -6,14 +6,14 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
 )
 
-add_executable(ReadWriteTest read_write_test.cpp $<TARGET_OBJECTS:Catch-objects>)
+add_executable(ReadWriteTest read_write_test.cpp)
 
 if(PGEFL_QT_SUPPORT)
     target_include_directories(ReadWriteTest PUBLIC ${Qt5Core_INCLUDE_DIRS})
     target_compile_definitions(ReadWriteTest PUBLIC ${Qt5Core_DEFINITIONS})
-    target_link_libraries(ReadWriteTest PRIVATE pgefl_qt ${Qt5Core_LIBRARIES})
+    target_link_libraries(ReadWriteTest PRIVATE pgefl_qt ${Qt5Core_LIBRARIES} catch2)
 else()
-    target_link_libraries(ReadWriteTest PRIVATE pgefl)
+    target_link_libraries(ReadWriteTest PRIVATE pgefl catch2)
 endif()
 
 target_compile_definitions(ReadWriteTest PRIVATE

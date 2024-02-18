@@ -6,14 +6,14 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
 )
 
-add_executable(38AWarpEffect 38a_warp_effect.cpp $<TARGET_OBJECTS:Catch-objects>)
+add_executable(38AWarpEffect 38a_warp_effect.cpp)
 
 if(PGEFL_QT_SUPPORT)
     target_include_directories(38AWarpEffect PUBLIC ${Qt5Core_INCLUDE_DIRS})
     target_compile_definitions(38AWarpEffect PUBLIC ${Qt5Core_DEFINITIONS})
-    target_link_libraries(38AWarpEffect PRIVATE pgefl_qt ${Qt5Core_LIBRARIES})
+    target_link_libraries(38AWarpEffect PRIVATE pgefl_qt ${Qt5Core_LIBRARIES} catch2)
 else()
-    target_link_libraries(38AWarpEffect PRIVATE pgefl)
+    target_link_libraries(38AWarpEffect PRIVATE pgefl catch2)
 endif()
 
 target_compile_definitions(38AWarpEffect PRIVATE
