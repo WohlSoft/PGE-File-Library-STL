@@ -817,9 +817,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                             );
 
                             mv.type = static_cast<WorldEvent38A_LayerMove::MoveType>(type);
-                            SMBX38A_Num2Exp_URLEN(mv.param_h, mv.expression_param_h);
-                            SMBX38A_Num2Exp_URLEN(mv.param_v, mv.expression_param_v);
-                            SMBX38A_Num2Exp_URLEN(mv.param_extra, mv.expression_param_extra);
+                            SMBX38A_Exp2Double(mv.expression_param_h, mv.param_h);
+                            SMBX38A_Exp2Double(mv.expression_param_v, mv.param_v);
+                            SMBX38A_Exp2Double(mv.expression_param_extra, mv.param_extra);
                             event.layers_move.push_back(mv);
                         }
                     ),
@@ -1351,9 +1351,103 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
 
 
 
-    // events
+    for(auto &event : FileData.events38A)
+    {
+        out << "WE";
+        out << "|" << PGE_URLENC(event.name);
 
+        int way = 0;
+        way += event.nosmoke ? 1 : 0;
+        way += event.layers_mode == WorldEvent38A::LM_StateLayers ? 20 : 0;
 
+        out << "|" << fromNum(way);
+
+        bool first = true;
+
+        out << "/";
+        for(auto &layer : event.layers_hide)
+        {
+            if(first)
+                first = true;
+            else
+                out << ",";
+
+            out << PGE_URLENC(layer);
+        }
+
+        first = true;
+        out << "/";
+
+        for(auto &layer : event.layers_show)
+        {
+            if(first)
+                first = true;
+            else
+                out << ",";
+
+            out << PGE_URLENC(layer);
+        }
+
+        first = true;
+        out << "/";
+
+        for(auto &layer : event.layers_toggle)
+        {
+            if(first)
+                first = true;
+            else
+                out << ",";
+
+            out << PGE_URLENC(layer);
+        }
+
+        out << "|";
+
+        first = true;
+        for(auto &mv : event.layers_move)
+        {
+            if(first)
+                first = true;
+            else
+                out << "\\";
+
+            //Convert all floats into strings if expression fields are empty
+            PGESTRING expression_ph = mv.expression_param_h;
+            PGESTRING expression_pv = mv.expression_param_v;
+            PGESTRING expression_pe = mv.expression_param_extra;
+            SMBX38A_Num2Exp_URLEN(mv.param_h, expression_ph);
+            SMBX38A_Num2Exp_URLEN(mv.param_v, expression_pv);
+            SMBX38A_Num2Exp_URLEN(mv.param_extra, expression_pe);
+            out << expression_ph;
+            out << "," << expression_pv;
+            out << "," << expression_pe;
+        }
+
+        out << "|" << fromNum((int)event.autostart);
+        out << "/" << fromNum((int)event.start_on_condition);
+        out << "," << fromNum((int)event.is_level_enter_exit);
+        out << "," << fromNum((int)event.interrupt_on_false);
+        out << "," << fromNum((int)event.show_msg_on_interrupt);
+        out << "," << PGE_URLENC(event.autostart_condition);
+        out << "," << PGE_URLENC(event.interrupt_message);
+
+        out << "|" << fromNum(event.sound_id);
+        out << "/";
+        if(event.lock_keyboard_delay_ms != 0 && event.lock_keyboard_delay == 0)
+            out << fromNum((int)(event.lock_keyboard_delay_ms * 1000 / 65.0));
+        else
+            out << fromNum(event.lock_keyboard_delay);
+
+        out << "/" << PGE_URLENC(event.trigger);
+        out << "," << fromNum(event.trigger_timer);
+        out << "/" << PGE_URLENC(event.trigger_script);
+        out << "/" << PGE_URLENC(event.msg);
+        out << "/" << fromNum(event.move_to_x);
+        out << "," << fromNum(event.move_to_y);
+        out << "," << fromNum(event.level_anchor_id);
+
+        out << "\n";
+    }
 
 
 
