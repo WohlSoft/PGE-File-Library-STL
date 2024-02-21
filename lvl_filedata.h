@@ -208,7 +208,7 @@ struct LevelBGO
     //! Y position of Background Object
     long y = 0;
     //! ID of background object type defined in the lvl_bgo.ini
-    unsigned long id =0 ;
+    unsigned long id = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
 

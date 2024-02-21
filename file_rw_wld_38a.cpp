@@ -1048,8 +1048,9 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         << ","
         << fromNum((int)FileData.nocharacter5);
 
-    out << "|" << PGE_URLENC(FileData.IntroLevel_file)
-        << "," << PGE_URLENC(FileData.GameOverLevel_file);
+    out << "|" << PGE_URLENC(FileData.IntroLevel_file);
+    if(format_version >= 67)
+        out << "," << PGE_URLENC(FileData.GameOverLevel_file);
 
     out << "|" << fromNum((int)FileData.restrictSinglePlayer)
         << "," << fromNum((int)FileData.HubStyledWorld)
@@ -1058,8 +1059,9 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         << "," << fromNum((int)FileData.restrictSecureGameSave)
         << "," << fromNum(FileData.saveResumePolicy)
         << "," << fromNum((int)FileData.saveAuto)
-        << "," << fromNum((int)FileData.showEverything)
-        << "," << fromNum((int)FileData.disableEnterScreen);
+        << "," << fromNum((int)FileData.showEverything);
+    if(format_version >= 68)
+        out << "," << fromNum((int)FileData.disableEnterScreen);
 
     out << "|" << fromNum(FileData.stars)
         << "," << fromNum(FileData.inventoryLimit);
@@ -1118,7 +1120,9 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "#CUST#" << PGE_BASE64ENC_nopad(FileData.authors);
     }
 
-    out << "|" << PGE_URLENC(FileData.authors_music);
+    if(format_version >= 69)
+        out << "|" << PGE_URLENC(FileData.authors_music);
+
     out << "\n";
 
 
@@ -1152,7 +1156,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "T";
         out << "|" << fromNum(tile.id);
 
-        if(tile.gfx_dx > 0 || tile.gfx_dy > 0)
+        if(format_version >= 67 && (tile.gfx_dx > 0 || tile.gfx_dy > 0))
         {
             out << "," << fromNum(tile.gfx_dx);
             out << "," << fromNum(tile.gfx_dy);
@@ -1172,7 +1176,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "S";
         out << "|" << fromNum(scene.id);
 
-        if(scene.gfx_dx > 0 || scene.gfx_dy > 0)
+        if(format_version >= 67 && (scene.gfx_dx > 0 || scene.gfx_dy > 0))
         {
             out << "," << fromNum(scene.gfx_dx);
             out << "," << fromNum(scene.gfx_dy);
@@ -1191,7 +1195,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "P";
         out << "|" << fromNum(path.id);
 
-        if(path.gfx_dx > 0 || path.gfx_dy > 0)
+        if(format_version >= 67 && (path.gfx_dx > 0 || path.gfx_dy > 0))
         {
             out << "," << fromNum(path.gfx_dx);
             out << "," << fromNum(path.gfx_dy);
@@ -1233,7 +1237,12 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
             out << "|" << layerNotDef(mus.layer);
             out << "|" << fromNum(mus.w);
             out << "|" << fromNum(mus.h);
-            out << "|" << fromNum(mus.flags);
+
+            uint32_t flags = mus.flags;
+            if(format_version < 69) // Unsupported flag
+                flags &= ~WorldAreaRect::SETUP_AUTO_WALKING;
+
+            out << "|" << fromNum(flags);
             out << "|" << PGE_URLENC(mus.eventTouch)
                 << "," << fromNum(mus.eventTouchPolicy);
             if(!IsEmpty(mus.eventBreak) ||
@@ -1255,7 +1264,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
         out << "L";
         out << "|" << fromNum(level.id);
 
-        if(level.gfx_dx > 0 || level.gfx_dy > 0)
+        if(format_version >= 67 && (level.gfx_dx > 0 || level.gfx_dy > 0))
         {
             out << "," << fromNum(level.gfx_dx);
             out << "," << fromNum(level.gfx_dy);

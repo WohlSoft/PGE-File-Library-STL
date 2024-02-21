@@ -1640,19 +1640,23 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "B";
         //    layer=layer name["" == "Default"][***urlencode!***]
         out << "|" << layerNotDef(blk.layer);
+
         //  only if name != ""
         //  name=block's name
-        if(!IsEmpty(blk.gfx_name))
+        if(format_version >= 67 && !IsEmpty(blk.gfx_name))
             out << "," << PGE_URLENC(blk.gfx_name);
+
         //    id=block id
         out << "|" << fromNum(blk.id);
-        if((blk.gfx_dx) > 0 || (blk.gfx_dy > 0))
+
+        if(format_version >= 67 && (blk.gfx_dx > 0 || blk.gfx_dy > 0))
         {
             //  dx=graphics extend x
             out << "," << fromNum(blk.gfx_dx);
             //  dy=graphics extend y
             out << "," << fromNum(blk.gfx_dy);
         }
+
         //    x=block position x
         out << "|" << fromNum(blk.x);
         //    y=block position y
@@ -1661,8 +1665,11 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        [1001-1000+NPCMAX] npc-id
         //        [1-999] coin number
         //        [0] nothing
-        out << "|" << ((blk.npc_id == 0) ? ""
-                        : fromNum(blk.npc_id <= 0 ? (-1 * blk.npc_id) : (blk.npc_id + 1000)) );
+        out << "|" << ((blk.npc_id == 0) ?
+                         (format_version >= 68 ? "" : "0") :
+                           fromNum(blk.npc_id <= 0 ?
+                                    (-1 * blk.npc_id) :
+                                        (blk.npc_id + 1000)) );
 
         if(format_version >= 69) //! [Since 69] sp=advset of npc
             out << "," << fromNum(blk.npc_special_value);
@@ -1676,17 +1683,31 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //    b2=invisible[0=false !0=true]
         out << "|" << fromNum((int)blk.invisible);
         //    e1=block destory event name[***urlencode!***]
-        out << "|" << PGE_URLENC(blk.event_destroy);
-        //    e2=block hit event name[***urlencode!***]
-        out << "," << PGE_URLENC(blk.event_hit);
-        //    e3=no more object in layer event name[***urlencode!***]4
-        out << "," << PGE_URLENC(blk.event_emptylayer);
+        out << "|";
 
-        if(format_version >= 68) // e4=block onscreen event name[***urlencode!***]
-            out << "," << PGE_URLENC(blk.event_on_screen);
+        if(format_version < 68 ||
+            !IsEmpty(blk.event_destroy) ||
+            !IsEmpty(blk.event_hit) ||
+            !IsEmpty(blk.event_emptylayer) ||
+            !IsEmpty(blk.event_on_screen)
+        )
+        {
+            out << PGE_URLENC(blk.event_destroy);
+            //    e2=block hit event name[***urlencode!***]
+            out << "," << PGE_URLENC(blk.event_hit);
+            //    e3=no more object in layer event name[***urlencode!***]4
+            out << "," << PGE_URLENC(blk.event_emptylayer);
+
+            if(format_version >= 68) // e4=block onscreen event name[***urlencode!***]
+                out << "," << PGE_URLENC(blk.event_on_screen);
+        }
 
         //    w=width
-        out << "|" << fromNum(blk.autoscale ? (-1 * blk.w) : blk.w);
+        out << "|";
+        if(format_version >= 67)
+            out << fromNum(blk.autoscale ? (-1 * blk.w) : blk.w);
+        else
+            out << fromNum(blk.w < 0 ? 0 : blk.w);
         //    h=height
         out << "|" << fromNum(blk.h);
         out << "\n";
@@ -1702,13 +1723,15 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "|" << layerNotDef(bgo.layer);
         //    id=background id
         out << "|" << fromNum(bgo.id);
-        if((bgo.gfx_dx) > 0 || (bgo.gfx_dy > 0))
+
+        if(format_version >= 67 && (bgo.gfx_dx > 0 || bgo.gfx_dy > 0))
         {
             //  dx=graphics extend x
             out << "," << fromNum(bgo.gfx_dx);
             //  dy=graphics extend y
             out << "," << fromNum(bgo.gfx_dy);
         }
+
         //    x=background position x
         out << "|" << fromNum(bgo.x);
         //    y=background position y
@@ -1725,6 +1748,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         long containerType = 0;
         long specialData = npc.special_data;
         int direct = npc.direct;
+
         switch(npcID)//Convert npcID and contents ID into container type
         {
         case 91:
@@ -1749,6 +1773,10 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             containerType = 0;
             break;
         }
+
+        if(format_version >= 68 && npc.wings_type > 0)
+            containerType = 100 + npc.wings_type;
+
         if(containerType != 0)
         {
             //Set NPC-ID of contents as main NPC-ID for this NPC
@@ -1803,19 +1831,23 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "N";
         //    layer=layer name["" == "Default"][***urlencode!***]
         out << "|" << layerNotDef(npc.layer);
+
         //only if name != ""
         //name=npc's name
-        if(!IsEmpty(npc.gfx_name))
+        if(format_version >= 67 && !IsEmpty(npc.gfx_name))
             out << "," << PGE_URLENC(npc.gfx_name);
+
         //    id=npc id
         out << "|" << fromNum(npcID);
-        if((npc.gfx_dx) > 0 || (npc.gfx_dy > 0))
+
+        if(format_version >= 67 && (npc.gfx_dx > 0 || npc.gfx_dy > 0))
         {
             //  dx=graphics extend x
             out << "," << fromNum(npc.gfx_dx);
             //  dy=graphics extend y
             out << "," << fromNum(npc.gfx_dy);
         }
+
         //    x=npc position x
         out << "|" << fromNum(npc.x);
         //    y=npc position y
@@ -1826,7 +1858,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "," << fromNum((int)npc.friendly);
         //    b3=don't move npc
         out << "," << fromNum((int)npc.nomove);
-        //    b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300]
+        //    b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300][101~107=wing type]
         out << "," << fromNum(containerType);
 
         if(format_version >= 69)
@@ -1839,21 +1871,35 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
         //    sp=special option
         out << "|" << fromNum(specialData);
-        //        [***urlencode!***]
-        //        e1=death event
-        out << "|" << PGE_URLENC(npc.event_die);
-        //        e2=talk event
-        out << "," << PGE_URLENC(npc.event_talk);
-        //        e3=activate event
-        out << "," << PGE_URLENC(npc.event_activate);
-        //        e4=no more object in layer event
-        out << "," << PGE_URLENC(npc.event_emptylayer);
-        //        e5=grabed event
-        out << "," << PGE_URLENC(npc.event_grab);
-        //        e6=next frame event
-        out << "," << PGE_URLENC(npc.event_nextframe);
-        //        e7=touch event
-        out << "," << PGE_URLENC(npc.event_touch);
+
+        out << "|";
+        if(format_version < 68 ||
+            !IsEmpty(npc.event_die) ||
+            !IsEmpty(npc.event_talk) ||
+            !IsEmpty(npc.event_activate) ||
+            !IsEmpty(npc.event_emptylayer) ||
+            !IsEmpty(npc.event_grab) ||
+            !IsEmpty(npc.event_nextframe) ||
+            !IsEmpty(npc.event_touch)
+        )
+        {
+            //        [***urlencode!***]
+            //        e1=death event
+            out << PGE_URLENC(npc.event_die);
+            //        e2=talk event
+            out << "," << PGE_URLENC(npc.event_talk);
+            //        e3=activate event
+            out << "," << PGE_URLENC(npc.event_activate);
+            //        e4=no more object in layer event
+            out << "," << PGE_URLENC(npc.event_emptylayer);
+            //        e5=grabed event
+            out << "," << PGE_URLENC(npc.event_grab);
+            //        e6=next frame event
+            out << "," << PGE_URLENC(npc.event_nextframe);
+            //        e7=touch event
+            out << "," << PGE_URLENC(npc.event_touch);
+        }
+
         //        a1=layer name to attach
         out << "|" << PGE_URLENC(npc.attach_layer);
         //        a2=variable name to send
@@ -1992,6 +2038,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         out << "," << fromNum((int)door.special_state_required);
         //    size=Warp Size(pixel)
         out << "," << fromNum(door.length_i);
+
         if(format_version >= 67 && (door.two_way || door.cannon_exit || door.stood_state_required))
         {
             //    ts = two-way
@@ -2002,6 +2049,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             if(door.stood_state_required && format_version >= 69)
                 out << "," << fromNum((int)door.stood_state_required);
         }
+
         //    lik=warp to level[***urlencode!***]
         out << "|" << PGE_URLENC(door.lname);
         //    liid=normal enterance / to warp[0-WARPMAX]
@@ -2023,6 +2071,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     for(i = 0; i < FileData.physez.size(); i++)
     {
         const LevelPhysEnv &pez = FileData.physez[i];
+        int pezType = pez.env_type + 1;
+
         /*TRIVIA: It is NOT a PEZ candy brand, just "Physical Environment Zone" :-P*/
         //    Q|layer|x|y|w|h|b1,b2,b3,b4,b5|event
         out << "Q";
@@ -2054,7 +2104,23 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         //        15-Event Always(NPC)
         //        16-NPC Hurting Field
         //        17=SubArea
-        out << "|" << fromNum((pez.env_type + 1));
+
+
+        if(format_version < 67 && pezType == 13)
+            pezType = 3;
+        else if(format_version < 68)
+        {
+            if(pezType == 14)
+                pezType = 7;
+            else if(pezType == 15)
+                pezType = 8;
+            else
+                pezType = 13;
+        }
+        else if(format_version < 69 && pezType == 17)
+            pezType = 13;
+
+        out << "|" << fromNum(pezType);
         //    b2=friction
         out << "," << fromNum(pez.friction);
         //    b3=Acceleration Direction
@@ -2501,6 +2567,9 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
         else
             out << "|" << var.value;
 
+        if(format_version >= 69)
+            out << "|" << fromNum((int)var.is_global);
+
         out << "\n";
     }
 
@@ -2541,18 +2610,34 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
     {
         for(const LevelItemSetup38A &is : FileData.custom38A_configs)
         {
+            int maxHex = 0;
             //    V|name|value
             switch(is.type)
             {
             case LevelItemSetup38A::BLOCK:
+                if(format_version == 69)
+                    maxHex = 0x20;
+                else
+                    maxHex = 0x0D;
                 out << "CB";
                 break;
+
             case LevelItemSetup38A::BGO:
                 out << "CT";
+                if(format_version == 69)
+                    maxHex = 0x65;
+                else
+                    maxHex = 0x04;
                 break;
+
             case LevelItemSetup38A::EFFECT:
                 out << "CE";
+                if(format_version == 69)
+                    maxHex = 0xC9;
+                else
+                    maxHex = 0x05;
                 break;
+
             case LevelItemSetup38A::UNKNOWN:
             default:
                 out << "CUnk";
@@ -2564,6 +2649,8 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             for(pge_size_t j = 0; j < is.data.size(); j++)
             {
                 const LevelItemSetup38A::Entry &e = is.data[j];
+                if(maxHex != 0 && e.key > maxHex)
+                    continue; // Skip unsupported parameters by version
                 out << ((j == 0) ? "|" : ",");
                 out << SMBX38A_CC_encode(e.key, e.value);
             }
