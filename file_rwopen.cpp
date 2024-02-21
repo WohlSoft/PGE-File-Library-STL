@@ -172,9 +172,13 @@ bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, Le
 }
 
 
-bool FileFormats::SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, LevelFileFormat format, unsigned int FormatVersion)
+bool FileFormats::SaveLevelFile(LevelData &FileData,
+                                const PGESTRING &filePath,
+                                LevelFileFormat format,
+                                unsigned int formatVersion)
 {
     FileData.meta.ERROR_info.clear();
+
     switch(format)
     {
     case LVL_PGEX:
@@ -192,7 +196,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, 
     {
         //Apply SMBX64-specific things to entire array
         smbx64LevelPrepare(FileData);
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx64 : formatVersion;
 
         if(!FileFormats::WriteSMBX64LvlFileF(filePath, FileData, outVer))
         {
@@ -214,7 +218,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, 
     //break;
     case LVL_SMBX38A:
     {
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
         if(!FileFormats::WriteSMBX38ALvlFileF(filePath, FileData, outVer))
         {
             FileData.meta.ERROR_info = "Cannot save file " + filePath + ".";
@@ -224,13 +228,18 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, 
     }
         //break;
     }
+
     FileData.meta.ERROR_info = "Unsupported file type";
     return false;
 }
 
-bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion)
+bool FileFormats::SaveLevelData(LevelData &FileData,
+                                PGESTRING &RawData,
+                                LevelFileFormat format,
+                                unsigned int formatVersion)
 {
     FileData.meta.ERROR_info.clear();
+
     switch(format)
     {
     case LVL_PGEX:
@@ -242,7 +251,7 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
     //break;
     case LVL_SMBX64:
     {
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx64 : formatVersion;
         smbx64LevelPrepare(FileData);
         WriteSMBX64LvlFileRaw(FileData, RawData, outVer);
         return true;
@@ -250,12 +259,13 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
     //break;
     case LVL_SMBX38A:
     {
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
         FileFormats::WriteSMBX38ALvlFileRaw(FileData, RawData, outVer);
         return true;
     }
         //break;
     }
+
     FileData.meta.ERROR_info = "Unsupported file type";
     FileData.meta.ReadFileValid = false;
     return false;
@@ -405,9 +415,13 @@ bool FileFormats::OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, Wo
     }
 }
 
-bool FileFormats::SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, FileFormats::WorldFileFormat format, unsigned int FormatVersion)
+bool FileFormats::SaveWorldFile(WorldData &FileData,
+                                const PGESTRING &filePath,
+                                FileFormats::WorldFileFormat format,
+                                unsigned int formatVersion)
 {
     FileData.meta.ERROR_info.clear();
+
     switch(format)
     {
     case WLD_PGEX:
@@ -422,7 +436,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, 
     //break;
     case WLD_SMBX64:
     {
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx64 : formatVersion;
         if(!FileFormats::WriteSMBX64WldFileF(filePath, FileData, outVer))
         {
             FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
@@ -443,7 +457,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, 
     //break;
     case WLD_SMBX38A:
     {
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
         if(!FileFormats::WriteSMBX38AWldFileF(filePath, FileData, outVer))
         {
             FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
@@ -453,13 +467,18 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, 
     }
         //break;
     }
+
     FileData.meta.ERROR_info = "Unsupported file type";
     return false;
 }
 
-bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFormats::WorldFileFormat format, unsigned int FormatVersion)
+bool FileFormats::SaveWorldData(WorldData &FileData,
+                                PGESTRING &RawData,
+                                FileFormats::WorldFileFormat format,
+                                unsigned int formatVersion)
 {
     FileData.meta.ERROR_info.clear();
+
     switch(format)
     {
     case WLD_PGEX:
@@ -470,19 +489,20 @@ bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFor
     //break;
     case WLD_SMBX64:
     {
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx64 : formatVersion;
         WriteSMBX64WldFileRaw(FileData, RawData, outVer);
         return true;
     }
     //break;
     case WLD_SMBX38A:
     {
-        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
         WriteSMBX38AWldFileRaw(FileData, RawData, outVer);
         return true;
     }
         //break;
     }
+
     FileData.meta.ERROR_info = "Unsupported file type";
     return false;
 }

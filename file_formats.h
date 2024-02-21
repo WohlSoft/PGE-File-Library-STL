@@ -181,7 +181,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, LevelFileFormat format, unsigned int FormatVersion = c_version_default);
+    static bool SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, LevelFileFormat format, unsigned int formatVersion = c_version_default);
     /*!
      * \brief Save a level file to the raw string
      * \param FileData Level data structure
@@ -190,7 +190,7 @@ public:
      * \param FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if data successfully generated
      */
-    static bool SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion = c_version_default);
+    static bool SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int formatVersion = c_version_default);
 
 
     // SMBX64 LVL File
@@ -607,7 +607,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, WorldFileFormat format, unsigned int FormatVersion = c_version_default);
+    static bool SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, WorldFileFormat format, unsigned int formatVersion = c_version_default);
     /*!
      * \brief Save a world map file to the raw string
      * \param [__in] FileData World data structure
@@ -616,7 +616,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if data successfully generated
      */
-    static bool SaveWorldData(WorldData &FileData, PGESTRING &RawData, WorldFileFormat format, unsigned int FormatVersion = c_version_default);
+    static bool SaveWorldData(WorldData &FileData, PGESTRING &RawData, WorldFileFormat format, unsigned int formatVersion = c_version_default);
 
 
     // SMBX64 WLD File
