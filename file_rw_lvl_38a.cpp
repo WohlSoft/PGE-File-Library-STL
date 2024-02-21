@@ -106,7 +106,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
     FileData.meta.RecentFormat = LevelData::SMBX38A;
-    FileData.meta.RecentFormatVersion = latest_version_38a;
+    FileData.meta.RecentFormatVersion = c_latest_version_smbx38a;
     // Mark all 38A levels with a "SMBX-38A" key
     FileData.meta.configPackId = "SMBX-38A";
 
@@ -124,7 +124,7 @@ bool FileFormats::ReadSMBX38ALvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf
 
         FileData.meta.RecentFormatVersion = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
 
-        if(FileData.meta.RecentFormatVersion > latest_version_38a)
+        if(FileData.meta.RecentFormatVersion > c_latest_version_smbx38a)
             throw std::logic_error("File format has newer version which is not supported yet");
 
         while(!inf.eof())
@@ -251,7 +251,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
     FileData.meta.ERROR_info.clear();
     CreateLevelData(FileData);
     FileData.meta.RecentFormat = LevelData::SMBX38A;
-    FileData.meta.RecentFormatVersion = latest_version_38a;
+    FileData.meta.RecentFormatVersion = c_latest_version_smbx38a;
 #if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.LevelName.clear();
     FileData.stars = 0;
@@ -311,7 +311,7 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelD
 
         FileData.meta.RecentFormatVersion = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
 
-        if(FileData.meta.RecentFormatVersion > latest_version_38a)
+        if(FileData.meta.RecentFormatVersion > c_latest_version_smbx38a)
             throw std::logic_error("File format has newer version which is not supported yet");
 
         while(!in.eof())

@@ -59,6 +59,10 @@ class FileFormats PGE_FILES_INHERED
 #endif
 
 public:
+    static const unsigned int c_latest_version_smbx64 = 64;
+    static const unsigned int c_latest_version_smbx38a = 69;
+    static const unsigned int c_version_default = 0xFFFFFFFF;
+
 
     /******************************non-SMBX64 Meda-data file***********************************/
     /*!
@@ -177,7 +181,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, LevelFileFormat format, unsigned int FormatVersion = 64);
+    static bool SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, LevelFileFormat format, unsigned int FormatVersion = c_version_default);
     /*!
      * \brief Save a level file to the raw string
      * \param FileData Level data structure
@@ -186,7 +190,7 @@ public:
      * \param FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if data successfully generated
      */
-    static bool SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion = 64);
+    static bool SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFileFormat format, unsigned int FormatVersion = c_version_default);
 
 
     // SMBX64 LVL File
@@ -253,7 +257,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64LvlFileF(const PGESTRING &filePath, LevelData &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64LvlFileF(const PGESTRING &filePath, LevelData &FileData, unsigned int file_format = c_latest_version_smbx64);
     /*!
      * \brief Generates SMBX1...64 Level file data and saves into raw string
      * \param [__in] FileData Target file path
@@ -261,7 +265,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int file_format = 64);
+    static bool WriteSMBX64LvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int file_format = c_latest_version_smbx64);
     /*!
      * \brief Generates SMBX1...64 Level file data and saves it through file output descriptor
      * \param [__inout] out Output file descriptor
@@ -269,7 +273,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData /*output*/ &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData /*output*/ &FileData, unsigned int file_format = c_latest_version_smbx64);
 
     // SMBX-38A LVL File
     /*!
@@ -333,7 +337,7 @@ public:
      * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData, unsigned int format_version = 69);
+    static bool WriteSMBX38ALvlFileF(const PGESTRING &filePath, LevelData &FileData, unsigned int format_version = c_latest_version_smbx38a);
     /*!
      * \brief Generates SMBX-38A Level file data and saves into raw string
      * \param [__in] FileData Target file path
@@ -341,7 +345,7 @@ public:
      * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int format_version = 69);
+    static bool WriteSMBX38ALvlFileRaw(LevelData &FileData, PGESTRING &rawdata, unsigned int format_version = c_latest_version_smbx38a);
     /*!
      * \brief Generates SMBX-38A Level file data and saves it through file output descriptor
      * \param [__inout] out Output file descriptor
@@ -349,7 +353,7 @@ public:
      * \param [__in] file_format SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData, unsigned int format_version = 69);
+    static bool WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData, unsigned int format_version = c_latest_version_smbx38a);
 
 
 
@@ -603,7 +607,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if file successfully saved
      */
-    static bool SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, WorldFileFormat format, unsigned int FormatVersion = 64);
+    static bool SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, WorldFileFormat format, unsigned int FormatVersion = c_version_default);
     /*!
      * \brief Save a world map file to the raw string
      * \param [__in] FileData World data structure
@@ -612,7 +616,7 @@ public:
      * \param [__in] FormatVersion Version of target SMBX1...64 file. Takes no effect for other file formats
      * \return true if data successfully generated
      */
-    static bool SaveWorldData(WorldData &FileData, PGESTRING &RawData, WorldFileFormat format, unsigned int FormatVersion = 64);
+    static bool SaveWorldData(WorldData &FileData, PGESTRING &RawData, WorldFileFormat format, unsigned int FormatVersion = c_version_default);
 
 
     // SMBX64 WLD File
@@ -667,7 +671,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64WldFileF(const PGESTRING &filePath, WorldData &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64WldFileF(const PGESTRING &filePath, WorldData &FileData, unsigned int file_format = c_latest_version_smbx64);
     /*!
      * \brief Generates raw data string in SMBX1...64 World map format
      * \param [__in] FileData World map data structure
@@ -675,7 +679,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64WldFileRaw(WorldData &FileData, PGESTRING &rawdata, unsigned int file_format = 64);
+    static bool WriteSMBX64WldFileRaw(WorldData &FileData, PGESTRING &rawdata, unsigned int file_format = c_latest_version_smbx64);
     /*!
      * \brief Writes world map data into file output descriptor of SMBX1...64 World map format
      * \param [__inout] out Output file descriptor
@@ -683,7 +687,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, WorldData /*output*/ &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64WldFile(PGE_FileFormats_misc::TextOutput &out, WorldData /*output*/ &FileData, unsigned int file_format = c_latest_version_smbx64);
 
     // SMBX-38A WLD File
     /*!
@@ -737,7 +741,7 @@ public:
      * \param [__in] format_version SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData &FileData, unsigned int format_version = 69);
+    static bool WriteSMBX38AWldFileF(const PGESTRING &filePath, WorldData &FileData, unsigned int format_version = c_latest_version_smbx38a);
     /*!
      * \brief Generates SMBX-38A Level file data and saves into raw string
      * \param [__in] FileData Target file path
@@ -745,7 +749,7 @@ public:
      * \param [__in] format_version SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38AWldFileRaw(WorldData &FileData, PGESTRING &rawdata, unsigned int format_version = 69);
+    static bool WriteSMBX38AWldFileRaw(WorldData &FileData, PGESTRING &rawdata, unsigned int format_version = c_latest_version_smbx38a);
     /*!
      * \brief Generates SMBX-38A Level file data and saves it through file output descriptor
      * \param [__inout] out Output file descriptor
@@ -753,7 +757,7 @@ public:
      * \param [__in] format_version SMBX-38A file format version number (from 64 to 69)
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData, unsigned int format_version = 69);
+    static bool WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData, unsigned int format_version = c_latest_version_smbx38a);
 
     // PGE Extended World map File
     /*!
@@ -1005,7 +1009,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64ConfigFileF(const PGESTRING &filePath, SMBX64_ConfigFile &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64ConfigFileF(const PGESTRING &filePath, SMBX64_ConfigFile &FileData, unsigned int file_format = c_latest_version_smbx64);
     /*!
      * \brief Generates raw data string in SMBX1...64 SMBX Engine specific config format
      * \param [__in] FileData World map data structure
@@ -1013,7 +1017,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64ConfigFileRaw(SMBX64_ConfigFile &FileData, PGESTRING &rawdata, unsigned int file_format = 64);
+    static bool WriteSMBX64ConfigFileRaw(SMBX64_ConfigFile &FileData, PGESTRING &rawdata, unsigned int file_format = c_latest_version_smbx64);
     /*!
      * \brief Writes data into file output descriptor of SMBX1...64 SMBX Engine specific config format
      * \param [__inout] out Output file descriptor
@@ -1021,7 +1025,7 @@ public:
      * \param [__in] file_format SMBX file format version number (from 0 to 64) [Example of level in SMBX0 format is intro.dat included with SMBX 1.0]
      * \return true if file successfully saved, false if error occouped
      */
-    static bool WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, SMBX64_ConfigFile &FileData, unsigned int file_format = 64);
+    static bool WriteSMBX64ConfigFile(PGE_FileFormats_misc::TextOutput &out, SMBX64_ConfigFile &FileData, unsigned int file_format = c_latest_version_smbx64);
 
 
     /******************************NPC.txt file***********************************/

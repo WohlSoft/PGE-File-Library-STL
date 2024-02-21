@@ -35,8 +35,6 @@
 #include "CSVUtils.h"
 #include "pge_ff_units.h"
 
-static constexpr uint32_t latest_version_38a = 69;
-
 using namespace CSVReader;
 
 extern const int SMBX38A_NpcGeneratorTypes[29];

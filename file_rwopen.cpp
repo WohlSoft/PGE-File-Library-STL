@@ -192,8 +192,9 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, 
     {
         //Apply SMBX64-specific things to entire array
         smbx64LevelPrepare(FileData);
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
 
-        if(!FileFormats::WriteSMBX64LvlFileF(filePath, FileData, FormatVersion))
+        if(!FileFormats::WriteSMBX64LvlFileF(filePath, FileData, outVer))
         {
             FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
             return false;
@@ -213,7 +214,8 @@ bool FileFormats::SaveLevelFile(LevelData &FileData, const PGESTRING &filePath, 
     //break;
     case LVL_SMBX38A:
     {
-        if(!FileFormats::WriteSMBX38ALvlFileF(filePath, FileData))
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        if(!FileFormats::WriteSMBX38ALvlFileF(filePath, FileData, outVer))
         {
             FileData.meta.ERROR_info = "Cannot save file " + filePath + ".";
             return false;
@@ -240,14 +242,16 @@ bool FileFormats::SaveLevelData(LevelData &FileData, PGESTRING &RawData, LevelFi
     //break;
     case LVL_SMBX64:
     {
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
         smbx64LevelPrepare(FileData);
-        WriteSMBX64LvlFileRaw(FileData, RawData, FormatVersion);
+        WriteSMBX64LvlFileRaw(FileData, RawData, outVer);
         return true;
     }
     //break;
     case LVL_SMBX38A:
     {
-        FileFormats::WriteSMBX38ALvlFileRaw(FileData, RawData);
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        FileFormats::WriteSMBX38ALvlFileRaw(FileData, RawData, outVer);
         return true;
     }
         //break;
@@ -418,7 +422,8 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, 
     //break;
     case WLD_SMBX64:
     {
-        if(!FileFormats::WriteSMBX64WldFileF(filePath, FileData, FormatVersion))
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
+        if(!FileFormats::WriteSMBX64WldFileF(filePath, FileData, outVer))
         {
             FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
             return false;
@@ -438,7 +443,8 @@ bool FileFormats::SaveWorldFile(WorldData &FileData, const PGESTRING &filePath, 
     //break;
     case WLD_SMBX38A:
     {
-        if(!FileFormats::WriteSMBX38AWldFileF(filePath, FileData))
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        if(!FileFormats::WriteSMBX38AWldFileF(filePath, FileData, outVer))
         {
             FileData.meta.ERROR_info += "Cannot save file " + filePath + ".";
             return false;
@@ -464,13 +470,15 @@ bool FileFormats::SaveWorldData(WorldData &FileData, PGESTRING &RawData, FileFor
     //break;
     case WLD_SMBX64:
     {
-        WriteSMBX64WldFileRaw(FileData, RawData, FormatVersion);
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx64 : FormatVersion;
+        WriteSMBX64WldFileRaw(FileData, RawData, outVer);
         return true;
     }
     //break;
     case WLD_SMBX38A:
     {
-        WriteSMBX38AWldFileRaw(FileData, RawData);
+        uint32_t outVer = FormatVersion == c_version_default ? c_latest_version_smbx38a : FormatVersion;
+        WriteSMBX38AWldFileRaw(FileData, RawData, outVer);
         return true;
     }
         //break;
