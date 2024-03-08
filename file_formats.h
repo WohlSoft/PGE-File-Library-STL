@@ -505,8 +505,15 @@ public:
      */
     static void             LevelAddInternalEvents(LevelData &FileData);
     /*!
+     * \brief Sets sort priority of unspecified BGOs according to SMBX64 priorities (component of smbx64LevelPrepare)
+     * \param [__inout] lvl Level data structure object
+     */
+    static void             smbx64LevelSetBGOPriorities(LevelData &lvl);
+    /*!
      * \brief Optimizing level data for SMBX64 Standard requirements
      * \param [__inout] lvl Level data structure object
+     *
+     * Internally calls smbx64LevelSetBGOPriorities and sets lvl.stars using smbx64CountStars
      */
     static void             smbx64LevelPrepare(LevelData &lvl);
     /*!

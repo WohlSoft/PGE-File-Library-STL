@@ -47,7 +47,7 @@ static const int _smbx64_bgo_sort_priorities[190] =
     75, 125, 125, 75, 75
 };
 
-void FileFormats::smbx64LevelPrepare(LevelData &lvl)
+void FileFormats::smbx64LevelSetBGOPriorities(LevelData &lvl)
 {
     //Set SMBX64 specific option to BGO
     for(auto &bgo : lvl.bgo)
@@ -60,6 +60,11 @@ void FileFormats::smbx64LevelPrepare(LevelData &lvl)
         else
             bgo.smbx64_sp_apply = bgo.smbx64_sp;
     }
+}
+
+void FileFormats::smbx64LevelPrepare(LevelData &lvl)
+{
+    smbx64LevelSetBGOPriorities(lvl);
 
     //Mark & Count Stars
     lvl.stars = smbx64CountStars(lvl);
