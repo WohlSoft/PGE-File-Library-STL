@@ -117,6 +117,7 @@ struct saveLevelInfo
     unsigned int max_medals;
     PGELIST<bool> medals_best;
     PGELIST<bool> medals_got;
+    unsigned int exits_got;
 };
 
 /*!

@@ -250,6 +250,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                     PGEX_UIntVal("M", level_info.max_medals)
                     PGEX_BoolArrVal("MG", level_info.medals_got)
                     PGEX_BoolArrVal("MB", level_info.medals_best)
+                    PGEX_UIntVal("E", level_info.exits_got)
                 }
                 FileData.levelInfo.push_back(level_info);
             }
@@ -463,6 +464,8 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
 
             if(!slinfo.medals_best.empty())
                 out << PGEFile::value("MB", PGEFile::WriteBoolArr(slinfo.medals_best));
+
+            out << PGEFile::value("E", PGEFile::WriteInt(slinfo.exits_got));
 
             out << "\n";
         }
