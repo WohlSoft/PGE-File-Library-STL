@@ -22,6 +22,8 @@ if(NOT CMAKE_DEBUG_POSTFIX)
     set(CMAKE_DEBUG_POSTFIX "d")
 endif()
 
+option(PGEFL_ENABLE_RWOPS "Enable SDL_RWops interfaces (if this option is enabled, then PGE-FL has a build-time dependency on SDL2's headers)" OFF)
+
 if(NOT DEFINED PGE_FORCE_QT5 AND NOT DEFINED PGEFL_PREFER_QT5)
     option(PGE_FORCE_QT5 "Try to find Qt5 instead of Qt6 if available" ON)
 endif()
@@ -78,6 +80,12 @@ set(LIBRARY_PROJECT 1)
 include(build_props.cmake)
 include(pge_file_library.cmake)
 
+if(PGEFL_ENABLE_RWOPS)
+    list(APPEND PGE_FILE_LIBRARY_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/pge_file_lib_globs_rwops.cpp
+    )
+endif()
+
 if(PGEFL_USE_QT6)
     pge_cxx_standard(17)
 else()
@@ -94,6 +102,10 @@ add_library(pgefl STATIC
 set_target_properties(pgefl PROPERTIES AUTOMOC OFF)
 target_include_directories(pgefl PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 list(APPEND PGEFL_INSTALLS pgefl)
+
+if(PGEFL_ENABLE_RWOPS)
+    target_compile_definitions(pgefl PUBLIC -DPGEFL_ENABLE_RWOPS)
+endif()
 
 if(PGEFL_QT_SUPPORT)
     add_library(pgefl_qt STATIC

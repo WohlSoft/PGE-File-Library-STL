@@ -144,6 +144,16 @@ public:
      * @return true if file successfully opened and parsed, false if error occouped
      */
     static bool OpenLevelRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData);
+#ifdef PGEFL_ENABLE_RWOPS
+    /**
+     * @brief Parses a level file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] rwops SDL_RWops read-mode handle to a supported level file
+     * @param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * @param [__out] FileData Level data structure
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenLevelRWops(SDL_RWops *rwops, const PGESTRING &filePath, LevelData &FileData);
+#endif
     /**
      * @brief Parses a level file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] file Input file descriptor
@@ -577,6 +587,16 @@ public:
      * @return true if file successfully opened and parsed, false if error occouped
      */
     static bool OpenWorldRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData);
+#ifdef PGEFL_ENABLE_RWOPS
+    /**
+     * @brief Parses a world map file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] rwops SDL_RWops read-mode handle to a supported world file
+     * @param [__in] filePath Full path to the file (if empty, custom data in the episode and in the custom directories are will be inaccessible)
+     * @param [__out] FileData World data structure
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenWorldRWops(SDL_RWops *rwops, const PGESTRING &filePath, WorldData &FileData);
+#endif
     /**
      * @brief Parses a level world map data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * @param [__in] file Input file descriptor

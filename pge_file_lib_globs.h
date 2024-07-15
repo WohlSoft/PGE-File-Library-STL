@@ -114,6 +114,8 @@ typedef char PGEChar;
 
 #endif /* PGE_FILES_QT */
 
+struct SDL_RWops;
+
 /*!
  * Misc I/O classes used by PGE File Library internally
  */
@@ -311,6 +313,37 @@ private:
     PGESTRING *m_data = nullptr;
 };
 
+
+#ifdef PGEFL_ENABLE_RWOPS
+
+class RWopsTextInput: public TextInput
+{
+public:
+    RWopsTextInput();
+    RWopsTextInput(SDL_RWops *rwops, const PGESTRING &filePath = PGESTRING());
+    virtual ~RWopsTextInput();
+    bool open(SDL_RWops *rwops, const PGESTRING &filePath = PGESTRING());
+    void close();
+    virtual PGESTRING read(int64_t len);
+    virtual PGESTRING readLine();
+    virtual PGESTRING readCVSLine();
+    virtual PGESTRING readAll();
+    virtual bool eof();
+    virtual int64_t tell();
+    virtual int seek(int64_t pos, positions relativeTo);
+
+private:
+    void fillBuffer();
+
+    SDL_RWops *m_rwops = nullptr;
+    PGESTRING m_buffer;
+    int64_t m_bufferStartOffset = 0;
+    int64_t m_readOffset = 0;
+    int64_t m_rwopsOffset = 0;
+    bool m_bufferIsEof = false;
+};
+
+#endif
 
 
 /*!

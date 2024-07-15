@@ -64,6 +64,24 @@ bool FileFormats::OpenLevelRaw(PGESTRING &rawdata, const PGESTRING &filePath, Le
     return OpenLevelFileT(file, FileData);
 }
 
+#ifdef PGEFL_ENABLE_RWOPS
+bool FileFormats::OpenLevelRWops(SDL_RWops *rwops, const PGESTRING &filePath, LevelData &FileData)
+{
+    PGE_FileFormats_misc::RWopsTextInput file;
+
+    if(!file.open(rwops, filePath))
+    {
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        return false;
+    }
+
+    return OpenLevelFileT(file, FileData);
+}
+#endif
+
 bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelData &FileData)
 {
     PGESTRING firstLine;
@@ -304,6 +322,24 @@ bool FileFormats::OpenWorldRaw(PGESTRING &rawdata, const PGESTRING &filePath, Wo
 
     return OpenWorldFileT(file, FileData);
 }
+
+#ifdef PGEFL_ENABLE_RWOPS
+bool FileFormats::OpenWorldRWops(SDL_RWops *rwops, const PGESTRING &filePath, WorldData &FileData)
+{
+    PGE_FileFormats_misc::RWopsTextInput file;
+
+    if(!file.open(rwops, filePath))
+    {
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "Can't open file";
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        return false;
+    }
+
+    return OpenWorldFileT(file, FileData);
+}
+#endif
 
 bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldData &data)
 {
