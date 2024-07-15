@@ -983,7 +983,7 @@ void TextFileInput::read(PGESTRING &out, int64_t len)
         buf[gotten] = '\0';
     out = m_utf8 ? QString::fromUtf8(buf, gotten) : QString::fromLocal8Bit(buf, gotten);
     delete[] buf;
-    return out;//stream.read(len);
+    return;//stream.read(len);
 #else
     if(!stream)
         return;
