@@ -41,9 +41,9 @@ namespace CSVReader
         typedef PGESTRING string_type;
         CSVPGEReader(PGE_FileFormats_misc::TextInput *reader) : _reader(reader) {}
 
-        PGESTRING read_line()
+        void read_line(PGESTRING &ret)
         {
-            return _reader->readLine();
+            _reader->readLine(ret);
         }
     private:
         PGE_FileFormats_misc::TextInput *_reader;

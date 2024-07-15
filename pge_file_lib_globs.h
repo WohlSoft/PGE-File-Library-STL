@@ -219,9 +219,9 @@ public:
 
     TextInput();
     virtual ~TextInput() = default;
-    virtual PGESTRING read(int64_t len);
-    virtual PGESTRING readLine();
-    virtual PGESTRING readCVSLine();
+    virtual void read(PGESTRING &ret, int64_t len);
+    virtual void readLine(PGESTRING &ret);
+    virtual void readCVSLine(PGESTRING &ret);
     virtual PGESTRING readAll();
     virtual bool eof();
     virtual int64_t tell();
@@ -283,9 +283,9 @@ public:
     virtual ~RawTextInput() = default;
     bool open(PGESTRING *rawString, const PGESTRING &filepath = PGESTRING());
     void close();
-    virtual PGESTRING read(int64_t len);
-    virtual PGESTRING readLine();
-    virtual PGESTRING readCVSLine();
+    virtual void read(PGESTRING &ret, int64_t len);
+    virtual void readLine(PGESTRING &ret);
+    virtual void readCVSLine(PGESTRING &ret);
     virtual PGESTRING readAll();
     virtual bool eof();
     virtual int64_t tell();
@@ -324,9 +324,9 @@ public:
     virtual ~RWopsTextInput();
     bool open(SDL_RWops *rwops, const PGESTRING &filePath = PGESTRING());
     void close();
-    virtual PGESTRING read(int64_t len);
-    virtual PGESTRING readLine();
-    virtual PGESTRING readCVSLine();
+    virtual void read(PGESTRING &ret, int64_t len);
+    virtual void readLine(PGESTRING &ret);
+    virtual void readCVSLine(PGESTRING &ret);
     virtual PGESTRING readAll();
     virtual bool eof();
     virtual int64_t tell();
@@ -395,22 +395,22 @@ public:
 
     /*!
      * \brief Reads requested number of characters from a file
+     * \param ret - reset and filled with requested set of characters
      * \param Maximal lenght of characters to read from file
-     * \return string contains requested line of characters
      */
-    PGESTRING read(int64_t len);
+    void read(PGESTRING &ret, int64_t len);
 
     /*!
      * \brief Reads whole line before line feed character
-     * \return string contains gotten line
+     * \param ret - reset and filled with gotten line
      */
-    PGESTRING readLine();
+    void readLine(PGESTRING &ret);
 
     /*!
      * \brief Reads whole line before line feed character or before first unquoted comma
-     * \return string contains gotten line
+     * \param ret - reset and filled with gotten line
      */
-    PGESTRING readCVSLine();
+    void readCVSLine(PGESTRING &ret);
 
     /*!
      * \brief Reads all data from a file at current position of carriage

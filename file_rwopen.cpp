@@ -88,7 +88,7 @@ bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelDat
     CreateLevelData(FileData);
 
     FileData.meta.ERROR_info.clear();
-    firstLine = file.read(8);
+    file.read(firstLine, 8);
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
@@ -163,7 +163,7 @@ bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, Le
 
     CreateLevelHeader(data);
 
-    firstLine = file.readLine();
+    file.readLine(firstLine);
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
@@ -348,7 +348,7 @@ bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldDat
     CreateWorldData(data);
 
     data.meta.ERROR_info.clear();
-    firstLine = file.read(8);
+    file.read(firstLine, 8);
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
@@ -425,7 +425,7 @@ bool FileFormats::OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, Wo
 
     CreateWorldHeader(data);
 
-    firstLine = file.readLine();
+    file.readLine(firstLine);
     file.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))

@@ -248,7 +248,7 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
     };
 
     //Read NPC.TXT File config
-#define NextLine(line) line = inf.readCVSLine();
+#define NextLine(line) inf.readCVSLine(line);
 
     do
     {

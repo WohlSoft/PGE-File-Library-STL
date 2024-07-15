@@ -216,9 +216,9 @@ namespace CSVReader
         typedef StrT string_type;
 
         DirectReader(const StrT &data) : _data(data) {}
-        StrT read_line()
+        void read_line(StrT &ret)
         {
-            return _data;
+            ret = _data;
         }
     private:
         StrT _data;
@@ -813,7 +813,7 @@ namespace CSVReader
             _currentTotalFields = sizeof...(allValues);
             this->_fieldTracker = 0; // We need the tracker at 0 (because of out of range exception)
             if(_requireReadLine)
-                this->_currentLine = _reader->read_line();
+                _reader->read_line(this->_currentLine);
             ReadNext(std::forward<Values>(allValues)...);
             _requireReadLine = true;
 
@@ -829,7 +829,7 @@ namespace CSVReader
             _currentTotalFields = sizeof(value);
             this->_fieldTracker = 0; // We need the tracker at 0 (because of out of range exception)
             if(_requireReadLine)
-                this->_currentLine = _reader->read_line();
+                _reader->read_line(this->_currentLine);
             value = this->_currentLine;
             _requireReadLine = true;
 
@@ -850,7 +850,7 @@ namespace CSVReader
             _currentTotalFields = 0;
 
             if(_requireReadLine)
-                this->_currentLine = _reader->read_line();
+                _reader->read_line(this->_currentLine);
             while(this->HasNext())
             {
                 StrT next = this->NextField();
@@ -871,7 +871,7 @@ namespace CSVReader
         T ReadField(int fieldNum)
         {
             if(_requireReadLine)
-                this->_currentLine = _reader->read_line();
+                _reader->read_line(this->_currentLine);
             _requireReadLine = false;
             this->_currentCharIndex = 0;
 

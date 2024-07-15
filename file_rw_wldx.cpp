@@ -91,7 +91,7 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
     do
     {
         str_count++;
-        line = inf.readLine();
+        inf.readLine(line);
     }
     while((line != "HEAD") && (!inf.eof()));
 
@@ -102,13 +102,13 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
         goto skipHeaderParse;
 
     str_count++;
-    line = inf.readLine();
+    inf.readLine(line);
 
     while((line != "HEAD_END") && (!inf.eof()))
     {
         header.push_back(line);
         str_count++;
-        line = inf.readLine();
+        inf.readLine(line);
 
         if(line == "HEAD_END")
             closed = true;

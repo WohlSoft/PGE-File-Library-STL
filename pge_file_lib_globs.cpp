@@ -524,17 +524,17 @@ bool TextFileOutput::exists(const PGESTRING &filePath)
 /*****************BASE TEXT I/O CLASS***************************/
 TextInput::TextInput() : m_lineNumber(0) {}
 
-PGESTRING TextInput::read(int64_t)
+void TextInput::read(PGESTRING &ret, int64_t)
 {
-    return PGESTRING();
+    ret.clear();
 }
-PGESTRING TextInput::readLine()
+void TextInput::readLine(PGESTRING &ret)
 {
-    return PGESTRING();
+    ret.clear();
 }
-PGESTRING TextInput::readCVSLine()
+void TextInput::readCVSLine(PGESTRING &ret)
 {
-    return PGESTRING();
+    ret.clear();
 }
 PGESTRING TextInput::readAll()
 {
@@ -636,35 +636,38 @@ void RawTextInput::close()
     m_lineNumber = 0;
 }
 
-PGESTRING RawTextInput::read(int64_t len)
+void RawTextInput::read(PGESTRING &buf, int64_t len)
 {
+    buf.clear();
+
     if(!m_data)
-        return PGESTRING();
+        return;
     if(m_isEOF)
-        return PGESTRING();
+        return;
 
     if((m_pos + len) >= static_cast<int64_t>(m_data->size()))
     {
         len = static_cast<int64_t>(m_data->size()) - m_pos;
         m_isEOF = true;
     }
-    PGESTRING buf(static_cast<pge_size_t>(len + 1), '\0');
+
 #ifdef PGE_FILES_QT
     buf = m_data->mid(static_cast<int>(m_pos), static_cast<int>(len));
 #else
     buf = m_data->substr(static_cast<size_t>(m_pos), static_cast<size_t>(len));
 #endif
     m_pos += len;
-    return buf;
 }
 
-PGESTRING RawTextInput::readLine()
+void RawTextInput::readLine(PGESTRING &buffer)
 {
+    buffer.clear();
+
     if(!m_data)
-        return "";
+        return;
     if(m_isEOF)
-        return "";
-    PGESTRING buffer;
+        return;
+
     PGEChar cur;
     do
     {
@@ -683,15 +686,16 @@ PGESTRING RawTextInput::readLine()
     }
     while((cur != '\n') && !m_isEOF);
     m_lineNumber++;
-    return buffer;
 }
 
-PGESTRING RawTextInput::readCVSLine()
+void RawTextInput::readCVSLine(PGESTRING &buffer)
 {
-    if(!m_data) return PGESTRING();
-    if(m_isEOF) return PGESTRING();
+    buffer.clear();
+
+    if(!m_data) return;
+    if(m_isEOF) return;
     bool quoteIsOpen = false;
-    PGESTRING buffer;
+
     PGEChar cur;
     do
     {
@@ -715,7 +719,6 @@ PGESTRING RawTextInput::readCVSLine()
         }
     }
     while((((cur != '\n') && (cur != ',')) || quoteIsOpen) && (!m_isEOF));
-    return buffer;
 }
 
 PGESTRING RawTextInput::readAll()
@@ -967,39 +970,40 @@ void TextFileInput::close()
 #endif
 }
 
-PGESTRING TextFileInput::read(int64_t len)
+void TextFileInput::read(PGESTRING &out, int64_t len)
 {
+    out.clear();
+
 #ifdef PGE_FILES_QT
-    if(!file.isOpen()) return "";
+    if(!file.isOpen()) return;
     char *buf = new char[static_cast<size_t>(len + 1)];
     buf[0] = '\0';
     int gotten = static_cast<int>(file.read(buf, static_cast<int>(len)));
     if(gotten >= 0)
         buf[gotten] = '\0';
-    QString out = m_utf8 ? QString::fromUtf8(buf, gotten) : QString::fromLocal8Bit(buf, gotten);
+    out = m_utf8 ? QString::fromUtf8(buf, gotten) : QString::fromLocal8Bit(buf, gotten);
     delete[] buf;
     return out;//stream.read(len);
 #else
     if(!stream)
-        return "";
-    std::string buf(static_cast<size_t>(len + 1), '\0');
-    size_t lenR = fread(&buf[0], 1, static_cast<size_t>(len), stream);
-    (void)lenR;
-    return buf;
+        return;
+    out.resize(len);
+    size_t lenR = fread(&out[0], 1, static_cast<size_t>(len), stream);
+    out.resize(lenR);
 #endif
 }
 
-PGESTRING TextFileInput::readLine()
+void TextFileInput::readLine(PGESTRING &out)
 {
+    out.clear();
+
 #ifdef PGE_FILES_QT
-    if(!file.isOpen()) return "";
-    return stream.readLine();
+    if(!file.isOpen()) return;
+    out = stream.readLine();
 #else
     if(!stream)
-        return "";
+        return;
 
-    std::string out;
-    out.reserve(1024);
     int C = 0;
     do
     {
@@ -1010,23 +1014,22 @@ PGESTRING TextFileInput::readLine()
     while((C != '\n') && (C != EOF));
 
     if(out.size() == 0)
-        return "";
-
-    out.shrink_to_fit();
+        return;
 
     m_lineNumber++;
-    return out;
 #endif
 }
 
-PGESTRING TextFileInput::readCVSLine()
+void TextFileInput::readCVSLine(PGESTRING &buffer)
 {
+    buffer.clear();
+
     bool quoteIsOpen = false;
-    std::string buffer;
 #ifdef PGE_FILES_QT
+    std::string _buffer;
     char cur = 0;
     if(!file.isOpen())
-        return "";
+        return;
 
     do
     {
@@ -1036,19 +1039,18 @@ PGESTRING TextFileInput::readCVSLine()
         else
         {
             if((cur != '\r') && (((cur != '\n') && (cur != ',')) || (quoteIsOpen)))
-                buffer.push_back(cur);
+                _buffer.push_back(cur);
             if(cur == '\n') m_lineNumber++;
         }
     }
     while((((cur != '\n') && (cur != ',')) || quoteIsOpen)
           && !file.atEnd());
-    return m_utf8 ?
-           QString::fromStdString(buffer) :
-           QString::fromLocal8Bit(buffer.c_str(), static_cast<int>(buffer.size()));
+    buffer = (m_utf8) ?
+           QString::fromStdString(_buffer) :
+           QString::fromLocal8Bit(_buffer.c_str(), static_cast<int>(_buffer.size()));
 #else
-    buffer.reserve(1024);
     if(!stream)
-        return "";
+        return;
 
     int  gc;
     char cur;
@@ -1070,8 +1072,8 @@ PGESTRING TextFileInput::readCVSLine()
             }
         }
         while((((cur != '\n') && (cur != ',')) || quoteIsOpen));
-    buffer.shrink_to_fit();
-    return buffer;
+
+    return;
 #endif
 }
 

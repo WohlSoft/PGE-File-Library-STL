@@ -77,7 +77,7 @@ bool FileFormats::ReadSMBX64WldFileHeaderT(PGE_FileFormats_misc::TextInput &inf,
     FileData.meta.path = in_1.dirpath();
     inf.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
     SMBX64_FileBegin();
-#define nextLineH() line = inf.readCVSLine()
+#define nextLineH() inf.readCVSLine(line)
     FileData.meta.RecentFormat = WorldData::SMBX64;
     FileData.meta.RecentFormatVersion = 64;
 

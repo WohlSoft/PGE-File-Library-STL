@@ -75,7 +75,7 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
     FileData.meta.filename = in_1.basename();
     FileData.meta.path = in_1.dirpath();
     FileData.meta.RecentFormat = LevelData::PGEX;
-#define NextLine(line) str_count++;(line) = inf.readLine();
+#define NextLine(line) str_count++; inf.readLine(line);
 
     //Find level header part
     do

@@ -41,7 +41,7 @@
                            PGESTRING line                  /*Current Line data*/
 
 //Jump to next line
-#define nextLine() line = in.readCVSLine()
+#define nextLine() in.readCVSLine(line)
 
 //Version comparison
 #define ge(v) file_format>=(v)

@@ -121,12 +121,13 @@ void RWopsTextInput::fillBuffer()
     }
 }
 
-PGESTRING RWopsTextInput::read(int64_t len)
+void RWopsTextInput::read(PGESTRING &buf, int64_t len)
 {
-    if(!m_rwops)
-        return "";
+    buf.clear();
 
-    std::string buf;
+    if(!m_rwops)
+        return;
+
     buf.resize(static_cast<size_t>(len));
     char * const begin = &buf[0];
     char * const end = begin + len;
@@ -150,20 +151,19 @@ PGESTRING RWopsTextInput::read(int64_t len)
         else
         {
             buf.resize(dest - begin);
-            return buf;
+            return;
         }
     }
 
-    return buf;
+    return;
 }
 
-PGESTRING RWopsTextInput::readLine()
+void RWopsTextInput::readLine(PGESTRING &out)
 {
-    if(!m_rwops)
-        return "";
+    out.clear();
 
-    std::string out;
-    out.reserve(1024);
+    if(!m_rwops)
+        return;
 
     while(true)
     {
@@ -173,7 +173,7 @@ PGESTRING RWopsTextInput::readLine()
         if(bytes_available <= 0)
         {
             // EOF
-            return out;
+            return;
         }
 
         const char * const begin = &m_buffer[0] + (m_readOffset - m_bufferStartOffset);
@@ -188,7 +188,7 @@ PGESTRING RWopsTextInput::readLine()
 
                 m_readOffset += (byte + 1) - begin;
 
-                return out;
+                return;
             }
             else if(*byte != '\r')
                 out.push_back(*byte);
@@ -198,13 +198,12 @@ PGESTRING RWopsTextInput::readLine()
     }
 }
 
-PGESTRING RWopsTextInput::readCVSLine()
+void RWopsTextInput::readCVSLine(PGESTRING &out)
 {
-    if(!m_rwops)
-        return "";
+    out.clear();
 
-    std::string out;
-    out.reserve(1024);
+    if(!m_rwops)
+        return;
 
     bool quoteIsOpen = false;
 
@@ -216,7 +215,7 @@ PGESTRING RWopsTextInput::readCVSLine()
         if(bytes_available <= 0)
         {
             // EOF
-            return out;
+            return;
         }
 
         const char * const begin = &m_buffer[0] + (m_readOffset - m_bufferStartOffset);
@@ -240,7 +239,7 @@ PGESTRING RWopsTextInput::readCVSLine()
 
             m_readOffset += (byte + 1) - begin;
 
-            return out;
+            return;
         }
 
         m_readOffset += end - begin;
