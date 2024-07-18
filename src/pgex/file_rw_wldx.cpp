@@ -27,7 +27,7 @@
 #include "file_formats.h"
 #include "pgex/file_strlist.h"
 #include "wld_filedata.h"
-#include "pgex/pge_x.h"
+#include "pge_x.h"
 #include "pgex/pge_x_macro.h"
 #include "pge_file_lib_sys.h"
 

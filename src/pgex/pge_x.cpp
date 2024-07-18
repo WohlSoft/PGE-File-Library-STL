@@ -42,7 +42,7 @@
 #include <regex>
 #endif
 
-#include "pgex/pge_x.h"
+#include "pge_x.h"
 #include "pgex/file_strlist.h"
 
 namespace PGEExtendedFormat
@@ -1050,4 +1050,3 @@ void PGEFile::escapeString(PGESTRING &output, const PGESTRING &input, bool addQu
 
     output.resize(j);
 }
-

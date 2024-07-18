@@ -26,7 +26,7 @@
 
 #include "file_formats.h"
 #include "file_strlist.h"
-#include "pgex/pge_x.h"
+#include "pge_x.h"
 #include "pgex/pge_x_macro.h"
 
 #ifdef PGE_FILES_QT
