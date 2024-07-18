@@ -80,12 +80,6 @@ set(LIBRARY_PROJECT 1)
 include(build_props.cmake)
 include(pge_file_library.cmake)
 
-if(PGEFL_ENABLE_RWOPS)
-    list(APPEND PGE_FILE_LIBRARY_SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/pge_file_lib_globs_rwops.cpp
-    )
-endif()
-
 if(PGEFL_USE_QT6)
     pge_cxx_standard(17)
 else()
@@ -100,7 +94,9 @@ add_library(pgefl STATIC
     ${PGE_FILE_LIBRARY_SRCS}
 )
 set_target_properties(pgefl PROPERTIES AUTOMOC OFF)
-target_include_directories(pgefl PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(pgefl PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src")
 list(APPEND PGEFL_INSTALLS pgefl)
 
 if(PGEFL_ENABLE_RWOPS)
@@ -113,7 +109,10 @@ if(PGEFL_QT_SUPPORT)
     )
     set_target_properties(pgefl_qt PROPERTIES AUTOMOC ON)
     target_compile_definitions(pgefl_qt PUBLIC -DPGE_FILES_QT ${PGEFL_QT_CORE_DEFS})
-    target_include_directories(pgefl_qt PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" ${PGEFL_QT_CORE_INCS})
+    target_include_directories(pgefl_qt PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
+        ${PGEFL_QT_CORE_INCS})
     list(APPEND PGEFL_INSTALLS pgefl_qt)
 endif()
 

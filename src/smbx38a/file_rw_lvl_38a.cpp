@@ -26,9 +26,8 @@
 
 #include "pge_file_lib_sys.h"
 #include "file_formats.h"
-#include "file_strlist.h"
 
-#include "smbx38a_private.h"
+#include "smbx38a/smbx38a_private.h"
 
 
 /***********  Pre-defined values dependent to NPC Generator Effect field value  **************/

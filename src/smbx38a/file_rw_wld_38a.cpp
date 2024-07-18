@@ -26,7 +26,6 @@
 
 #include "pge_file_lib_sys.h"
 #include "file_formats.h"
-#include "file_strlist.h"
 
 #include "smbx38a_private.h"
 

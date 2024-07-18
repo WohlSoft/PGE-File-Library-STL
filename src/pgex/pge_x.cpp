@@ -42,8 +42,8 @@
 #include <regex>
 #endif
 
-#include "pge_x.h"
-#include "file_strlist.h"
+#include "pgex/pge_x.h"
+#include "pgex/file_strlist.h"
 
 namespace PGEExtendedFormat
 {

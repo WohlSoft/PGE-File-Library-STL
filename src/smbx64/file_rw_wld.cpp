@@ -27,9 +27,8 @@
 #include "pge_file_lib_sys.h"
 #include "file_formats.h"
 #include "wld_filedata.h"
-#include "file_strlist.h"
-#include "smbx64.h"
-#include "smbx64_macro.h"
+#include "smbx64/smbx64.h"
+#include "smbx64/smbx64_macro.h"
 #include "CSVUtils.h"
 
 //*********************************************************

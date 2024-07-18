@@ -33,10 +33,9 @@
 #endif
 
 #include "file_formats.h"
-#include "file_strlist.h"
 #include "save_filedata.h"
-#include "smbx64.h"
-#include "smbx64_macro.h"
+#include "smbx64/smbx64.h"
+#include "smbx64/smbx64_macro.h"
 #include "CSVUtils.h"
 
 //*********************************************************

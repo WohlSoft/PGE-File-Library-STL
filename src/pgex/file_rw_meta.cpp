@@ -25,9 +25,8 @@
  */
 
 #include "file_formats.h"
-#include "file_strlist.h"
 #include "pge_file_lib_private.h"
-#include "pge_x.h"
+#include "pgex/pge_x.h"
 
 //*********************************************************
 //****************READ FILE FORMAT*************************

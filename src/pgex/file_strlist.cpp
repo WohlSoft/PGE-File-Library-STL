@@ -26,7 +26,7 @@
 
 #include "pge_file_lib_sys.h"
 #include "pge_file_lib_private.h"
-#include "file_strlist.h"
+#include "pgex/file_strlist.h"
 
 FileStringList::FileStringList()
 {

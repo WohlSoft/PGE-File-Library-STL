@@ -25,7 +25,6 @@
  */
 
 #include "file_formats.h"
-#include "file_strlist.h"
 #include "smbx64.h"
 
 #include <functional>

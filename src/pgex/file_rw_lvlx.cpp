@@ -26,9 +26,9 @@
 
 #include "pge_file_lib_sys.h"
 #include "file_formats.h"
-#include "file_strlist.h"
-#include "pge_x.h"
-#include "pge_x_macro.h"
+#include "pgex/file_strlist.h"
+#include "pgex/pge_x.h"
+#include "pgex/pge_x_macro.h"
 #include <cfloat>
 
 //*********************************************************
