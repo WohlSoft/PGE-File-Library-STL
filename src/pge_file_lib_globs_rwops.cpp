@@ -124,13 +124,13 @@ void RWopsTextInput::fillBuffer()
 #ifndef PGE_FILES_QT
 void RWopsTextInput::read(PGESTRING &buf, int64_t len)
 #else
-void RWopsTextInput::read(PGESTRING &out, int64_t len)
+void RWopsTextInput::read(PGESTRING &buf_utf16, int64_t len)
 #endif
 {
 #ifndef PGE_FILES_QT
     buf.clear();
 #else
-    out.clear();
+    buf_utf16.clear();
     std::string buf;
 #endif
 
@@ -162,7 +162,7 @@ void RWopsTextInput::read(PGESTRING &out, int64_t len)
             buf.resize(dest - begin);
 
 #ifdef PGE_FILES_QT
-            out = QString::fromStdString(buf);
+            buf_utf16 = QString::fromStdString(buf);
 #endif
 
             return;
@@ -170,15 +170,24 @@ void RWopsTextInput::read(PGESTRING &out, int64_t len)
     }
 
 #ifdef PGE_FILES_QT
-    out = QString::fromStdString(buf);
+    buf_utf16 = QString::fromStdString(buf);
 #endif
 
     return;
 }
 
+#ifndef PGE_FILES_QT
 void RWopsTextInput::readLine(PGESTRING &out)
+#else
+void RWopsTextInput::readLine(PGESTRING &out_utf16)
+#endif
 {
+#ifndef PGE_FILES_QT
     out.clear();
+#else
+    out_utf16.clear();
+    std::string out;
+#endif
 
     if(!m_rwops)
         return;
@@ -191,6 +200,9 @@ void RWopsTextInput::readLine(PGESTRING &out)
         if(bytes_available <= 0)
         {
             // EOF
+#ifdef PGE_FILES_QT
+            out_utf16 = QString::fromStdString(out);
+#endif
             return;
         }
 
@@ -206,6 +218,10 @@ void RWopsTextInput::readLine(PGESTRING &out)
 
                 m_readOffset += (byte + 1) - begin;
 
+#ifdef PGE_FILES_QT
+                out_utf16 = QString::fromStdString(out);
+#endif
+
                 return;
             }
             else if(*byte != '\r')
@@ -216,9 +232,18 @@ void RWopsTextInput::readLine(PGESTRING &out)
     }
 }
 
+#ifndef PGE_FILES_QT
 void RWopsTextInput::readCVSLine(PGESTRING &out)
+#else
+void RWopsTextInput::readCVSLine(PGESTRING &out_utf16)
+#endif
 {
+#ifndef PGE_FILES_QT
     out.clear();
+#else
+    out_utf16.clear();
+    std::string out;
+#endif
 
     if(!m_rwops)
         return;
@@ -233,6 +258,9 @@ void RWopsTextInput::readCVSLine(PGESTRING &out)
         if(bytes_available <= 0)
         {
             // EOF
+#ifdef PGE_FILES_QT
+            out_utf16 = QString::fromStdString(out);
+#endif
             return;
         }
 
@@ -256,6 +284,10 @@ void RWopsTextInput::readCVSLine(PGESTRING &out)
                 continue;
 
             m_readOffset += (byte + 1) - begin;
+
+#ifdef PGE_FILES_QT
+            out_utf16 = QString::fromStdString(out);
+#endif
 
             return;
         }
