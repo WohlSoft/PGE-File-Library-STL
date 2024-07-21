@@ -631,13 +631,13 @@ bool PGEFile::IsStringArray(const PGESTRING &in) // String array
         case 1://between entries
             switch(comma)
             {
-            case 0:
-                if(in[i] == ']') depth = 0; //Close array
-                else if(in[i] == ',') comma++; //Close array
+            case 0: // terminated string
+                if(in[i] == ']') depth = 3; //Array terminated
+                else if(in[i] == ',') comma++; //Ready for term
                 else valid = false;
                 break;
 
-            case 1:
+            case 1: // comma present
                 if(in[i] == '"')     depth = 2; //Open value
                 else valid = false;
                 break;
@@ -670,6 +670,10 @@ bool PGEFile::IsStringArray(const PGESTRING &in) // String array
                 break;
             }
             escape = false;
+            break;
+
+        case 3://Array terminated
+            valid = false;
             break;
 
         default:
@@ -710,9 +714,9 @@ PGESTRINGList PGEFile::X2STRArr(const PGESTRING &in, bool *_valid)
         case 1://between entries
             switch(comma)
             {
-            case 0:
-                if(in[i] == ']') depth = 0; //Close array
-                else if(in[i] == ',') comma++; //Close array
+            case 0: // terminated string
+                if(in[i] == ']') depth = 3; //Array terminated
+                else if(in[i] == ',') comma++; //Ready for term
                 else valid = false;
                 break;
 
@@ -754,6 +758,10 @@ PGESTRINGList PGEFile::X2STRArr(const PGESTRING &in, bool *_valid)
 
             entry.push_back(in[i]);
             escape = false;
+            break;
+
+        case 3: //Array terminated
+            valid = false;
             break;
 
         default:
