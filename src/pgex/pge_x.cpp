@@ -549,7 +549,7 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
 
     if((in.size() == 1) && (!isDegit(in[0])))
         return false;
-    if((!isDegit(in[0])) && (PGEGetChar(in[0]) != '-') && (PGEGetChar(in[0]) != '.') && (PGEGetChar(in[0]) != ','))
+    if((!isDegit(in[0])) && (PGEGetChar(in[0]) != '-') && (PGEGetChar(in[0]) != '.'))
         return false;
 
     bool decimal = false;
@@ -559,7 +559,7 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
     {
         if((!decimal) && (!pow10))
         {
-            if((PGEGetChar(in[i]) == '.') || (PGEGetChar(in[i]) == ','))
+            if((PGEGetChar(in[i]) == '.'))
             {
                 in[i] = '.'; //replace comma with a dot.empty()
                 decimal = true;
