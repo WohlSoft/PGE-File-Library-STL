@@ -4,6 +4,7 @@ PGE File Formats Changelog
 * Made a set of changes to improve library-wide validation.
   * Out-of-range integer fields now cause file parse to fail. (Previously, such fields were silently clipped.)
   * The behavior of the string split function was made consistent between the stdc++ and Qt builds.
+    * The bounds of numeric values are now checked more strictly in the Qt build, consistent with the stdc++ build.
 
 * Made a set of changes to standardize the PGE-X file format:
   * Sections:

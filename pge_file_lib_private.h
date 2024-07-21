@@ -137,19 +137,35 @@ inline bool      IsEmpty(const PGESTRINGList &str)
 }
 inline int       toInt(const PGESTRING &str)
 {
-    return str.toInt();
+    bool okay;
+    signed int ret = str.toInt(&okay);
+    if(!okay)
+        throw std::range_error("int value out of range");
+    return ret;
 }
 inline unsigned int toUInt(const PGESTRING &str)
 {
-    return str.toUInt();
+    bool okay;
+    unsigned int ret = str.toUInt(&okay);
+    if(!okay)
+        throw std::range_error("uint value out of range");
+    return ret;
 }
 inline long      toLong(const PGESTRING &str)
 {
-    return str.toLong();
+    bool okay;
+    signed long ret = str.toLong(&okay);
+    if(!okay)
+        throw std::range_error("long value out of range");
+    return ret;
 }
 inline unsigned long toULong(const PGESTRING &str)
 {
-    return str.toULong();
+    bool okay;
+    unsigned long ret = str.toULong(&okay);
+    if(!okay)
+        throw std::range_error("ulong value out of range");
+    return ret;
 }
 inline float     toFloat(const PGESTRING &str)
 {
