@@ -63,6 +63,9 @@ PGE File Formats Changelog
   * `CUSTOM_ITEMS_38A`:
     * Data keys must not exceed the maximum 32-bit signed integer, `2 147 483 647`. This invalidates `T:0;ID:0;D:["3000000000=0"];` (previously silently parsed in an undefined way).
     * Field `T` (type) must be 0 (block), 1 (bgo), or 2 (effect). This invalidates `T:3;ID:0;D:["1=2"];` (previously interpreted in an unspecified way).
+    * Each item in `D` must be exactly of the form `INT=LONG`. This invalidates `D:["1=2=..."];` (previously interpreted as `D:["1=2"];`).
+
+      (Note also that the stdc++ build previously interpreted `==1==2==` as `1=2`, ignoring any empty segments of the string when split by `=`. This error did not affect the Qt build used in the Moondust Editor.)
 * WLDX:
   * `META_BOOKMARKS`: fixed the types of fields `X` and `Y` (`float`, was `int`).
 
