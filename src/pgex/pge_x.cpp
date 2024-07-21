@@ -159,7 +159,7 @@ bool PGEFile::buildTreeFromRaw()
 #ifndef PGE_FILES_QT
         if(PGEXsection.first.size() != strlen(PGEXsection.first.c_str()))
 #else
-        int found = PGEXsection.first.indexOf('\0');
+        int found = PGEXsection.first.indexOf((QChar)('\0'));
         if(found != -1)
 #endif
         {
@@ -300,7 +300,7 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
 #ifndef PGE_FILES_QT
             pge_size_t size = strlen(srcData_nc.c_str());
 #else
-            int first_nul = srcData_nc.indexOf('\0');
+            int first_nul = srcData_nc.indexOf((QChar)('\0'));
             pge_size_t size = (first_nul == -1) ? srcData_nc.size() : first_nul;
 #endif
             pge_size_t tail = size - 1;
@@ -844,7 +844,7 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
 #ifndef PGE_FILES_QT
     pge_size_t size = strlen(src_data.c_str());
 #else
-    int first_nul = src_data.indexOf('\0');
+    int first_nul = src_data.indexOf((QChar)('\0'));
     pge_size_t size = (first_nul == -1) ? src_data.size() : first_nul;
 #endif
     pge_size_t tail = size - 1;
