@@ -242,6 +242,7 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
     bool valid = true;
     for(pge_size_t q = 0; q < src_data.size(); q++)
     {
+#if 0
         if(IsSectionTitle(removeSpaces(src_data[q])))
         {
             //Build and store subTree
@@ -285,6 +286,7 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
 
         }
         else
+#endif
         {
             PGEX_Item dataItem;
             PGESTRING &srcData_nc = src_data[q];
