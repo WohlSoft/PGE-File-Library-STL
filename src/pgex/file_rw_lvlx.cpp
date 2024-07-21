@@ -1081,7 +1081,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             continue;
 
                         pge_size_t s_i = q - musicSets_begin;
-                        if(s_i >= musicSets.size())
+                        if(s_i >= event.sets.size())
                             continue;
 
                         auto &s = event.sets[s_i];
@@ -1099,7 +1099,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             continue;
 
                         pge_size_t s_i = q - bgSets_begin;
-                        if(s_i >= bgSets.size())
+                        if(s_i >= event.sets.size())
                             continue;
 
                         auto &s = event.sets[s_i];
