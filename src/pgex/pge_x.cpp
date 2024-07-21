@@ -660,10 +660,10 @@ bool PGEFile::IsStringArray(const PGESTRING &in) // String array
                 depth = 1;    //Close value
                 comma = 0;
             }
-            else if(!escape && (in[i] == '[' || in[i] == ']' || in[i] == ','))
-            {
-                valid = false;
-            }
+            // else if(!escape && (in[i] == '[' || in[i] == ']' || in[i] == ','))
+            // {
+            //     valid = false;
+            // }
             else if((in[i] == '\\') && (!escape))
             {
                 escape = true;
@@ -725,7 +725,7 @@ PGESTRINGList PGEFile::X2STRArr(const PGESTRING &in, bool *_valid)
                 else valid = false;
                 break;
 
-            case 1:
+            case 1: // comma present
                 if(in[i] == '"')     depth = 2; //Open value
                 else valid = false;
                 break;
@@ -749,12 +749,13 @@ PGESTRINGList PGEFile::X2STRArr(const PGESTRING &in, bool *_valid)
                 entry.clear();
                 depth = 1;
                 comma = 0;
-            }
-            else if((!escape) && (in[i] == '[' || in[i] == ']' || in[i] == ','))
-            {
-                valid = false;
                 break;
             }
+            // else if((!escape) && (in[i] == '[' || in[i] == ']' || in[i] == ','))
+            // {
+            //     valid = false;
+            //     break;
+            // }
             else if((in[i] == '\\') && (!escape))
             {
                 escape = true;
