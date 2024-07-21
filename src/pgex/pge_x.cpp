@@ -322,11 +322,6 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                 {
                     escape--;
                 }
-                if((c == '\\') && (escape == 0))
-                {
-                    //Skip escape sequence
-                    escape = 2;
-                }
                 switch(state)
                 {
                 case STATE_MARKER:
@@ -335,12 +330,12 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                         valid = false;
                         break;
                     }
-                    if((c == ';') && (escape == 0))
+                    if(c == ';' || c == '\\')
                     {
                         state = STATE_ERROR;
                         continue;
                     }
-                    if((c == ':') && (escape == 0))
+                    if(c == ':')
                     {
                         state = STATE_VALUE;
                         continue;
@@ -348,6 +343,11 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                     dataValue.marker.push_back(c);
                     break;
                 case STATE_VALUE:
+                    if((c == '\\') && (escape == 0))
+                    {
+                        //Skip escape sequence
+                        escape = 2;
+                    }
                     if((c == ':') && (escape == 0))
                     {
                         state = STATE_ERROR;
@@ -841,12 +841,6 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
             escape--;
         }
 
-        if((c == '\\') && (escape == 0))
-        {
-            //Skip escape sequence
-            escape = 2;
-        }
-
         switch(state)
         {
         default:
@@ -859,12 +853,12 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
                 valid = false;
                 break;
             }
-            if((c == ';') && (escape == 0))
+            if(c == ';' || c == '\\')
             {
                 state = STATE_ERROR;
                 continue;
             }
-            if((c == ':') && (escape == 0))
+            if(c == ':')
             {
                 state = STATE_VALUE;
                 continue;
@@ -873,6 +867,11 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
             break;
 
         case STATE_VALUE:
+            if((c == '\\') && (escape == 0))
+            {
+                //Skip escape sequence
+                escape = 2;
+            }
             if((c == ':') && (escape == 0))
             {
                 state = STATE_ERROR;
