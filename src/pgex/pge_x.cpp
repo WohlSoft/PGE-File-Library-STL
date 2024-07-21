@@ -569,7 +569,7 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
         }
         if(!pow10)
         {
-            if((PGEGetChar(in[i]) == 'E') || (PGEGetChar(in[i]) == 'e'))
+            if((PGEGetChar(in[i]) == 'e'))
             {
                 pow10 = true;
                 if(i == (in.size() - 1)) return false;
