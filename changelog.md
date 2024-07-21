@@ -29,3 +29,4 @@ PGE File Formats Changelog
   * Data lines must end with a semicolon.
 
     This invalidates lines `F1:V1;F2:V2?` (previously parsed as `F1:V1;F2:V2;`) and `F1:V1;F2` (previously parsed as `F1:V1;`).
+  * If a data line embeds a nul byte, the file is malformed and behavior is undefined. Currently, the remainder of the line is silently ignored. Such files may fail to parse in the future.
