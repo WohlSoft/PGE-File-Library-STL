@@ -145,9 +145,30 @@ bool PGEFile::buildTreeFromRaw()
         PGEXsection.first = in.readLine();
         PGEXsection.second.clear();
 
-        //Skip empty parts
-        PGESTRING pgex_sectionName = removeSpaces(PGEXsection.first);
-        if(IsEmpty(pgex_sectionName)) continue;
+        // ignore line if all spaces
+        bool all_spaces = true;
+        for(const auto c : PGEXsection.first)
+        {
+            if(c != ' ')
+                all_spaces = false;
+        }
+        if(all_spaces)
+            continue;
+
+        // ban section name including null characters
+#ifndef PGE_FILES_QT
+        if(PGEXsection.first.size() != strlen(PGEXsection.first.c_str()))
+#else
+        int found = PGEXsection.first.indexOf('\0');
+        if(found != -1)
+#endif
+        {
+            PGESTRING errSect = PGEXsection.first;
+            PGE_CutLength(errSect, 20);
+            PGE_FilterBinary(errSect);
+            m_lastError = PGESTRING("Section [" + errSect + "] has invalid name");
+            return false;
+        }
 
         sectionOpened = true;
         PGESTRING data;
