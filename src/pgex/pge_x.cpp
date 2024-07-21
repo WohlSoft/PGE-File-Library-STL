@@ -471,7 +471,7 @@ bool PGEFile::IsQoutedString(const PGESTRING &in) // QUOTED STRING
         escape = false;
     }
 
-    if(i == 0)
+    if(i == 0 || i == 1)
         return false;
 
     return true;
