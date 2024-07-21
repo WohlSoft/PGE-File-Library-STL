@@ -1067,8 +1067,9 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     ssSets_begin = ssSets.size();
                 }//If new-styled section settings are gotten
 
-                //Parse odl-style parameters
-                else
+                //Always parse odl-style parameters, but don't always use
+                // else
+                if(true)
                 {
                     //Apply MusicSets
                     for(pge_size_t q = 0; q < musicSets.size(); q++)
