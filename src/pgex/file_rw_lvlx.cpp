@@ -47,7 +47,18 @@ bool FileFormats::ReadExtendedLvlFileHeader(const PGESTRING &filePath, LevelData
         return false;
     }
 
-    return ReadExtendedLvlFileHeaderT(inf, FileData);
+    try
+    {
+        return ReadExtendedLvlFileHeaderT(inf, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData)
@@ -63,7 +74,18 @@ bool FileFormats::ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRI
         return false;
     }
 
-    return ReadExtendedLvlFileHeaderT(inf, FileData);
+    try
+    {
+        return ReadExtendedLvlFileHeaderT(inf, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData)
@@ -204,7 +226,18 @@ bool FileFormats::ReadExtendedLvlFileF(const PGESTRING &filePath, LevelData &Fil
         return false;
     }
 
-    return ReadExtendedLvlFile(file, FileData);
+    try
+    {
+        return ReadExtendedLvlFile(file, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  LevelData &FileData)
@@ -221,7 +254,18 @@ bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, const PGESTRING &fi
         return false;
     }
 
-    return ReadExtendedLvlFile(file, FileData);
+    try
+    {
+        return ReadExtendedLvlFile(file, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)

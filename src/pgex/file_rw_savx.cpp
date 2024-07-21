@@ -51,7 +51,18 @@ bool FileFormats::ReadExtendedSaveFileF(const PGESTRING &filePath, GamesaveData 
         return false;
     }
 
-    return ReadExtendedSaveFile(file, FileData);
+    try
+    {
+        return ReadExtendedSaveFile(file, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, GamesaveData &FileData)
@@ -68,7 +79,18 @@ bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, const PGESTRING &f
         return false;
     }
 
-    return ReadExtendedSaveFile(file, FileData);
+    try
+    {
+        return ReadExtendedSaveFile(file, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, GamesaveData &FileData)

@@ -56,7 +56,18 @@ bool FileFormats::ReadExtendedWldFileHeader(const PGESTRING &filePath, WorldData
         return false;
     }
 
-    return ReadExtendedWldFileHeaderT(inf, FileData);
+    try
+    {
+        return ReadExtendedWldFileHeaderT(inf, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData)
@@ -72,7 +83,19 @@ bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRI
         return false;
     }
 
-    return ReadExtendedWldFileHeaderT(inf, FileData);
+
+    try
+    {
+        return ReadExtendedWldFileHeaderT(inf, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData)
@@ -242,7 +265,18 @@ bool FileFormats::ReadExtendedWldFileF(const PGESTRING &filePath, WorldData &Fil
         return false;
     }
 
-    return ReadExtendedWldFile(file, FileData);
+    try
+    {
+        return ReadExtendedWldFile(file, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  WorldData &FileData)
@@ -259,7 +293,18 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &fi
         return false;
     }
 
-    return ReadExtendedWldFile(file, FileData);
+    try
+    {
+        return ReadExtendedWldFile(file, FileData);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, WorldData &FileData)

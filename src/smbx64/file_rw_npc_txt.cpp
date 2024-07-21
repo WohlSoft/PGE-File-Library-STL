@@ -42,7 +42,17 @@ bool FileFormats::ReadNpcTXTFileF(const PGESTRING &filePath, NPCConfigFile &File
         FileData.ReadFileValid = false;
         return false;
     }
-    return ReadNpcTXTFile(file, FileData, IgnoreBad);
+
+    try
+    {
+        return ReadNpcTXTFile(file, FileData, IgnoreBad);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.errorString = e.what();
+        FileData.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData, bool IgnoreBad)
@@ -55,7 +65,17 @@ bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData,
         FileData.ReadFileValid = false;
         return false;
     }
-    return ReadNpcTXTFile(file, FileData, IgnoreBad);
+
+    try
+    {
+        return ReadNpcTXTFile(file, FileData, IgnoreBad);
+    }
+    catch(const std::exception& e)
+    {
+        FileData.errorString = e.what();
+        FileData.ReadFileValid = false;
+        return false;
+    }
 }
 
 
