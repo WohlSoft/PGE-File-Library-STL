@@ -493,6 +493,10 @@ bool PGEFile::IsBool(const PGESTRING &in) // Boolean
 bool PGEFile::IsIntU(const PGESTRING &in) // Unsigned Int
 {
     using namespace PGEExtendedFormat;
+
+    if(IsEmpty(in))
+        return false;
+
 #ifdef PGE_FILES_QT
     const PGEChar *data = in.data();
 #else
