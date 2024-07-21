@@ -39,3 +39,4 @@ PGE File Formats Changelog
     This means that `STR:"\a";` (previously parsed as `STR:"\\a";`) is now parsed as `STR:"a";`.
   * An array may include no entries. This makes `ARR:[];` valid. (Such arrays match the default array, so they will not be saved by any future tooling.)
   * An array may not reopened after it has been closed. This invalidates `ARR:["A"]["B"];` (previously parsed as `ARR:["A","B"];`).
+  * An array must be closed. This invalidates `ARR:["A";` and `ARR:["A",;` (previously parsed as `ARR:["A"];`).

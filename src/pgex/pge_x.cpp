@@ -685,6 +685,11 @@ bool PGEFile::IsStringArray(const PGESTRING &in) // String array
             break;//Stop parsing on invalid
         i++;
     }
+
+    // require closing ]
+    if(depth != 3)
+        valid = false;
+
     return valid;
 }
 
@@ -773,6 +778,10 @@ PGESTRINGList PGEFile::X2STRArr(const PGESTRING &in, bool *_valid)
             break;//Stop parsing on invalid
         i++;
     }
+
+    // require closing ]
+    if(depth != 3)
+        valid = false;
 
     if(_valid)
         *_valid = valid;
