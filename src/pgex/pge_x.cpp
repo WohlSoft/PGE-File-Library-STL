@@ -756,11 +756,13 @@ PGESTRINGList PGEFile::X2STRArr(const PGESTRING &in, bool *_valid)
             else if((in[i] == '\\') && (!escape))
             {
                 escape = true;
-                break;
+            }
+            else
+            {
+                escape = false;
             }
 
             entry.push_back(in[i]);
-            escape = false;
             break;
 
         case 3: //Array terminated

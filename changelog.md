@@ -54,6 +54,7 @@ PGE File Formats Changelog
       This makes `ARR["[,]"];` valid, and it parses identically to `ARR["\[\,\]"];`.
 
       (For compatibility, the save routines will continue to escape these characters in strings indefinitely.)
+    * Escape characters are passed to the array item's parser. This fixes the parse of `LS:["a\nd"];` (previously parsed as `LS:["and"];`).
   * Numeric types:
     * An unsigned int must not be empty. This invalidates `UINT:;` (previously parsed as `UINT:0;`).
     * Floating point values must not use `,` as the decimal separator. This invalidates `DBL:1,2;` (previously parsed as `DBL:1.2;`).
