@@ -406,6 +406,12 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //add captured value into array
                 pge_size_t sections_count = FileData.sections.size();
 
+                if(lvl_section.id < 0 || lvl_section.id > 1000)
+                {
+                    errorString = "Negative section ID";
+                    goto badfile;
+                }
+
                 if(lvl_section.id >= static_cast<int>(sections_count))
                 {
                     pge_size_t needToAdd = static_cast<pge_size_t>(lvl_section.id) - (FileData.sections.size() - 1);
@@ -1016,11 +1022,12 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             }
                         }//for parameters
 
+                        // TODO: remove this logic (duplicated in the load callback)
                         if(
                             ((sectionSet.id < 0) || (sectionSet.id >= static_cast<long>(event.sets.size())))
                         )//Append sections
                         {
-                            if(sectionSet.id < 0)
+                            if(sectionSet.id < 0 || sectionSet.id > 1000)
                             {
                                 errorString = "Section settings event contains negative section ID value or missed!";
                                 goto badfile;//Missmatched section ID!

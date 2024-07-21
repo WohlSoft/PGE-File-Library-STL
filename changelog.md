@@ -60,6 +60,11 @@ PGE File Formats Changelog
 
       This invalidates `DBL:1e12345;`, and makes `DBL:1.;` valid.
 * LVLX:
+  * `SECTION`:
+    * `SC`: section index must be >= 0 and <= 1000. Any other value will cause a parse failure. This invalidates `SC:-1;` (previously crashed parser) and `SC:1000000;` (previously cause hang and allocation failure).
+  * `EVENTS_CLASSIC`:
+    * `SSS` (section settings):
+      * `ID`: section index must be >= 0 and <= 1000. Any other value will cause a parse failure. This invalidates `ID:-1;` (previously crashed parser) and `ID:1000000;` (previously cause hang and allocation failure).
   * `CUSTOM_ITEMS_38A`:
     * Data keys must not exceed the maximum 32-bit signed integer, `2 147 483 647`. This invalidates `T:0;ID:0;D:["3000000000=0"];` (previously silently parsed in an undefined way).
     * Field `T` (type) must be 0 (block), 1 (bgo), or 2 (effect). This invalidates `T:3;ID:0;D:["1=2"];` (previously interpreted in an unspecified way).
