@@ -114,6 +114,10 @@ if(PGEFL_QT_SUPPORT)
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
         ${PGEFL_QT_CORE_INCS})
     list(APPEND PGEFL_INSTALLS pgefl_qt)
+
+    if(PGEFL_ENABLE_RWOPS)
+        target_compile_definitions(pgefl_qt PUBLIC -DPGEFL_ENABLE_RWOPS)
+    endif()
 endif()
 
 # Don't install libraries when PGE-FL was built as a part of Moondust master project

@@ -64,6 +64,7 @@
 */
 
 #include <cstdint>
+#include <string>
 
 #ifdef PGE_FILES_QT
 #include <QString>
@@ -92,7 +93,6 @@ typedef QChar   PGEChar;
 
 #else /* PGE_FILES_QT */
 
-#include <string>
 #include <vector>
 #include <cstdio>
 #include <utility>
@@ -336,7 +336,7 @@ private:
     void fillBuffer();
 
     SDL_RWops *m_rwops = nullptr;
-    PGESTRING m_buffer;
+    std::string m_buffer;
     int64_t m_bufferStartOffset = 0;
     int64_t m_readOffset = 0;
     int64_t m_rwopsOffset = 0;

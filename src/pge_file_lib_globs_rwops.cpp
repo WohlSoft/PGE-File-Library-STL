@@ -121,9 +121,18 @@ void RWopsTextInput::fillBuffer()
     }
 }
 
+#ifndef PGE_FILES_QT
 void RWopsTextInput::read(PGESTRING &buf, int64_t len)
+#else
+void RWopsTextInput::read(PGESTRING &out, int64_t len)
+#endif
 {
+#ifndef PGE_FILES_QT
     buf.clear();
+#else
+    out.clear();
+    std::string buf;
+#endif
 
     if(!m_rwops)
         return;
@@ -151,9 +160,18 @@ void RWopsTextInput::read(PGESTRING &buf, int64_t len)
         else
         {
             buf.resize(dest - begin);
+
+#ifdef PGE_FILES_QT
+            out = QString::fromStdString(buf);
+#endif
+
             return;
         }
     }
+
+#ifdef PGE_FILES_QT
+    out = QString::fromStdString(buf);
+#endif
 
     return;
 }
@@ -264,7 +282,11 @@ PGESTRING RWopsTextInput::readAll()
         if(bytes_available <= 0)
         {
             // EOF
+#ifndef PGE_FILES_QT
             return out;
+#else
+            return QString::fromStdString(out);
+#endif
         }
 
         const char * const begin = &m_buffer[0] + (m_readOffset - m_bufferStartOffset);
