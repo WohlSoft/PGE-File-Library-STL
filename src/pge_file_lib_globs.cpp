@@ -136,8 +136,7 @@ void split(std::vector<std::string> &dest, const std::string &str, const std::st
     {
         end = str.find(separator, begin);
         std::string s = str.substr(begin, end - begin);
-        if(!s.empty())
-            dest.push_back(s);
+        dest.push_back(s);
         begin = end + sepLen;
     }
     while(end != std::string::npos);

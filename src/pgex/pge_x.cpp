@@ -154,6 +154,10 @@ bool PGEFile::buildTreeFromRaw()
         while(!in.atEnd())
         {
             data = in.readLine();
+
+            if(IsEmpty(data))
+                continue;
+
             if(data == PGEXsection.first + "_END")
             {
                 sectionOpened = false;    // Close Section
