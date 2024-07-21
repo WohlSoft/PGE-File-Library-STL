@@ -54,3 +54,4 @@ PGE File Formats Changelog
   * Numeric types:
     * An unsigned int must not be empty. This invalidates `UINT:;` (previously parsed as `UINT:0;`).
     * Floating point values must not use `,` as the decimal separator. This invalidates `DBL:1,2;` (previously parsed as `DBL:1.2;`).
+    * Floating point values must not use the sign character `+`. This invalidates `DBL:+1;` (previously parsed as `DBL:1;`) and `DBL:1e+1` (previously parsed as `DBL:1e1`).

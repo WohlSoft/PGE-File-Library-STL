@@ -554,7 +554,6 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
 
     bool decimal = false;
     bool pow10  = false;
-    bool sign   = false;
     for(pge_size_t i = ((PGEGetChar(in[0]) == '-') ? 1 : 0); i < in.size(); i++)
     {
         if((!decimal) && (!pow10))
@@ -574,20 +573,10 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
             {
                 pow10 = true;
                 if(i == (in.size() - 1)) return false;
+                // allow exponent sign (negative only)
+                if(PGEGetChar(in[i + 1]) == '-') i++;
+                if(i == (in.size() - 1)) return false;
                 continue;
-            }
-        }
-        else
-        {
-            if(!sign)
-            {
-                sign = true;
-                if((PGEGetChar(in[i]) == '+') || (PGEGetChar(in[i]) == '-'))
-                {
-                    if(i == (in.size() - 1))
-                        return false;
-                    continue;
-                }
             }
         }
         if(!isDegit(in[i])) return false;
