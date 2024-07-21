@@ -1594,6 +1594,11 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                     customcfg38A.data.push_back(e);
                 }
+                if(type < LevelItemSetup38A::UNKNOWN || type >= LevelItemSetup38A::ITEM_TYPE_MAX)
+                {
+                    errorString = "Wrong type";
+                    goto badfile;
+                }
                 customcfg38A.type = (LevelItemSetup38A::ItemType)type;
                 FileData.custom38A_configs.push_back(customcfg38A);
             }
