@@ -37,3 +37,4 @@ PGE File Formats Changelog
   * If a string includes a `\` followed by a non-escape character, the `\` is now silently ignored. (Previously, the `\` was included in the unescaped string.)
 
     This means that `STR:"\a";` (previously parsed as `STR:"\\a";`) is now parsed as `STR:"a";`.
+  * An array may now include no entries. This makes `ARR:[];` valid. (Such arrays match the default array, so they will not be saved by any future tooling.)
