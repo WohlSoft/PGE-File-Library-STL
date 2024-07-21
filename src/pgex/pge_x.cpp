@@ -305,7 +305,9 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
 #endif
             pge_size_t tail = size - 1;
 
-            if(size > 0 && srcData_nc.back() != ';')
+            // even if there is a nul in the line, it must still end with a semicolon
+            // (so two semicolons will be required for a valid parse if there is a nul)
+            if(srcData_nc.size() > 0 && srcData_nc.back() != ';')
                 state = STATE_ERROR;
 
             PGEX_Val dataValue;
@@ -849,7 +851,9 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
 #endif
     pge_size_t tail = size - 1;
 
-    if(size > 0 && src_data.back() != ';')
+    // even if there is a nul in the line, it must still end with a semicolon
+    // (so two semicolons will be required for a valid parse if there is a nul)
+    if(src_data.size() > 0 && src_data.back() != ';')
         state = STATE_ERROR;
 
     PGESTRING marker;

@@ -32,7 +32,7 @@ PGE File Formats Changelog
     * Data lines must end with a semicolon.
 
       This invalidates lines `F1:V1;F2:V2?` (previously parsed as `F1:V1;F2:V2;`) and `F1:V1;F2` (previously parsed as `F1:V1;`).
-    * If a data line embeds a nul byte, the file is malformed and behavior is undefined. Currently, the remainder of the line is silently ignored. Such files may fail to parse in the future.
+    * If a data line embeds a nul byte, the file is malformed and behavior is undefined. Currently, the remainder of the line is silently ignored, but there must still be a semicolon immediately before the line ending. This behavior may arbitrarily change in the future.
     * Markers (tags) in data lines may not include the characters `\`, `:`, or `;`. (As before, values in data lines must escape the characters `:` and `;` with a backslash.)
 
       This invalidates lines `F1\::V1;`, `F1\\:V1;` and `F1\;:V1;`, but does not invalidate lines `F1:V1\:;`, `F1:V1\\;` or `F1:V1\;;`.
