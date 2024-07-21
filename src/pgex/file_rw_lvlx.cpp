@@ -952,7 +952,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                                 errorString = "Invalid Section Autoscroll type value type";
 
                                 if(PGEFile::IsIntU(param[1]))
-                                    sectionSet.autoscroll_style = static_cast<int>(toUInt(param[1]));
+                                    sectionSet.autoscroll_style = toInt(param[1]);
                                 else
                                     goto badfile;
                             }
