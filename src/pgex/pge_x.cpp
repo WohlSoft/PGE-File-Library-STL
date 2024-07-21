@@ -297,6 +297,10 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                 STATE_ERROR = 2
             };
             pge_size_t state = 0, size = srcData_nc.size(), tail = srcData_nc.size() - 1;
+
+            if(size > 0 && srcData_nc.back() != ';')
+                state = STATE_ERROR;
+
             PGEX_Val dataValue;
             int escape = 0;
             for(pge_size_t i = 0; i < size; i++)
@@ -319,6 +323,11 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                 switch(state)
                 {
                 case STATE_MARKER:
+                    if(i == tail)
+                    {
+                        valid = false;
+                        break;
+                    }
                     if((c == ';') && (escape == 0))
                     {
                         state = STATE_ERROR;
@@ -337,7 +346,7 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                         state = STATE_ERROR;
                         continue;
                     }
-                    if(((c == ';') && (escape == 0)) || (i == tail))
+                    if((c == ';') && (escape == 0))
                     {
                         //STORE DATA
                         dataItem.values.push_back(dataValue);
@@ -346,12 +355,21 @@ PGEFile::PGEX_Entry PGEFile::buildTree(PGESTRINGList &src_data, bool *_valid)
                         state = STATE_MARKER;
                         continue;
                     }
+                    else if(i == tail)
+                    {
+                        valid = false;
+                        break;
+                    }
                     dataValue.value.push_back(c);
                     break;
                     //case STATE_ERROR: //Dead code
                     //break;
                 }
             }
+
+            if(state == STATE_ERROR)
+                valid = false;
+
             dataItem.type = PGEX_Struct;
             entryData.type = PGEX_Struct;
             entryData.data.push_back(dataItem);
@@ -787,6 +805,10 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
     };
 
     pge_size_t state = 0, size = src_data.size(), tail = src_data.size() - 1;
+
+    if(size > 0 && src_data.back() != ';')
+        state = STATE_ERROR;
+
     PGESTRING marker;
     PGESTRING value;
     int escape = 0;
@@ -818,6 +840,11 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
             break;
 
         case STATE_MARKER:
+            if(i == tail)
+            {
+                valid = false;
+                break;
+            }
             if((c == ';') && (escape == 0))
             {
                 state = STATE_ERROR;
@@ -837,7 +864,7 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
                 state = STATE_ERROR;
                 continue;
             }
-            if(((c == ';') && (escape == 0)) || (i == tail))
+            if((c == ';') && (escape == 0))
             {
                 //STORE ENTRY!
                 PGESTRINGList fields;
@@ -849,12 +876,20 @@ PGELIST<PGESTRINGList > PGEFile::splitDataLine(const PGESTRING &src_data, bool *
                 state = STATE_MARKER;
                 continue;
             }
+            else if(i == tail)
+            {
+                valid = false;
+                break;
+            }
             value.push_back(c);
             break;
             //case STATE_ERROR:  //Dead code
             //break;
         }
     }
+
+    if(state == STATE_ERROR)
+        valid = false;
 
     if(_valid)
         *_valid = valid;
