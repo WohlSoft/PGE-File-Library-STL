@@ -751,12 +751,15 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 event = CreateLvlEvent();
                 PGESTRINGList musicSets;
+                pge_size_t musicSets_begin = 0;
                 PGESTRINGList bgSets;
+                pge_size_t bgSets_begin = 0;
                 PGESTRINGList ssSets;
+                pge_size_t ssSets_begin = 0;
                 PGESTRINGList movingLayers;
                 pge_size_t movingLayers_begin = 0;
                 PGESTRINGList newSectionSettingsSets;
-                pge_size_t newSectionSettingsSets_begin = 0;
+                int newSectionSettingsSets_begin = -1;
                 PGESTRINGList spawnNPCs;
                 pge_size_t spawnNPCs_begin = 0;
                 PGESTRINGList spawnEffectss;
@@ -775,9 +778,9 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrArrVal("LS", event.layers_show) //Show layers
                     PGEX_StrArrVal("LT", event.layers_toggle) //Toggle layers
                     //Legacy values (without SMBX-38A values support)
-                    PGEX_StrArrVal("SM", musicSets)  //Switch music
-                    PGEX_StrArrVal("SB", bgSets)     //Switch background
-                    PGEX_StrArrVal("SS", ssSets)     //Section Size
+                    PGEX_StrArrVal_Validate("SM", musicSets, musicSets_begin)  //Switch music
+                    PGEX_StrArrVal_Validate("SB", bgSets, bgSets_begin)     //Switch background
+                    PGEX_StrArrVal_Validate("SS", ssSets, ssSets_begin)     //Section Size
                     //-------------------
                     //New values (with SMBX-38A values support)
                     PGEX_StrArrVal_Validate("SSS", newSectionSettingsSets, newSectionSettingsSets_begin) //Section settings in new format
@@ -810,7 +813,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
 
                 //Parse new-style parameters
-                if(!newSectionSettingsSets.empty())
+                if(newSectionSettingsSets_begin != -1)
                 {
                     for(pge_size_t i = 0; i < newSectionSettingsSets.size(); i++)
                     {
@@ -1030,7 +1033,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                         }//for parameters
 
                         // skip after validating if the field got duplicated
-                        if(i < newSectionSettingsSets_begin)
+                        if(i < (pge_size_t)newSectionSettingsSets_begin)
                             continue;
 
                         // TODO: remove this logic (duplicated in the load callback)
@@ -1057,52 +1060,84 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                         event.sets[static_cast<pge_size_t>(sectionSet.id)] = sectionSet;
                     }//for section settings entries
+
+                    // skip over (but validate) legacy arrays
+                    musicSets_begin = musicSets.size();
+                    bgSets_begin = bgSets.size();
+                    ssSets_begin = ssSets.size();
                 }//If new-styled section settings are gotten
+
                 //Parse odl-style parameters
                 else
                 {
                     //Apply MusicSets
-                    pge_size_t q = 0;
-
-                    for(q = 0; q < event.sets.size() && q < musicSets.size(); q++)
+                    for(pge_size_t q = 0; q < musicSets.size(); q++)
                     {
-                        auto &s = event.sets[q];
-                        s.id = static_cast<long>(q);
-
                         if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
-                        s.music_id = toLong(musicSets[q]);
+                        long got = toLong(musicSets[q]);
+
+                        if(q < musicSets_begin)
+                            continue;
+
+                        pge_size_t s_i = q - musicSets_begin;
+                        if(s_i >= musicSets.size())
+                            continue;
+
+                        auto &s = event.sets[s_i];
+                        s.id = static_cast<long>(q);
+                        s.music_id = got;
                     }
 
                     //Apply Background sets
-                    for(q = 0; q < event.sets.size() && q < bgSets.size(); q++)
+                    for(pge_size_t q = 0; q < bgSets.size(); q++)
                     {
-                        auto &s = event.sets[q];
-                        s.id = static_cast<long>(q);
-
                         if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
-                        s.background_id = toLong(bgSets[q]);
+                        long got = toLong(bgSets[q]);
+
+                        if(q < bgSets_begin)
+                            continue;
+
+                        pge_size_t s_i = q - bgSets_begin;
+                        if(s_i >= bgSets.size())
+                            continue;
+
+                        auto &s = event.sets[s_i];
+                        s.id = static_cast<long>(q);
+                        s.background_id = got;
                     }
 
-                    //Apply section sets
-                    for(q = 0; q < event.sets.size() && q < ssSets.size(); q++)
+                    //Apply Background sets
+                    for(pge_size_t q = 0; q < ssSets.size(); q++)
                     {
-                        auto &s = event.sets[q];
-                        s.id = static_cast<long>(q);
                         PGESTRINGList sizes;
                         PGE_SPLITSTRING(sizes, ssSets[q], ",");
 
                         if(sizes.size() != 4) goto badfile; //-V112
 
                         if(!PGEFile::IsIntS(sizes[0])) goto badfile;
-                        s.position_left = toLong(sizes[0]);
-
                         if(!PGEFile::IsIntS(sizes[1])) goto badfile;
-                        s.position_top = toLong(sizes[1]);
-
                         if(!PGEFile::IsIntS(sizes[2])) goto badfile;
-                        s.position_bottom = toLong(sizes[2]);
-
                         if(!PGEFile::IsIntS(sizes[3])) goto badfile;
+
+                        long got[4];
+                        for(int i = 0; i < 4; i++)
+                        {
+                            if(!PGEFile::IsIntS(sizes[i])) goto badfile;
+                            got[i] = toLong(sizes[i]);
+                        }
+
+                        if(q < ssSets_begin)
+                            continue;
+
+                        pge_size_t s_i = q - ssSets_begin;
+                        if(s_i >= ssSets.size())
+                            continue;
+
+                        auto &s = event.sets[s_i];
+                        s.id = static_cast<long>(q);
+                        s.position_left = got[0];
+                        s.position_top = toLong(sizes[1]);
+                        s.position_bottom = toLong(sizes[2]);
                         s.position_right = toLong(sizes[3]);
                     }
                 }
