@@ -35,6 +35,9 @@ PGE File Formats Changelog
     * Markers (tags) in data lines may not include the characters `\`, `:`, or `;`. (As before, values in data lines must escape the characters `:` and `;` with a backslash.)
 
       This invalidates lines `F1\::V1;`, `F1\\:V1;` and `F1\;:V1;`, but does not invalidate lines `F1:V1\:;`, `F1:V1\\;` or `F1:V1\;;`.
+  * Markers (tags) in data lines may be repeated. If they are repeated, only the data from the last marker will be kept. However, all values, even the ones that will be overwritten, must be validly formatted.
+    * Previously, invalid substructure arrays were silently ignored.
+    * This invalidates (for example), `ET:"Event Name";SSS:["F1;V1;"];SSS:["F1:V1;"];` (previously parsed as `ET:"Event Name";SSS:["F1:V1;"];`).
   * Strings:
     * A string may not comprise of a single `"` character. This invalidates line `STR:";` (previously parsed as `STR:"";`).
     * If a string includes a `\` followed by a non-escape character, the `\` is now silently ignored. (Previously, the `\` was included in the unescaped string.)
