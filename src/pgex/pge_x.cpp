@@ -1049,7 +1049,8 @@ ReCheckQuotie:
                 i++;
                 break;
             default:
-                output[j++] = input[i];
+                // invalid escape sequence, simply ignore the backslash
+                // output[j++] = input[i];
                 output[j]   = input[k];
                 i++;
                 break;

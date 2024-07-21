@@ -34,3 +34,6 @@ PGE File Formats Changelog
 
     This invalidates lines `F1\::V1;`, `F1\\:V1;` and `F1\;:V1;`, but does not invalidate lines `F1:V1\:;`, `F1:V1\\;` or `F1:V1\;;`.
   * A string may no longer comprise of a single `"` character. This invalidates line `STR:";` (previously parsed as `STR:"";`).
+  * If a string includes a `\` followed by a non-escape character, the `\` is now silently ignored. (Previously, the `\` was included in the unescaped string.)
+
+    This means that `STR:"\a";` (previously parsed as `STR:"\\a";`) is now parsed as `STR:"a";`.
