@@ -974,6 +974,7 @@ struct LevelItemSetup38A
         BLOCK = 0,
         BGO = 1,
         EFFECT = 2,
+        ITEM_TYPE_MAX
     } type = UNKNOWN;
 
     int64_t id = 0;

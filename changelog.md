@@ -59,3 +59,13 @@ PGE File Formats Changelog
     * Floating point values may end with `.`, but must have at least 1 digit. The exponent must have at least 1 and at most 4 digits.
 
       This invalidates `DBL:1e12345;`, and makes `DBL:1.;` valid.
+* LVLX:
+  * `CUSTOM_ITEMS_38A`:
+    * Data keys must not exceed the maximum 32-bit signed integer, `2 147 483 647`. This invalidates `T:0;ID:0;D:["3000000000=0"];` (previously silently parsed in an undefined way).
+* WLDX:
+  * `META_BOOKMARKS`: fixed the types of fields `X` and `Y` (`float`, was `int`).
+
+    This makes `BM:"Name";X:128.0;Y:128.0;` valid.
+  * `AREARECTS`: fixed the type of field `TP` (`unsigned int`, was `int`).
+
+    This invalidates `TP:-1;` (which previously set the touch policy to an indeterminate value).

@@ -380,8 +380,8 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 {
                     PGEX_ValueBegin()
                     PGEX_StrVal("BM", meta_bookmark.bookmarkName) //Bookmark name
-                    PGEX_SIntVal("X", meta_bookmark.x) // Position X
-                    PGEX_SIntVal("Y", meta_bookmark.y) // Position Y
+                    PGEX_FloatVal("X", meta_bookmark.x) // Position X
+                    PGEX_FloatVal("Y", meta_bookmark.y) // Position Y
                 }
                 FileData.metaData.bookmarks.push_back(meta_bookmark);
             }
@@ -423,9 +423,9 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal("ID", tile.id) //Tile ID
-                    PGEX_SIntVal("X",  tile.x) //X Position
-                    PGEX_SIntVal("Y",  tile.y) //Y Position
+                    PGEX_ULongVal("ID", tile.id) //Tile ID
+                    PGEX_SLongVal("X",  tile.x) //X Position
+                    PGEX_SLongVal("Y",  tile.y) //Y Position
                     PGEX_StrVal("XTRA", tile.meta.custom_params)//Custom JSON data tree
                 }
                 tile.meta.array_id = FileData.tile_array_id++;
@@ -446,9 +446,9 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal("ID", scen.id)  //Scenery ID
-                    PGEX_SIntVal("X", scen.x) //X Position
-                    PGEX_SIntVal("Y", scen.y) //Y Position
+                    PGEX_ULongVal("ID", scen.id)  //Scenery ID
+                    PGEX_SLongVal("X", scen.x) //X Position
+                    PGEX_SLongVal("Y", scen.y) //Y Position
                     PGEX_StrVal("XTRA", scen.meta.custom_params)//Custom JSON data tree
                 }
                 scen.meta.array_id = FileData.scene_array_id++;
@@ -469,9 +469,9 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal("ID", pathitem.id)  //Path ID
-                    PGEX_SIntVal("X", pathitem.x) //X Position
-                    PGEX_SIntVal("Y", pathitem.y) //Y Position
+                    PGEX_ULongVal("ID", pathitem.id)  //Path ID
+                    PGEX_SLongVal("X", pathitem.x) //X Position
+                    PGEX_SLongVal("Y", pathitem.y) //Y Position
                     PGEX_StrVal("XTRA", pathitem.meta.custom_params)//Custom JSON data tree
                 }
                 pathitem.meta.array_id = FileData.path_array_id++;
@@ -492,9 +492,9 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal("ID", musicbox.id) //MISICBOX ID
-                    PGEX_SIntVal("X", musicbox.x) //X Position
-                    PGEX_SIntVal("Y", musicbox.y) //X Position
+                    PGEX_ULongVal("ID", musicbox.id) //MISICBOX ID
+                    PGEX_SLongVal("X", musicbox.x) //X Position
+                    PGEX_SLongVal("Y", musicbox.y) //X Position
                     PGEX_StrVal("MF", musicbox.music_file)  //Custom music file
                     PGEX_StrVal("XTRA", musicbox.meta.custom_params)//Custom JSON data tree
                 }
@@ -516,21 +516,21 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_USIntVal("F", arearect.flags)  //Flags
-                    PGEX_SIntVal("X", arearect.x) //X Position
-                    PGEX_SIntVal("Y", arearect.y) //X Position
-                    PGEX_USIntVal("W", arearect.w) //Width
-                    PGEX_USIntVal("H", arearect.h) //Height
+                    PGEX_UIntVal("F", arearect.flags)  //Flags
+                    PGEX_SLongVal("X", arearect.x) //X Position
+                    PGEX_SLongVal("Y", arearect.y) //X Position
+                    PGEX_USLongVal("W", arearect.w) //Width
+                    PGEX_USLongVal("H", arearect.h) //Height
 
                     // unused stuff
-                    PGEX_UIntVal("MI", arearect.music_id) //MUSICBOX ID
+                    PGEX_ULongVal("MI", arearect.music_id) //MUSICBOX ID
                     PGEX_StrVal("MF", arearect.music_file)  //Custom music file
                     PGEX_StrVal("LR", arearect.layer)
                     PGEX_StrVal("EB", arearect.eventBreak)
                     PGEX_StrVal("EW", arearect.eventWarp)
                     PGEX_StrVal("EA", arearect.eventAnchor)
                     PGEX_StrVal("ET", arearect.eventTouch)
-                    PGEX_SIntVal("TP", arearect.eventTouchPolicy)
+                    PGEX_UIntVal("TP", arearect.eventTouchPolicy)
                     PGEX_StrVal("XTRA", arearect.meta.custom_params)//Custom JSON data tree
                 }
                 arearect.meta.array_id = FileData.arearect_array_id++;
@@ -551,18 +551,18 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_UIntVal("ID", lvlitem.id) //LEVEL IMAGE ID
-                    PGEX_SIntVal("X",  lvlitem.x) //X Position
-                    PGEX_SIntVal("Y",  lvlitem.y) //X Position
+                    PGEX_ULongVal("ID", lvlitem.id) //LEVEL IMAGE ID
+                    PGEX_SLongVal("X",  lvlitem.x) //X Position
+                    PGEX_SLongVal("Y",  lvlitem.y) //X Position
                     PGEX_StrVal("LF", lvlitem.lvlfile)  //Target level file
                     PGEX_StrVal("LT", lvlitem.title)   //Level title
-                    PGEX_UIntVal("EI", lvlitem.entertowarp) //Entrance Warp ID (if 0 - start level from default points)
+                    PGEX_ULongVal("EI", lvlitem.entertowarp) //Entrance Warp ID (if 0 - start level from default points)
                     PGEX_SIntVal("ET", lvlitem.top_exit) //Open top path on exit type
                     PGEX_SIntVal("EL", lvlitem.left_exit) //Open left path on exit type
                     PGEX_SIntVal("ER", lvlitem.right_exit) //Open right path on exit type
                     PGEX_SIntVal("EB", lvlitem.bottom_exit) //Open bottom path on exit type
-                    PGEX_SIntVal("WX", lvlitem.gotox) //Goto world map X
-                    PGEX_SIntVal("WY", lvlitem.gotoy) //Goto world map Y
+                    PGEX_SLongVal("WX", lvlitem.gotox) //Goto world map X
+                    PGEX_SLongVal("WY", lvlitem.gotoy) //Goto world map Y
                     PGEX_BoolVal("AV", lvlitem.alwaysVisible) //Always visible
                     PGEX_BoolVal("SP", lvlitem.gamestart) //Is Game start point
                     PGEX_BoolVal("BP", lvlitem.pathbg) //Path background
