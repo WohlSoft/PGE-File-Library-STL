@@ -66,6 +66,10 @@ PGE File Formats Changelog
     * `SSS` (section settings):
       * `ID`: section index must be >= 0 and <= 1000. Any other value will cause a parse failure. This invalidates `ID:-1;` (previously crashed parser) and `ID:1000000;` (previously cause hang and allocation failure).
       * `AST`: autoscroll type must not exceed the maximum 32-bit signed integer, `2 147 483 647`. This invalidates `AST:3000000000;` (previously silently parsed in an undefined way).
+      * `SHX`: load section height expression from field with marker `SHX` (was previously incorrectly saved to `SHX` but loaded from `SWH`).
+    * `ML` (move layers):
+      * `SXX`: load x speed expression from field with marker `SXX` (was previously incorrectly saved to `SXX` but loaded from `AXX`).
+      * `SYX`: load y speed expression from field with marker `SYX` (was previously incorrectly saved to `SYX` but loaded from `AYX`).
   * `CUSTOM_ITEMS_38A`:
     * Field `T` (type) must be 0 (block), 1 (bgo), or 2 (effect). This invalidates `T:3;ID:0;D:["1=2"];` (previously interpreted in an unspecified way).
     * `D`: data keys must not exceed the maximum 32-bit signed integer, `2 147 483 647`. This invalidates `T:0;ID:0;D:["3000000000=0"];` (previously silently parsed in an undefined way).
