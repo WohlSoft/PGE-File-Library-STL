@@ -1131,7 +1131,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             continue;
 
                         pge_size_t s_i = q - ssSets_begin;
-                        if(s_i >= ssSets.size())
+                        if(s_i >= event.sets.size())
                             continue;
 
                         auto &s = event.sets[s_i];
