@@ -56,18 +56,7 @@ bool FileFormats::ReadExtendedWldFileHeader(const PGESTRING &filePath, WorldData
         return false;
     }
 
-    try
-    {
-        return ReadExtendedWldFileHeaderT(inf, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedWldFileHeaderT(inf, FileData);
 }
 
 bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, WorldData &FileData)
@@ -84,22 +73,14 @@ bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRI
     }
 
 
-    try
-    {
-        return ReadExtendedWldFileHeaderT(inf, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedWldFileHeaderT(inf, FileData);
 }
 
 bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData)
 {
+  // indented 2 spaces to avoid large diff hunk
+  try
+  {
     PGESTRING line;
     int str_count = 0;
     bool valid = false;
@@ -249,6 +230,15 @@ badfile:
     PGE_CutLength(FileData.meta.ERROR_linedata, 50);
     PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
+  }
+  catch(const std::exception& e)
+  {
+    FileData.meta.ERROR_info = e.what();
+    FileData.meta.ERROR_linedata.clear();
+    FileData.meta.ERROR_linenum = -1;
+    FileData.meta.ReadFileValid = false;
+    return false;
+  }
 }
 
 bool FileFormats::ReadExtendedWldFileF(const PGESTRING &filePath, WorldData &FileData)
@@ -265,18 +255,7 @@ bool FileFormats::ReadExtendedWldFileF(const PGESTRING &filePath, WorldData &Fil
         return false;
     }
 
-    try
-    {
-        return ReadExtendedWldFile(file, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedWldFile(file, FileData);
 }
 
 bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  WorldData &FileData)
@@ -293,22 +272,14 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &fi
         return false;
     }
 
-    try
-    {
-        return ReadExtendedWldFile(file, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedWldFile(file, FileData);
 }
 
 bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, WorldData &FileData)
 {
+  // indented 2 spaces to avoid large diff hunk
+  try
+  {
     PGESTRING errorString;
     PGEX_FileBegin();
     PGESTRING filePath = in.getFilePath();
@@ -588,6 +559,15 @@ badfile:    //If file format not corrects
     PGE_CutLength(FileData.meta.ERROR_linedata, 50);
     PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
+  }
+  catch(const std::exception& e)
+  {
+    FileData.meta.ERROR_info = e.what();
+    FileData.meta.ERROR_linedata.clear();
+    FileData.meta.ERROR_linenum = -1;
+    FileData.meta.ReadFileValid = false;
+    return false;
+  }
 }
 
 

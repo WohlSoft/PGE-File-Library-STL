@@ -51,18 +51,7 @@ bool FileFormats::ReadExtendedSaveFileF(const PGESTRING &filePath, GamesaveData 
         return false;
     }
 
-    try
-    {
-        return ReadExtendedSaveFile(file, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedSaveFile(file, FileData);
 }
 
 bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, const PGESTRING &filePath, GamesaveData &FileData)
@@ -79,22 +68,14 @@ bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, const PGESTRING &f
         return false;
     }
 
-    try
-    {
-        return ReadExtendedSaveFile(file, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedSaveFile(file, FileData);
 }
 
 bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, GamesaveData &FileData)
 {
+  // indented 2 spaces to avoid large diff hunk
+  try
+  {
     FileData = CreateGameSaveData();
     PGESTRING errorString;
     PGEX_FileBegin();
@@ -324,6 +305,15 @@ badfile:    //If file format not corrects
     PGE_CutLength(FileData.meta.ERROR_linedata, 50);
     PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
+  }
+  catch(const std::exception& e)
+  {
+    FileData.meta.ERROR_info = e.what();
+    FileData.meta.ERROR_linedata.clear();
+    FileData.meta.ERROR_linenum = -1;
+    FileData.meta.ReadFileValid = false;
+    return false;
+  }
 }
 
 

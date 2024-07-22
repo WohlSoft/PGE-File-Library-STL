@@ -47,18 +47,7 @@ bool FileFormats::ReadExtendedLvlFileHeader(const PGESTRING &filePath, LevelData
         return false;
     }
 
-    try
-    {
-        return ReadExtendedLvlFileHeaderT(inf, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedLvlFileHeaderT(inf, FileData);
 }
 
 bool FileFormats::ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRING &filePath, LevelData &FileData)
@@ -74,22 +63,14 @@ bool FileFormats::ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRI
         return false;
     }
 
-    try
-    {
-        return ReadExtendedLvlFileHeaderT(inf, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedLvlFileHeaderT(inf, FileData);
 }
 
 bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData)
 {
+  // indented 2 spaces to avoid large diff hunk
+  try
+  {
     PGESTRING line;
     int str_count = 0;
     bool valid = false;
@@ -208,6 +189,15 @@ bad_file:
     PGE_CutLength(FileData.meta.ERROR_linedata, 50);
     PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
+  }
+  catch(const std::exception& e)
+  {
+    FileData.meta.ERROR_info = e.what();
+    FileData.meta.ERROR_linedata.clear();
+    FileData.meta.ERROR_linenum = -1;
+    FileData.meta.ReadFileValid = false;
+    return false;
+  }
 }
 
 
@@ -226,18 +216,7 @@ bool FileFormats::ReadExtendedLvlFileF(const PGESTRING &filePath, LevelData &Fil
         return false;
     }
 
-    try
-    {
-        return ReadExtendedLvlFile(file, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedLvlFile(file, FileData);
 }
 
 bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, const PGESTRING &filePath,  LevelData &FileData)
@@ -254,22 +233,14 @@ bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, const PGESTRING &fi
         return false;
     }
 
-    try
-    {
-        return ReadExtendedLvlFile(file, FileData);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.meta.ERROR_info = e.what();
-        FileData.meta.ERROR_linedata.clear();
-        FileData.meta.ERROR_linenum = -1;
-        FileData.meta.ReadFileValid = false;
-        return false;
-    }
+    return ReadExtendedLvlFile(file, FileData);
 }
 
 bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)
 {
+  // indented 2 spaces to avoid large diff hunk
+  try
+  {
     PGESTRING errorString;
     PGESTRING filePath = in.getFilePath();
     PGESTRING line;  /*Current Line data*/
@@ -1705,6 +1676,15 @@ badfile:    //If file format is not correct
     PGE_CutLength(FileData.meta.ERROR_linedata, 50);
     PGE_FilterBinary(FileData.meta.ERROR_linedata);
     return false;
+  }
+  catch(const std::exception& e)
+  {
+    FileData.meta.ERROR_info = e.what();
+    FileData.meta.ERROR_linedata.clear();
+    FileData.meta.ERROR_linenum = -1;
+    FileData.meta.ReadFileValid = false;
+    return false;
+  }
 }
 
 

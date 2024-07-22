@@ -43,16 +43,7 @@ bool FileFormats::ReadNpcTXTFileF(const PGESTRING &filePath, NPCConfigFile &File
         return false;
     }
 
-    try
-    {
-        return ReadNpcTXTFile(file, FileData, IgnoreBad);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.errorString = e.what();
-        FileData.ReadFileValid = false;
-        return false;
-    }
+    return ReadNpcTXTFile(file, FileData, IgnoreBad);
 }
 
 bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData, bool IgnoreBad)
@@ -66,16 +57,7 @@ bool FileFormats::ReadNpcTXTFileRAW(PGESTRING &rawdata, NPCConfigFile &FileData,
         return false;
     }
 
-    try
-    {
-        return ReadNpcTXTFile(file, FileData, IgnoreBad);
-    }
-    catch(const std::exception& e)
-    {
-        FileData.errorString = e.what();
-        FileData.ReadFileValid = false;
-        return false;
-    }
+    return ReadNpcTXTFile(file, FileData, IgnoreBad);
 }
 
 
@@ -102,6 +84,9 @@ static inline PGESTRING invalidLine_BOOL(long line, const PGESTRING &data)
 
 bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfigFile &fileData, bool ignoreBad)
 {
+  // indented 2 spaces to avoid large diff hunk
+  try
+  {
     PGESTRING line;           //Current Line data
     PGESTRINGList params;
     fileData = CreateEmpytNpcTXT();
@@ -333,6 +318,13 @@ bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfig
 
     fileData.ReadFileValid = true;
     return true;
+  }
+  catch(const std::exception& e)
+  {
+    fileData.errorString = e.what();
+    fileData.ReadFileValid = false;
+    return false;
+  }
 }
 
 
