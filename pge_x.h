@@ -213,7 +213,7 @@ public:
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsFloat(PGESTRING &in);// FLOAT
+    static bool IsFloat(const PGESTRING &in);// FLOAT
     /*!
      * \brief Is given value is a boolean degit?
      * \param in Input data string with data required to valitade
@@ -253,6 +253,7 @@ public:
     {
         return fromNum(input);
     }
+#if 0
     /*!
      * \brief Encode floating point numeric value with rounding into PGE-X string
      * \param input floating point number
@@ -263,6 +264,7 @@ public:
     {
         return fromNum(std::round(input));
     }
+#endif
     /*!
      * \brief Encode boolean value into PGE-X string
      * \param input boolean flag

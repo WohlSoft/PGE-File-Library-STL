@@ -125,15 +125,15 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
                     }
                     else if(v.marker == "X") // Position X
                     {
-                        if(PGEFile::IsIntS(v.value))
-                            meta_bookmark.x = toInt(v.value);
+                        if(PGEFile::IsFloat(v.value))
+                            meta_bookmark.x = toFloat(v.value);
                         else
                             goto badfile;
                     }
                     else if(v.marker == "Y") //Position Y
                     {
-                        if(PGEFile::IsIntS(v.value))
-                            meta_bookmark.y = toInt(v.value);
+                        if(PGEFile::IsFloat(v.value))
+                            meta_bookmark.y = toFloat(v.value);
                         else
                             goto badfile;
                     }
@@ -210,8 +210,8 @@ bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, 
             Bookmark &bm = metaData.bookmarks[i];
             //Bookmark name
             out << PGEFile::value("BM", PGEFile::WriteStr(bm.bookmarkName));
-            out << PGEFile::value("X", PGEFile::WriteRoundFloat(bm.x));
-            out << PGEFile::value("Y", PGEFile::WriteRoundFloat(bm.y));
+            out << PGEFile::value("X", PGEFile::WriteFloat(bm.x));
+            out << PGEFile::value("Y", PGEFile::WriteFloat(bm.y));
             out << "\n";
         }
 

@@ -542,7 +542,7 @@ bool PGEFile::IsIntS(const PGESTRING &in) // Signed Int
     return true;
 }
 
-bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
+bool PGEFile::IsFloat(const PGESTRING &in) // Float Point numeric
 {
     using namespace PGEExtendedFormat;
 
@@ -564,7 +564,6 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
         {
             if((PGEGetChar(in[i]) == '.'))
             {
-                in[i] = '.'; //replace comma with a dot.empty()
                 decimal = true;
                 continue;
             }
