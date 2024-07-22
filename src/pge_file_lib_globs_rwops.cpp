@@ -337,6 +337,9 @@ PGESTRING RWopsTextInput::readAll()
 
 bool RWopsTextInput::eof()
 {
+    if(!m_rwops)
+        return true;
+
     return (m_bufferIsEof) && (m_readOffset >= m_bufferStartOffset + (int64_t)m_buffer.size());
 }
 
