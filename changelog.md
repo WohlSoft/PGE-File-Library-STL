@@ -60,7 +60,8 @@ PGE File Formats Changelog
     * An unsigned int must not be empty. This invalidates `UINT:;` (previously parsed as `UINT:0;`).
     * Floating point values must not use `,` as the decimal separator. This invalidates `DBL:1,2;` (previously parsed as `DBL:1.2;`).
     * Floating point values must not use `E` as the exponent separator. This invalidates `DBL:1E2;` (previously parsed as `DBL:1e2;`).
-    * Floating point values must not use the sign character `+`. This invalidates `DBL:+1;` (previously parsed as `DBL:1;`) and `DBL:1e+1` (previously parsed as `DBL:1e1`).
+    * Floating point values must not use the sign character `+`. This invalidates `DBL:+1;` (previously parsed as `DBL:1;`).
+    * The floating point exponent may use the sign character `+`. `DBL:1e+1` and `DBL:1e1` have the same meaning.
     * Floating point values may end with `.`, but must have at least 1 digit. The exponent must have at least 1 and at most 4 digits.
 
       This invalidates `DBL:1e12345;`, and makes `DBL:1.;` valid.

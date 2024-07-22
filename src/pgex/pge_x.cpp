@@ -575,8 +575,8 @@ bool PGEFile::IsFloat(PGESTRING &in) // Float Point numeric
             {
                 pow10 = true;
                 if(i == (in.size() - 1)) return false;
-                // allow exponent sign (negative only)
-                if(PGEGetChar(in[i + 1]) == '-') i++;
+                // allow exponent sign (negative or positive)
+                if(PGEGetChar(in[i + 1]) == '-' || PGEGetChar(in[i + 1]) == '+') i++;
                 if(i == (in.size() - 1)) return false;
                 continue;
             }
