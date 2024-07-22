@@ -1647,6 +1647,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 PGESTRINGList data;
                 pge_size_t data_begin = 0;
                 int type = -1;
+                errorString = "Wrong type";
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
@@ -1655,12 +1656,13 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_StrArrVal_Validate("D", data, data_begin) //Variable value
 
                     // check type for every value (instead of only the final stored type)
-                    if(type < LevelItemSetup38A::UNKNOWN || type >= LevelItemSetup38A::ITEM_TYPE_MAX)
-                    {
-                        errorString = "Wrong type";
+                    if(type <= LevelItemSetup38A::UNKNOWN || type >= LevelItemSetup38A::ITEM_TYPE_MAX)
                         goto badfile;
-                    }
                 }
+
+                if(type == -1)
+                    goto badfile;
+
                 errorString = "Wrong pair syntax";
                 for(pge_size_t i = 0; i < data.size(); i++)
                 {
