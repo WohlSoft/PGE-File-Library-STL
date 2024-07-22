@@ -65,6 +65,7 @@ PGE File Formats Changelog
     * Floating point values may end with `.`, but must have at least 1 digit. The exponent must have at least 1 and at most 4 digits.
 
       This invalidates `DBL:1e12345;`, and makes `DBL:1.;` valid.
+    * Floating point values may not overflow to infinity. They may leave the underlying type's range of integer precision. This invalidates `DBL:1e999;`.
 * LVLX:
   * `SECTION`:
     * `SC`: section index must be >= 0 and <= 1000. Any other value will cause a parse failure. This invalidates `SC:-1;` (previously crashed parser) and `SC:1000000;` (previously cause hang and allocation failure).

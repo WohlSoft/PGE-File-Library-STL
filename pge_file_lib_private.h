@@ -169,11 +169,19 @@ inline unsigned long toULong(const PGESTRING &str)
 }
 inline float     toFloat(const PGESTRING &str)
 {
-    return str.toFloat();
+    bool okay;
+    float ret = str.toFloat(&okay);
+    if(!okay)
+        throw std::range_error("float value out of range");
+    return ret;
 }
 inline double    toDouble(const PGESTRING &str)
 {
-    return str.toDouble();
+    bool okay;
+    float ret = str.toDouble(&okay);
+    if(!okay)
+        throw std::range_error("double value out of range");
+    return ret;
 }
 inline PGESTRING removeSpaces(PGESTRING src)
 {
@@ -403,12 +411,12 @@ inline unsigned long toULong(const PGESTRING &str)
 
 inline float toFloat(const PGESTRING &str)
 {
-    return static_cast<float>(std::atof(str.c_str()));
+    return std::stof(str, nullptr);
 }
 
 inline double toDouble(const PGESTRING &str)
 {
-    return std::atof(str.c_str());
+    return std::stod(str, nullptr);
 }
 
 inline PGESTRING removeSpaces(const PGESTRING &src)
