@@ -281,7 +281,10 @@ public:
     template<typename T>
     static PGESTRING WriteFloat(const T &input)
     {
-        return fromNum(input);
+        if(input == 0)
+            return "0";
+        else
+            return fromNum(input);
     }
 
     /*!
