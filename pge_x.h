@@ -379,6 +379,9 @@ public:
      */
     static inline PGESTRING value(PGESTRING &&marker, PGESTRING &&data)
     {
+        if(IsEmpty(data))
+            return "";
+
         PGESTRING out;
         out += marker + ":" + data + ";";
         return out;
