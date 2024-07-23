@@ -209,25 +209,33 @@ void RWopsTextInput::readLine(PGESTRING &out_utf16)
         const char * const begin = &m_buffer[0] + (m_readOffset - m_bufferStartOffset);
         const char * const end = &m_buffer[0] + m_buffer.size();
 
+        const char * append_begin = begin;
+
         for(const char *byte = begin; byte != end; byte++)
         {
-            if(*byte == '\n')
-            {
-                if(out.size() > 0)
-                    m_lineNumber++;
+            if(*byte != '\r' && *byte != '\n')
+                continue;
 
-                m_readOffset += (byte + 1) - begin;
+            out.append(append_begin, byte - append_begin);
+
+            if(*byte == '\r')
+            {
+                append_begin = byte + 1;
+                continue;
+            }
+
+            // newline
+            m_lineNumber++;
+            m_readOffset += (byte + 1) - begin;
 
 #ifdef PGE_FILES_QT
-                out_utf16 = QString::fromStdString(out);
+            out_utf16 = QString::fromStdString(out);
 #endif
 
-                return;
-            }
-            else if(*byte != '\r')
-                out.push_back(*byte);
+            return;
         }
 
+        out.append(append_begin, end - append_begin);
         m_readOffset += end - begin;
     }
 }
