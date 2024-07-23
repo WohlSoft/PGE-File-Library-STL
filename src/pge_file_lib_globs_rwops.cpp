@@ -284,21 +284,51 @@ void RWopsTextInput::readCVSLine(PGESTRING &out_utf16)
         const char * const begin = &m_buffer[0] + (m_readOffset - m_bufferStartOffset);
         const char * const end = &m_buffer[0] + m_buffer.size();
 
+        const char * append_begin = begin;
+
         for(const char *byte = begin; byte != end; byte++)
         {
-            char cur = static_cast<char>(*byte);
-            if(cur == '\"')
-                quoteIsOpen = !quoteIsOpen;
-            else
+            switch(*byte)
             {
-                if((cur != '\r') && (((cur != '\n') && (cur != ',')) || (quoteIsOpen)))
-                    out.push_back(cur);
-                if(cur == '\n')
+            case '\n':
+                m_lineNumber++;
+                // fallthrough
+            case ',':
+                if(quoteIsOpen)
+                    continue;
+                break;
+            case '"':
+                quoteIsOpen = !quoteIsOpen;
+                goto skip_char;
+            case '\r':
+                // special fast path for \r\n
+                if(!quoteIsOpen && (byte + 1) != end && *(byte + 1) == '\n') [[likely]]
+                {
                     m_lineNumber++;
+
+                    if(byte != append_begin)
+                        out.append(append_begin, byte - append_begin);
+                    m_readOffset += (byte + 2) - begin;
+
+#ifdef PGE_FILES_QT
+                    out_utf16 = QString::fromStdString(out);
+#endif
+
+                    return;
+                }
+
+            skip_char:
+                if(byte != append_begin)
+                    out.append(append_begin, byte - append_begin);
+
+                append_begin = byte + 1;
+                // fallthrough
+            default:
+                continue;
             }
 
-            if((((cur != '\n') && (cur != ',')) || quoteIsOpen))
-                continue;
+            if(byte != append_begin)
+                out.append(append_begin, byte - append_begin);
 
             m_readOffset += (byte + 1) - begin;
 
@@ -309,6 +339,7 @@ void RWopsTextInput::readCVSLine(PGESTRING &out_utf16)
             return;
         }
 
+        out.append(append_begin, end - append_begin);
         m_readOffset += end - begin;
     }
 }
