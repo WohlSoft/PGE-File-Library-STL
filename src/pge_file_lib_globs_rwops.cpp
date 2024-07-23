@@ -76,10 +76,7 @@ void RWopsTextInput::close()
 
 void RWopsTextInput::fillBuffer()
 {
-    if(m_readOffset >= m_bufferStartOffset && m_bufferStartOffset + (int64_t)m_buffer.size() > m_readOffset)
-        return;
-
-    if(m_bufferIsEof && m_readOffset >= m_bufferStartOffset)
+    if(in_buffer() && m_bufferIsEof)
         return;
 
     if(!m_rwops)
@@ -144,9 +141,13 @@ void RWopsTextInput::read(PGESTRING &buf_utf16, int64_t len)
 
     while(dest < end)
     {
-        fillBuffer();
+        long to_copy = bytes_available();
+        if(to_copy <= 0 || !in_buffer())
+        {
+            fillBuffer();
+            to_copy = bytes_available();
+        }
 
-        long to_copy = m_bufferStartOffset + m_buffer.size() - m_readOffset;
         if(to_copy > 0)
         {
             if(end - dest < to_copy)
@@ -194,10 +195,14 @@ void RWopsTextInput::readLine(PGESTRING &out_utf16)
 
     while(true)
     {
-        fillBuffer();
+        long to_copy = bytes_available();
+        if(to_copy <= 0 || !in_buffer())
+        {
+            fillBuffer();
+            to_copy = bytes_available();
+        }
 
-        long bytes_available = m_bufferStartOffset + m_buffer.size() - m_readOffset;
-        if(bytes_available <= 0)
+        if(to_copy <= 0)
         {
             // EOF
 #ifdef PGE_FILES_QT
@@ -260,10 +265,14 @@ void RWopsTextInput::readCVSLine(PGESTRING &out_utf16)
 
     while(true)
     {
-        fillBuffer();
+        long to_copy = bytes_available();
+        if(to_copy <= 0 || !in_buffer())
+        {
+            fillBuffer();
+            to_copy = bytes_available();
+        }
 
-        long bytes_available = m_bufferStartOffset + m_buffer.size() - m_readOffset;
-        if(bytes_available <= 0)
+        if(to_copy <= 0)
         {
             // EOF
 #ifdef PGE_FILES_QT
@@ -316,10 +325,10 @@ PGESTRING RWopsTextInput::readAll()
 
     while(true)
     {
-        fillBuffer();
+        if(!buffer_okay())
+            fillBuffer();
 
-        long bytes_available = m_bufferStartOffset + m_buffer.size() - m_readOffset;
-        if(bytes_available <= 0)
+        if(bytes_available() <= 0)
         {
             // EOF
 #ifndef PGE_FILES_QT

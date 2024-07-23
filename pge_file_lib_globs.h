@@ -333,6 +333,18 @@ public:
     virtual int seek(int64_t pos, positions relativeTo);
 
 private:
+    inline bool in_buffer() const
+    {
+        return m_readOffset >= m_bufferStartOffset;
+    }
+    inline long bytes_available() const
+    {
+        return m_bufferStartOffset + m_buffer.size() - m_readOffset;
+    }
+    inline bool buffer_okay() const
+    {
+        return in_buffer() && bytes_available() > 0;
+    }
     void fillBuffer();
 
     SDL_RWops *m_rwops = nullptr;
