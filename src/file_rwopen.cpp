@@ -125,6 +125,38 @@ bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelDat
     return true;
 }
 
+bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, const LevelLoadCallbacks &cb)
+{
+    PGESTRING firstLine;
+
+    file.read(firstLine, 8);
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
+
+    if(PGE_StartsWith(firstLine, "SMBXFile"))
+    {
+        //Read SMBX65-38A LVL File
+        if(!ReadSMBX38ALvlFile(file, cb))
+            return false;
+    }
+    else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
+    {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
+        //Read SMBX LVL File
+        if(!ReadSMBX64LvlFile(file, cb))
+            return false;
+    }
+    else
+    {
+        //Read PGE LVLX File
+        if(!ReadExtendedLvlFile(file, cb))
+            return false;
+    }
+
+    return true;
+}
+
 bool FileFormats::OpenLevelFileHeader(const PGESTRING &filePath, LevelData &data)
 {
     PGE_FileFormats_misc::TextFileInput file;
