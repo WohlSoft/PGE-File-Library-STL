@@ -93,6 +93,10 @@ inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
 {
     return src.replace(from, to);
 }
+inline void PGE_ReplSTRING_inline(PGESTRING& src, PGESTRING from, PGESTRING to)
+{
+    src.replace(from, to);
+}
 inline PGESTRING PGE_RemSubSTRING(const PGESTRING &src, const PGESTRING &substr)
 {
     return QString(src).remove(substr);
@@ -331,6 +335,11 @@ inline PGESTRING PGE_ReplSTRING(PGESTRING src, const PGESTRING &from, const PGES
 {
     PGE_FileFormats_misc::replaceAll(src, from, to);
     return src;
+}
+
+inline void PGE_ReplSTRING_inline(PGESTRING& src, const PGESTRING &from, const PGESTRING &to)
+{
+    PGE_FileFormats_misc::replaceAll(src, from, to);
 }
 
 inline PGESTRING PGE_RemSubSTRING(PGESTRING src, const PGESTRING &substr)
