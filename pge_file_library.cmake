@@ -28,6 +28,14 @@ list(APPEND PGE_FILE_LIBRARY_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/src/pgex/file_rw_savx.cpp
 #    ${CMAKE_CURRENT_LIST_DIR}/src/smbx38a/file_rw_lvl_38a_old.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/smbx38a/file_rw_wld_38a.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/mdx_exception.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/value/mdx_value_string.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/value/mdx_value_numeric.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/value/mdx_value_boollist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/value/mdx_value_qstringlist.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/mdx_object.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/mdx_section.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/mdx_file.cpp
 )
 
 if(PGEFL_ENABLE_RWOPS)
