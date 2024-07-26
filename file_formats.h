@@ -48,6 +48,8 @@
 #   define PGEFL_DEPRECATED(func) func
 #endif
 
+#define PGEFL_CALLBACK_API
+
 /*!
  * \brief PGE File library class of static functions.
  *        Library is buildable in both Qt and STL applications
@@ -163,6 +165,13 @@ public:
      * @return true if file successfully opened and parsed, false if error occouped
      */
     static bool OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelData &FileData);
+    /**
+     * @brief Parses a level file data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] file Input file descriptor
+     * @param [__out] callbacks Callbacks to receive level data
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, const LevelLoadCallbacks &callbacks);
     /*!
      * \brief Parses a level file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
      * \param [__in] filePath Full path to file which must be opened
@@ -263,6 +272,13 @@ public:
      */
     static bool ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, LevelData /*output*/ &FileData);
     /*!
+     * \brief Parses SMBX1...64 level file data
+     * \param [__in] in Input file descriptor
+     * \param [__in] callbacks Callbacks for level load
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, const LevelLoadCallbacks &callbacks);
+    /*!
      * \brief Generates SMBX1...64 Level file data and saves into file
      * \param [__in] filePath Target file path
      * \param [__in] FileData Level data structure
@@ -333,6 +349,13 @@ public:
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, LevelData /*output*/ &FileData);
+    /*!
+     * \brief Parses SMBX-38A level file data from raw data string
+     * \param [__in] in File input descriptor
+     * \param [__out] callbacks LevelLoadCallbacks Level data structure
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, const LevelLoadCallbacks &callbacks);
 #if 0 // Removed
     /*!
      * \brief Parses SMBX-38A level file data from raw data string (Old algorithm)
@@ -393,6 +416,13 @@ public:
      */
     static bool ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData);
     /*!
+     * \brief Parses PGE-X Level file header from the file
+     * \param [__in] inf Input file descriptor
+     * \param [__in] callbacks Level load callbacks (will only attempt to call the load_head and on_error callbacks)
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, const LevelLoadCallbacks &callbacks);
+    /*!
      * \brief Parses PGE-X level file data from file
      * \param [__in] filePath Full path to the file
      * \param [__out] FileData Level data structure
@@ -414,6 +444,13 @@ public:
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, LevelData /*output*/ &FileData);
+    /*!
+     * \brief Parses PGE-X level file data from file input descriptor
+     * \param [__in] in File Input descriptor
+     * \param [__in] callbacks Level load callbacks
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const LevelLoadCallbacks &callbacks);
     /*!
      * \brief Generates PGE-X Level file
      * \param [__in] filePath Target file path
