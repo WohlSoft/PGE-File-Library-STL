@@ -40,6 +40,12 @@ void FileFormats::SetSMBX64LvlFlags(int flags)
     s_smbx64_flags = flags;
 }
 
+static inline void skipSection(PGE_FileFormats_misc::TextInput& in, PGESTRING& line)
+{
+    while(line != "next" && !in.eof())
+        in.readCVSLine(line);
+}
+
 
 //*********************************************************
 //****************READ FILE FORMAT*************************
@@ -311,6 +317,9 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, const L
         ////////////Block Data//////////
         nextLine();
 
+        if(!cb.load_block)
+            skipSection(in, line);
+
         while(line != "next")
         {
             blocks = FileFormats::CreateLvlBlock();
@@ -409,6 +418,9 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, const L
         ////////////BGO Data//////////
         nextLine();
 
+        if(!cb.load_bgo)
+            skipSection(in, line);
+
         while(line != "next")
         {
             bgodata = FileFormats::CreateLvlBgo();
@@ -439,6 +451,9 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, const L
 
         ////////////NPC Data//////////
         nextLine();
+
+        if(!cb.load_npc)
+            skipSection(in, line);
 
         while(line != "next")
         {
@@ -680,6 +695,9 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, const L
         {
             nextLine();
 
+            if(!cb.load_phys)
+                skipSection(in, line);
+
             while(line != "next")
             {
                 waters = FileFormats::CreateLvlPhysEnv();
@@ -713,6 +731,9 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, const L
             ////////////Layers Data//////////
             nextLine();
 
+            if(!cb.load_layer)
+                skipSection(in, line);
+
             while((line != "next") && (!in.eof()) && (!IsEmpty(line)))
             {
                 SMBX64::ReadStr(&layers.name, line);     //Layer name
@@ -727,6 +748,9 @@ bool FileFormats::ReadSMBX64LvlFile(PGE_FileFormats_misc::TextInput &in, const L
 
             ////////////Events Data//////////
             nextLine();
+
+            if(!cb.load_event)
+                skipSection(in, line);
 
             while((!IsEmpty(line)) && (!in.eof()))
             {
