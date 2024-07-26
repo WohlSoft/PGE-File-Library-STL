@@ -26,6 +26,7 @@
 
 #include "pge_file_lib_sys.h"
 #include "pge_file_lib_private.h"
+#include "CSVUtils.h"
 
 #include "file_formats.h"
 
@@ -73,6 +74,20 @@ PGESTRING FileFormats::getErrorString(FileFormats::ErrorCodes errCode)
         return "PGE-X Invalid data type";
     }
     return "Unknown error";
+}
+
+/***************************************************************************/
+void FileFormatsError::add_exc_info(const std::exception& e, long linenum, PGESTRING&& line)
+{
+#ifdef PGE_FILES_QT
+    ERROR_info += QString::fromStdString(exception_to_pretty_string(e));
+#else
+    ERROR_info += exception_to_pretty_string(e);
+#endif
+    ERROR_linenum = linenum;
+    ERROR_linedata = std::move(line);
+    PGE_CutLength(ERROR_linedata, 50);
+    PGE_FilterBinary(ERROR_linedata);
 }
 
 /***************************************************************************/
