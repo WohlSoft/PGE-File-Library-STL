@@ -40,6 +40,8 @@ list(APPEND PGE_FILE_LIBRARY_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/mdx_meta_file_rw.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/mdx_level_file.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/mdx_level_file_rw.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/mdx_world_file.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/mdx/mdx_world_file_rw.cpp
 )
 
 if(PGEFL_ENABLE_RWOPS)
