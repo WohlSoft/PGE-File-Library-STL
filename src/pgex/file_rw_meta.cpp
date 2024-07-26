@@ -27,6 +27,7 @@
 #include "file_formats.h"
 #include "pge_file_lib_private.h"
 #include "pge_x.h"
+#include "mdx/mdx_meta_file.h"
 
 //*********************************************************
 //****************READ FILE FORMAT*************************
@@ -68,6 +69,9 @@ bool FileFormats::ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, const PGESTRING &
 
 bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in, MetaData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_load_meta(in, FileData);
+
   // indented 2 spaces to avoid large diff hunk
   try
   {
@@ -210,6 +214,9 @@ bool FileFormats::WriteNonSMBX64MetaDataRaw(MetaData &metaData, PGESTRING &rawda
 
 bool FileFormats::WriteNonSMBX64MetaData(PGE_FileFormats_misc::TextOutput &out, MetaData &metaData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_save_meta(out, metaData);
+
     pge_size_t i;
 
     //Bookmarks
