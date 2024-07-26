@@ -34,15 +34,31 @@
 
 #include "pge_file_lib_globs.h"
 #include <memory>
+#include <exception>
+
+/**
+ * @brief Common data structure for errors
+ */
+struct FileFormatsError
+{
+    //! Error messsage
+    PGESTRING ERROR_info;
+    //! Line data where error was occured
+    PGESTRING ERROR_linedata;
+    //! Number of line where error was occured
+    long      ERROR_linenum = -1;
+
+    //! Fill error info from an exception
+    void add_exc_info(const std::exception& e, long linenum, PGESTRING&& line);
+};
 
 /**
  * @brief Common data structure meta-data
  */
-struct FileFormatMeta
+struct FileFormatMeta : public FileFormatsError
 {
     FileFormatMeta():
         ReadFileValid(true),
-        ERROR_linenum(-1),
         RecentFormat(0),
         RecentFormatVersion(0),
         modified(true),
@@ -51,12 +67,6 @@ struct FileFormatMeta
     {}
     //! Is file parsed correctly, false if some error is occouped
     bool ReadFileValid;
-    //! Error messsage
-    PGESTRING ERROR_info;
-    //! Line data where error was occouped
-    PGESTRING ERROR_linedata;
-    //! Number of line where error was occouped
-    long      ERROR_linenum;
     //! Recently used (open or save) file format
     int RecentFormat;
     //! Recently used format version (for SMBX1...64 files only)
