@@ -35,6 +35,8 @@
 #include "pge_file_lib_globs.h"
 #include "pge_file_lib_private.h"
 
+#include "src/mdx/mdx_utils.h"
+
 /*!
  * \brief SMBX64 Standard validation and raw data conversion functions
  */
@@ -231,6 +233,8 @@ namespace SMBX64
         *out = qRound(input.toDouble(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
+        if(input.size() != 0 && MDX_load_int(*out, input.c_str()) == input.c_str() + input.size()) [[likely]]
+            return;
         *out = static_cast<int>(std::round(std::stod(input)));
         #endif
     }
@@ -242,6 +246,8 @@ namespace SMBX64
         *out = static_cast<long>(std::round(input.toDouble(&ok)));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
+        if(input.size() != 0 && MDX_load_long(*out, input.c_str()) == input.c_str() + input.size())
+            return;
         *out = static_cast<long>(std::round(std::stod(input)));
         #endif
     }
