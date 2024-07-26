@@ -68,6 +68,9 @@ bool FileFormats::ReadNonSMBX64MetaDataRaw(PGESTRING &rawdata, const PGESTRING &
 
 bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in, MetaData &FileData)
 {
+  // indented 2 spaces to avoid large diff hunk
+  try
+  {
     PGESTRING errorString;
     int str_count = 0;      //Line Counter
     PGESTRING line;           //Current Line data
@@ -157,6 +160,15 @@ badfile:    //If file format is not correct
     FileData.meta.ReadFileValid = false;
     FileData.bookmarks.clear();
     return false;
+  }
+  catch(const std::exception& e)
+  {
+    FileData.meta.ERROR_info = e.what();
+    FileData.meta.ERROR_linedata.clear();
+    FileData.meta.ERROR_linenum = -1;
+    FileData.meta.ReadFileValid = false;
+    return false;
+  }
 }
 
 
