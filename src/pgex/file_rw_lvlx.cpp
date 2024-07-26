@@ -29,6 +29,7 @@
 #include "pgex/file_strlist.h"
 #include "pge_x.h"
 #include "pgex/pge_x_macro.h"
+#include "mdx/mdx_level_file.h"
 #include <cfloat>
 
 //*********************************************************
@@ -68,6 +69,9 @@ bool FileFormats::ReadExtendedLvlFileHeaderRaw(PGESTRING &rawdata, const PGESTRI
 
 bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_load_level_header(inf, FileData);
+
   // indented 2 spaces to avoid large diff hunk
   try
   {
@@ -238,6 +242,9 @@ bool FileFormats::ReadExtendedLvlFileRaw(PGESTRING &rawdata, const PGESTRING &fi
 
 bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_load_level(in, FileData);
+
   // indented 2 spaces to avoid large diff hunk
   try
   {
@@ -1723,6 +1730,9 @@ bool FileFormats::WriteExtendedLvlFileRaw(LevelData &FileData, PGESTRING &rawdat
 
 bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, LevelData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_save_level(out, FileData);
+
     pge_size_t i;
     FileData.meta.RecentFormat = LevelData::PGEX;
     //Count placed stars on this level
