@@ -32,6 +32,7 @@
 #ifndef META_FILEDATA_H
 #define META_FILEDATA_H
 
+#include "pge_base_callbacks.h"
 #include "pge_file_lib_globs.h"
 #include <memory>
 #include <exception>
@@ -173,6 +174,16 @@ struct MetaData
 
     //!Helper meta-data
     FileFormatMeta meta;
+};
+
+struct MetaLoadCallbacks : PGE_FileFormats_misc::LoadCallbacks
+{
+    callback<Bookmark> load_bookmark = nullptr;
+};
+
+struct MetaSaveCallbacks : PGE_FileFormats_misc::SaveCallbacks
+{
+    callback<Bookmark> save_bookmark = nullptr;
 };
 
 #endif // META_FILEDATA_H
