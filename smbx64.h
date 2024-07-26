@@ -253,13 +253,26 @@ namespace SMBX64
             out->clear();
             return;
         }
-        *out = input;
+
         PGESTRING &target = *out;
-        if(target[0] == PGEChar('\"'))
-            PGE_RemStrRng(target, 0, 1);
-        if( (!IsEmpty(target)) && (target[target.size()-1] == PGEChar('\"')) )
+
+        if(input[0] != PGEChar('\"') && input[input.size() - 1] != PGEChar('\"'))
+            target = std::move(input);
+        else if(input[0] != PGEChar('\"'))
+        {
+            target = std::move(input);
             PGE_RemStrRng(target, int(target.size() - 1), 1);
-        target = PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
+        }
+        else
+        {
+            target = input;
+            PGE_RemStrRng(target, 0, 1);
+
+            if( (!IsEmpty(target)) && (target[target.size()-1] == PGEChar('\"')) )
+                PGE_RemStrRng(target, int(target.size() - 1), 1);
+        }
+
+        PGE_ReplSTRING_inline(target, "\"", "\'");//Correct damaged by SMBX line
     }
 
 
