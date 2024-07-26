@@ -37,6 +37,7 @@
 
 #include "pge_file_lib_globs.h"
 #include "meta_filedata.h"
+#include "pge_base_callbacks.h"
 
 //! Game Save specific Visible element entry <array-id, is-vizible>
 typedef PGEPAIR<unsigned int, bool > visibleItem;
@@ -99,7 +100,7 @@ struct saveUserData
         //! Optionally, for example, level filename
         PGESTRING           location_name;
         //! Name of data section
-        PGESTRING           name;
+        PGESTRING           name = "default";
         //! key=value Data entries
         PGELIST<DataEntry>  data;
     };
@@ -118,6 +119,41 @@ struct saveLevelInfo
     PGELIST<bool> medals_best;
     PGELIST<bool> medals_got;
     unsigned int exits_got;
+};
+
+/*!
+ * \brief Game save header data structure. Contains general values for the game save.
+ */
+struct GamesaveHead
+{
+    //! Number of lives
+    int lives = 3;
+    //! Hundreds of coins, used in TheXTech to replace the legacy lives system. In the file format, 0 is reserved as "unspecified", and 1 is the first non-negative value.
+    int hundreds = 0;
+    //! Number of coins
+    unsigned int coins = 0;
+    //! Number of points
+    unsigned int points = 0;
+    //! Total stars
+    unsigned int totalStars = 0;
+
+    //! Last world map position X
+    long worldPosX = 0;
+    //! Last world map position Y
+    long worldPosY = 0;
+
+    //! Last entered/exited warp Array-ID on the HUB-based episodes.
+    unsigned long last_hub_warp = 0;
+    //! Last visited sub-hub level file
+    PGESTRING last_hub_level_file;
+
+    //! Current world music ID
+    unsigned int musicID = 0;
+    //! Current world music file (custom music)
+    PGESTRING musicFile;
+
+    //! Is episode was completed in last time
+    bool gameCompleted = false;
 };
 
 /*!
@@ -171,6 +207,32 @@ struct GamesaveData
     PGELIST<starOnLevel > gottenStars;
     //! Cached per-level information and medals registry
     PGELIST<saveLevelInfo > levelInfo;
+};
+
+struct GamesaveLoadCallbacks : PGE_FileFormats_misc::LoadCallbacks
+{
+    callback<GamesaveHead>              load_head = nullptr;
+    callback<saveCharState>             load_charstate = nullptr;
+    callback<savePlayerState>           load_selchar = nullptr;
+    callback<visibleItem>               load_vis_level = nullptr;
+    callback<visibleItem>               load_vis_path = nullptr;
+    callback<visibleItem>               load_vis_scene = nullptr;
+    callback<starOnLevel>               load_star = nullptr;
+    callback<saveLevelInfo>             load_level_info = nullptr;
+    callback<saveUserData::DataSection> load_userdata = nullptr;
+};
+
+struct GamesaveSaveCallbacks : PGE_FileFormats_misc::SaveCallbacks
+{
+    callback<GamesaveHead>              save_head = nullptr;
+    callback<saveCharState>             save_charstate = nullptr;
+    callback<savePlayerState>           save_selchar = nullptr;
+    callback<visibleItem>               save_vis_level = nullptr;
+    callback<visibleItem>               save_vis_path = nullptr;
+    callback<visibleItem>               save_vis_scene = nullptr;
+    callback<starOnLevel>               save_star = nullptr;
+    callback<saveLevelInfo>             save_level_info = nullptr;
+    callback<saveUserData::DataSection> save_userdata = nullptr;
 };
 
 #endif // SAVE_FILEDATA_H

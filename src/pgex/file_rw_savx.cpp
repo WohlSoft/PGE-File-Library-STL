@@ -28,6 +28,7 @@
 #include "file_strlist.h"
 #include "pge_x.h"
 #include "pgex/pge_x_macro.h"
+#include "mdx/mdx_gamesave_file.h"
 
 #ifdef PGE_FILES_QT
 #include <QDir>
@@ -73,6 +74,9 @@ bool FileFormats::ReadExtendedSaveFileRaw(PGESTRING &rawdata, const PGESTRING &f
 
 bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, GamesaveData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_load_gamesave(in, FileData);
+
   // indented 2 spaces to avoid large diff hunk
   try
   {
@@ -351,6 +355,9 @@ bool FileFormats::WriteExtendedSaveFileRaw(GamesaveData &FileData, PGESTRING &ra
 
 bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, GamesaveData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_save_gamesave(out, FileData);
+
     pge_size_t i;
     out << "SAVE_HEADER\n";
     out << PGEFile::value("LV", PGEFile::WriteInt(FileData.lives));

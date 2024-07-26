@@ -24,52 +24,22 @@
  * SOFTWARE.
  */
 
-#include "file_formats.h"
+/*!
+ *  \file mdx_gamesave_file.h
+ *  \brief Contains data structure definitions for the MDX save loader
+ */
 
-//*********************************************************
-//****************Sctructure initalizers*******************
-//*********************************************************
+#pragma once
+#ifndef MDX_GAMESAVE_FILE_H
+#define MDX_GAMESAVE_FILE_H
 
-saveCharState FileFormats::CreateSavCharacterState()
-{
-    saveCharState newData;
+#include "pge_file_lib_globs.h"
+#include "save_filedata.h"
 
-    // rely on constructor
-#if 0
-    newData.id          = 1;
-    newData.health      = 0;
-    newData.itemID      = 0;
-    newData.mountID     = 0;
-    newData.mountType   = 0;
-    newData.state       = 1;
-#endif
+bool MDX_load_gamesave(PGE_FileFormats_misc::TextInput& input, const GamesaveLoadCallbacks& callbacks);
+bool MDX_load_gamesave(PGE_FileFormats_misc::TextInput &file, GamesaveData &FileData);
 
-    return newData;
-}
+bool MDX_save_gamesave(PGE_FileFormats_misc::TextOutput& output, const GamesaveSaveCallbacks& callbacks);
+bool MDX_save_gamesave(PGE_FileFormats_misc::TextOutput &file, const GamesaveData &FileData);
 
-
-GamesaveData FileFormats::CreateGameSaveData()
-{
-    GamesaveData newData;
-
-    newData.lives = 3;
-
-//    newData.meta.RecentFormatVersion = 0;
-//    newData.coins = 0;
-//    newData.points = 0;
-//    newData.totalStars = 0;
-//
-//    newData.last_hub_warp = 0;
-//
-//    newData.musicID = 0;
-//    newData.musicFile = "";
-//
-//    newData.worldPosX = 0;
-//    newData.worldPosY = 0;
-//    newData.gameCompleted = false;
-
-    newData.characterStates.push_back(CreateSavCharacterState()); //-V823
-    newData.currentCharacter.push_back(1);
-
-    return newData;
-}
+#endif // #ifndef MDX_GAMESAVE_FILE_H
