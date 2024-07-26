@@ -31,6 +31,8 @@
 #include "pgex/pge_x_macro.h"
 #include "pge_file_lib_sys.h"
 
+#include "mdx/mdx_world_file.h"
+
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
@@ -78,6 +80,9 @@ bool FileFormats::ReadExtendedWldFileHeaderRaw(PGESTRING &rawdata, const PGESTRI
 
 bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &inf, WorldData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_load_world_header(inf, FileData);
+
   // indented 2 spaces to avoid large diff hunk
   try
   {
@@ -277,6 +282,9 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &fi
 
 bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, WorldData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_load_world(in, FileData);
+
   // indented 2 spaces to avoid large diff hunk
   try
   {
@@ -606,6 +614,9 @@ bool FileFormats::WriteExtendedWldFileRaw(WorldData &FileData, PGESTRING &rawdat
 
 bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, WorldData &FileData)
 {
+    if(!g_use_legacy_pgex_parser)
+        return MDX_save_world(out, FileData);
+
     pge_size_t i = 0;
     FileData.meta.RecentFormat = WorldData::PGEX;
 

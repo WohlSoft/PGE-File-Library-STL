@@ -34,6 +34,7 @@
 #define WLD_FILEDATA_H
 
 #include "pge_file_lib_globs.h"
+#include "pge_base_callbacks.h"
 #include "meta_filedata.h"
 
 #ifndef DEFAULT_LAYER_NAME
@@ -477,6 +478,39 @@ struct WorldItemSetup38A
     PGELIST<Entry> data;
 };
 
+/*!
+ * \brief World map header data structure. Contains all available settings for the map.
+ */
+struct WorldHead
+{
+    //! Title of the episode
+    PGESTRING EpisodeTitle;
+    //! List of disabled playable characters (boolean array by ID of each playable character)
+    PGELIST<bool > nocharacter;
+
+    PGESTRING IntroLevel_file;
+    PGESTRING GameOverLevel_file;
+    bool HubStyledWorld = false;
+    bool restartlevel = false;
+
+    //! Cached total number of available stars on this episode
+    unsigned int    stars = 0;
+
+    //! Episode credits (full text area)
+    PGESTRING authors;
+    //! Credits scene background music
+    PGESTRING authors_music;
+
+    //! World map wide policy of per-level stars count displaying
+    int starsShowPolicy = -1;
+
+    //! JSON-like string with a custom properties (without master brackets, like "param":"value,["subparam":value])
+    PGESTRING custom_params;
+
+    //! A config pack identify string.
+    PGESTRING configPackId;
+};
+
 /**
  * @brief World map data structure
  */
@@ -655,6 +689,32 @@ struct WorldData
     int     CurSection = 0;
     bool    playmusic = false;
     int     currentMusic = 0;
+};
+
+struct WorldLoadCallbacks : PGE_FileFormats_misc::LoadCallbacks
+{
+    callback<WorldHead>        load_head = nullptr;
+    callback<Bookmark>         load_bookmark = nullptr;
+    callback<CrashData>        load_crash_data = nullptr;
+    callback<WorldTerrainTile> load_tile = nullptr;
+    callback<WorldScenery>     load_scene = nullptr;
+    callback<WorldPathTile>    load_path = nullptr;
+    callback<WorldMusicBox>    load_music = nullptr;
+    callback<WorldAreaRect>    load_arearect = nullptr;
+    callback<WorldLevelTile>   load_level = nullptr;
+};
+
+struct WorldSaveCallbacks : PGE_FileFormats_misc::SaveCallbacks
+{
+    callback<WorldHead>        save_head = nullptr;
+    callback<Bookmark>         save_bookmark = nullptr;
+    callback<CrashData>        save_crash_data = nullptr;
+    callback<WorldTerrainTile> save_tile = nullptr;
+    callback<WorldScenery>     save_scene = nullptr;
+    callback<WorldPathTile>    save_path = nullptr;
+    callback<WorldMusicBox>    save_music = nullptr;
+    callback<WorldAreaRect>    save_arearect = nullptr;
+    callback<WorldLevelTile>   save_level = nullptr;
 };
 
 #endif // WLD_FILEDATA_H
