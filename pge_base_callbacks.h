@@ -48,7 +48,7 @@ namespace PGE_FileFormats_misc
 {
 
 // error that callbacks may raise when unpacking object
-class callback_error : std::exception
+class callback_error : public std::exception
 {
     const char* const m_message = nullptr;
 public:
@@ -60,7 +60,7 @@ public:
 };
 
 // way that callbacks may fully terminate parse process without any error
-class callback_interrupt : std::exception {};
+class callback_interrupt : public std::exception {};
 
 
 struct LoadCallbacks
