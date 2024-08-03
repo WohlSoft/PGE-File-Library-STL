@@ -184,6 +184,14 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
                                          else goto badfile; \
                                          PGE_check_inst<unsigned int>(targetValue); }
 
+/*! \def PGEX_UIntVal(Mark, targetValue)
+    \brief Parse uint32_t integer value by requested Marker and write into target variable
+*/
+#define PGEX_UInt32Val(Mark, targetValue)  if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
+targetValue = toUInt(v.value);\
+    else goto badfile; \
+    PGE_check_inst<uint32_t>(targetValue); }
+
 /*! \def PGEX_SIntVal(Mark, targetValue)
     \brief Parse signed integer value by requested Marker and write into target variable
 */
@@ -207,6 +215,14 @@ PGEFile::PGEX_Item x = f_section.data[sdata];
                                          targetValue = toULong(v.value);\
                                          else goto badfile; \
                                          PGE_check_inst<unsigned long>(targetValue); }
+
+/*! \def PGEX_UInt64Val(Mark, targetValue)
+    \brief Parse uint64_t integer value by requested Marker and write into target variable
+*/
+#define PGEX_UInt64Val(Mark, targetValue) if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
+targetValue = toULong(v.value);\
+    else goto badfile; \
+    PGE_check_inst<uint64_t>(targetValue); }
 
 /*! \def PGEX_USLongVal(Mark, targetValue)
     \brief Parse unsigned long integer value by requested Marker and write into target signed long variable

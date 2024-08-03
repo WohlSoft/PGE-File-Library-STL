@@ -457,7 +457,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
                     PGEX_SLongVal("CS", block.npc_special_value) //Special value for contained NPC
                     PGEX_BoolVal("IV", block.invisible) //Invisible
                     PGEX_BoolVal("SL", block.slippery) //Slippery
-                    PGEX_UIntVal("MA", block.motion_ai_id) //Motion AI type
+                    PGEX_UInt32Val("MA", block.motion_ai_id) //Motion AI type
                     PGEX_SLongVal("S1", block.special_data) //Special value 1
                     PGEX_SLongVal("S2", block.special_data2) //Special value 2
                     PGEX_StrVal("LR", block.layer) //Layer name
@@ -509,7 +509,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", npcdata.id) //NPC ID
+                    PGEX_UInt64Val("ID", npcdata.id) //NPC ID
                     PGEX_SLongVal("X", npcdata.x) //X position
                     PGEX_SLongVal("Y", npcdata.y) //Y position
                     PGEX_StrVal("GXN", npcdata.gfx_name) //38A GFX-Name
