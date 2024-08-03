@@ -1573,7 +1573,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
                 {
                     PGEX_ValueBegin()
                     PGEX_USIntVal("T",  type) //Type of item
-                    PGEX_USLongVal("ID", customcfg38A.id)
+                    PGEX_USInt64Val("ID", customcfg38A.id)
                     PGEX_StrArrVal_Validate("D", data, data_begin) //Variable value
 
                     // check type for every value (instead of only the final stored type)

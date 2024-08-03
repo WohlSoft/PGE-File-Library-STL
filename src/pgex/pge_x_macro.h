@@ -232,6 +232,13 @@ targetValue = toULong(v.value);\
                                          else goto badfile; \
                                          PGE_check_inst<signed long>(targetValue); }
 
+/*! \def PGEX_USInt64Val(Mark, targetValue)
+    \brief Parse unsigned 64-bit integer value by requested Marker and write into target int64_t variable
+*/
+#define PGEX_USInt64Val(Mark, targetValue) if(v.marker==Mark) { if(PGEFile::IsIntU(v.value)) \
+                                         targetValue = toLong(v.value);\
+                                         else goto badfile; \
+                                         PGE_check_inst<int64_t>(targetValue); }
 
 /*! \def PGEX_FloatVal(Mark, targetValue)
     \brief Parse floating point value by requested Marker and write into target variable
