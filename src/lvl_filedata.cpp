@@ -383,7 +383,7 @@ PlayerPoint FileFormats::CreateLvlPlayerPoint(unsigned int id)
         dummyPlayer.h = 60;
         break;
     default:
-        dummyPlayer.h = 32; //-V112 //-V1048
+        dummyPlayer.h = 0; //-V112 //-V1048
     }
 
     return dummyPlayer;
