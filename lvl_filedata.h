@@ -120,9 +120,9 @@ struct PlayerPoint
     //! Y-position of player spawn point
     long y = 0;
     //! Height of player spawn point (used to calculate position of bottom to place playable character correctly)
-    long h = 32;
+    long h = 0;
     //! Wodth of player spawn point (used to calculate position of bottom to place playable character correctly)
-    long w = 24;
+    long w = 0;
     //! Defined ID of player
     unsigned int id = 0;
     //! Initial direction of playable character (-1 is left, 1 is right, 0 is right by default)
