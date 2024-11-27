@@ -48,12 +48,12 @@ struct MDX_MetaFile : MDX_File<MetaLoadCallbacks, MetaSaveCallbacks>
 
 bool MDX_load_meta(PGE_FileFormats_misc::TextInput& input, const MetaLoadCallbacks& callbacks)
 {
-    MDX_MetaFile f;
-    return f.load_file(input, callbacks);
+    std::unique_ptr<MDX_MetaFile> f(new MDX_MetaFile());
+    return f->load_file(input, callbacks);
 }
 
 bool MDX_save_meta(PGE_FileFormats_misc::TextOutput& output, const MetaSaveCallbacks& callbacks)
 {
-    MDX_MetaFile f;
-    return f.save_file(output, callbacks);
+    std::unique_ptr<MDX_MetaFile> f(new MDX_MetaFile());
+    return f->save_file(output, callbacks);
 }

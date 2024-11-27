@@ -173,12 +173,12 @@ struct MDX_GamesaveFile : MDX_File<GamesaveLoadCallbacks, GamesaveSaveCallbacks>
 
 bool MDX_load_gamesave(PGE_FileFormats_misc::TextInput& input, const GamesaveLoadCallbacks& callbacks)
 {
-    MDX_GamesaveFile f;
-    return f.load_file(input, callbacks);
+    std::unique_ptr<MDX_GamesaveFile> f(new MDX_GamesaveFile());
+    return f->load_file(input, callbacks);
 }
 
 bool MDX_save_gamesave(PGE_FileFormats_misc::TextOutput& output, const GamesaveSaveCallbacks& callbacks)
 {
-    MDX_GamesaveFile f;
-    return f.save_file(output, callbacks);
+    std::unique_ptr<MDX_GamesaveFile> f(new MDX_GamesaveFile());
+    return f->save_file(output, callbacks);
 }
