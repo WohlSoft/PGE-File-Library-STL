@@ -493,6 +493,7 @@ inline PGESTRING fromBoolToNum(bool num)
 #define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
 #endif /* ------ PGE_FILES_QT ------ */
 
+
 inline bool PGE_floatEqual(double l, double r, double precission)
 {
     return static_cast<long long>(l * std::pow(10.0, precission)) ==
@@ -532,5 +533,22 @@ static inline int PGE_toNearestS(double o)
 
     return int(PGE_toNearestU(o)) * sign;
 }
+
+
+#if __has_cpp_attribute(likely)
+#   define PGE_ATTR_LIKELY [[likely]]
+#elif __has_cpp_attribute(__likely__)
+#   define PGE_ATTR_LIKELY [[__likely__]]
+#else
+#   define PGE_ATTR_LIKELY
+#endif
+
+#if __has_cpp_attribute(unlikely)
+#   define PGE_ATTR_UNLIKELY [[unlikely]]
+#elif __has_cpp_attribute(__unlikely__)
+#   define PGE_ATTR_UNLIKELY [[__unlikely__]]
+#else
+#   define PGE_ATTR_UNLIKELY
+#endif
 
 #endif // PGE_FILE_LIB_PRIVATE_H_

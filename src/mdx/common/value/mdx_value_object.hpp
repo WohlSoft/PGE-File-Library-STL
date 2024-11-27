@@ -46,7 +46,7 @@ struct MDX_Value_Object
     static const obj_loader_t s_obj_loader;
     static const char* load(typename obj_loader_t::obj_t& dest, const char* field_data);
     static bool save(std::string& out, const typename obj_loader_t::obj_t& src);
-    static bool is_ref(const PGELIST<bool>& src, const PGELIST<bool>& /*reference*/)
+    static bool is_ref(const PGELIST<bool>& /*src*/, const PGELIST<bool>& /*reference*/)
     {
         return false;
     }
