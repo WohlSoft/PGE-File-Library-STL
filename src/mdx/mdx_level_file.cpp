@@ -662,12 +662,12 @@ struct MDX_LevelFile : MDX_File<LevelLoadCallbacks, LevelSaveCallbacks>
 
 bool MDX_load_level(PGE_FileFormats_misc::TextInput& input, const LevelLoadCallbacks& callbacks)
 {
-    MDX_LevelFile f;
-    return f.load_file(input, callbacks);
+    std::unique_ptr<MDX_LevelFile> f(new MDX_LevelFile());
+    return f->load_file(input, callbacks);
 }
 
 bool MDX_save_level(PGE_FileFormats_misc::TextOutput& output, const LevelSaveCallbacks& callbacks)
 {
-    MDX_LevelFile f;
-    return f.save_file(output, callbacks);
+    std::unique_ptr<MDX_LevelFile> f(new MDX_LevelFile());
+    return f->save_file(output, callbacks);
 }

@@ -148,12 +148,12 @@ struct MDX_WorldFile : MDX_File<WorldLoadCallbacks, WorldSaveCallbacks>
 
 bool MDX_load_world(PGE_FileFormats_misc::TextInput& input, const WorldLoadCallbacks& callbacks)
 {
-    MDX_WorldFile f;
-    return f.load_file(input, callbacks);
+    std::unique_ptr<MDX_WorldFile> f(new MDX_WorldFile());
+    return f->load_file(input, callbacks);
 }
 
 bool MDX_save_world(PGE_FileFormats_misc::TextOutput& output, const WorldSaveCallbacks& callbacks)
 {
-    MDX_WorldFile f;
-    return f.save_file(output, callbacks);
+    std::unique_ptr<MDX_WorldFile> f(new MDX_WorldFile());
+    return f->save_file(output, callbacks);
 }
