@@ -35,6 +35,9 @@
 #include <limits>
 #include <cmath>
 #include <cstdarg>
+
+#include "pge_file_lib_private.h"
+
 #include "mdx/common/mdx_value.h"
 #include "mdx/common/mdx_exception.h"
 #include "mdx/common/value/milo_yip/itoa.h"
@@ -64,9 +67,9 @@ static const char* s_MDX_load_uint(uint_t& dest, const char* field_data)
 
         uint_t digit = c - '0';
 
-        if(value >= std::numeric_limits<uint_t>::max() / 10) [[unlikely]]
+        if(value >= std::numeric_limits<uint_t>::max() / 10) PGE_ATTR_UNLIKELY
         {
-            if(value > std::numeric_limits<uint_t>::max() / 10 || digit > std::numeric_limits<uint_t>::max() % 10) [[likely]]
+            if(value > std::numeric_limits<uint_t>::max() / 10 || digit > std::numeric_limits<uint_t>::max() % 10) PGE_ATTR_LIKELY
                 return ret_error;
         }
 
@@ -108,17 +111,17 @@ static const char* s_MDX_load_int(int_t& dest, const char* field_data)
 
         if(sign == 1)
         {
-            if(value >= std::numeric_limits<int_t>::max() / 10) [[unlikely]]
+            if(value >= std::numeric_limits<int_t>::max() / 10) PGE_ATTR_UNLIKELY
             {
-                if(value > std::numeric_limits<int_t>::max() / 10 || digit > std::numeric_limits<int_t>::max() % 10) [[likely]]
+                if(value > std::numeric_limits<int_t>::max() / 10 || digit > std::numeric_limits<int_t>::max() % 10) PGE_ATTR_LIKELY
                     return ret_error;
             }
         }
         else
         {
-            if(value <= std::numeric_limits<int_t>::min() / 10) [[unlikely]]
+            if(value <= std::numeric_limits<int_t>::min() / 10) PGE_ATTR_UNLIKELY
             {
-                if(value < std::numeric_limits<int_t>::min() / 10 || digit > -(std::numeric_limits<int_t>::min() % 10)) [[likely]]
+                if(value < std::numeric_limits<int_t>::min() / 10 || digit > -(std::numeric_limits<int_t>::min() % 10)) PGE_ATTR_LIKELY
                     return ret_error;
             }
         }
@@ -168,7 +171,7 @@ static const char* s_MDX_load_double(double& dest, const char* field_data)
 
         field_data++;
 
-        if(value >= std::numeric_limits<double>::max() / 10) [[unlikely]]
+        if(value >= std::numeric_limits<double>::max() / 10) PGE_ATTR_UNLIKELY
             return ret_error;
 
         value *= 10;

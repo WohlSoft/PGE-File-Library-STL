@@ -233,7 +233,7 @@ namespace SMBX64
         *out = qRound(input.toDouble(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
-        if(input.size() != 0 && MDX_load_int(*out, input.c_str()) == input.c_str() + input.size()) [[likely]]
+        if(input.size() != 0 && MDX_load_int(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
             return;
         *out = static_cast<int>(std::round(std::stod(input)));
         #endif

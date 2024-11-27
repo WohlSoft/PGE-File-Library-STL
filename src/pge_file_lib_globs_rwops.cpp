@@ -28,12 +28,6 @@
 #include "pge_file_lib_private.h"
 #include <SDL2/SDL_rwops.h>
 
-#if __cplusplus >= 202002L
-#   define ATTR_LIKELY [[likely]]
-#else
-#   define ATTR_LIKELY
-#endif
-
 namespace PGE_FileFormats_misc
 {
 
@@ -308,7 +302,7 @@ void RWopsTextInput::readCVSLine(PGESTRING &out_utf16)
                 goto skip_char;
             case '\r':
                 // special fast path for \r\n
-                if(!quoteIsOpen && (byte + 1) != end && *(byte + 1) == '\n') ATTR_LIKELY // likely
+                if(!quoteIsOpen && (byte + 1) != end && *(byte + 1) == '\n') PGE_ATTR_LIKELY
                 {
                     m_lineNumber++;
 
