@@ -147,7 +147,7 @@ public:
         }
 
         // convert to wchar_t
-        size_t retval = mbstowcs(a_pOutputData,
+        size_t retval = mbstowcs(reinterpret_cast<wchar_t*>(a_pOutputData),
             a_pInputData, a_uOutputDataSize);
         return retval != (size_t)(-1);
     }

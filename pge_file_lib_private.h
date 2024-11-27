@@ -139,6 +139,28 @@ inline bool      IsEmpty(const PGESTRINGList &str)
 {
     return str.isEmpty();
 }
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+inline QCharRef  Back(PGESTRING &str)
+{
+    return str.back();
+}
+
+inline QChar Back(const PGESTRING &str)
+{
+    return str.back();
+}
+#else
+inline QChar&    Back(PGESTRING &str)
+{
+    return *(str.end() - 1);
+}
+
+inline const QChar&    Back(const PGESTRING &str)
+{
+    return *(str.end() - 1);
+}
+#endif
+
 inline int       toInt(const PGESTRING &str)
 {
     bool okay;
@@ -391,6 +413,17 @@ inline bool IsEmpty(const PGESTRINGList &str)
 {
     return str.empty();
 }
+
+inline char& Back(PGESTRING &str)
+{
+    return str.back();
+}
+
+inline const char& Back(const PGESTRING &str)
+{
+    return str.back();
+}
+
 
 inline int toInt(const PGESTRING &str)
 {
