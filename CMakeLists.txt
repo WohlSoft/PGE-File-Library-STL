@@ -103,6 +103,10 @@ if(PGEFL_ENABLE_RWOPS)
     target_compile_definitions(pgefl PUBLIC -DPGEFL_ENABLE_RWOPS)
 endif()
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    target_compile_options(pgefl PRIVATE "-Wno-c++20-extensions")
+endif()
+
 if(PGEFL_QT_SUPPORT)
     add_library(pgefl_qt STATIC
         ${PGE_FILE_LIBRARY_SRCS}
