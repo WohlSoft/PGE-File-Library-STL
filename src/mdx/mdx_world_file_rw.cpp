@@ -300,6 +300,114 @@ static bool s_save_level(const void* _FileData, WorldLevelTile& obj, pge_size_t 
     return true;
 }
 
+static bool s_load_layer38a(void* _FileData, WorldLayer& obj)
+{
+    WorldData& FileData = *reinterpret_cast<WorldData*>(_FileData);
+
+    obj.meta.array_id = FileData.layers_array_id++;
+    obj.meta.index = static_cast<unsigned int>(FileData.layers.size());
+    FileData.layers.push_back(obj);
+
+    return true;
+}
+
+static bool s_save_layer38a(const void* _FileData, WorldLayer& obj, pge_size_t index)
+{
+    const WorldData& FileData = *reinterpret_cast<const WorldData*>(_FileData);
+
+    if(index >= FileData.layers.size())
+        return false;
+
+    obj = FileData.layers[index];
+
+    return true;
+}
+
+static bool s_load_event38a(void* _FileData, WorldEvent38A& obj)
+{
+    WorldData& FileData = *reinterpret_cast<WorldData*>(_FileData);
+
+    obj.meta.array_id = FileData.events38A_array_id++;
+    obj.meta.index = static_cast<unsigned int>(FileData.events38A.size());
+    FileData.events38A.push_back(obj);
+
+    return true;
+}
+
+static bool s_save_event38a(const void* _FileData, WorldEvent38A& obj, pge_size_t index)
+{
+    const WorldData& FileData = *reinterpret_cast<const WorldData*>(_FileData);
+
+    if(index >= FileData.events38A.size())
+        return false;
+
+    obj = FileData.events38A[index];
+
+    return true;
+}
+
+static bool s_load_config38a(void* _FileData, WorldItemSetup38A& obj)
+{
+    WorldData& FileData = *reinterpret_cast<WorldData*>(_FileData);
+
+    FileData.custom38A_configs.push_back(obj);
+
+    return true;
+}
+
+static bool s_save_config38a(const void* _FileData, WorldItemSetup38A& obj, pge_size_t index)
+{
+    const WorldData& FileData = *reinterpret_cast<const WorldData*>(_FileData);
+
+    if(index >= FileData.custom38A_configs.size())
+        return false;
+
+    obj = FileData.custom38A_configs[index];
+
+    return true;
+}
+
+static bool s_load_junk_line(void* _FileData, PGESTRING& src)
+{
+    WorldData& FileData = *reinterpret_cast<WorldData*>(_FileData);
+    FileData.unsupported_38a_lines.push_back(std::move(src));
+
+    return true;
+}
+
+static bool s_save_junk_line(const void* _FileData, PGESTRING& obj, pge_size_t index)
+{
+    const WorldData& FileData = *reinterpret_cast<const WorldData*>(_FileData);
+
+    if(index >= FileData.unsupported_38a_lines.size())
+        return false;
+
+    obj = FileData.unsupported_38a_lines[index];
+
+    return true;
+}
+
+static bool s_load_head38a(void* _FileData, WorldHead38A& src)
+{
+    WorldData& FileData = *reinterpret_cast<WorldData*>(_FileData);
+
+    static_cast<WorldHead38A&>(FileData) = src;
+
+    return true;
+}
+
+static bool s_save_head38a(const void* _FileData, WorldHead38A& obj, pge_size_t index)
+{
+    if(index != 0)
+        return false;
+
+    const WorldData& FileData = *reinterpret_cast<const WorldData*>(_FileData);
+
+    obj = static_cast<const WorldHead38A&>(FileData);
+
+    return true;
+}
+
 bool MDX_load_world(PGE_FileFormats_misc::TextInput &file, WorldData &FileData)
 {
     FileFormats::CreateWorldData(FileData);
@@ -336,6 +444,12 @@ WorldLoadCallbacks PGEFL_make_load_callbacks(WorldData& target)
     callbacks.load_music = s_load_music;
     callbacks.load_arearect = s_load_arearect;
     callbacks.load_level = s_load_level;
+
+    callbacks.load_head38a = s_load_head38a;
+    callbacks.load_layer38a = s_load_layer38a;
+    callbacks.load_event38a = s_load_event38a;
+    callbacks.load_config38a = s_load_config38a;
+    callbacks.load_junk_line = s_load_junk_line; // but aren't they all junk lines?
 
     callbacks.userdata = reinterpret_cast<void*>(&target);
 
@@ -395,6 +509,12 @@ WorldSaveCallbacks PGEFL_make_save_callbacks(const WorldData& target)
     callbacks.save_music = s_save_music;
     callbacks.save_arearect = s_save_arearect;
     callbacks.save_level = s_save_level;
+
+    callbacks.save_head38a = s_save_head38a;
+    callbacks.save_layer38a = s_save_layer38a;
+    callbacks.save_event38a = s_save_event38a;
+    callbacks.save_config38a = s_save_config38a;
+    callbacks.save_junk_line = s_save_junk_line;
 
     callbacks.userdata = reinterpret_cast<const void*>(&target);
 
