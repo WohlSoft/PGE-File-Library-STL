@@ -23,6 +23,7 @@ if(NOT CMAKE_DEBUG_POSTFIX)
 endif()
 
 option(PGEFL_ENABLE_RWOPS "Enable SDL_RWops interfaces (if this option is enabled, then PGE-FL has a build-time dependency on SDL2's headers)" OFF)
+option(PGEFL_DISABLE_SMBX38A "Disable loading of SMBX-38A content" OFF)
 
 if(NOT DEFINED PGE_FORCE_QT5 AND NOT DEFINED PGEFL_PREFER_QT5)
     option(PGE_FORCE_QT5 "Try to find Qt5 instead of Qt6 if available" ON)
@@ -103,6 +104,10 @@ if(PGEFL_ENABLE_RWOPS)
     target_compile_definitions(pgefl PUBLIC -DPGEFL_ENABLE_RWOPS)
 endif()
 
+if(PGEFL_DISABLE_SMBX38A)
+    target_compile_definitions(pgefl PRIVATE -DPGEFL_DISABLE_SMBX38A)
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_compile_options(pgefl PRIVATE "-Wno-c++20-extensions")
 endif()
@@ -121,6 +126,10 @@ if(PGEFL_QT_SUPPORT)
 
     if(PGEFL_ENABLE_RWOPS)
         target_compile_definitions(pgefl_qt PUBLIC -DPGEFL_ENABLE_RWOPS)
+    endif()
+
+    if(PGEFL_DISABLE_SMBX38A)
+        target_compile_definitions(pgefl PRIVATE -DPGEFL_DISABLE_SMBX38A)
     endif()
 endif()
 

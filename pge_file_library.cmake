@@ -7,7 +7,6 @@ list(APPEND PGE_FILE_LIBRARY_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/src/ConvertUTF_PGEFF.c
     ${CMAKE_CURRENT_LIST_DIR}/src/file_formats.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/smbx64/file_rw_lvl.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/smbx38a/file_rw_lvl_38a.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/pgex/file_rw_lvlx.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/pgex/file_rw_meta.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/smbx64/file_rw_npc_txt.cpp
@@ -26,8 +25,6 @@ list(APPEND PGE_FILE_LIBRARY_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/src/wld_filedata.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/pge_file_lib_globs.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/pgex/file_rw_savx.cpp
-#    ${CMAKE_CURRENT_LIST_DIR}/src/smbx38a/file_rw_lvl_38a_old.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/smbx38a/file_rw_wld_38a.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/mdx_exception.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/value/mdx_value_string.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/common/value/mdx_value_numeric.cpp
@@ -45,6 +42,13 @@ list(APPEND PGE_FILE_LIBRARY_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/mdx_gamesave_file.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/mdx/mdx_gamesave_file_rw.cpp
 )
+
+if(NOT PGEFL_DISABLE_SMBX38A)
+    list(APPEND PGE_FILE_LIBRARY_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/src/smbx38a/file_rw_lvl_38a.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/smbx38a/file_rw_wld_38a.cpp
+    )
+endif()
 
 if(PGEFL_ENABLE_RWOPS)
     list(APPEND PGE_FILE_LIBRARY_SRCS
