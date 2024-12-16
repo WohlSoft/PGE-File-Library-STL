@@ -509,6 +509,11 @@ struct WorldHead
 
     //! A config pack identify string.
     PGESTRING configPackId;
+
+    //! Recently used (open or save) file format
+    int RecentFormat = 0;
+    //! Recently used format version (for SMBX1...64 files only)
+    unsigned int RecentFormatVersion = 0;
 };
 
 /**
