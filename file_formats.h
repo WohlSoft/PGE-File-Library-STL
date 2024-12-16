@@ -643,6 +643,13 @@ public:
      * @return true if file successfully opened and parsed, false if error occouped
      */
     static bool OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldData &data);
+    /**
+     * @brief Parses a level world map data with auto-detection of a file type (SMBX1...64 LVL or PGE-LVLX)
+     * @param [__in] file Input file descriptor
+     * \param [__out] callbacks WorldLoadCallbacks Callbacks to store loaded world data
+     * @return true if file successfully opened and parsed, false if error occouped
+     */
+    static bool OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, const WorldLoadCallbacks &data);
     /*!
      * \brief Parses a world map file header only with auto-detection of a file type (SMBX1...64 LVL or PGE-WLDX)
      * \param [__in] filePath Full path to file which must be opened
@@ -884,6 +891,13 @@ public:
      * \return true if file successfully parsed, false if error occouped
      */
     static bool ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, WorldData /*output*/ &FileData);
+    /*!
+     * \brief Parses PGE-X World map file from file input descriptor
+     * \param [__in] in File Input descriptor
+     * \param [__out] callbacks WorldLoadCallbacks Callbacks to store loaded world data
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, const WorldLoadCallbacks& callbacks);
     /*!
      * \brief Saves world map data into file of PGE-X World map format
      * \param [__in] filePath Target file path
