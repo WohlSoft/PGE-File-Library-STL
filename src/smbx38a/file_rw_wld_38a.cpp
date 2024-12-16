@@ -29,6 +29,8 @@
 
 #include "smbx38a_private.h"
 
+#include "mdx/mdx_world_file.h"
+
 
 //*********************************************************
 //****************READ FILE FORMAT*************************
@@ -284,16 +286,11 @@ bool FileFormats::ReadSMBX38AWldFileRaw(PGESTRING& rawdata, const PGESTRING &fil
 
 bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldData& FileData)
 {
-    SMBX38A_FileBeginN();
     PGESTRING filePath = in.getFilePath();
     FileData.meta.ERROR_info.clear();
 
     CreateWorldData(FileData);
 
-    FileData.meta.RecentFormat = WorldData::SMBX38A;
-    FileData.meta.RecentFormatVersion = c_latest_version_smbx38a;
-
-#if !defined(_MSC_VER) || _MSC_VER > 1800
     FileData.EpisodeTitle.clear();
     FileData.stars = 0;
     FileData.CurSection = 0;
@@ -309,9 +306,30 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
     FileData.level_array_id = 1;
     FileData.musicbox_array_id = 1;
 
-    // Mark all 38A levels with a "SMBX-38A" key
-    FileData.meta.configPackId = "SMBX-38A";
+    //Add path data
+    if(!IsEmpty(filePath))
+    {
+        PGE_FileFormats_misc::FileInfo in_1(filePath);
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
+    }
 
+    FileData.meta.ReadFileValid = true;
+
+    FileData.CurSection = 0;
+    FileData.playmusic = 0;
+
+    return ReadSMBX38AWldFile(in, PGEFL_make_load_callbacks(FileData));
+}
+
+bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, const WorldLoadCallbacks& cb)
+{
+    SMBX38A_FileBeginN();
+
+#if !defined(_MSC_VER) || _MSC_VER > 1800
+
+    WorldHead           head;
+    WorldHead38A        head38a;
     WorldTerrainTile    tile;
     WorldScenery        scen;
     WorldPathTile       pathitem;
@@ -324,13 +342,11 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 
     PGESTRING           identifier;
 
-    //Add path data
-    if(!IsEmpty(filePath))
-    {
-        PGE_FileFormats_misc::FileInfo in_1(filePath);
-        FileData.meta.filename = in_1.basename();
-        FileData.meta.path = in_1.dirpath();
-    }
+    head.RecentFormat = WorldData::SMBX38A;
+    head.RecentFormatVersion = c_latest_version_smbx38a;
+
+    // Mark all 38A levels with a "SMBX-38A" key
+    head.configPackId = "SMBX-38A";
 
     in.seek(0, PGE_FileFormats_misc::TextFileInput::begin);
 
@@ -344,9 +360,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
         if(!PGE_StartsWith(fileIndentifier, "SMBXFile"))
             throw std::logic_error("Invalid file format");
 
-        FileData.meta.RecentFormatVersion = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
+        head.RecentFormatVersion = toUInt(PGE_SubStr(fileIndentifier, 8, -1));
 
-        if(FileData.meta.RecentFormatVersion > c_latest_version_smbx38a)
+        if(head.RecentFormatVersion > c_latest_version_smbx38a)
             throw std::logic_error("File format has newer version which is not supported yet");
 
         while(!in.eof())
@@ -355,61 +371,68 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
 
             if(identifier == "WS1")
             {
+                bool nocharacter1, nocharacter2, nocharacter3, nocharacter4, nocharacter5;
+
                 dataReader.ReadDataLine(
                     CSVDiscard(), // Skip the first field (this is already "identifier")
                     //  wn=episode name[***urlencode!***]
-                    MakeCSVPostProcessor(&FileData.EpisodeTitle, PGEUrlDecodeFunc),
+                    MakeCSVPostProcessor(&head.EpisodeTitle, PGEUrlDecodeFunc),
                     //  bp(n)=don't use player(n) as player's character
                     MakeCSVSubReader(
                         dataReader, ',',
-                        MakeCSVOptional(&FileData.nocharacter1, false),
-                        MakeCSVOptional(&FileData.nocharacter2, false),
-                        MakeCSVOptional(&FileData.nocharacter3, false),
-                        MakeCSVOptional(&FileData.nocharacter4, false),
-                        MakeCSVOptional(&FileData.nocharacter5, false)
+                        MakeCSVOptional(&nocharacter1, false),
+                        MakeCSVOptional(&nocharacter2, false),
+                        MakeCSVOptional(&nocharacter3, false),
+                        MakeCSVOptional(&nocharacter4, false),
+                        MakeCSVOptional(&nocharacter5, false)
                     ),
                     MakeCSVSubReader(
                         dataReader, ',',
                         //  asn=auto start level file name[***urlencode!***]
-                        MakeCSVPostProcessor(&FileData.IntroLevel_file, PGEUrlDecodeFunc),
+                        MakeCSVPostProcessor(&head.IntroLevel_file, PGEUrlDecodeFunc),
                         //  gon=game over level file name[***urlencode!***]
-                        MakeCSVOptional(&FileData.GameOverLevel_file, "", nullptr, PGEUrlDecodeFunc)
+                        MakeCSVOptional(&head38a.GameOverLevel_file, "", nullptr, PGEUrlDecodeFunc)
                     ),
                     MakeCSVSubReader(
                         dataReader, ',',
                         //  dtp=disable two player[0=false !0=true]
-                        MakeCSVOptional(&FileData.restrictSinglePlayer, false),
+                        MakeCSVOptional(&head38a.restrictSinglePlayer, false),
                         //  nwm=no world map[0=false !0=true]
-                        MakeCSVOptional(&FileData.HubStyledWorld, false),
+                        MakeCSVOptional(&head.HubStyledWorld, false),
                         //  rsd=restart last level on player's character death[0=false !0=true]
-                        MakeCSVOptional(&FileData.restartlevel, false),
+                        MakeCSVOptional(&head.restartlevel, false),
                         //  dcp=disable change player[0=false !0=true]
-                        MakeCSVOptional(&FileData.restrictCharacterSwitch, false),
+                        MakeCSVOptional(&head38a.restrictCharacterSwitch, false),
                         //  sc=save machine code to sav file[0=false !0=true]
-                        MakeCSVOptional(&FileData.restrictSecureGameSave, false),
+                        MakeCSVOptional(&head38a.restrictSecureGameSave, false),
                         //  sm=save mode
-                        MakeCSVOptional(&FileData.saveResumePolicy, 0),
+                        MakeCSVOptional(&head38a.saveResumePolicy, 0),
                         //  asg=auto save game[0=false !0=true]
-                        MakeCSVOptional(&FileData.saveAuto, false),
+                        MakeCSVOptional(&head38a.saveAuto, false),
                         //  smb3=smb3 style world map[0=false !0=true]
-                        MakeCSVOptional(&FileData.showEverything, false),
+                        MakeCSVOptional(&head38a.showEverything, false),
                         //  dss=No Entry Scene
-                        MakeCSVOptional(&FileData.disableEnterScreen, false)
+                        MakeCSVOptional(&head38a.disableEnterScreen, false)
                     ),
                     MakeCSVSubReader(
                         dataReader, ',',
                         //  sn=star number
-                        MakeCSVOptional(&FileData.stars, 0),
+                        MakeCSVOptional(&head.stars, 0),
                         //  mis=max item number in world inventory
-                        MakeCSVOptional(&FileData.inventoryLimit, 0)
+                        MakeCSVOptional(&head38a.inventoryLimit, 0)
                     ),
                     //  acm=anti cheat mode[0=don't allow in list !0=allow in list]
-                    &FileData.cheatsPolicy,
+                    &head38a.cheatsPolicy,
                     //  sc=enable save locker[0=false !0=true]
-                    &FileData.saveLocker
+                    &head38a.saveLocker
                 );
 
-                FileData.charactersFromS64();
+                head.nocharacter.clear();
+                head.nocharacter.push_back(nocharacter1);
+                head.nocharacter.push_back(nocharacter2);
+                head.nocharacter.push_back(nocharacter3);
+                head.nocharacter.push_back(nocharacter4);
+                head.nocharacter.push_back(nocharacter5);
             }
             else if(identifier == "WS2")
             {
@@ -421,14 +444,14 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     //  [2]
                     //  #CUST#xxxxxx[***base64encode!***]
                     //  xxxxxx=any string
-                    MakeCSVPostProcessor(&FileData.authors, [](PGESTRING& value)
+                    MakeCSVPostProcessor(&head.authors, [](PGESTRING& value)
                     {
                         PGESTRING prefix = PGE_SubStr(value, 0, 6);
                         if((prefix == "#DEFT#") || (prefix == "#CUST#"))
                             PGE_RemStrRng(value, 0, 6);
                         value = PGE_BASE64DEC(value);
                     }),
-                    MakeCSVOptionalEmpty(&FileData.authors_music, "", nullptr, PGEUrlDecodeFunc)
+                    MakeCSVOptionalEmpty(&head.authors_music, "", nullptr, PGEUrlDecodeFunc)
                 );
             }
             else if(identifier == "WS3")
@@ -442,7 +465,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     MakeCSVPostProcessor(&cheatsList, [&](PGESTRING& value)
                     {
                         PGESTRING list = PGE_URLDEC(value);
-                        PGE_SPLITSTRING(FileData.cheatsList, list, ",");
+                        PGE_SPLITSTRING(head38a.cheatsList, list, ",");
                     })
                 );
             }
@@ -451,9 +474,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                 dataReader.ReadDataLine(
                     CSVDiscard(),
                     //    se=save locker syntax[***urlencode!***][syntax]
-                    MakeCSVPostProcessor(&FileData.saveLockerEx, PGEUrlDecodeFunc),
+                    MakeCSVPostProcessor(&head38a.saveLockerEx, PGEUrlDecodeFunc),
                     //    msg=message when save was locked[***urlencode!***]
-                    MakeCSVPostProcessor(&FileData.saveLockerMsg, PGEUrlDecodeFunc)
+                    MakeCSVPostProcessor(&head38a.saveLockerMsg, PGEUrlDecodeFunc)
                 );
             }
             else if(identifier == "T")
@@ -473,8 +496,8 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     MakeCSVOptional(&tile.layer, "Default", nullptr, PGELayerOrDefault)
                 );
 
-                tile.meta.array_id = FileData.tile_array_id++;
-                FileData.tiles.push_back(tile);
+                if(cb.load_tile)
+                    cb.load_tile(cb.userdata, tile);
             }
             else if(identifier == "S")
             {
@@ -493,8 +516,8 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     MakeCSVOptional(&tile.layer, "Default", nullptr, PGELayerOrDefault)
                 );
 
-                scen.meta.array_id = FileData.scene_array_id++;
-                FileData.scenery.push_back(scen);
+                if(cb.load_scene)
+                    cb.load_scene(cb.userdata, scen);
             }
             else if(identifier == "P")
             {
@@ -513,8 +536,8 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     MakeCSVOptional(&tile.layer, "Default", nullptr, PGELayerOrDefault)
                 );
 
-                pathitem.meta.array_id = FileData.path_array_id++;
-                FileData.paths.push_back(pathitem);
+                if(cb.load_path)
+                    cb.load_path(cb.userdata, pathitem);
             }
             else if(identifier == "M")
             {
@@ -578,14 +601,15 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     musicbox.x          = arearect.x;
                     musicbox.y          = arearect.y;
                     musicbox.layer      = arearect.layer;
-                    musicbox.meta.array_id = FileData.musicbox_array_id++;
-                    FileData.music.push_back(musicbox);
+
+                    if(cb.load_music)
+                        cb.load_music(cb.userdata, musicbox);
                 }
                 else
                 {
                     //Store as separated "Area-rect" type
-                    arearect.meta.array_id = FileData.arearect_array_id++;
-                    FileData.arearects.push_back(arearect);
+                    if(cb.load_arearect)
+                        cb.load_arearect(cb.userdata, arearect);
                 }
             }
             else if(identifier == "L")
@@ -735,8 +759,8 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     )
                 );
 
-                lvlitem.meta.array_id = FileData.level_array_id++;
-                FileData.levels.push_back(lvlitem);
+                if(cb.load_level)
+                    cb.load_level(cb.userdata, lvlitem);
             }
             else if(identifier == "WL")
             {
@@ -748,8 +772,8 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                     &layer.hidden
                 );
 
-                layer.meta.array_id = FileData.layers_array_id++;
-                FileData.layers.push_back(layer);
+                if(cb.load_layer38a)
+                    cb.load_layer38a(cb.userdata, layer);
             }
             else if(identifier == "WE")
             {
@@ -880,8 +904,9 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                         )
                     )
                 );
-                event.meta.array_id = FileData.events38A_array_id++;
-                FileData.events38A.push_back(event);
+
+                if(cb.load_event38a)
+                    cb.load_event38a(cb.userdata, event);
             }
             else if((identifier == "WCT") || (identifier == "WCS") || (identifier == "WCL") )
             {
@@ -915,21 +940,40 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
                         }
                     )
                 );
-                FileData.custom38A_configs.push_back(customcfg);
+
+                if(cb.load_config38a)
+                    cb.load_config38a(cb.userdata, customcfg);
             }
             else
             {
                 // Unsupported line, just keep it
                 PGESTRING str;
                 dataReader.ReadRawLine(str);
-                FileData.unsupported_38a_lines.push_back(str);
+
+                if(cb.load_junk_line)
+                    cb.load_junk_line(cb.userdata, str);
             }
         }//while is not EOF
     }
+    catch(const PGE_FileFormats_misc::callback_interrupt& e)
+    {
+        // not an error!
+        return true;
+    }
     catch(const std::exception &err)
     {
-        // First we try to extract the line number out of the nested exception.
+        if(!cb.on_error)
+            return false;
+
+        FileFormatsError error;
+
+        // Fill in the error data.
+        error.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(head.RecentFormatVersion) + " format\n";
+
+        // Now we try to extract the line number out of the nested exception.
         auto *possibleNestedException = dynamic_cast<const std::nested_exception *>(&err); //-V641
+
+        int line_num = in.getCurrentLineNumber();
 
         if(possibleNestedException)
         {
@@ -939,7 +983,7 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
             }
             catch(const parse_error &parseErr)
             {
-                FileData.meta.ERROR_linenum = static_cast<long>(parseErr.get_line_number());
+                line_num = static_cast<long>(parseErr.get_line_number());
             }
             catch(...)
             {   //-V565
@@ -947,44 +991,54 @@ bool FileFormats::ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput& in, WorldD
             }
         }
 
-        // Now fill in the error data.
-        FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
-                                   "Caused by: \n" + toPgeString(exception_to_pretty_string(err));
+        // Fill exception data with line_num (which may be the file's line num)
+        error.add_exc_info(err, line_num, "");
 
-        // If we were unable to find error line number from the exception, then get the line number from the file reader.
-        if(FileData.meta.ERROR_linenum == 0)
-            FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
+        // call error callback
+        cb.on_error(cb.userdata, error);
 
-        FileData.meta.ERROR_linedata.clear();
         return false;
     }
     catch(...)
     {
+        if(!cb.on_error)
+            return false;
+
+        FileFormatsError error;
+
         /*
          * This is an attempt to fix crash on Windows 32 bit release assembly,
          * and possible, on some other platforms too
          */
         // Now fill in the error data.
-        FileData.meta.ReadFileValid = false;
-        FileData.meta.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(FileData.meta.RecentFormatVersion) + " format\n"
+        error.ERROR_info = "Invalid file format, detected file SMBX-38A-" + fromNum(head.RecentFormatVersion) + " format\n"
                                    "Caused by unknown exception\n";
         if(!IsEmpty(identifier))
-            FileData.meta.ERROR_info += "\n Field type " + identifier;
+            error.ERROR_info += "\n Field type " + identifier;
         // If we were unable to find error line number from the exception, then get the line number from the file reader.
-        if(FileData.meta.ERROR_linenum == 0)
-            FileData.meta.ERROR_linenum = in.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata.clear();
+        error.ERROR_linenum = in.getCurrentLineNumber();
+        error.ERROR_linedata.clear();
+
+        cb.on_error(cb.userdata, error);
+
         return false;
     }
 
-    FileData.CurSection = 0;
-    FileData.playmusic = 0;
-    FileData.meta.ReadFileValid = true;
+    if(cb.load_head)
+        cb.load_head(cb.userdata, head);
+
+    if(cb.load_head38a)
+        cb.load_head38a(cb.userdata, head38a);
+
     return true;
 #else
-    FileData.meta.ReadFileValid = false;
-    FileData.meta.ERROR_info = "Unsupported on MSVC2013 or lower";
+    if(!cb.on_error)
+        return false;
+
+    FileFormatsError error;
+    error.ERROR_info = "38A format unsupported on MSVC2013 or lower";
+    cb.on_error(cb.userdata, error);
+
     return false;
 #endif
 }

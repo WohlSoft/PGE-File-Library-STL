@@ -808,6 +808,13 @@ public:
      */
     static bool ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput &in, WorldData /*output*/ &FileData);
     /*!
+     * \brief Parses SMBX-38A world map file data from raw data string
+     * \param [__in] in File input descriptor
+     * \param [__out] callbacks WorldLoadCallbacks Callbacks to store loaded world data
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX38AWldFile(PGE_FileFormats_misc::TextInput &in, const WorldLoadCallbacks& callbacks);
+    /*!
      * \brief Generates SMBX-38A Level file data and saves into file
      * \param [__in] filePath Target file path
      * \param [__in] FileData Level data structure
