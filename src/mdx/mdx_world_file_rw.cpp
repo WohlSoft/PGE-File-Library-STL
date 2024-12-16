@@ -62,9 +62,16 @@ static bool s_load_head(void* _FileData, WorldHead& dest)
     FileData.starsShowPolicy = dest.starsShowPolicy;
     FileData.custom_params = dest.custom_params;
     FileData.meta.configPackId = dest.configPackId;
+    FileData.meta.RecentFormat = dest.RecentFormat;
+    FileData.meta.RecentFormatVersion = dest.RecentFormatVersion;
 
     // unpack nocharacter array for some loaders
     FileData.charactersToS64();
+
+    if(FileData.meta.RecentFormat == LevelData::SMBX38A)
+        FileData.meta.smbx64strict = false;
+    else if(FileData.meta.RecentFormat == LevelData::SMBX64)
+        FileData.meta.smbx64strict = true;
 
     return true;
 }
@@ -311,6 +318,11 @@ bool MDX_load_world(PGE_FileFormats_misc::TextInput &file, WorldData &FileData)
     FileData.meta.modified = false;
     FileData.meta.ReadFileValid = true;
 
+    return MDX_load_world(file, PGEFL_make_load_callbacks(FileData));
+}
+
+WorldLoadCallbacks PGEFL_make_load_callbacks(WorldData& target)
+{
     WorldLoadCallbacks callbacks;
 
     callbacks.on_error = s_on_error;
@@ -325,9 +337,9 @@ bool MDX_load_world(PGE_FileFormats_misc::TextInput &file, WorldData &FileData)
     callbacks.load_arearect = s_load_arearect;
     callbacks.load_level = s_load_level;
 
-    callbacks.userdata = reinterpret_cast<void*>(&FileData);
+    callbacks.userdata = reinterpret_cast<void*>(&target);
 
-    return MDX_load_world(file, callbacks);
+    return callbacks;
 }
 
 bool MDX_load_world_header(PGE_FileFormats_misc::TextInput &file, WorldData &FileData)
@@ -349,18 +361,28 @@ bool MDX_load_world_header(PGE_FileFormats_misc::TextInput &file, WorldData &Fil
     FileData.meta.modified = false;
     FileData.meta.ReadFileValid = true;
 
+    return MDX_load_world(file, PGEFL_make_header_load_callbacks(FileData));
+}
+
+WorldLoadCallbacks PGEFL_make_header_load_callbacks(WorldData& target)
+{
     WorldLoadCallbacks callbacks;
 
     callbacks.on_error = s_on_error;
 
     callbacks.load_head = s_load_head_only;
 
-    callbacks.userdata = reinterpret_cast<void*>(&FileData);
+    callbacks.userdata = reinterpret_cast<void*>(&target);
 
-    return MDX_load_world(file, callbacks);
+    return callbacks;
 }
 
 bool MDX_save_world(PGE_FileFormats_misc::TextOutput &file, const WorldData &FileData)
+{
+    return MDX_save_world(file, PGEFL_make_save_callbacks(FileData));
+}
+
+WorldSaveCallbacks PGEFL_make_save_callbacks(const WorldData& target)
 {
     WorldSaveCallbacks callbacks;
 
@@ -374,7 +396,7 @@ bool MDX_save_world(PGE_FileFormats_misc::TextOutput &file, const WorldData &Fil
     callbacks.save_arearect = s_save_arearect;
     callbacks.save_level = s_save_level;
 
-    callbacks.userdata = reinterpret_cast<const void*>(&FileData);
+    callbacks.userdata = reinterpret_cast<const void*>(&target);
 
-    return MDX_save_world(file, callbacks);
+    return callbacks;
 }

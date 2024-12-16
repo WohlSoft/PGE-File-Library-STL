@@ -43,4 +43,8 @@ bool MDX_load_world_header(PGE_FileFormats_misc::TextInput &file, WorldData &Fil
 bool MDX_save_world(PGE_FileFormats_misc::TextOutput& output, const WorldSaveCallbacks& callbacks);
 bool MDX_save_world(PGE_FileFormats_misc::TextOutput &file, const WorldData &FileData);
 
+WorldLoadCallbacks PGEFL_make_load_callbacks(WorldData& target);
+WorldLoadCallbacks PGEFL_make_header_load_callbacks(WorldData& target);
+WorldSaveCallbacks PGEFL_make_save_callbacks(const WorldData& target);
+
 #endif // #ifndef MDX_LEVEL_FILE_H
