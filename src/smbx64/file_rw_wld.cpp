@@ -31,6 +31,8 @@
 #include "smbx64_macro.h"
 #include "CSVUtils.h"
 
+#include "mdx/mdx_world_file.h"
+
 //*********************************************************
 //****************READ FILE FORMAT*************************
 //*********************************************************
@@ -212,9 +214,10 @@ bool FileFormats::ReadSMBX64WldFileRaw(PGESTRING &rawdata, const PGESTRING &file
     return ReadSMBX64WldFile(file, FileData);
 }
 
+
+
 bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldData &FileData)
 {
-    SMBX64_FileBegin();
     PGESTRING filePath = in.getFilePath();
 
     CreateWorldData(FileData);
@@ -233,9 +236,17 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
     FileData.meta.untitled = false;
     FileData.meta.modified = false;
 
-    //Enable strict mode for SMBX WLD file format
-    FileData.meta.smbx64strict = true;
+    FileData.meta.ReadFileValid = true;
 
+    return ReadSMBX64WldFile(in, PGEFL_make_load_callbacks(FileData));
+}
+
+
+bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, const WorldLoadCallbacks &cb)
+{
+    SMBX64_FileBegin();
+
+    WorldHead head;
     WorldTerrainTile tile;
     WorldScenery scen;
     WorldPathTile pathitem;
@@ -248,71 +259,83 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
         //File format number
         nextLine();
         SMBX64::ReadUInt(&file_format, line);
-        FileData.meta.RecentFormatVersion = file_format;
+        head.RecentFormat = WorldData::SMBX64;
+        head.RecentFormatVersion = file_format;
 
         //Episode title
         nextLine();
-        SMBX64::ReadStr(&FileData.EpisodeTitle, line);
+        SMBX64::ReadStr(&head.EpisodeTitle, line);
 
         if(ge(55))
         {
+            bool nocharacter1 = false;
+            bool nocharacter2 = false;
+            bool nocharacter3 = false;
+            bool nocharacter4 = false;
+            bool nocharacter5 = false;
+
             nextLine();
-            SMBX64::ReadCSVBool(&FileData.nocharacter1, line);//Edisode without Mario
+            SMBX64::ReadCSVBool(&nocharacter1, line);//Edisode without Mario
             nextLine();
-            SMBX64::ReadCSVBool(&FileData.nocharacter2, line);//Edisode without Luigi
+            SMBX64::ReadCSVBool(&nocharacter2, line);//Edisode without Luigi
             nextLine();
-            SMBX64::ReadCSVBool(&FileData.nocharacter3, line);//Edisode without Peach
+            SMBX64::ReadCSVBool(&nocharacter3, line);//Edisode without Peach
             nextLine();
-            SMBX64::ReadCSVBool(&FileData.nocharacter4, line);//Edisode without Toad
+            SMBX64::ReadCSVBool(&nocharacter4, line);//Edisode without Toad
             if(ge(56))
             {
                 nextLine();
-                SMBX64::ReadCSVBool(&FileData.nocharacter5, line);//Edisode without Link
+                SMBX64::ReadCSVBool(&nocharacter5, line);//Edisode without Link
             }
             //Convert into the bool array
-            FileData.nocharacter.push_back(FileData.nocharacter1);
-            FileData.nocharacter.push_back(FileData.nocharacter2);
-            FileData.nocharacter.push_back(FileData.nocharacter3);
-            FileData.nocharacter.push_back(FileData.nocharacter4);
-            FileData.nocharacter.push_back(FileData.nocharacter5);
+            head.nocharacter.push_back(nocharacter1);
+            head.nocharacter.push_back(nocharacter2);
+            head.nocharacter.push_back(nocharacter3);
+            head.nocharacter.push_back(nocharacter4);
+            head.nocharacter.push_back(nocharacter5);
         }
 
         if(ge(3))
         {
             nextLine();
-            SMBX64::ReadStr(&FileData.IntroLevel_file, line);//Autostart level
+            SMBX64::ReadStr(&head.IntroLevel_file, line);//Autostart level
             nextLine();
-            SMBX64::ReadCSVBool(&FileData.HubStyledWorld, line); //Don't use world map on this episode
+            SMBX64::ReadCSVBool(&head.HubStyledWorld, line); //Don't use world map on this episode
             nextLine();
-            SMBX64::ReadCSVBool(&FileData.restartlevel, line);//Restart level on playable character's death
+            SMBX64::ReadCSVBool(&head.restartlevel, line);//Restart level on playable character's death
         }
 
         if(ge(20))
         {
             nextLine();
-            SMBX64::ReadUInt(&FileData.stars, line);//Stars number
+            SMBX64::ReadUInt(&head.stars, line);//Stars number
         }
 
         if(file_format >= 17)
         {
-            nextLine();
-            SMBX64::ReadStr(&FileData.author1, line); //Author 1
-            nextLine();
-            SMBX64::ReadStr(&FileData.author2, line); //Author 2
-            nextLine();
-            SMBX64::ReadStr(&FileData.author3, line); //Author 3
-            nextLine();
-            SMBX64::ReadStr(&FileData.author4, line); //Author 4
-            nextLine();
-            SMBX64::ReadStr(&FileData.author5, line); //Author 5
+            PGESTRING author1, author2, author3, author4, author5;
 
-            FileData.authors.clear();
-            FileData.authors += (IsEmpty(FileData.author1)) ? "" : FileData.author1 + "\n";
-            FileData.authors += (IsEmpty(FileData.author2)) ? "" : FileData.author2 + "\n";
-            FileData.authors += (IsEmpty(FileData.author3)) ? "" : FileData.author3 + "\n";
-            FileData.authors += (IsEmpty(FileData.author4)) ? "" : FileData.author4 + "\n";
-            FileData.authors += (IsEmpty(FileData.author5)) ? "" : FileData.author5;
+            nextLine();
+            SMBX64::ReadStr(&author1, line); //Author 1
+            nextLine();
+            SMBX64::ReadStr(&author2, line); //Author 2
+            nextLine();
+            SMBX64::ReadStr(&author3, line); //Author 3
+            nextLine();
+            SMBX64::ReadStr(&author4, line); //Author 4
+            nextLine();
+            SMBX64::ReadStr(&author5, line); //Author 5
+
+            head.authors.clear();
+            head.authors += (IsEmpty(author1)) ? "" : author1 + "\n";
+            head.authors += (IsEmpty(author2)) ? "" : author2 + "\n";
+            head.authors += (IsEmpty(author3)) ? "" : author3 + "\n";
+            head.authors += (IsEmpty(author4)) ? "" : author4 + "\n";
+            head.authors += (IsEmpty(author5)) ? "" : author5;
         }
+
+        if(cb.load_head)
+            cb.load_head(cb.userdata, head);
 
 
         ////////////Tiles Data//////////
@@ -326,11 +349,9 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine();
             SMBX64::ReadUInt(&tile.id, line);//Tile ID
 
-            tile.meta.array_id = FileData.tile_array_id;
-            FileData.tile_array_id++;
-            tile.meta.index = (unsigned int)FileData.tiles.size(); //Apply element index
+            if(cb.load_tile)
+                cb.load_tile(cb.userdata, tile);
 
-            FileData.tiles.push_back(tile);
             nextLine();
         }
 
@@ -345,11 +366,8 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine();
             SMBX64::ReadUInt(&scen.id, line);//Scenery ID
 
-            scen.meta.array_id = FileData.scene_array_id;
-            FileData.scene_array_id++;
-            scen.meta.index = (unsigned int)FileData.scenery.size(); //Apply element index
-
-            FileData.scenery.push_back(scen);
+            if(cb.load_scene)
+                cb.load_scene(cb.userdata, scen);
 
             nextLine();
         }
@@ -365,11 +383,8 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine();
             SMBX64::ReadUInt(&pathitem.id, line); //Path ID
 
-            pathitem.meta.array_id = FileData.path_array_id;
-            FileData.path_array_id++;
-            pathitem.meta.index = (unsigned int)FileData.paths.size(); //Apply element index
-
-            FileData.paths.push_back(pathitem);
+            if(cb.load_path)
+                cb.load_path(cb.userdata, pathitem);
 
             nextLine();
         }
@@ -424,11 +439,8 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
                     lvlitem.gamestart = true;
             }
 
-            lvlitem.meta.array_id = FileData.level_array_id;
-            FileData.level_array_id++;
-            lvlitem.meta.index = (unsigned int)FileData.levels.size(); //Apply element index
-
-            FileData.levels.push_back(lvlitem);
+            if(cb.load_level)
+                cb.load_level(cb.userdata, lvlitem);
 
             nextLine();
         }
@@ -444,35 +456,33 @@ bool FileFormats::ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldDa
             nextLine();
             SMBX64::ReadUInt(&musicbox.id, line);//MusicBox ID
 
-            musicbox.meta.array_id = FileData.musicbox_array_id;
-            FileData.musicbox_array_id++;
-            musicbox.meta.index = (unsigned int)FileData.music.size(); //Apply element index
-
-            FileData.music.push_back(musicbox);
+            if(cb.load_music)
+                cb.load_music(cb.userdata, musicbox);
 
             nextLine();
         }
         nextLine(); // Read last line
         ///////////////////////////////////////EndFile///////////////////////////////////////
-        FileData.meta.ReadFileValid = true;
         return true;
     }
-    catch(const std::exception &err)
+    catch(const PGE_FileFormats_misc::callback_interrupt& e)
     {
-        if(file_format > 0)
-            FileData.meta.ERROR_info = "Detected file format: SMBX-" + fromNum(file_format) + " is invalid\n";
-        else
-            FileData.meta.ERROR_info = "It is not an SMBX world map file\n";
-#ifdef PGE_FILES_QT
-        FileData.meta.ERROR_info += QString::fromStdString(exception_to_pretty_string(err));
-#else
-        FileData.meta.ERROR_info += exception_to_pretty_string(err);
-#endif
-        FileData.meta.ERROR_linenum  = in.getCurrentLineNumber();
-        FileData.meta.ERROR_linedata = std::move(line);
-        FileData.meta.ReadFileValid  = false;
-        PGE_CutLength(FileData.meta.ERROR_linedata, 50);
-        PGE_FilterBinary(FileData.meta.ERROR_linedata);
+        // not an error!
+        return true;
+    }
+    catch(const std::exception& e)
+    {
+        if(cb.on_error)
+        {
+            FileFormatsError error;
+            if(file_format > 0)
+                error.ERROR_info = "Detected file format: SMBX-" + fromNum(file_format) + " is invalid\n";
+            else
+                error.ERROR_info = "It is not an SMBX world map file\n";
+            error.add_exc_info(e, in.getCurrentLineNumber(), std::move(line));
+            cb.on_error(cb.userdata, error);
+        }
+
         return false;
     }
 }

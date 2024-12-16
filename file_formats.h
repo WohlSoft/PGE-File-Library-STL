@@ -731,6 +731,13 @@ public:
      */
     static bool ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, WorldData /*output*/ &FileData);
     /*!
+     * \brief Parses SMBX1...64 World map file from raw data from file input descriptor
+     * \param [__in] in File Input descriptor
+     * \param [__out] callbacks WorldLoadCallbacks Callbacks to store loaded world data
+     * \return true if file successfully parsed, false if error occouped
+     */
+    static bool ReadSMBX64WldFile(PGE_FileFormats_misc::TextInput &in, const WorldLoadCallbacks &callbacks);
+    /*!
      * \brief Saves level data into file of SMBX1...64 World map format
      * \param [__in] filePath Target file path
      * \param [__in] FileData World map data structure
