@@ -516,10 +516,55 @@ struct WorldHead
     unsigned int RecentFormatVersion = 0;
 };
 
+struct WorldHead38A
+{
+    PGESTRING GameOverLevel_file;
+
+    //! This episode can be played in the single player only
+    bool restrictSinglePlayer = false;
+    //! Disable ability to toggle a playabele character on the world map
+    bool restrictCharacterSwitch = false;
+    //! Use stronger securty on the game save files
+    bool restrictSecureGameSave = false;
+    //! Don't show entreance screen on each entering into the level
+    bool disableEnterScreen = false;
+
+    enum CheatsPolicy
+    {
+        CHEATS_DENY_IN_LIST = false,
+        CHEATS_ALLOW_IN_LIST = true
+    };
+    //! If unchecked - allow all cheats except listed, If checked - deny all except listed
+    bool cheatsPolicy = CHEATS_DENY_IN_LIST;
+    //! List of cheat codes (granted or forbidden dependent on restrictNoCheats flag state)
+    PGESTRINGList cheatsList;
+
+    enum SaveMode
+    {
+        SAVE_RESUME_AT_INTRO = -1,
+        SAVE_RESUME_AT_WORLD_MAP = 0,
+        SAVE_RESUME_AT_RECENT_LEVEL = 1,
+    };
+    //! Policy where resume game on save load
+    int     saveResumePolicy = SAVE_RESUME_AT_WORLD_MAP;
+    //! Automatically save game on level completing
+    bool    saveAuto = false;
+    //! Enable save locker
+    bool    saveLocker = false;
+    //! Save locker expression
+    PGESTRING saveLockerEx;
+    //! Message box shown on save locking
+    PGESTRING saveLockerMsg;
+    //! Always show any closed cells (overwise closed cells are will be hidden until player will open them)
+    bool    showEverything = false;
+    //! 38A Inventory limit
+    unsigned long   inventoryLimit = 0;
+};
+
 /**
  * @brief World map data structure
  */
-struct WorldData
+struct WorldData : public WorldHead38A
 {
     //! Helper meta-data
     FileFormatMeta meta;
@@ -572,51 +617,11 @@ struct WorldData
     }
 
     PGESTRING IntroLevel_file;
-    PGESTRING GameOverLevel_file;
     bool HubStyledWorld = false;
     bool restartlevel = false;
 
-    //! This episode can be played in the single player only
-    bool restrictSinglePlayer = false;
-    //! Disable ability to toggle a playabele character on the world map
-    bool restrictCharacterSwitch = false;
-    //! Use stronger securty on the game save files
-    bool restrictSecureGameSave = false;
-    //! Don't show entreance screen on each entering into the level
-    bool disableEnterScreen = false;
-
-    enum CheatsPolicy
-    {
-        CHEATS_DENY_IN_LIST = false,
-        CHEATS_ALLOW_IN_LIST = true
-    };
-    //! If unchecked - allow all cheats except listed, If checked - deny all except listed
-    bool cheatsPolicy = CHEATS_DENY_IN_LIST;
-    //! List of cheat codes (granted or forbidden dependent on restrictNoCheats flag state)
-    PGESTRINGList cheatsList;
-
-    enum SaveMode
-    {
-        SAVE_RESUME_AT_INTRO = -1,
-        SAVE_RESUME_AT_WORLD_MAP = 0,
-        SAVE_RESUME_AT_RECENT_LEVEL = 1,
-    };
-    //! Policy where resume game on save load
-    int     saveResumePolicy = SAVE_RESUME_AT_WORLD_MAP;
-    //! Automatically save game on level completing
-    bool    saveAuto = false;
-    //! Enable save locker
-    bool    saveLocker = false;
-    //! Save locker expression
-    PGESTRING saveLockerEx;
-    //! Message box shown on save locking
-    PGESTRING saveLockerMsg;
-    //! Always show any closed cells (overwise closed cells are will be hidden until player will open them)
-    bool    showEverything = false;
     //! Cached total number of available stars on this episode
     unsigned int    stars = 0;
-    //! 38A Inventory limit
-    unsigned long   inventoryLimit = 0;
 
     enum StarsShowPolicy
     {
@@ -707,6 +712,11 @@ struct WorldLoadCallbacks : PGE_FileFormats_misc::LoadCallbacks
     callback<WorldMusicBox>    load_music = nullptr;
     callback<WorldAreaRect>    load_arearect = nullptr;
     callback<WorldLevelTile>   load_level = nullptr;
+    callback<WorldLayer>       load_layer38a = nullptr;
+    callback<WorldEvent38A>    load_event38a = nullptr;
+    callback<WorldItemSetup38A> load_config38a = nullptr;
+    callback<WorldHead38A>     load_head38a = nullptr;
+    callback<PGESTRING>        load_junk_line = nullptr;
 };
 
 struct WorldSaveCallbacks : PGE_FileFormats_misc::SaveCallbacks
@@ -720,6 +730,11 @@ struct WorldSaveCallbacks : PGE_FileFormats_misc::SaveCallbacks
     callback<WorldMusicBox>    save_music = nullptr;
     callback<WorldAreaRect>    save_arearect = nullptr;
     callback<WorldLevelTile>   save_level = nullptr;
+    callback<WorldLayer>       save_layer38a = nullptr;
+    callback<WorldEvent38A>    save_event38a = nullptr;
+    callback<WorldItemSetup38A> save_config38a = nullptr;
+    callback<WorldHead38A>     save_head38a = nullptr;
+    callback<PGESTRING>        save_junk_line = nullptr;
 };
 
 #endif // WLD_FILEDATA_H
