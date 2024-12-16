@@ -280,6 +280,11 @@ bool FileFormats::ReadExtendedWldFileRaw(PGESTRING &rawdata, const PGESTRING &fi
     return ReadExtendedWldFile(file, FileData);
 }
 
+bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, const WorldLoadCallbacks& cb)
+{
+    return MDX_load_world(in, cb);
+}
+
 bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, WorldData &FileData)
 {
     if(!g_use_legacy_pgex_parser)

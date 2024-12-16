@@ -417,6 +417,38 @@ bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldDat
     return true;
 }
 
+bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, const WorldLoadCallbacks &cb)
+{
+    PGESTRING firstLine;
+
+    file.read(firstLine, 8);
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
+
+    if(PGE_StartsWith(firstLine, "SMBXFile"))
+    {
+        //Read SMBX-38A WLD File
+        if(!ReadSMBX38AWldFile(file, cb))
+            return false;
+    }
+    else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
+    {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
+        //Read SMBX WLD File
+        if(!ReadSMBX64WldFile(file, cb))
+            return false;
+    }
+    else
+    {
+        //Read PGE WLDX File
+        if(!ReadExtendedWldFile(file, cb))
+            return false;
+    }
+
+    return true;
+}
+
 bool FileFormats::OpenWorldFileHeader(const PGESTRING &filePath, WorldData &data)
 {
     PGE_FileFormats_misc::TextFileInput file;
