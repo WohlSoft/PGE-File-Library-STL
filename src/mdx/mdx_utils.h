@@ -35,5 +35,14 @@
 
 const char* MDX_load_int(int& dest, const char* field_data);
 const char* MDX_load_long(long& dest, const char* field_data);
+const char* MDX_load_longlong(long long& dest, const char* field_data);
+
+const char* MDX_load_uint(int& dest, const char* field_data);
+const char* MDX_load_ulong(long& dest, const char* field_data);
+const char* MDX_load_ulonglong(long long& dest, const char* field_data);
+
+const char* MDX_load_uint(unsigned int& dest, const char* field_data);
+const char* MDX_load_ulong(unsigned long& dest, const char* field_data);
+const char* MDX_load_ulonglong(unsigned long long& dest, const char* field_data);
 
 #endif // #ifndef MDX_UTILS_H

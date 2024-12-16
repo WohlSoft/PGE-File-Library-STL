@@ -259,6 +259,40 @@ const char* MDX_load_long(long& dest, const char* field_data)
     return s_MDX_load_int<long, 1>(dest, field_data);
 }
 
+const char* MDX_load_longlong(long long& dest, const char* field_data)
+{
+    return s_MDX_load_int<long long, 1>(dest, field_data);
+}
+
+const char* MDX_load_uint(int& dest, const char* field_data)
+{
+    return s_MDX_load_uint(dest, field_data);
+}
+
+const char* MDX_load_ulong(long& dest, const char* field_data)
+{
+    return s_MDX_load_uint(dest, field_data);
+}
+
+const char* MDX_load_ulonglong(long long& dest, const char* field_data)
+{
+    return s_MDX_load_uint(dest, field_data);
+}
+
+const char* MDX_load_uint(unsigned int& dest, const char* field_data)
+{
+    return s_MDX_load_uint(dest, field_data);
+}
+
+const char* MDX_load_ulong(unsigned long& dest, const char* field_data)
+{
+    return s_MDX_load_uint(dest, field_data);
+}
+
+const char* MDX_load_ulonglong(unsigned long long& dest, const char* field_data)
+{
+    return s_MDX_load_uint(dest, field_data);
+}
 
 /******************************
  * exported utility functions *

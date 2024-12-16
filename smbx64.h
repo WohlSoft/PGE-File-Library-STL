@@ -50,7 +50,9 @@ namespace SMBX64
         *out = input.toUInt(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to unsigned int");
         #else
-        *out = static_cast<unsigned int>(std::stoul(input));
+        if(input.size() != 0 && MDX_load_uint(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
 
@@ -61,7 +63,9 @@ namespace SMBX64
         *out = input.toULong(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to unsigned long");
         #else
-        *out = std::stoul(input);
+        if(input.size() != 0 && MDX_load_ulong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
 
@@ -72,7 +76,9 @@ namespace SMBX64
         *out = input.toULongLong(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to unsigned long long");
         #else
-        *out = std::stoull(input);
+        if(input.size() != 0 && MDX_load_ulonglong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
     inline void ReadUInt(int*out, PGESTRING &input)
@@ -82,7 +88,9 @@ namespace SMBX64
         *out = static_cast<int>(input.toUInt(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to unsigned int");
         #else
-        *out = static_cast<int>(static_cast<unsigned int>(std::stoul(input)));
+        if(input.size() != 0 && MDX_load_uint(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
     inline void ReadUInt(long*out, PGESTRING &input)
@@ -92,7 +100,9 @@ namespace SMBX64
         *out = static_cast<long>(input.toULong(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to unsigned long");
         #else
-        *out = static_cast<long>(std::stoul(input));
+        if(input.size() != 0 && MDX_load_ulong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
     inline void ReadUInt(long long*out, PGESTRING &input)
@@ -102,7 +112,9 @@ namespace SMBX64
         *out = static_cast<long long>(input.toULongLong(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to unsigned long long");
         #else
-        *out = static_cast<long long>(std::stoull(input));
+        if(input.size() != 0 && MDX_load_ulonglong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
 
@@ -113,7 +125,9 @@ namespace SMBX64
         *out = input.toInt(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to int");
         #else
-        *out = std::stoi(input);
+        if(input.size() != 0 && MDX_load_int(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
 
@@ -124,7 +138,9 @@ namespace SMBX64
         *out = input.toLong(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to long");
         #else
-        *out = std::stol(input);
+        if(input.size() != 0 && MDX_load_long(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
     inline void ReadSInt(long long*out, PGESTRING &input)
@@ -134,7 +150,9 @@ namespace SMBX64
         *out = input.toLongLong(&ok);
         if(!ok) throw std::invalid_argument("Could not convert to long long");
         #else
-        *out = std::stoll(input);
+        if(input.size() != 0 && MDX_load_longlong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number");
         #endif
     }
 
@@ -246,7 +264,7 @@ namespace SMBX64
         *out = static_cast<long>(std::round(input.toDouble(&ok)));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
         #else
-        if(input.size() != 0 && MDX_load_long(*out, input.c_str()) == input.c_str() + input.size())
+        if(input.size() != 0 && MDX_load_long(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
             return;
         *out = static_cast<long>(std::round(std::stod(input)));
         #endif
