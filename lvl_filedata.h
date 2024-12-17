@@ -517,6 +517,8 @@ struct LevelDoor
     unsigned int length_o = 32u;
     //! Trigger event on enter
     PGESTRING event_enter;
+    //! Trigger event after player exits the warp
+    PGESTRING event_exit;
     //! Is this warp a two-way (possible to enter from both sides)
     bool two_way = false;
     //! Cannon shoot warp exit

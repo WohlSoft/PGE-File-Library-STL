@@ -635,6 +635,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_FloatVal("PS", door.cannon_exit_speed) //Cannon exit speed
                     PGEX_StrVal("LR", door.layer)  //Layer
                     PGEX_StrVal("EE", door.event_enter)  //On-Enter event slot
+                    PGEX_StrVal("EEX", door.event_exit)  //On-Exit event slot
                     PGEX_BoolVal("TW", door.two_way) //Two-way warp
                     PGEX_StrVal("XTRA", door.meta.custom_params)//Custom JSON data tree
                 }
@@ -2241,6 +2242,8 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
                 out << PGEFile::value("LR", PGEFile::WriteStr(warp.layer));  // Layer
             if(!IsEmpty(warp.event_enter)) //Write only if not default
                 out << PGEFile::value("EE", PGEFile::WriteStr(warp.event_enter));  // On-Enter event
+            if(!IsEmpty(warp.event_exit)) //Write only if not default
+                out << PGEFile::value("EEX", PGEFile::WriteStr(warp.event_exit));  // On-Exit event
             if(warp.two_way)
                 out << PGEFile::value("TW", PGEFile::WriteBool(warp.two_way)); //Two-way warp
             if(!IsEmpty(warp.meta.custom_params))
