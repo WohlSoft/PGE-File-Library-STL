@@ -377,9 +377,15 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 //add captured value into array
                 pge_size_t sections_count = FileData.sections.size();
 
-                if(lvl_section.id < 0 || lvl_section.id > 1000)
+                if(lvl_section.id < 0)
                 {
-                    errorString = "Negative section ID";
+                    errorString = "Section ID has negative value";
+                    goto badfile;
+                }
+
+                if(lvl_section.id > 1000)
+                {
+                    errorString = "Section ID is larger than 1000";
                     goto badfile;
                 }
 
@@ -414,6 +420,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_SLongVal("Y", player.y)
                     PGEX_SIntVal("D",  player.direction)
                 }
+
                 //add captured value into array
                 bool found = false;
                 pge_size_t q = 0;
@@ -1012,7 +1019,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                             ((sectionSet.id < 0) || (sectionSet.id >= static_cast<long>(event.sets.size())))
                         )//Append sections
                         {
-                            if(sectionSet.id < 0 || sectionSet.id > 1000)
+                            if((sectionSet.id < 0) || (sectionSet.id > 1000))
                             {
                                 errorString = "Section settings event contains negative section ID value or missed!";
                                 goto badfile;//Missmatched section ID!
@@ -1038,81 +1045,77 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     ssSets_begin = ssSets.size();
                 }//If new-styled section settings are gotten
 
-                //Always parse odl-style parameters, but don't always use
-                // else
-                if(true)
+                //Apply old MusicSets (if presented)
+                for(pge_size_t q = 0; q < musicSets.size(); q++)
                 {
-                    //Apply MusicSets
-                    for(pge_size_t q = 0; q < musicSets.size(); q++)
-                    {
-                        if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
-                        long got = toLong(musicSets[q]);
+                    if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
+                    long got = toLong(musicSets[q]);
 
-                        if(q < musicSets_begin)
-                            continue;
+                    if(q < musicSets_begin)
+                        continue;
 
-                        pge_size_t s_i = q - musicSets_begin;
-                        if(s_i >= event.sets.size())
-                            continue;
+                    pge_size_t s_i = q - musicSets_begin;
+                    if(s_i >= event.sets.size())
+                        continue;
 
-                        auto &s = event.sets[s_i];
-                        s.id = static_cast<long>(q);
-                        s.music_id = got;
-                    }
-
-                    //Apply Background sets
-                    for(pge_size_t q = 0; q < bgSets.size(); q++)
-                    {
-                        if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
-                        long got = toLong(bgSets[q]);
-
-                        if(q < bgSets_begin)
-                            continue;
-
-                        pge_size_t s_i = q - bgSets_begin;
-                        if(s_i >= event.sets.size())
-                            continue;
-
-                        auto &s = event.sets[s_i];
-                        s.id = static_cast<long>(q);
-                        s.background_id = got;
-                    }
-
-                    //Apply Background sets
-                    for(pge_size_t q = 0; q < ssSets.size(); q++)
-                    {
-                        PGESTRINGList sizes;
-                        PGE_SPLITSTRING(sizes, ssSets[q], ",");
-
-                        if(sizes.size() != 4) goto badfile; //-V112
-
-                        if(!PGEFile::IsIntS(sizes[0])) goto badfile;
-                        if(!PGEFile::IsIntS(sizes[1])) goto badfile;
-                        if(!PGEFile::IsIntS(sizes[2])) goto badfile;
-                        if(!PGEFile::IsIntS(sizes[3])) goto badfile;
-
-                        long got[4];
-                        for(int i = 0; i < 4; i++)
-                        {
-                            if(!PGEFile::IsIntS(sizes[i])) goto badfile;
-                            got[i] = toLong(sizes[i]);
-                        }
-
-                        if(q < ssSets_begin)
-                            continue;
-
-                        pge_size_t s_i = q - ssSets_begin;
-                        if(s_i >= event.sets.size())
-                            continue;
-
-                        auto &s = event.sets[s_i];
-                        s.id = static_cast<long>(q);
-                        s.position_left = got[0];
-                        s.position_top = toLong(sizes[1]);
-                        s.position_bottom = toLong(sizes[2]);
-                        s.position_right = toLong(sizes[3]);
-                    }
+                    auto &s = event.sets[s_i];
+                    s.id = static_cast<long>(q);
+                    s.music_id = got;
                 }
+
+                //Apply old Background sets (if presented)
+                for(pge_size_t q = 0; q < bgSets.size(); q++)
+                {
+                    if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
+                    long got = toLong(bgSets[q]);
+
+                    if(q < bgSets_begin)
+                        continue;
+
+                    pge_size_t s_i = q - bgSets_begin;
+                    if(s_i >= event.sets.size())
+                        continue;
+
+                    auto &s = event.sets[s_i];
+                    s.id = static_cast<long>(q);
+                    s.background_id = got;
+                }
+
+                //Apply old Background sets (if presented)
+                for(pge_size_t q = 0; q < ssSets.size(); q++)
+                {
+                    PGESTRINGList sizes;
+                    PGE_SPLITSTRING(sizes, ssSets[q], ",");
+
+                    if(sizes.size() != 4) goto badfile; //-V112
+
+                    if(!PGEFile::IsIntS(sizes[0])) goto badfile;
+                    if(!PGEFile::IsIntS(sizes[1])) goto badfile;
+                    if(!PGEFile::IsIntS(sizes[2])) goto badfile;
+                    if(!PGEFile::IsIntS(sizes[3])) goto badfile;
+
+                    long got[4];
+                    for(int i = 0; i < 4; i++)
+                    {
+                        if(!PGEFile::IsIntS(sizes[i])) goto badfile;
+                        got[i] = toLong(sizes[i]);
+                    }
+
+                    if(q < ssSets_begin)
+                        continue;
+
+                    pge_size_t s_i = q - ssSets_begin;
+                    if(s_i >= event.sets.size())
+                        continue;
+
+                    auto &s = event.sets[s_i];
+                    s.id = static_cast<long>(q);
+                    s.position_left = got[0];
+                    s.position_top = toLong(sizes[1]);
+                    s.position_bottom = toLong(sizes[2]);
+                    s.position_right = toLong(sizes[3]);
+                }
+
 
                 //Parse Moving layers
                 if(!movingLayers.empty())
@@ -1501,23 +1504,29 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }//If SMBX38A variable update lists are gotten
 
                 //Convert boolean array into control flags
-                const auto cs = controls.size();
-                // SMBX64-only
-                if(cs >= 1)  event.ctrl_up = controls[0];
-                if(cs >= 2)  event.ctrl_down = controls[1];
-                if(cs >= 3)  event.ctrl_left = controls[2];
-                if(cs >= 4)  event.ctrl_right = controls[3]; //-V112
-                if(cs >= 5)  event.ctrl_run = controls[4];
-                if(cs >= 6)  event.ctrl_jump = controls[5];
-                if(cs >= 7)  event.ctrl_drop = controls[6];
-                if(cs >= 8)  event.ctrl_start = controls[7];
-                if(cs >= 9)  event.ctrl_altrun = controls[8];
-                if(cs >= 10) event.ctrl_altjump = controls[9];
-                // SMBX64-only end
-                // SMBX-38A begin
-                if(cs >= 11) event.ctrls_enable = controls[10];
-                if(cs >= 12) event.ctrl_lock_keyboard = controls[11];
-                // SMBX-38A end
+                bool *co [] =
+                {
+                    // SMBX64-only
+                    &event.ctrl_up,
+                    &event.ctrl_down,
+                    &event.ctrl_left,
+                    &event.ctrl_right,
+                    &event.ctrl_run,
+                    &event.ctrl_jump,
+                    &event.ctrl_drop,
+                    &event.ctrl_start,
+                    &event.ctrl_altrun,
+                    &event.ctrl_altjump,
+                    // SMBX64-only end
+                    // SMBX-38A begin
+                    &event.ctrls_enable,
+                    &event.ctrl_lock_keyboard
+                    // SMBX-38A end
+                };
+
+                for(pge_size_t c = 0; c < controls.size() && c < 12; ++c)
+                    *(co[c]) = controls[c];
+
                 //add captured value into array
                 bool found = false;
                 pge_size_t q = 0;
