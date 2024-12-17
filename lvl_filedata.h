@@ -518,6 +518,8 @@ struct LevelDoor
     unsigned int length_o = 32u;
     //! Trigger event on enter
     PGESTRING event_enter;
+    //! Trigger event after player exits the warp
+    PGESTRING event_exit;
     //! Is this warp a two-way (possible to enter from both sides)
     bool two_way = false;
     //! Cannon shoot warp exit
@@ -547,9 +549,9 @@ struct LevelPhysEnv
     long x = 0;
     //! Y position of physical environment zone
     long y = 0;
-    //! Height of physical environment zone
+    //! Height of physical environment zone (Value -1 turns shape into a circle)
     long h = 0;
-    //! Width of physical environment zone
+    //! Width of physical environment zone (if height is -1, then it's a radius of the circle)
     long w = 0;
     //! Buoy value, reserved and unused in SMBX
     float buoy = 0;
@@ -562,15 +564,15 @@ struct LevelPhysEnv
         ENV_GRAVITATIONAL_FIELD     = 3,
         ENV_TOUCH_EVENT_ONCE_PLAYER = 4,
         ENV_TOUCH_EVENT_PLAYER      = 5,
-        ENV_TOUCH_EVENT_ONCE_NPC    = 6,
-        ENV_TOUCH_EVENT_NPC         = 7,
+        ENV_TOUCH_EVENT_ONCE_ANY    = 6,
+        ENV_TOUCH_EVENT_ANY         = 7,
         ENV_CLICK_EVENT             = 8,
         ENV_COLLISION_SCRIPT        = 9,
         ENV_CLICK_SCRIPT            = 10,
         ENV_COLLISION_EVENT         = 11,
         ENV_AIR                     = 12,
-        ENV_TOUCH_EVENT_ONCE_NPC1   = 13,
-        ENV_TOUCH_EVENT_NPC1        = 14,
+        ENV_TOUCH_EVENT_ONCE_NPC    = 13,
+        ENV_TOUCH_EVENT_NPC         = 14,
         ENV_NPC_HURTING_FIELD       = 15,
         ENV_SUBAREA                 = 16
     };
