@@ -67,7 +67,7 @@ next line: section properties
 	musicfile=custom music file[***urlencode!***]
 next line: blocks
 	B|layer|id|x|y|contain|b1|b2|e1,e2,e3|w|h
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 	id=block id
 	x=block position x
 	y=block position y
@@ -84,17 +84,17 @@ next line: blocks
 	h=height
 next line: backgrounds
 	T|layer|id|x|y
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 	id=background id
 	x=background position x
 	y=background position y
 next line: npcs
 	N|layer|id|x|y|b1,b2,b3,b4|sp|e1,e2,e3,e4,e5,e6,e7|a1,a2|c1[,c2,c3,c4,c5,c6,c7]|msg|
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 	id=npc id
 	x=npc position x
-	y=npc position y	
-	b1=[1]left [0]random [-1]right
+	y=npc position y
+	b1=[1]left [-1]random [0]right
 	b2=friendly npc
 	b3=don't move npc
 	b4=[1=npc91][2=npc96][3=npc283][4=npc284][5=npc300]
@@ -126,7 +126,7 @@ next line: npcs
 	msg=message by this npc talkative[***urlencode!***]
 next line: waters
 	Q|layer|x|y|w|h|b1,b2,b3,b4,b5|event
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 	x=position x
 	y=position y
 	w=width
@@ -152,7 +152,7 @@ next line: waters
 	event=touch event
 next line: warps
 	W|layer|x|y|ex|ey|type|enterd|exitd|sn,msg,hide|locked,noyoshi,canpick,bomb,hidef,anpc,mini,size|lik|liid|noexit|wx|wy|le|we
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 	x=entrance position x
 	y=entrance postion y
 	ex=exit position x
@@ -171,7 +171,7 @@ next line: warps
 	anpc=allow npc interlevel
 	mini=Mini-Only
 	size=Warp Size(pixel)
-	lik=warp to level[***urlencode!***]	
+	lik=warp to level[***urlencode!***]
 	liid=normal enterance / to warp[0-WARPMAX]
 	noexit=level entrance
 	wx=warp to x on world map
@@ -234,7 +234,7 @@ next line: events
 			em=id,mtype,musicid,customfile
 				id=section id
 				mtype=[0=don't change][1=default][2=custom]
-				musicid=[when mtype=2]custom music id	
+				musicid=[when mtype=2]custom music id
 				customfile=[when mtype=3]custom music file name[***urlencode!***]
 	eef=sound/endgame/ce1/ce2...cen
 		sound=play sound number
@@ -254,7 +254,7 @@ next line: events
 			x=npc position x[***urlencode!***][syntax]
 			y=npc position y[***urlencode!***][syntax]
 			sx=npc horizontal speed[***urlencode!***][syntax]
-			sy=npc vertical speed[***urlencode!***][syntax]			
+			sy=npc vertical speed[***urlencode!***][syntax]
 			sp=advanced settings of generated npc
 	evc=vc1/vc2...vcn
 		vc(n)=name,newvalue
@@ -341,19 +341,19 @@ next line: tiles
 	id=tile id
 	x=tile position x
 	y=tile position y
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 next line: scenerys
 	S|id|x|y|layer
 	id=scenery id
 	x=scenery position x
 	y=scenery position y
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 next line: paths
 	P|id|x|y|layer
 	id=path id
 	x=path position x
 	y=path position y
-	layer=layer name["" == "Default"][***urlencode!***]	
+	layer=layer name["" == "Default"][***urlencode!***]
 next line: Areas
 	M|id|x|y|name|layer|w|h|flag|te,eflag|ie1,ie2,ie3
 	id=music id
@@ -455,7 +455,7 @@ next line: events
 		wwx=Warp Whistle: Map Warp Location x
 		wwy=Warp Whistle: Map Warp Location y
 			if (wwx == -1 && wwy == -1) [means not moving]
-		lockl=[Level ID]Affected by Anchor 
+		lockl=[Level ID]Affected by Anchor
 
 
 ========================================================
@@ -484,15 +484,3 @@ next line: custom sounds
 	CW|cdata1|cdata2|...|cdatan
 		cdata=sound-id,sound-filename
 			sound-filename:[***urlencode!***]
-
-
-
-
-
-
-
-
-
-
-
-
