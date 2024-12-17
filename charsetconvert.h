@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -49,7 +49,7 @@ class SI_ConvertW
 {
     bool m_bStoreIsUtf8;
 protected:
-    SI_ConvertW() { }
+    SI_ConvertW() : m_bStoreIsUtf8(false) { }
 public:
     SI_ConvertW(bool a_bStoreIsUtf8) : m_bStoreIsUtf8(a_bStoreIsUtf8) { }
 
@@ -91,7 +91,7 @@ public:
             return utf8len(a_pInputData);
         }
 
-#if defined(SI_NO_MBSTOWCS_NULL) || (!defined(_MSC_VER) && !defined(_linux))
+#if defined(SI_NO_MBSTOWCS_NULL) || (!defined(_MSC_VER) && !defined(__linux))
         // fall back processing for platforms that don't support a NULL dest to mbstowcs
         // worst case scenario is 1:1, this will be a sufficient buffer size
         (void)a_pInputData;
@@ -127,7 +127,7 @@ public:
             // ConvertUTF.h and ConvertUTF.c which should be included in
             // the distribution but are publically available from unicode.org
             // at http://www.unicode.org/Public/PROGRAMS/CVTUTF/
-            pgeFfConversionResult retval;
+            pgeFfConversionResult retval = conversionOK;
             const UTF8 * pUtf8 = (const UTF8 *) a_pInputData;
             if (sizeof(SI_CHAR) == sizeof(UTF32)) {
                 UTF32 * pUtf32 = (UTF32 *) a_pOutputData;
@@ -147,7 +147,7 @@ public:
         }
 
         // convert to wchar_t
-        size_t retval = mbstowcs(a_pOutputData,
+        size_t retval = mbstowcs(reinterpret_cast<wchar_t*>(a_pOutputData),
             a_pInputData, a_uOutputDataSize);
         return retval != (size_t)(-1);
     }
@@ -215,7 +215,7 @@ public:
             // ConvertUTF.h and ConvertUTF.c which should be included in
             // the distribution but are publically available from unicode.org
             // at http://www.unicode.org/Public/PROGRAMS/CVTUTF/
-            pgeFfConversionResult retval;
+            pgeFfConversionResult retval = conversionOK;
             UTF8 * pUtf8 = (UTF8 *) a_pOutputData;
             if (sizeof(SI_CHAR) == sizeof(UTF32)) {
                 const UTF32 * pUtf32 = (const UTF32 *) a_pInputData;

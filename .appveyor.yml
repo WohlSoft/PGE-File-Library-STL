@@ -9,16 +9,16 @@ environment:
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
-      QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13\mingw73_32
+      QT_BUILD: OFF
+      QT_PATH: C:\Qt\5.15.2\mingw81_32
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2019"
     - BUILD_TYPE: Release
       COMPILER: MinGW
       COMPILER_FAMILY: MinGW
       GENERATOR: "MinGW Makefiles"
       PLATFORM: Win32
-      QT_BUILD: ON
-      QT_PATH: C:\Qt\5.13\mingw73_32
+      QT_BUILD: OFF
+      QT_PATH: C:\Qt\5.15.2\mingw81_32
       APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2019"
     - BUILD_TYPE: Debug
       COMPILER: MinGW-w64
@@ -123,4 +123,3 @@ deploy:
 
 #on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-

@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -107,6 +107,18 @@ struct saveUserData
     PGELIST<DataSection> store;
 };
 
+/**
+ * @brief Per-level cached counters
+ */
+struct saveLevelInfo
+{
+    PGESTRING level_filename;
+    unsigned int max_stars;
+    unsigned int max_medals;
+    PGELIST<bool> medals_best;
+    PGELIST<bool> medals_got;
+    unsigned int exits_got;
+};
 
 /*!
  * \brief Game save data structure
@@ -118,6 +130,8 @@ struct GamesaveData
 
     //! Number of lives
     int lives = 0;
+    //! Hundreds of coins, used in TheXTech to replace the legacy lives system. In the file format, 0 is reserved as "unspecified", and 1 is the first non-negative value.
+    int hundreds = 0;
     //! Number of coins
     unsigned int coins = 0;
     //! Number of points
@@ -132,6 +146,8 @@ struct GamesaveData
 
     //! Last entered/exited warp Array-ID on the HUB-based episodes.
     unsigned long last_hub_warp = 0;
+    //! Last visited sub-hub level file
+    PGESTRING last_hub_level_file;
 
     //! Current world music ID
     unsigned int musicID = 0;
@@ -151,7 +167,10 @@ struct GamesaveData
     PGELIST<visibleItem > visibleLevels;
     PGELIST<visibleItem > visiblePaths;
     PGELIST<visibleItem > visibleScenery;
+    //! Registry of taken per-level stars
     PGELIST<starOnLevel > gottenStars;
+    //! Cached per-level information and medals registry
+    PGELIST<saveLevelInfo > levelInfo;
 };
 
 #endif // SAVE_FILEDATA_H

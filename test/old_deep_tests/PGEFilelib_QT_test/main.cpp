@@ -377,9 +377,9 @@ int main(int argc, char *argv[])
         newInvalid.open(QIODevice::WriteOnly|QIODevice::Truncate);
         QTextStream niout(&newInvalid);
 
-        QFile oldInvalid("invalid_old.log");
-        oldInvalid.open(QIODevice::WriteOnly|QIODevice::Truncate);
-        QTextStream oiout(&oldInvalid);
+//        QFile oldInvalid("invalid_old.log");
+//        oldInvalid.open(QIODevice::WriteOnly|QIODevice::Truncate);
+//        QTextStream oiout(&oldInvalid);
 
         QFile diffs("differents.log");
         diffs.open(QIODevice::WriteOnly|QIODevice::Truncate);
@@ -427,6 +427,7 @@ int main(int argc, char *argv[])
                 newInvalid.flush();
             }
 
+#if 0
             FileDataOld = FileFormats::CreateLevelData();
             fileI.seek(0, PGE_FileFormats_misc::TextInput::begin);
 
@@ -469,9 +470,13 @@ int main(int argc, char *argv[])
                 QFile(opath+file+".old.lvlx").remove();
                 QFile(opath+file+".new.lvlx").remove();
             }
+#endif
+            QFile(opath+file+".old.lvlx").remove();
+            QFile(opath+file+".new.lvlx").remove();
             cout.flush();
         }
-        oldInvalid.close();
+
+//        oldInvalid.close();
         newInvalid.close();
         diffs.close();
         cout << "==================DEEP TEST OF SMBX38A=END==============\n";
@@ -546,4 +551,3 @@ int main(int argc, char *argv[])
     a.exit(0);
     return 0;
 }
-

@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -215,6 +215,20 @@ struct WorldLevelTile
         PGELIST<Line> paths;
     } movement;
 
+    enum StarsShowPolicy
+    {
+        //! Prefer global settings
+        STARS_UNSPECIFIED = -1,
+        //! Never show stars counter
+        STARS_DONT_SHOW = 0,
+        //! Show collected only
+        STARS_SHOW_COLLECTED_ONLY = 1,
+        //! Show collected and available
+        STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
+    };
+    //! The policy of per-level stars count displaying
+    int starsShowPolicy = STARS_UNSPECIFIED;
+
     /*
      * Editor-only parameters which are not saving into file
      */
@@ -326,12 +340,113 @@ struct WorldLayer
     ElementMeta meta;
 };
 
+/*!
+ * \brief Layer move command
+ */
+struct WorldEvent38A_LayerMove
+{
+    //! Layer to move
+    PGESTRING layer;
+
+    //! Type of move
+    enum MoveType
+    {
+        Move_Speed = 0,
+        Move_Coordinate = 1,
+        Move_MoveTo = 2,
+        Move_Rorate = 3,
+        Move_Spin = 4
+    } type = Move_Speed;
+
+    //! Horizontal parameter
+    double param_h = 0.0;
+    //! Vertical parameter
+    double param_v = 0.0;
+    //! Additional parameter
+    double param_extra = 0.0;
+
+    //! Expression to compute the horizontal parameter
+    PGESTRING expression_param_h;
+    //! Expression to compute the vertical parameter
+    PGESTRING expression_param_v;
+    //! Exrpression to compute the additional parameter
+    PGESTRING expression_param_extra;
+};
+
+/*!
+ * \brief World map specific event entry structure
+ */
 struct WorldEvent38A
 {
     //! Name of the event
     PGESTRING name;
 
-    //TODO: Implement other fields!!!
+    //! Disable the smoke effect
+    bool nosmoke = false;
+    //! List of layers to hide
+    PGELIST<PGESTRING> layers_hide;
+    //! List of layers to show
+    PGELIST<PGESTRING> layers_show;
+    //! List of layers to toggle
+    PGELIST<PGESTRING> layers_toggle;
+
+    enum LayersMode
+    {
+        LM_StateLayers = 0,
+        LM_StateObjects = 1
+    } layers_mode = LM_StateLayers;
+
+    //! List of per-event layer move commands
+    PGELIST<WorldEvent38A_LayerMove> layers_move;
+
+    //! Autostart event
+    enum AutoStart
+    {
+        AutoStart_None = 0,
+        AutoStart_OnFirstLoad = 1,
+        AutoStart_OnEveryLoad = 2,
+        AutoStart_OnLevelExit = 3
+    } autostart = AutoStart_None;
+
+    //! Start event when all given conditions match
+    bool start_on_condition = false;
+    //! Condition to start this event
+    PGESTRING autostart_condition;
+
+    bool is_level_enter_exit = false;
+    //! Allow interruption of event when `false` returned by script
+    bool interrupt_on_false = false;
+    //! Show message on interrupt
+    bool show_msg_on_interrupt = false;
+    //! Message box to show when interruption occured
+    PGESTRING interrupt_message;
+
+    //! Sound ID to play if not zero
+    long sound_id = 0;
+
+    //! Number of 1/65 seconds to lock the player's input
+    int lock_keyboard_delay = 0;
+    //! Number of milliseconds to lock the player's input
+    int lock_keyboard_delay_ms = 0;
+
+    //! Trigger another event if not empty
+    PGESTRING trigger;
+    //! Trigger another event after time in 1/65 of second
+    long trigger_timer = 0;
+
+    //! Trigger script by name
+    PGESTRING trigger_script;
+
+    //! Message box to show when event executed
+    PGESTRING msg;
+
+    //! Move player to X position (-1 - don't move) and play the animation
+    long move_to_x = -1;
+    //! Move player to Y position (-1 - don't move) and play the animation
+    long move_to_y = -1;
+
+    //! Anchored level id
+    long level_anchor_id = 0;
 
     /*
      * Editor-only parameters which are not saving into file
@@ -383,7 +498,7 @@ struct WorldData
     };
 
     //! Title of the episode
-    PGESTRING EpisodeTitle = "";
+    PGESTRING EpisodeTitle;
     //! Disable SMBX64 Character 1
     bool nocharacter1 = false;
     //! Disable SMBX64 Character 2
@@ -417,8 +532,8 @@ struct WorldData
         nocharacter5 = nocharacter.size() > 4 ? nocharacter[4] : false;
     }
 
-    PGESTRING IntroLevel_file = "";
-    PGESTRING GameOverLevel_file = "";
+    PGESTRING IntroLevel_file;
+    PGESTRING GameOverLevel_file;
     bool HubStyledWorld = false;
     bool restartlevel = false;
 
@@ -441,7 +556,8 @@ struct WorldData
     //! List of cheat codes (granted or forbidden dependent on restrictNoCheats flag state)
     PGESTRINGList cheatsList;
 
-    enum SaveMode{
+    enum SaveMode
+    {
         SAVE_RESUME_AT_INTRO = -1,
         SAVE_RESUME_AT_WORLD_MAP = 0,
         SAVE_RESUME_AT_RECENT_LEVEL = 1,
@@ -453,9 +569,9 @@ struct WorldData
     //! Enable save locker
     bool    saveLocker = false;
     //! Save locker expression
-    PGESTRING saveLockerEx = "";
+    PGESTRING saveLockerEx;
     //! Message box shown on save locking
-    PGESTRING saveLockerMsg = "";
+    PGESTRING saveLockerMsg;
     //! Always show any closed cells (overwise closed cells are will be hidden until player will open them)
     bool    showEverything = false;
     //! Cached total number of available stars on this episode
@@ -463,21 +579,35 @@ struct WorldData
     //! 38A Inventory limit
     unsigned long   inventoryLimit = 0;
 
+    enum StarsShowPolicy
+    {
+        //! Prefer global settings
+        STARS_UNSPECIFIED = -1,
+        //! Never show stars counter
+        STARS_DONT_SHOW = 0,
+        //! Show collected only
+        STARS_SHOW_COLLECTED_ONLY = 1,
+        //! Show collected and available
+        STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
+    };
+    //! World map wide policy of per-level stars count displaying
+    int starsShowPolicy = STARS_UNSPECIFIED;
+
     //! Episode credits (full text area)
-    PGESTRING authors = "";
+    PGESTRING authors;
     //! Episode credits (SMBX64 single-line field 1)
-    PGESTRING author1 = "";
+    PGESTRING author1;
     //! Episode credits (SMBX64 single-line field 2)
-    PGESTRING author2 = "";
+    PGESTRING author2;
     //! Episode credits (SMBX64 single-line field 3)
-    PGESTRING author3 = "";
+    PGESTRING author3;
     //! Episode credits (SMBX64 single-line field 4)
-    PGESTRING author4 = "";
+    PGESTRING author4;
     //! Episode credits (SMBX64 single-line field 5)
-    PGESTRING author5 = "";
+    PGESTRING author5;
 
     //! Credits scene background music
-    PGESTRING authors_music = "";
+    PGESTRING authors_music;
 
     //! JSON-like string with a custom properties (without master brackets, like "param":"value,["subparam":value])
     PGESTRING custom_params;

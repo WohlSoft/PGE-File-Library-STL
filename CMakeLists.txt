@@ -1,23 +1,4 @@
-cmake_minimum_required (VERSION 2.8.12)
-
-if(Vita OR VITA)
-    message("VITASDK Defined!")
-    message("VITA BUILD!")
-    #set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-    set(CMAKE_TOOLCHAIN_FILE "/usr/local/vitasdk/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-
-    #include("${VITASDK}/share/vita.cmake" REQUIRED)
-    include("/usr/local/vitasdk/share/vita.cmake" REQUIRED)
-
-    set(VITA 1)
-    # set(VITA_APP_NAME "TheXTech Vita Edition")
-    # set(VITA_TITLEID  "THEXTECH00001")
-    # set(VITA_VERSION  "01.00")
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second -std=gnu11")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second -std=gnu++11 -fno-optimize-sibling-calls -Wno-class-conversion")
-    set(PGEFL_QT_SUPPORT OFF)
-endif()
+cmake_minimum_required (VERSION 2.8.12...3.5.0)
 
 project(PGEFileLibrary C CXX)
 
@@ -30,14 +11,51 @@ if(POLICY CMP0077) # Allow external configuring when building as sub-directory
     cmake_policy(SET CMP0077 NEW)
 endif()
 
+if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
+    cmake_policy(SET CMP0069 NEW)
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_DEBUG_POSTFIX "d")
+if(NOT CMAKE_DEBUG_POSTFIX)
+    set(CMAKE_DEBUG_POSTFIX "d")
+endif()
 
-find_package(Qt5Core QUIET)
+option(PGEFL_ENABLE_RWOPS "Enable SDL_RWops interfaces (if this option is enabled, then PGE-FL has a build-time dependency on SDL2's headers)" OFF)
 
-if(Qt5Core_FOUND)
+if(NOT DEFINED PGE_FORCE_QT5 AND NOT DEFINED PGEFL_PREFER_QT5)
+    option(PGE_FORCE_QT5 "Try to find Qt5 instead of Qt6 if available" ON)
+endif()
+
+macro(pgeflFindQt)
+    if(NOT PGE_FORCE_QT5 AND NOT PGEFL_PREFER_QT5)
+        find_package(Qt6Core QUIET)
+    endif()
+
+    if(PGE_FORCE_QT5 OR PGEFL_PREFER_QT5 OR NOT Qt6Core_FOUND)
+        find_package(Qt5Core QUIET)
+        set(PGEFL_USE_QT5 TRUE)
+        set(PGEFL_QT_CORE_DEFS ${Qt5Core_DEFINITIONS})
+        set(PGEFL_QT_CORE_INCS ${Qt5Core_INCLUDE_DIRS})
+        message("-- PGE-FL Qt 5 detected")
+    else()
+        set(PGEFL_USE_QT6 TRUE)
+        set(PGEFL_QT_CORE_DEFS ${Qt6Core_DEFINITIONS})
+        set(PGEFL_QT_CORE_INCS ${Qt6Core_INCLUDE_DIRS})
+        message("-- PGE-FL Qt 6 detected")
+    endif()
+endmacro()
+
+if(NOT DEFINED PGEFL_QT_SUPPORT AND NOT VITA)
+    pgeflFindQt()
+endif()
+
+if(PGEFL_QT_SUPPORT)
+    pgeflFindQt()
+endif()
+
+if(VITA OR PGEFL_USE_QT5 OR PGEFL_USE_QT6)
     set(OPT_DEF_PGEFL_QT_SUPPORT OFF)
 else()
     set(OPT_DEF_PGEFL_QT_SUPPORT ON)
@@ -46,7 +64,7 @@ endif()
 if(NOT PGEFL_QT_SUPPORT)
     option(PGEFL_QT_SUPPORT "Build also Qt variant" ${OPT_DEF_PGEFL_QT_SUPPORT})
 endif()
-if(PGEFL_QT_SUPPORT AND NOT VITA)
+if(PGEFL_QT_SUPPORT AND NOT VITA AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH)
     message("== PGE-FL Qt Edition WILL be built!")
     if(POLICY CMP0071) # Automoc
         cmake_policy(SET CMP0071 NEW)
@@ -62,7 +80,13 @@ set(LIBRARY_PROJECT 1)
 include(build_props.cmake)
 include(pge_file_library.cmake)
 
-pge_cxx_standard(11)
+if(PGEFL_USE_QT6)
+    pge_cxx_standard(17)
+else()
+    pge_cxx_standard(11)
+endif()
+
+pgefl_disable_cxx_warning_flag("deprecated-copy" NO_DEPRECATED_COPY)
 
 set(PGEFL_INSTALLS)
 
@@ -70,17 +94,30 @@ add_library(pgefl STATIC
     ${PGE_FILE_LIBRARY_SRCS}
 )
 set_target_properties(pgefl PROPERTIES AUTOMOC OFF)
-target_include_directories(pgefl PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(pgefl PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src")
 list(APPEND PGEFL_INSTALLS pgefl)
+
+if(PGEFL_ENABLE_RWOPS)
+    target_compile_definitions(pgefl PUBLIC -DPGEFL_ENABLE_RWOPS)
+endif()
 
 if(PGEFL_QT_SUPPORT)
     add_library(pgefl_qt STATIC
         ${PGE_FILE_LIBRARY_SRCS}
     )
     set_target_properties(pgefl_qt PROPERTIES AUTOMOC ON)
-    target_compile_definitions(pgefl_qt PUBLIC -DPGE_FILES_QT ${Qt5Core_DEFINITIONS})
-    target_include_directories(pgefl_qt PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" ${Qt5Core_INCLUDE_DIRS})
+    target_compile_definitions(pgefl_qt PUBLIC -DPGE_FILES_QT ${PGEFL_QT_CORE_DEFS})
+    target_include_directories(pgefl_qt PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
+        ${PGEFL_QT_CORE_INCS})
     list(APPEND PGEFL_INSTALLS pgefl_qt)
+
+    if(PGEFL_ENABLE_RWOPS)
+        target_compile_definitions(pgefl_qt PUBLIC -DPGEFL_ENABLE_RWOPS)
+    endif()
 endif()
 
 # Don't install libraries when PGE-FL was built as a part of Moondust master project
@@ -107,4 +144,3 @@ if(WITH_UNIT_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()
-

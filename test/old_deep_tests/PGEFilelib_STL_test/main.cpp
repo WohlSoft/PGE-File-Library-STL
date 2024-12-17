@@ -430,6 +430,7 @@ int main()
             FileDataOld = FileFormats::CreateLevelData();
             fileI.close();
 
+#if 0
             fileI.open(path + file, false);
             meter.restart();
             if(FileFormats::ReadSMBX38ALvlFile_OLD(fileI, FileDataOld))
@@ -474,6 +475,7 @@ int main()
                 //QFile(opath+file+".old.lvlx").remove();
                 //QFile(opath+file+".new.lvlx").remove();
             }
+#endif
             cout.flush();
         }
         oiout.close();

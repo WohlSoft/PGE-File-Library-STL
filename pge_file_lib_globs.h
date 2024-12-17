@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -64,11 +64,13 @@
 */
 
 #include <cstdint>
+#include <string>
 
 #ifdef PGE_FILES_QT
 #include <QString>
 #include <QStringList>
 #include <QList>
+#include <QVector>
 #include <QPair>
 #include <QFile>
 #include <QMap>
@@ -80,14 +82,17 @@ typedef QString PGESTRING;
 typedef QStringList PGESTRINGList;
 typedef QChar   PGEChar;
 #define PGELIST QList
+#define PGEVECTOR QVector
 #define PGEPAIR QPair
 #define PGEMAP QMap
 #define PGEMAPKEY(it) (it.key())
 #define PGEMAPVAL(it) (it.value())
 
+#define PGESTRING_EMPLACE(x) push_back(x)
+
+
 #else /* PGE_FILES_QT */
 
-#include <string>
 #include <vector>
 #include <cstdio>
 #include <utility>
@@ -99,12 +104,17 @@ typedef std::string                 PGESTRING;
 typedef std::vector<std::string>    PGESTRINGList;
 typedef char PGEChar;
 #define PGELIST std::vector
+#define PGEVECTOR std::vector
 #define PGEPAIR std::pair
 #define PGEMAP std::map
 #define PGEMAPKEY(it) (it->first)
 #define PGEMAPVAL(it) (it->second)
 
+#define PGESTRING_EMPLACE(x) emplace_back(x)
+
 #endif /* PGE_FILES_QT */
+
+struct SDL_RWops;
 
 /*!
  * Misc I/O classes used by PGE File Library internally
@@ -132,12 +142,12 @@ public:
      * \brief Constructor with pre-opening of a file
      * \param filepath relative or absolute file path
      */
-    FileInfo(PGESTRING filepath);
+    FileInfo(const PGESTRING &filepath);
     /*!
      * \brief Sets file which will be used to calculate file information
      * \param filepath
      */
-    void setFile(PGESTRING filepath);
+    void setFile(const PGESTRING &filepath);
     /*!
      * \brief Returns file extension (last part of filename after last dot)
      * \return file suffix or name extension (last part of filename after last dot)
@@ -208,16 +218,16 @@ public:
     };
 
     TextInput();
-    virtual ~TextInput();
-    virtual PGESTRING read(int64_t len);
-    virtual PGESTRING readLine();
-    virtual PGESTRING readCVSLine();
+    virtual ~TextInput() = default;
+    virtual void read(PGESTRING &ret, int64_t len);
+    virtual void readLine(PGESTRING &ret);
+    virtual void readCVSLine(PGESTRING &ret);
     virtual PGESTRING readAll();
     virtual bool eof();
     virtual int64_t tell();
     virtual int seek(int64_t pos, positions relativeTo);
     virtual PGESTRING getFilePath();
-    virtual void setFilePath(PGESTRING path);
+    virtual void setFilePath(const PGESTRING &path);
     virtual long getCurrentLineNumber();
     virtual bool reOpen(bool utf8);
 
@@ -249,12 +259,12 @@ public:
     };
 
     TextOutput();
-    virtual ~TextOutput();
+    virtual ~TextOutput() = default;
     virtual int write(PGESTRING buffer);
     virtual int64_t tell();
     virtual int seek(int64_t pos, positions relativeTo);
     virtual PGESTRING getFilePath();
-    virtual void setFilePath(PGESTRING path);
+    virtual void setFilePath(const PGESTRING &path);
     virtual long getCurrentLineNumber();
     TextOutput &operator<<(const PGESTRING &s);
     TextOutput &operator<<(const char *s);
@@ -269,13 +279,13 @@ class RawTextInput: public TextInput
 {
 public:
     RawTextInput();
-    RawTextInput(PGESTRING *rawString, PGESTRING filepath = "");
-    virtual ~RawTextInput();
-    bool open(PGESTRING *rawString, PGESTRING filepath = "");
+    RawTextInput(PGESTRING *rawString, const PGESTRING &filepath = PGESTRING());
+    virtual ~RawTextInput() = default;
+    bool open(PGESTRING *rawString, const PGESTRING &filepath = PGESTRING());
     void close();
-    virtual PGESTRING read(int64_t len);
-    virtual PGESTRING readLine();
-    virtual PGESTRING readCVSLine();
+    virtual void read(PGESTRING &ret, int64_t len);
+    virtual void readLine(PGESTRING &ret);
+    virtual void readCVSLine(PGESTRING &ret);
     virtual PGESTRING readAll();
     virtual bool eof();
     virtual int64_t tell();
@@ -304,6 +314,49 @@ private:
 };
 
 
+#ifdef PGEFL_ENABLE_RWOPS
+
+class RWopsTextInput: public TextInput
+{
+public:
+    RWopsTextInput();
+    RWopsTextInput(SDL_RWops *rwops, const PGESTRING &filePath = PGESTRING());
+    virtual ~RWopsTextInput();
+    bool open(SDL_RWops *rwops, const PGESTRING &filePath = PGESTRING());
+    void close();
+    virtual void read(PGESTRING &ret, int64_t len);
+    virtual void readLine(PGESTRING &ret);
+    virtual void readCVSLine(PGESTRING &ret);
+    virtual PGESTRING readAll();
+    virtual bool eof();
+    virtual int64_t tell();
+    virtual int seek(int64_t pos, positions relativeTo);
+
+private:
+    inline bool in_buffer() const
+    {
+        return m_readOffset >= m_bufferStartOffset;
+    }
+    inline long bytes_available() const
+    {
+        return m_bufferStartOffset + m_buffer.size() - m_readOffset;
+    }
+    inline bool buffer_okay() const
+    {
+        return in_buffer() && bytes_available() > 0;
+    }
+    void fillBuffer();
+
+    SDL_RWops *m_rwops = nullptr;
+    std::string m_buffer;
+    int64_t m_bufferStartOffset = 0;
+    int64_t m_readOffset = 0;
+    int64_t m_rwopsOffset = 0;
+    bool m_bufferIsEof = false;
+};
+
+#endif
+
 
 /*!
  * \brief Provides cross-platform text file reading interface
@@ -316,17 +369,20 @@ public:
      * \param filePath Full or relative path to the file
      * \return true if file exists
      */
-    static bool exists(PGESTRING filePath);
+    static bool exists(const PGESTRING &filePath);
+
     /*!
      * \brief Constructor
      */
     TextFileInput();
+
     /*!
      * \brief Constructor with pre-opening of the file
      * \param filePath Full or relative path to the file
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
-    TextFileInput(PGESTRING filePath, bool utf8 = false);
+    TextFileInput(const PGESTRING &filePath, bool utf8 = false);
+
     /*!
      * \brief Destructor
      */
@@ -336,47 +392,56 @@ public:
      * \param filePath Full or relative path to the file
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
-    bool open(PGESTRING filePath, bool utf8 = false);
+    bool open(const PGESTRING &filePath, bool utf8 = false);
+
     /*!
      * \brief Re-open opened file with or without UTF8 mode enabled
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
     bool reOpen(bool utf8 = false);
+
     /*!
      * \brief Close currently opened file
      */
     void close();
+
     /*!
      * \brief Reads requested number of characters from a file
+     * \param ret - reset and filled with requested set of characters
      * \param Maximal lenght of characters to read from file
-     * \return string contains requested line of characters
      */
-    PGESTRING read(int64_t len);
+    void read(PGESTRING &ret, int64_t len);
+
     /*!
      * \brief Reads whole line before line feed character
-     * \return string contains gotten line
+     * \param ret - reset and filled with gotten line
      */
-    PGESTRING readLine();
+    void readLine(PGESTRING &ret);
+
     /*!
      * \brief Reads whole line before line feed character or before first unquoted comma
-     * \return string contains gotten line
+     * \param ret - reset and filled with gotten line
      */
-    PGESTRING readCVSLine();
+    void readCVSLine(PGESTRING &ret);
+
     /*!
      * \brief Reads all data from a file at current position of carriage
      * \return
      */
     PGESTRING readAll();
+
     /*!
      * \brief Is carriage position at end of file
      * \return true if carriage position at end of file
      */
     bool eof();
+
     /*!
      * \brief Returns current position of carriage relative to begin of file
      * \return current position of carriage relative to begin of file
      */
     int64_t tell();
+
     /*!
      * \brief Changes position of carriage to specific file position
      * \param pos Target position of carriage
@@ -407,7 +472,7 @@ public:
      * \param filePath Full or relative path to the file
      * \return true if file exists
      */
-    static bool exists(PGESTRING filePath);
+    static bool exists(const PGESTRING &filePath);
     /*!
      * \brief Constructor
      */

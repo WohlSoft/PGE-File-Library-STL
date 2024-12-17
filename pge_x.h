@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -116,27 +116,38 @@ public:
      * \brief Constructor
      */
     PGEFile();
+
     /*!
      * \brief Copy Constructor
      * \param pgeFile Another PGEFile object
      */
     PGEFile(const PGEFile &pgeFile);
 #endif
+
+    /*!
+     * \brief Assignment operator
+     * \param other Another PGEFile object
+     */
+    PGEFile &operator=(const PGEFile &other);
+
     /*!
      * \brief Constructor with pre-storing of raw data
      * \param _rawData
      */
-    PGEFile(const PGESTRING &_rawData);
+    explicit PGEFile(const PGESTRING &_rawData);
+
     /*!
      * \brief Stores raw data string
      * \param _rawData String contains raw data of entire file
      */
     void setRawData(const PGESTRING &_rawData);
+
     /*!
      * \brief Parses stored raw data into the data tree
      * \return
      */
     bool buildTreeFromRaw();
+
     /*!
      * \brief Returns last occouped error
      * \return Last occouped error
@@ -171,65 +182,65 @@ public:
      * \param in Input string which would be a title of the data section
      * \return True if data section title is valid
      */
-    static bool IsSectionTitle(PGESTRING in);
+    static bool IsSectionTitle(const PGESTRING &in);
 
     /*!
      * \brief Is given value is a quoted string?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsQoutedString(PGESTRING in);// QUOTED STRING
+    static bool IsQoutedString(const PGESTRING &in);// QUOTED STRING
     /*!
      * \brief Is given value is a heximal number?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsHex(PGESTRING in);// Hex Encoded String
+    static bool IsHex(const PGESTRING &in);// Hex Encoded String
     /*!
      * \brief Is given value is an unsigned integer number?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsIntU(PGESTRING in);// UNSIGNED INT
+    static bool IsIntU(const PGESTRING &in);// UNSIGNED INT
     /*!
      * \brief Is given value is a signed integer number?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsIntS(PGESTRING in);// SIGNED INT
+    static bool IsIntS(const PGESTRING &in);// SIGNED INT
     /*!
      * \brief Is given value is a floating point number?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsFloat(PGESTRING &in);// FLOAT
+    static bool IsFloat(const PGESTRING &in);// FLOAT
     /*!
      * \brief Is given value is a boolean degit?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsBool(PGESTRING in);//BOOL
+    static bool IsBool(const PGESTRING &in);//BOOL
     /*!
      * \brief Is given value is a boolean array (string contains 0 or 1 degits only)?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsBoolArray(PGESTRING in);//Boolean array
+    static bool IsBoolArray(const PGESTRING &in);//Boolean array
     /*!
      * \brief Is given value is an integer array?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsIntArray(PGESTRING in);//Integer array
+    static bool IsIntArray(const PGESTRING &in);//Integer array
     /*!
      * \brief Is given value is a string array?
      * \param in Input data string with data required to valitade
      * \return true if given value is passed or false if value is invalid
      */
-    static bool IsStringArray(PGESTRING in);//String array
+    static bool IsStringArray(const PGESTRING &in);//String array
 
     //Split string into data values
-    static PGELIST<PGESTRINGList> splitDataLine(PGESTRING src_data, bool *valid = 0);
+    static PGELIST<PGESTRINGList> splitDataLine(const PGESTRING &src_data, bool *valid = nullptr);
 
     //PGE Extended File parameter string generators
     /*!
@@ -238,26 +249,28 @@ public:
      * \return Encoded PGE-X raw string
      */
     template<typename T>
-    static inline PGESTRING WriteInt(T &input)
+    static inline PGESTRING WriteInt(const T &input)
     {
         return fromNum(input);
     }
+#if 0
     /*!
      * \brief Encode floating point numeric value with rounding into PGE-X string
      * \param input floating point number
      * \return Encoded PGE-X raw string
      */
     template<typename T>
-    static inline PGESTRING WriteRoundFloat(T &input)
+    static inline PGESTRING WriteRoundFloat(const T &input)
     {
         return fromNum(std::round(input));
     }
+#endif
     /*!
      * \brief Encode boolean value into PGE-X string
      * \param input boolean flag
      * \return Encoded PGE-X raw string
      */
-    static inline PGESTRING WriteBool(bool &input)
+    static inline PGESTRING WriteBool(bool input)
     {
         return PGESTRING((input) ? "1" : "0");
     }
@@ -268,9 +281,12 @@ public:
      * \return Encoded PGE-X raw string
      */
     template<typename T>
-    static PGESTRING WriteFloat(T &input)
+    static PGESTRING WriteFloat(const T &input)
     {
-        return fromNum(input);
+        if(input == 0)
+            return "0";
+        else
+            return fromNum(input);
     }
 
     /*!
@@ -296,31 +312,31 @@ public:
      * \param input Plain text string
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING hStrS(PGESTRING input);
+    static PGESTRING hStrS(const PGESTRING &input);
     /*!
      * \brief Encode string-array into PGE-X escaped string
      * \param input List of plain text strings
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING WriteStrArr(PGESTRINGList &input);
+    static PGESTRING WriteStrArr(const PGESTRINGList &input);
     /*!
      * \brief Encode array of integers into PGE-X escaped string
      * \param input List of integer numbers
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING WriteIntArr(PGELIST<int > input);
+    static PGESTRING WriteIntArr(const PGELIST<int > &input);
     /*!
      * \brief Encode array of integers into PGE-X escaped string
      * \param input List of integer numbers
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING WriteIntArr(PGELIST<long > input);
+    static PGESTRING WriteIntArr(const PGELIST<long > &input);
     /*!
      * \brief Encode array of booleans into PGE-X escaped string
      * \param input List of boolean flags
      * \return Encoded PGE-X raw string
      */
-    static PGESTRING WriteBoolArr(PGELIST<bool > input);
+    static PGESTRING WriteBoolArr(const PGELIST<bool > &input);
 
     /*!
      * \brief Decodes PGE-X string into plain text string
@@ -333,19 +349,19 @@ public:
      * \param src Encoded PGE-X string value
      * \return List of plain text strings
      */
-    static PGESTRINGList X2STRArr(PGESTRING in, bool *_valid = NULL);
+    static PGESTRINGList X2STRArr(const PGESTRING &in, bool *_valid = nullptr);
     /*!
      * \brief Decodes PGE-X String array into array of plain text strings
      * \param src Encoded PGE-X string value
      * \return List of plain text strings
      */
-    static PGELIST<long> X2IntArr(PGESTRING in, bool *_valid = NULL);
+    static PGELIST<long> X2IntArr(const PGESTRING &in, bool *_valid = nullptr);
     /*!
      * \brief Decodes PGE-X Boolean array into array of boolean flags
      * \param src Encoded PGE-X boolean array
      * \return List of boolean flags
      */
-    static PGELIST<bool> X2BollArr(PGESTRING src);
+    static PGELIST<bool> X2BollArr(const PGESTRING &src);
 
     /*!
      * \brief Applies PGE-X escape sequensions to the plain text string
@@ -368,6 +384,9 @@ public:
      */
     static inline PGESTRING value(PGESTRING &&marker, PGESTRING &&data)
     {
+        if(IsEmpty(data))
+            return "";
+
         PGESTRING out;
         out += marker + ":" + data + ";";
         return out;

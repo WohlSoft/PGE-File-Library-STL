@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -35,7 +35,11 @@
 #include <QStringList>
 #include <QFile>
 #include <QTextStream>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QStringConverter>
+#else
 #include <QTextCodec>
+#endif
 #include <QVector>
 #include <QPair>
 #include <QMap>
@@ -53,6 +57,12 @@ typedef int pge_size_t;
 #define PGEMAP  QMap
 #define PGEHASH QHash
 typedef QFile PGEFILE;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+#   define QSTR_SKIP_EMPTY_PARTS Qt::SkipEmptyParts
+#else
+#   define QSTR_SKIP_EMPTY_PARTS QString::SkipEmptyParts
+#endif
 
 inline PGESTRING PGESTR_Simpl(const PGESTRING &str)
 {
@@ -75,7 +85,7 @@ typedef int pge_size_t;
 #define PGEMAP  QMap
 #define PGEHASH QHash
 typedef QFile PGEFILE;
-inline void PGE_SPLITSTRING(PGESTRINGList &dst, PGESTRING &src, PGESTRING sep)
+inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, PGESTRING sep)
 {
     dst = src.split(sep);
 }
@@ -83,7 +93,7 @@ inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
 {
     return src.replace(from, to);
 }
-inline PGESTRING PGE_RemSubSTRING(const PGESTRING &src, PGESTRING substr)
+inline PGESTRING PGE_RemSubSTRING(const PGESTRING &src, const PGESTRING &substr)
 {
     return QString(src).remove(substr);
 }
@@ -91,7 +101,7 @@ inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
     return str.remove(pos, len);
 }
-inline PGESTRING PGE_SubStr(PGESTRING &str, int pos, int len = -1)
+inline PGESTRING PGE_SubStr(const PGESTRING &str, int pos, int len = -1)
 {
     return str.mid(pos, len);
 }
@@ -113,7 +123,7 @@ inline void PGE_FilterBinary(PGESTRING &str)
             str[i] = PGEChar('?');
     }
 }
-inline bool      IsNULL(const PGESTRING str)
+inline bool      IsNULL(const PGESTRING &str)
 {
     return str.isNull();
 }
@@ -125,43 +135,94 @@ inline bool      IsEmpty(const PGESTRINGList &str)
 {
     return str.isEmpty();
 }
-inline int       toInt(PGESTRING str)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+inline QCharRef  Back(PGESTRING &str)
 {
-    return str.toInt();
+    return str.back();
 }
-inline unsigned int toUInt(PGESTRING str)
+
+inline QChar Back(const PGESTRING &str)
 {
-    return str.toUInt();
+    return str.back();
 }
-inline long      toLong(PGESTRING str)
+#else
+inline QChar&    Back(PGESTRING &str)
 {
-    return str.toLong();
+    return *(str.end() - 1);
 }
-inline unsigned long toULong(PGESTRING str)
+
+inline const QChar&    Back(const PGESTRING &str)
 {
-    return str.toULong();
+    return *(str.end() - 1);
 }
-inline float     toFloat(PGESTRING str)
+#endif
+
+inline int       toInt(const PGESTRING &str)
 {
-    return str.toFloat();
+    bool okay;
+    signed int ret = str.toInt(&okay);
+    if(!okay)
+        throw std::range_error("int value out of range");
+    return ret;
 }
-inline double    toDouble(PGESTRING str)
+inline unsigned int toUInt(const PGESTRING &str)
 {
-    return str.toDouble();
+    bool okay;
+    unsigned int ret = str.toUInt(&okay);
+    if(!okay)
+        throw std::range_error("uint value out of range");
+    return ret;
+}
+inline long      toLong(const PGESTRING &str)
+{
+    bool okay;
+    signed long ret = str.toLong(&okay);
+    if(!okay)
+        throw std::range_error("long value out of range");
+    return ret;
+}
+inline unsigned long toULong(const PGESTRING &str)
+{
+    bool okay;
+    unsigned long ret = str.toULong(&okay);
+    if(!okay)
+        throw std::range_error("ulong value out of range");
+    return ret;
+}
+inline float     toFloat(const PGESTRING &str)
+{
+    bool okay;
+    float ret = str.toFloat(&okay);
+    if(!okay)
+        throw std::range_error("float value out of range");
+    return ret;
+}
+inline double    toDouble(const PGESTRING &str)
+{
+    bool okay;
+    float ret = str.toDouble(&okay);
+    if(!okay)
+        throw std::range_error("double value out of range");
+    return ret;
 }
 inline PGESTRING removeSpaces(PGESTRING src)
 {
     return src.remove(' ');
 }
+
+#define toPgeString(x) QString::fromStdString(x)
+
 template<typename T>
 PGESTRING fromNum(T num)
 {
     return QString::number(num);
 }
+
 inline PGESTRING fromBoolToNum(bool num)
 {
     return QString::number(static_cast<int>(num));
 }
+
 namespace PGE_FileFormats_misc
 {
     PGESTRING    url_encode(const PGESTRING &sSrc);
@@ -207,6 +268,7 @@ inline PGESTRING PGE_URLDEC(const PGESTRING &src)
 #include <algorithm>
 #include <map>
 #include <cmath>
+#include <climits>
 #include <cctype>
 #include <unordered_map>
 
@@ -263,6 +325,7 @@ typedef size_t pge_size_t;
 #define PGEMAP  std::map
 #define PGEHASH std::unordered_map
 typedef std::fstream PGEFILE;
+
 namespace PGE_FileFormats_misc
 {
     void split(std::vector<std::string> &dest, const std::string &str, const std::string& separator);
@@ -279,41 +342,45 @@ namespace PGE_FileFormats_misc
     std::string base64_encodeA(std::string &source, bool no_padding = false);
     std::string base64_decodeA(std::string &source);
 }
+
 inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, const PGESTRING &sep)
 {
     dst.clear();
     PGE_FileFormats_misc::split(dst, src, sep);
 }
-inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
+
+inline PGESTRING PGE_ReplSTRING(PGESTRING src, const PGESTRING &from, const PGESTRING &to)
 {
     PGE_FileFormats_misc::replaceAll(src, from, to);
     return src;
 }
 
-inline PGESTRING PGE_RemSubSTRING(PGESTRING src, PGESTRING substr)
+inline PGESTRING PGE_RemSubSTRING(PGESTRING src, const PGESTRING &substr)
 {
     PGE_FileFormats_misc::RemoveSub(src, substr);
     return src;
 }
+
 inline PGESTRING PGE_RemStrRng(PGESTRING &str, int pos, int len)
 {
     str.erase(static_cast<size_t>(pos), static_cast<size_t>(len));
     return str;
 }
-inline PGESTRING PGE_SubStr(PGESTRING &str, int pos, int len = -1)
+inline PGESTRING PGE_SubStr(const PGESTRING &str, int pos, int len = -1)
 {
     return str.substr(static_cast<std::string::size_type>(pos), static_cast<std::string::size_type>(len));
 }
+
 inline void PGE_CutLength(PGESTRING &str, int maxlength)
 {
-    if(str.size() > size_t(maxlength))
-        str.resize(size_t(maxlength));
+    if(str.size() > static_cast<size_t>(maxlength))
+        str.resize(static_cast<size_t>(maxlength));
 }
+
 inline void PGE_FilterBinary(PGESTRING &str)
 {
-    for(size_t i = 0; i < str.size(); i++)
+    for(PGEChar &c : str)
     {
-        PGEChar &c = str[i];
         if(c == '\r')
             c = 'r';
         else if(c == '\n')
@@ -322,46 +389,76 @@ inline void PGE_FilterBinary(PGESTRING &str)
             c = '?';
     }
 }
-inline bool IsNULL(const PGESTRING str)
+
+inline bool IsNULL(const PGESTRING &str)
 {
     return (str.empty());
 }
+
 inline bool IsEmpty(const PGESTRING &str)
 {
     return str.empty();
 }
+
 inline bool IsEmpty(const PGESTRINGList &str)
 {
     return str.empty();
 }
-inline int toInt(PGESTRING str)
+
+inline char& Back(PGESTRING &str)
 {
-    return std::atoi(str.c_str());
+    return str.back();
 }
-inline unsigned int toUInt(PGESTRING str)
+
+inline const char& Back(const PGESTRING &str)
 {
-    return static_cast<unsigned int>(std::stoul(str.c_str(), NULL, 10));
+    return str.back();
 }
-inline long toLong(PGESTRING str)
+
+
+inline int toInt(const PGESTRING &str)
 {
-    return std::atol(str.c_str());
+    long ret = std::stol(str, nullptr, 10);
+    if(ret > INT_MAX || ret < INT_MIN)
+        throw std::range_error("int value out of range");
+    return static_cast<int>(ret);
 }
-inline unsigned long toULong(PGESTRING str)
+
+inline unsigned int toUInt(const PGESTRING &str)
 {
-    return static_cast<unsigned long>(std::atoll(str.c_str()));
+    unsigned long ret = std::stoul(str, nullptr, 10);
+    if(ret > UINT_MAX)
+        throw std::range_error("unsigned int value out of range");
+    return static_cast<unsigned int>(ret);
 }
-inline float toFloat(PGESTRING str)
+
+inline long toLong(const PGESTRING &str)
 {
-    return static_cast<float>(std::atof(str.c_str()));
+    return std::stol(str, nullptr, 10);
 }
-inline double toDouble(PGESTRING str)
+
+inline unsigned long toULong(const PGESTRING &str)
 {
-    return std::atof(str.c_str());
+    return std::stoull(str, nullptr, 10);
 }
-inline PGESTRING removeSpaces(PGESTRING src)
+
+inline float toFloat(const PGESTRING &str)
+{
+    return std::stof(str, nullptr);
+}
+
+inline double toDouble(const PGESTRING &str)
+{
+    return std::stod(str, nullptr);
+}
+
+inline PGESTRING removeSpaces(const PGESTRING &src)
 {
     return PGE_RemSubSTRING(src, " ");
 }
+
+#define toPgeString(x) (x)
+
 template<typename T>
 PGESTRING fromNum(T num)
 {
@@ -385,7 +482,7 @@ inline PGESTRING fromBoolToNum(bool num)
 #define PGE_BASE64DEC_W(src) PGE_FileFormats_misc::base64_decodeW(src)
 #define PGE_BASE64ENC_A(src) PGE_FileFormats_misc::base64_encodeA(src)
 #define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
-#endif
+#endif /* ------ PGE_FILES_QT ------ */
 
 inline bool PGE_floatEqual(double l, double r, double precission)
 {
@@ -399,7 +496,7 @@ inline bool PGE_floatEqual(float l, float r, float precission)
            static_cast<long long>(r * std::pow(10.0f, precission));
 }
 
-inline bool PGE_StartsWith(PGESTRING src, PGESTRING with)
+inline bool PGE_StartsWith(const PGESTRING &src, const PGESTRING &with)
 {
 #ifdef PGE_FILES_QT
     return src.startsWith(with, Qt::CaseSensitive);
@@ -408,5 +505,23 @@ inline bool PGE_StartsWith(PGESTRING src, PGESTRING with)
 #endif
 }
 
+static inline uint32_t PGE_toNearestU(double o)
+{
+    if(uint32_t(o) % 2 == 0 && (uint32_t(o * 100000.0) == uint32_t((uint32_t(o) * 100000) + 50000)))
+        return uint32_t(o);
+    else if(uint32_t(o) % 2 != 0 && (uint32_t(o * 100000.0) == uint32_t((uint32_t(o) * 100000) + 50000)))
+        return uint32_t(o + 1.0);
+    else
+        return uint32_t(o + 0.5);
+}
 
-#endif // PGE_FILE_LIB_GLOBS_H_
+static inline int PGE_toNearestS(double o)
+{
+    int sign = o >= 0 ? +1 : -1;
+    if(o < 0)
+        o = -o;
+
+    return int(PGE_toNearestU(o)) * sign;
+}
+
+#endif // PGE_FILE_LIB_PRIVATE_H_

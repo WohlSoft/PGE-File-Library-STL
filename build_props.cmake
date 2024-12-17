@@ -1,3 +1,6 @@
+include(CheckCXXCompilerFlag)
+include(CheckCCompilerFlag)
+
 # If platform is Emscripten
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(EMSCRIPTEN 1 BOOLEAN)
@@ -108,7 +111,14 @@ if(MSVC)
 endif()
 
 # -fPIC thing
-if(LIBRARY_PROJECT AND NOT WIN32 AND NOT VITA)
+if(LIBRARY_PROJECT
+    AND NOT WIN32
+    AND NOT VITA
+    AND NOT NINTENDO_DS
+    AND NOT NINTENDO_3DS
+    AND NOT NINTENDO_WII
+    AND NOT NINTENDO_WIIU
+    AND NOT NINTENDO_SWITCH)
     message("-fPIC is on!")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
@@ -118,12 +128,11 @@ function(pge_cxx_standard STDVER)
     if(NOT WIN32)
         set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
     elseif(MSVC AND CMAKE_VERSION VERSION_LESS "3.9.0" AND MSVC_VERSION GREATER_EQUAL "1900")
-        include(CheckCXXCompilerFlag)
-        CHECK_CXX_COMPILER_FLAG("/std:c++${STDVER}" _cpp_stdxx_flag_supported)
+        check_cxx_compiler_flag("/std:c++${STDVER}" _cpp_stdxx_flag_supported)
         if (_cpp_stdxx_flag_supported)
             add_compile_options("/std:c++${STDVER}")
         else()
-            CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
+            check_cxx_compiler_flag("/std:c++latest" _cpp_latest_flag_supported)
             if (_cpp_latest_flag_supported)
                 add_compile_options("/std:c++latest")
             endif()
@@ -133,3 +142,16 @@ function(pge_cxx_standard STDVER)
     endif()
 endfunction()
 
+macro(pgefl_disable_c_warning_flag WARNINGFLAG WARNING_VAR)
+    check_c_compiler_flag("-W${WARNINGFLAG}" HAVE_C_W_${WARNING_VAR})
+    if(HAVE_C_W_${WARNING_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-${WARNINGFLAG}")
+    endif()
+endmacro()
+
+macro(pgefl_disable_cxx_warning_flag WARNINGFLAG WARNING_VAR)
+    check_cxx_compiler_flag("-W${WARNINGFLAG}" HAVE_CXX_W_${WARNING_VAR})
+    if(HAVE_CXX_W_${WARNING_VAR})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-${WARNINGFLAG}")
+    endif()
+endmacro()

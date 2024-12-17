@@ -42,3 +42,7 @@ Makefile*
 
 # LibreOffice
 .~lock*
+
+# PVS-Studio related stuff
+*.PVS-Studio.*
+.PVS-Studio/

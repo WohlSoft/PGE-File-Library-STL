@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -41,13 +41,12 @@
                            PGESTRING line                  /*Current Line data*/
 
 //Jump to next line
-#define nextLine() line = in.readCVSLine()
+#define nextLine() in.readCVSLine(line)
 
 //Version comparison
-#define ge(v) file_format>=v
-#define gt(v) file_format>v
-#define le(v) file_format<=v
-#define lt(v) file_format<v
+#define ge(v) file_format>=(v)
+#define gt(v) file_format>(v)
+#define le(v) file_format<=(v)
+#define lt(v) file_format<(v)
 
 #endif // SMBX64_MACRO_H
-

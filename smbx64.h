@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -160,9 +160,9 @@ namespace SMBX64
 #endif
     }
 
-    inline void ReadBool(bool*out, PGESTRING &input)
+    inline void ReadBool(bool*out, const PGESTRING &input)
     {
-        if(input == "0" || input == "") // FIXME: Is it correct? Or too hackish?
+        if(input == "0" || IsEmpty(input)) // FIXME: Is it correct? Or too hackish?
             *out = false;
         else if(input != "0") // FIXME: Is it correct? Or too hackish?
             *out = true;
@@ -170,7 +170,7 @@ namespace SMBX64
             throw std::invalid_argument(std::string("Could not convert to bool (must be empty, \"0\", \"!0\" or \"1\")"));
     }
 
-    inline void ReadCSVBool(bool*out, PGESTRING &input)
+    inline void ReadCSVBool(bool*out, const PGESTRING &input)
     {
         if(input == "#FALSE#")
             *out = false;
@@ -180,9 +180,9 @@ namespace SMBX64
             *out = false;
         else if(input == "true")
             *out = true;
-        else if( input == "0" || input == "" )
+        else if(input == "0" || IsEmpty(input))
             *out = false;
-        else if( input == "!0" || input == "1" )
+        else if(input == "!0" || input == "1")
             *out = true;
         else
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
@@ -198,7 +198,7 @@ namespace SMBX64
             *out = 0;
         else if(input == "true")
             *out = 1;
-        else if( input == "0" || input == "" )
+        else if( input == "0" || IsEmpty(input))
             *out = 0;
         else if( input == "!0" || input == "1"  )
             *out = 1;
@@ -206,7 +206,7 @@ namespace SMBX64
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
     }
 
-    inline void ReadCSVBool(long*out, PGESTRING &input)
+    inline void ReadCSVBool(long*out, const PGESTRING &input)
     {
         if(input == "#FALSE#")
             *out = 0;
@@ -216,9 +216,9 @@ namespace SMBX64
             *out = 0;
         else if(input == "true")
             *out = 1;
-        else if( input == "0" || input == "" )
+        else if(input == "0" || IsEmpty(input))
             *out = 0;
-        else if( input == "!0" || input == "1" )
+        else if(input == "!0" || input == "1")
             *out = 1;
         else
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
@@ -245,6 +245,7 @@ namespace SMBX64
         *out = static_cast<long>(std::round(std::stod(input)));
         #endif
     }
+
     inline void ReadStr(PGESTRING*out, PGESTRING &input)
     {
         if(IsEmpty(input))
@@ -268,33 +269,37 @@ namespace SMBX64
      * \param in raw value
      * \return true if value is valid
      */
-    bool IsUInt(PGESTRING in);
+    bool IsUInt(const PGESTRING &in);
+
     /*!
      * \brief Validate Signed Integer value
      * \param in raw value
      * \return true if value is valid
      */
-    bool IsSInt(PGESTRING in);
+    bool IsSInt(const PGESTRING &in);
+
     /*!
      * \brief Validate Floating Point value
      * \param in raw value
      * \return true if value is valid
      */
     bool IsFloat(PGESTRING &in);
+
     /*!
      * \brief Validate quoted string value
      * \param in raw value
      * \return true if value is valid
      */
-    bool IsQuotedString(PGESTRING in);
+    bool IsQuotedString(const PGESTRING &in);
+
     /*!
      * \brief Validate CSV-boolean value (#TRUE# or #FALSE#)
      * \param in raw value
      * \return true if value is INVALID
      */
-    inline bool IsCSVBool(PGESTRING in) //Worded BOOL
+    inline bool IsCSVBool(const PGESTRING &in) //Worded BOOL
     {
-        return ( (in=="#TRUE#")||(in=="#FALSE#") );
+        return ((in=="#TRUE#") || (in=="#FALSE#"));
     }
 
     /*!
@@ -302,11 +307,12 @@ namespace SMBX64
      * \param in raw value
      * \return true if value is valid
      */
-    inline bool IsBool(PGESTRING in) //Digital BOOL
+    inline bool IsBool(const PGESTRING &in) //Digital BOOL
     {
-        if((in.size()!=1) || (IsEmpty(in)) )
+        if((in.size() != 1) || (IsEmpty(in)) )
             return false;
-        return ((PGEGetChar(in[0])=='1')||(PGEGetChar(in[0])=='0'));
+
+        return ((PGEGetChar(in[0])=='1') || (PGEGetChar(in[0])=='0'));
     }
 
     /*!
@@ -314,8 +320,10 @@ namespace SMBX64
      * \param in raw value
      * \return boolean equivalent
      */
-    inline bool wBoolR(PGESTRING in)
-    { return ((in=="#TRUE#")?true:false); }
+    inline bool wBoolR(const PGESTRING &in)
+    {
+        return (in == "#TRUE#");
+    }
 
     /******************RAW to Internal**********************/
     /*!
@@ -323,16 +331,21 @@ namespace SMBX64
      * \param in raw value
      * \return fixed string vale
      */
-    inline PGESTRING StrToStr(PGESTRING in)
+    inline PGESTRING StrToStr(const PGESTRING &in)
     {
         PGESTRING target = in;
+
         if(IsEmpty(target))
             return target;
-        if(target[0]==PGEChar('\"'))
+
+        if(target[0] == PGEChar('\"'))
             PGE_RemStrRng(target, 0, 1);
+
         if((!IsEmpty(target)) && (target[target.size()-1]==PGEChar('\"')))
             PGE_RemStrRng(target, int(target.size() - 1), 1);
-        target=PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
+
+        target = PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
+
         return target;
     }
 

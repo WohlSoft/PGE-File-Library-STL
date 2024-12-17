@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -95,6 +95,8 @@ struct LevelSection
     bool underwater = false;
     //! Custom music file which will be playd if music ID defined to "Custom" music id
     PGESTRING music_file;
+    //! Level-wide music bank index (-1, the section-local path will be used, or 0..N-1 - use level-wide bank)
+    int music_file_idx = -1;
 
     /*
      * Editor-only parameters which are not saving into file
@@ -112,8 +114,6 @@ struct LevelSection
  */
 struct PlayerPoint
 {
-    //! Defined ID of player
-    unsigned int id = 0;
     //! X-position of player spawn point
     long x = 0;
     //! Y-position of player spawn point
@@ -122,6 +122,8 @@ struct PlayerPoint
     long h = 32;
     //! Wodth of player spawn point (used to calculate position of bottom to place playable character correctly)
     long w = 24;
+    //! Defined ID of player
+    unsigned int id = 0;
     //! Initial direction of playable character (-1 is left, 1 is right, 0 is right by default)
     int direction = 1;
     //! User data pointer, Useful in the editors to have direct pointer to pre-placed elements
@@ -157,6 +159,10 @@ struct LevelBlock
     bool slippery = false;
     //! Use the special AI to make block be movable
     uint32_t    motion_ai_id = 0;
+    //! User-data integer #1 used for configuring some block algorithm
+    long special_data = 0;
+    //! User-data integer #2 used for configuring some block algorithm
+    long special_data2 = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING   layer = DEFAULT_LAYER_NAME;
     //! 38A: Custom graphic file base name (default is empty)
@@ -202,7 +208,7 @@ struct LevelBGO
     //! Y position of Background Object
     long y = 0;
     //! ID of background object type defined in the lvl_bgo.ini
-    unsigned long id =0 ;
+    unsigned long id = 0;
     //! Name of a parent layer. Default value is "Default"
     PGESTRING layer = DEFAULT_LAYER_NAME;
 
@@ -511,6 +517,8 @@ struct LevelDoor
     unsigned int length_o = 32u;
     //! Trigger event on enter
     PGESTRING event_enter;
+    //! Trigger event after player exits the warp
+    PGESTRING event_exit;
     //! Is this warp a two-way (possible to enter from both sides)
     bool two_way = false;
     //! Cannon shoot warp exit
@@ -540,9 +548,9 @@ struct LevelPhysEnv
     long x = 0;
     //! Y position of physical environment zone
     long y = 0;
-    //! Height of physical environment zone
+    //! Height of physical environment zone (Value -1 turns shape into a circle)
     long h = 0;
-    //! Width of physical environment zone
+    //! Width of physical environment zone (if height is -1, then it's a radius of the circle)
     long w = 0;
     //! Buoy value, reserved and unused in SMBX
     float buoy = 0;
@@ -555,15 +563,15 @@ struct LevelPhysEnv
         ENV_GRAVITATIONAL_FIELD     = 3,
         ENV_TOUCH_EVENT_ONCE_PLAYER = 4,
         ENV_TOUCH_EVENT_PLAYER      = 5,
-        ENV_TOUCH_EVENT_ONCE_NPC    = 6,
-        ENV_TOUCH_EVENT_NPC         = 7,
+        ENV_TOUCH_EVENT_ONCE_ANY    = 6,
+        ENV_TOUCH_EVENT_ANY         = 7,
         ENV_CLICK_EVENT             = 8,
         ENV_COLLISION_SCRIPT        = 9,
         ENV_CLICK_SCRIPT            = 10,
         ENV_COLLISION_EVENT         = 11,
         ENV_AIR                     = 12,
-        ENV_TOUCH_EVENT_ONCE_NPC1   = 13,
-        ENV_TOUCH_EVENT_NPC1        = 14,
+        ENV_TOUCH_EVENT_ONCE_NPC    = 13,
+        ENV_TOUCH_EVENT_NPC         = 14,
         ENV_NPC_HURTING_FIELD       = 15,
         ENV_SUBAREA                 = 16
     };
@@ -623,8 +631,10 @@ struct LevelEvent_Sets
 
     //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
     long music_id = LESet_Nothing;
-    //! Set new Custom Music File path
+    //! Set new Custom Music File path (if empty - don't change)
     PGESTRING music_file;
+    //! Set new level-wide music bank index (-1 - don't change, -2 reset default, -3 - set to section-local music, 0..N - switch to any level-wide music bank entry)
+    int music_file_idx = LESet_Nothing;
     //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
     long background_id = LESet_Nothing;
 
@@ -664,8 +674,8 @@ struct LevelEvent_Sets
      */
     struct AutoScrollStopPoint
     {
-        long x;
-        long y;
+        long x = 0;
+        long y = 0;
         enum
         {
             TYPE_LINE = 0,
@@ -784,21 +794,26 @@ struct LevelEvent_UpdateVariable
 
 struct LevelEvent_SetTimer
 {
-    //! Enable timer
-    bool  enable = false;
-    //! Time left (ticks)
-    long  count = 0;
     //! Lenght of every tick (miliseconds per every tick)
     double interval = 1000.0;
+    //! Time left (ticks)
+    long  count = 0;
+    /**
+     * \brief Direction of the timer counting
+     */
     enum CountDirection
     {
+        //! Backward timer count direction: Time value will be gradually decreased
         DIR_REVERSE = 0,
+        //! Forward timer count direction: Time value will be gradually increased
         DIR_FORWARD = 1
     };
     //! Count direction
     int count_dir = DIR_REVERSE;
     //! Show timer
     bool show = false;
+    //! Enable timer
+    bool enable = false;
 };
 
 /*!
@@ -840,7 +855,7 @@ struct LevelSMBX64Event
      * \brief Check is one of control keys pressed
      * \return true if one of keys is pressed
      */
-    bool ctrlKeyPressed();
+    bool ctrlKeyPressed() const;
     //! Hold "Up" key controllers
     bool ctrl_up = false;
     //! Hold "Down" key controllers
@@ -922,7 +937,7 @@ struct LevelVariable
     //! Value of variable
     PGESTRING value;
     //! Is variable global
-    bool is_global;
+    bool is_global = false;
 };
 
 /*!
@@ -961,6 +976,7 @@ struct LevelItemSetup38A
         BLOCK = 0,
         BGO = 1,
         EFFECT = 2,
+        ITEM_TYPE_MAX
     } type = UNKNOWN;
 
     int64_t id = 0;
@@ -1027,6 +1043,9 @@ struct LevelData
     PGELIST<MusicOverrider > music_overrides;
     //! Override default sound effects
     PGELIST<MusicOverrider > sound_overrides;
+
+    //! Level-wide bank of custom music files
+    PGESTRINGList music_files;
 
     /*
      * Level data
@@ -1103,13 +1122,13 @@ struct LevelData
      * \param title Event name which need to check for existsing
      * \return true if requested event is exists
      */
-    bool eventIsExist(PGESTRING title);
+    bool eventIsExist(const PGESTRING &title);
     /*!
      * \brief Checks is layer with specified title exist in this level
      * \param title Layer name which need to check for existsing
      * \return true if requested event is exists
      */
-    bool layerIsExist(PGESTRING title);
+    bool layerIsExist(const PGESTRING &title);
 };
 
 

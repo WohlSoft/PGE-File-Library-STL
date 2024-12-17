@@ -1,7 +1,7 @@
 /*
  * PGE File Library - a library to process file formats, part of Moondust project
  *
- * Copyright (c) 2014-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * The MIT License (MIT)
  *
@@ -255,6 +255,11 @@ struct NPCConfigFile
     bool en_gridalign = false;
     //! Custom grid align style field
     uint32_t gridalign = 0;
+
+    //! Is the "usedefaultcam" flag set?
+    bool en_usedefaultcam = false;
+    //! At player-set resolutions, should the NPC still activate based on the content's default resolution?
+    bool usedefaultcam = false;
 
 };
 
