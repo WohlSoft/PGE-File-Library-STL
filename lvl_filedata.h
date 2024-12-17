@@ -546,9 +546,9 @@ struct LevelPhysEnv
     long x = 0;
     //! Y position of physical environment zone
     long y = 0;
-    //! Height of physical environment zone
+    //! Height of physical environment zone (Value -1 turns shape into a circle)
     long h = 0;
-    //! Width of physical environment zone
+    //! Width of physical environment zone (if height is -1, then it's a radius of the circle)
     long w = 0;
     //! Buoy value, reserved and unused in SMBX
     float buoy = 0;

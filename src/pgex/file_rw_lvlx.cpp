@@ -578,8 +578,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_USIntVal("ET", physiczone.env_type) //Environment type
                     PGEX_SLongVal("X",  physiczone.x) //X position
                     PGEX_SLongVal("Y",  physiczone.y) //Y position
-                    PGEX_USLongVal("W",  physiczone.w) //Width
-                    PGEX_USLongVal("H",  physiczone.h) //Height
+                    PGEX_USLongVal("W",  physiczone.w) //Width or circle Radius
+                    PGEX_USLongVal("H",  physiczone.h) //Height or -1 to turn the shape into circle
                     PGEX_StrVal("LR", physiczone.layer)  //Layer
                     PGEX_FloatVal("FR", physiczone.friction) //Friction
                     PGEX_FloatVal("AD", physiczone.accel_direct) //Custom acceleration direction
