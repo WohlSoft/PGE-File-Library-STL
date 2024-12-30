@@ -66,7 +66,7 @@ struct MDX_Object<OBJ_T> : MDX_BaseObject \
 { \
     using obj_t = OBJ_T; \
     BODY \
-}; \
+} \
 
 #define MDX_ENABLE_SUB_LIST(OBJ_T) template<> \
 struct MDX_Value<PGELIST<OBJ_T>> : public MDX_Value_ObjectList<MDX_Object<OBJ_T>> {}; \
