@@ -206,6 +206,7 @@ MDX_SETUP_OBJECT(LevelDoor,
     MDX_FIELD("PS", cannon_exit_speed); //Cannon exit speed
     MDX_FIELD("LR", layer);  //Layer
     MDX_FIELD("EE", event_enter);  //On-Enter event slot
+    MDX_FIELD("EEX", event_exit);  //On-Exit event slot
     MDX_FIELD("TW", two_way); //Two-way warp
     MDX_FIELD_XTRA();//Custom JSON data tree
 );
