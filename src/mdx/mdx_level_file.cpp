@@ -78,6 +78,8 @@ MDX_SETUP_OBJECT(PlayerPoint,
     MDX_FIELD_NO_SKIP("ID", id); //ID of player point
     MDX_FIELD("X", x);
     MDX_FIELD("Y", y);
+    MDX_FIELD("W", w);
+    MDX_FIELD("H", h);
     MDX_FIELD("D",  direction);
 );
 
