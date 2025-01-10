@@ -420,6 +420,11 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 player = CreateLvlPlayerPoint();
+
+                // default player dimensions overridden below
+                player.w = 0;
+                player.h = 0;
+
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
