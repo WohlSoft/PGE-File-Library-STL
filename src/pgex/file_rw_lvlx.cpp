@@ -420,19 +420,12 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 player = CreateLvlPlayerPoint();
-
-                // default player dimensions overridden below
-                player.w = 0;
-                player.h = 0;
-
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
                     PGEX_UIntVal("ID", player.id) //ID of player point
                     PGEX_SLongVal("X", player.x)
                     PGEX_SLongVal("Y", player.y)
-                    PGEX_SLongVal("W", player.w)
-                    PGEX_SLongVal("H", player.h)
                     PGEX_SIntVal("D",  player.direction)
                 }
 
@@ -1906,8 +1899,6 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             out << PGEFile::value("ID", PGEFile::WriteInt(pp.id));  // Player ID
             out << PGEFile::value("X", PGEFile::WriteInt(pp.x));  // Player X
             out << PGEFile::value("Y", PGEFile::WriteInt(pp.y));  // Player Y
-            out << PGEFile::value("W", PGEFile::WriteInt(pp.w));  // Player W
-            out << PGEFile::value("H", PGEFile::WriteInt(pp.h));  // Player H
             out << PGEFile::value("D", PGEFile::WriteInt(pp.direction));  // Direction -1 left, 1 right
             out << "\n";
         }
