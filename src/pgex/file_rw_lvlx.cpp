@@ -437,8 +437,12 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                 }
 
                 PlayerPoint sz = CreateLvlPlayerPoint(player.id);
-                player.w = sz.w;
-                player.h = sz.h;
+
+                if(player.w == 0)
+                    player.w = sz.w;
+
+                if(player.h == 0)
+                    player.h = sz.h;
 
                 if(found)
                     FileData.players[q] = player;
