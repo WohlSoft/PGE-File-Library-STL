@@ -412,6 +412,11 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
             {
                 PGEX_ItemBegin(PGEFile::PGEX_Struct)
                 player = CreateLvlPlayerPoint();
+
+                // default player dimensions overridden below
+                player.w = 0;
+                player.h = 0;
+
                 PGEX_Values() //Look markers and values
                 {
                     PGEX_ValueBegin()
@@ -438,6 +443,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
 
                 PlayerPoint sz = CreateLvlPlayerPoint(player.id);
 
+                // override player dimensions if unset
                 if(player.w == 0)
                     player.w = sz.w;
 
