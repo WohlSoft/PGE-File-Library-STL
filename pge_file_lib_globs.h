@@ -121,6 +121,17 @@ struct SDL_RWops;
  */
 namespace PGE_FileFormats_misc
 {
+
+#ifndef PGE_FILES_QT
+// moved from pge_file_lib_private.h, publicly used by TheXTech's macOS build
+
+/**
+ * @brief Decode percent-formatted URL
+ * @param sSrc source string
+ */
+PGESTRING url_decode(const std::string &sSrc);
+#endif // #ifndef PGE_FILES_QT
+
 /**
  * @brief Check the header to identify valid SMBX64 file format
  * @param src Header source string
