@@ -29,6 +29,7 @@
 #define PGE_FILE_LIB_PRIVATE_H_
 
 #include "pge_file_lib_globs.h"
+#include "src/mdx/common/mdx_value.h"
 
 #ifdef PGE_FILES_QT
 #include <QString>
@@ -265,9 +266,6 @@ inline PGESTRING PGE_URLDEC(const PGESTRING &src)
 #include <string>
 #include <vector>
 #include <utility>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <cstring>
 #include <algorithm>
 #include <map>
@@ -471,17 +469,16 @@ inline PGESTRING removeSpaces(const PGESTRING &src)
 template<typename T>
 PGESTRING fromNum(T num)
 {
-    std::ostringstream n;
-    n << num;
-    return n.str();
+    PGESTRING out;
+    MDX_save_value(out, num);
+    return out;
 }
 
 inline PGESTRING fromBoolToNum(bool num)
 {
-    std::ostringstream n;
-    n << static_cast<int>(num);
-    return n.str();
+    return fromNum((int)num);
 }
+
 #define PGE_URLENC(src) PGE_FileFormats_misc::url_encode(src)
 #define PGE_URLDEC(src) PGE_FileFormats_misc::url_decode(src)
 #define PGE_BASE64ENC(src)   PGE_FileFormats_misc::base64_encode(src)
