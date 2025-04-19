@@ -335,7 +335,6 @@ namespace PGE_FileFormats_misc
     void RemoveSub(std::string &sInput, const std::string &sub);
     bool hasEnding(std::string const &fullString, std::string const &ending);
     PGESTRING url_encode(const PGESTRING &sSrc);
-    PGESTRING url_decode(const std::string &sSrc);
     std::string base64_encode(unsigned char const *bytes_to_encode, size_t in_len, bool no_padding = false);
     std::string base64_encode(std::string const &source, bool no_padding = false);
     std::string base64_decode(std::string const &encoded_string);
