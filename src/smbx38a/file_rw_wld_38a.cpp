@@ -1483,7 +1483,7 @@ bool FileFormats::WriteSMBX38AWldFile(PGE_FileFormats_misc::TextOutput& out, Wor
             SMBX38A_Num2Exp_URLEN(mv.param_h, expression_ph);
             SMBX38A_Num2Exp_URLEN(mv.param_v, expression_pv);
             SMBX38A_Num2Exp_URLEN(mv.param_extra, expression_pe);
-            out << fromNum(mv.type);
+            out << fromNum((int)mv.type);
             out << "," << PGE_URLENC(mv.layer);
             out << "," << expression_ph;
             out << "," << expression_pv;

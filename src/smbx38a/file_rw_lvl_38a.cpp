@@ -2242,7 +2242,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
             out << "," << expression_x;
             out << "," << expression_y;
             //        way=[0=by speed][1=by Coordinate]
-            out << "," << fromNum(mvl.way);
+            out << "," << fromNum((int)mvl.way);
         }
 
         out << "|";
@@ -2379,7 +2379,7 @@ bool FileFormats::WriteSMBX38ALvlFile(PGE_FileFormats_misc::TextOutput &out, Lev
 
                         expression_as_x += fromNum(stop.x);
                         expression_as_x += "_" + fromNum(stop.y);
-                        expression_as_x += "_" + fromNum(stop.type);
+                        expression_as_x += "_" + fromNum((int)stop.type);
                         expression_as_x += "_" + fromNum(stop.speed);
                     }
 
