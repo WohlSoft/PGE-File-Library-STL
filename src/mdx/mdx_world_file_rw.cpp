@@ -62,6 +62,7 @@ static bool s_load_head(void* _FileData, WorldHead& dest)
     FileData.starsShowPolicy = dest.starsShowPolicy;
     FileData.custom_params = dest.custom_params;
     FileData.meta.configPackId = dest.configPackId;
+    FileData.meta.engineFeatureLevel = dest.engineFeatureLevel;
     FileData.meta.RecentFormat = dest.RecentFormat;
     FileData.meta.RecentFormatVersion = dest.RecentFormatVersion;
 
@@ -103,6 +104,7 @@ static bool s_save_head(const void* _FileData, WorldHead& dest, pge_size_t index
     dest.starsShowPolicy = FileData.starsShowPolicy;
     dest.custom_params = FileData.custom_params;
     dest.configPackId = FileData.meta.configPackId;
+    dest.engineFeatureLevel = FileData.meta.engineFeatureLevel;
 
     // clear no-character array if unnecessary
     bool any_no_character = false;

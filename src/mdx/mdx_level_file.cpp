@@ -49,6 +49,7 @@ MDX_SETUP_OBJECT(LevelHead,
     MDX_FIELD("NO", player_names_overrides); //Overrides of player names
     MDX_FIELD("XTRA", custom_params); //Level-wide Extra settings
     MDX_FIELD("CPID", configPackId); //Config pack ID string
+    MDX_FIELD("EFL", engineFeatureLevel); //Engine feature level value
     MDX_FIELD("MUS", music_files); // Level-wide list of external music files
 );
 
