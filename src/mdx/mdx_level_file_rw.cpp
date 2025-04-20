@@ -57,6 +57,7 @@ static bool s_load_head(void* _FileData, LevelHead& dest)
     FileData.player_names_overrides = dest.player_names_overrides;
     FileData.custom_params = dest.custom_params;
     FileData.meta.configPackId = dest.configPackId;
+    FileData.meta.engineFeatureLevel = dest.engineFeatureLevel;
     FileData.music_files = dest.music_files;
 
     FileData.music_overrides = dest.music_overrides;
@@ -94,6 +95,7 @@ static bool s_save_head(const void* _FileData, LevelHead& dest, pge_size_t index
     dest.player_names_overrides = FileData.player_names_overrides;
     dest.custom_params = FileData.custom_params;
     dest.configPackId = FileData.meta.configPackId;
+    dest.engineFeatureLevel = FileData.meta.engineFeatureLevel;
     dest.music_files = FileData.music_files;
 
     return true;

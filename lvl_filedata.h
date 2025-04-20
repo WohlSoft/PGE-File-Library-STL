@@ -1004,6 +1004,7 @@ struct LevelHead
     PGELIST<PGESTRING> player_names_overrides;
     PGESTRING custom_params;
     PGESTRING configPackId;
+    unsigned int engineFeatureLevel = 0;
     PGELIST<PGESTRING> music_files;
 
     struct MusicOverrider

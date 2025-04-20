@@ -54,6 +54,7 @@ MDX_SETUP_OBJECT(WorldHead,
     MDX_FIELD("SSS", starsShowPolicy); //Per-level stars count showing policy
     MDX_FIELD("XTRA", custom_params);     //World-wide Extra settings
     MDX_FIELD("CPID", configPackId);//Config pack ID string
+    MDX_FIELD("EFL", engineFeatureLevel); //Engine feature level value
 );
 
 MDX_SETUP_OBJECT(WorldTerrainTile,

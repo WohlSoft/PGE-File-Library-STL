@@ -510,6 +510,9 @@ struct WorldHead
     //! A config pack identify string.
     PGESTRING configPackId;
 
+    //! Minimum engine version for reading
+    unsigned int engineFeatureLevel = 0;
+
     //! Recently used (open or save) file format
     int RecentFormat = 0;
     //! Recently used format version (for SMBX1...64 files only)
