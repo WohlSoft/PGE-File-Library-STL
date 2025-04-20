@@ -214,6 +214,13 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
                 else
                     goto badfile;
             }
+            else if(data[i][0] == "EFL") //Engine feature level
+            {
+                if(PGEFile::IsIntU(data[i][1]))
+                    FileData.meta.engineFeatureLevel = toUInt(data[i][1]);
+                else
+                    goto badfile;
+            }
         }
     }
 
@@ -331,6 +338,7 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
                     PGEX_SIntVal("SSS", FileData.starsShowPolicy) //Per-level stars count showing policy
                     PGEX_StrVal("XTRA", FileData.custom_params)     //World-wide Extra settings
                     PGEX_StrVal("CPID", FileData.meta.configPackId)//Config pack ID string
+                    PGEX_UIntVal("EFL", FileData.meta.engineFeatureLevel) //Target engine version
                 }
             }
         }//head
@@ -648,6 +656,8 @@ bool FileFormats::WriteExtendedWldFile(PGE_FileFormats_misc::TextOutput &out, Wo
             outHeader += PGEFile::value("XTRA", PGEFile::WriteStr(FileData.custom_params));   // World-wide extra settings
         if(!IsEmpty(FileData.meta.configPackId))
             outHeader += PGEFile::value("CPID", PGEFile::WriteStr(FileData.meta.configPackId));
+        if(FileData.meta.engineFeatureLevel != 0)
+            outHeader += PGEFile::value("EFL", PGEFile::WriteInt(FileData.meta.engineFeatureLevel));
 
         if(!IsEmpty(outHeader))
             out << "HEAD\n" << outHeader << "\n" << "HEAD_END\n";

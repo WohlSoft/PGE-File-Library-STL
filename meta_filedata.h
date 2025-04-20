@@ -74,6 +74,8 @@ struct FileFormatMeta
     PGESTRING path;
     //! A config pack identify string.
     PGESTRING configPackId;
+    //! Minimum engine version for reading
+    unsigned int engineFeatureLevel = 0;
     // Missmatching of a config pack identify string with a same string at
     // the currently loaded config pack will lead a warning of possible
     // incompatibility.
