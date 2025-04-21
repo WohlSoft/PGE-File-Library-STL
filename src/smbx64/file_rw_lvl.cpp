@@ -1445,7 +1445,7 @@ bool FileFormats::WriteSMBX64LvlFile(PGE_FileFormats_misc::TextOutput &out, Leve
                 }
 
                 for(; j < s_limit; j++) // Protector
-                    out << "0\n0\n0\n-1\n-1\n-1\n";
+                    out << "-1\n-1\n-1\n0\n0\n0\n";
             }
 
             if(file_format >= 26)
