@@ -168,6 +168,13 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
                 else
                     goto bad_file;
             }
+            else if(val[0] == "EFL") //Engine feature level
+            {
+                if(PGEFile::IsIntU(val[1]))
+                    FileData.meta.engineFeatureLevel = toUInt(val[1]);
+                else
+                    goto bad_file;
+            }
             else if(val[0] == "MUS") // Level-wide list of external music files
             {
                 if(PGEFile::IsStringArray(val[1]))
@@ -321,6 +328,7 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
                     PGEX_StrArrVal("NO", head.player_names_overrides) //Overrides of player names
                     PGEX_StrVal("XTRA", head.custom_params) //Level-wide Extra settings
                     PGEX_StrVal("CPID", head.configPackId)//Config pack ID string
+                    PGEX_UIntVal("EFL", head.engineFeatureLevel) //Target engine version
                     PGEX_StrArrVal("MUS", head.music_files)// Level-wide list of external music files
                 }
             }
@@ -1754,6 +1762,9 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
         if(!IsEmpty(FileData.meta.configPackId))
             outHeader += PGEFile::value("CPID", PGEFile::WriteStr(FileData.meta.configPackId));
+
+        if(FileData.meta.engineFeatureLevel != 0)
+            outHeader += PGEFile::value("EFL", PGEFile::WriteInt(FileData.meta.engineFeatureLevel));
 
         if(!IsEmpty(FileData.music_files))
             outHeader += PGEFile::value("MUS", PGEFile::WriteStrArr(FileData.music_files));    // Overrides of player names

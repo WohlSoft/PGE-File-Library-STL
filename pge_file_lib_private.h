@@ -141,10 +141,17 @@ inline bool      IsEmpty(const PGESTRINGList &str)
     return str.isEmpty();
 }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+#   if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+inline QChar &Back(PGESTRING &str)
+{
+    return str.back();
+}
+#else
 inline QCharRef  Back(PGESTRING &str)
 {
     return str.back();
 }
+#endif
 
 inline QChar Back(const PGESTRING &str)
 {
