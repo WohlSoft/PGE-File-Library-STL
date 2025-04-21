@@ -171,7 +171,7 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
             else if(val[0] == "EFL") //Engine feature level
             {
                 if(PGEFile::IsIntU(val[1]))
-                    FileData.meta.engineFeatureLevel = toUInt(val[1]);
+                    head.engineFeatureLevel = toUInt(val[1]);
                 else
                     goto bad_file;
             }
