@@ -53,6 +53,8 @@ MDX_SETUP_OBJECT(GamesaveHead,
     MDX_FIELD("MI", musicID);
     MDX_FIELD("MF", musicFile);
     MDX_FIELD("GC", gameCompleted);
+    MDX_FIELD("SLV", savedLayersVisible);
+    MDX_FIELD("SLH", savedLayersHidden);
 );
 
 MDX_SETUP_OBJECT(saveCharState,

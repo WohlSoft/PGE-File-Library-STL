@@ -154,6 +154,11 @@ struct GamesaveHead
 
     //! Is episode was completed in last time
     bool gameCompleted = false;
+
+    //! Saved layers that are visible
+    PGELIST<PGESTRING> savedLayersVisible;
+    //! Saved layers that are hidden
+    PGELIST<PGESTRING> savedLayersHidden;
 };
 
 /*!
@@ -192,6 +197,11 @@ struct GamesaveData
 
     //! Is episode was completed in last time
     bool gameCompleted = false;
+
+    //! Saved layers that are visible
+    PGELIST<PGESTRING> savedLayersVisible;
+    //! Saved layers that are hidden
+    PGELIST<PGESTRING> savedLayersHidden;
 
     //! Extra data bank, saved via lua
     saveUserData userData;

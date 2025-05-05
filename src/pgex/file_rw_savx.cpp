@@ -129,6 +129,8 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                     PGEX_UIntVal("MI", FileData.musicID)
                     PGEX_StrVal("MF", FileData.musicFile)
                     PGEX_BoolVal("GC", FileData.gameCompleted)
+                    PGEX_StrArrVal("SLV", FileData.savedLayersVisible)
+                    PGEX_StrArrVal("SLH", FileData.savedLayersHidden)
                 }
             }
         }//Header
@@ -372,6 +374,10 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     out << PGEFile::value("MI", PGEFile::WriteInt(FileData.musicID));
     out << PGEFile::value("MF", PGEFile::WriteStr(FileData.musicFile));
     out << PGEFile::value("GC", PGEFile::WriteBool(FileData.gameCompleted));
+    if(!IsEmpty(FileData.savedLayersVisible))
+        out << PGEFile::value("SLV", PGEFile::WriteStrArr(FileData.savedLayersVisible));
+    if(!IsEmpty(FileData.savedLayersHidden))
+        out << PGEFile::value("SLH", PGEFile::WriteStrArr(FileData.savedLayersHidden));
     out << "\n";
     out << "SAVE_HEADER_END\n";
 
