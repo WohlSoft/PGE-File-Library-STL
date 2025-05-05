@@ -238,8 +238,8 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 FileData.gottenStars.push_back(star_level);
             }
         }//STARS
-        ///////////////////LAYERS//////////////////////
-        PGEX_Section("LAYERS")
+        ///////////////////SAVED_LAYERS//////////////////////
+        PGEX_Section("SAVED_LAYERS")
         {
             PGEX_SectionBegin(PGEFile::PGEX_Struct);
             PGEX_Items()
@@ -255,7 +255,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 }
                 FileData.savedLayers.push_back(saved_layer);
             }
-        }//LAYERS
+        }//SAVED_LAYERS
         ///////////////////LEVEL INFO//////////////////////
         PGEX_Section("LEVEL_INFO")
         {
@@ -481,7 +481,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
 
     if(!FileData.savedLayers.empty())
     {
-        out << "LAYERS\n";
+        out << "SAVED_LAYERS\n";
 
         for(i = 0; i < FileData.savedLayers.size(); i++)
         {
@@ -491,7 +491,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
             out << "\n";
         }
 
-        out << "LAYERS_END\n";
+        out << "SAVED_LAYERS_END\n";
     }
 
     if(!FileData.levelInfo.empty())
