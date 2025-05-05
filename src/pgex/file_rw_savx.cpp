@@ -82,6 +82,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
     saveCharState plr_state;
     visibleItem        vz_item;
     starOnLevel        star_level;
+    savedLayerSaveEntry saved_layer;
     saveLevelInfo      level_info;
     saveUserData::DataSection user_data_entry;
     //Add path data
@@ -237,6 +238,24 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                 FileData.gottenStars.push_back(star_level);
             }
         }//STARS
+        ///////////////////LAYERS//////////////////////
+        PGEX_Section("LAYERS")
+        {
+            PGEX_SectionBegin(PGEFile::PGEX_Struct);
+            PGEX_Items()
+            {
+                PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                saved_layer.first.clear();
+                saved_layer.second = 0;
+                PGEX_Values() //Look markers and values
+                {
+                    PGEX_ValueBegin()
+                    PGEX_StrVal("L", saved_layer.first)
+                    PGEX_SIntVal("S", saved_layer.second)
+                }
+                FileData.savedLayers.push_back(saved_layer);
+            }
+        }//LAYERS
         ///////////////////LEVEL INFO//////////////////////
         PGEX_Section("LEVEL_INFO")
         {
@@ -458,6 +477,21 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
         }
 
         out << "STARS_END\n";
+    }
+
+    if(!FileData.savedLayers.empty())
+    {
+        out << "LAYERS\n";
+
+        for(i = 0; i < FileData.savedLayers.size(); i++)
+        {
+            savedLayerSaveEntry &slayer = FileData.savedLayers[i];
+            out << PGEFile::value("L", PGEFile::WriteStr(slayer.first));
+            out << PGEFile::value("S", PGEFile::WriteInt(slayer.second));
+            out << "\n";
+        }
+
+        out << "LAYERS_END\n";
     }
 
     if(!FileData.levelInfo.empty())

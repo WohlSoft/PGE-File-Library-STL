@@ -42,6 +42,8 @@
 typedef PGEPAIR<unsigned int, bool > visibleItem;
 //! Game Save specific gotten star entry <Level-Filename, Section-ID(SMBX64-Standard, one star per section) or NPC-ArrayID (PGE-X, multiple stars per section)>
 typedef PGEPAIR<PGESTRING, int > starOnLevel;
+//! Game save specific saved layer entry <Layer-Name, Visible> (1 if Visible, 0 if Hidden)
+using savedLayerSaveEntry = starOnLevel;
 
 /*!
  * \brief Recent state of each playable character
@@ -169,6 +171,8 @@ struct GamesaveData
     PGELIST<visibleItem > visibleScenery;
     //! Registry of taken per-level stars
     PGELIST<starOnLevel > gottenStars;
+    //! List of layers and whether they are Visible
+    PGELIST<savedLayerSaveEntry > savedLayers;
     //! Cached per-level information and medals registry
     PGELIST<saveLevelInfo > levelInfo;
 };
