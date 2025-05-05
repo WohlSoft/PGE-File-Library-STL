@@ -229,6 +229,7 @@ struct GamesaveLoadCallbacks : PGE_FileFormats_misc::LoadCallbacks
     callback<visibleItem>               load_vis_path = nullptr;
     callback<visibleItem>               load_vis_scene = nullptr;
     callback<starOnLevel>               load_star = nullptr;
+    callback<savedLayerSaveEntry>       load_saved_layer = nullptr;
     callback<saveLevelInfo>             load_level_info = nullptr;
     callback<saveUserData::DataSection> load_userdata = nullptr;
 };
@@ -242,6 +243,7 @@ struct GamesaveSaveCallbacks : PGE_FileFormats_misc::SaveCallbacks
     callback<visibleItem>               save_vis_path = nullptr;
     callback<visibleItem>               save_vis_scene = nullptr;
     callback<starOnLevel>               save_star = nullptr;
+    callback<savedLayerSaveEntry>       save_saved_layer = nullptr;
     callback<saveLevelInfo>             save_level_info = nullptr;
     callback<saveUserData::DataSection> save_userdata = nullptr;
 };
