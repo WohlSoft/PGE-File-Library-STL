@@ -156,6 +156,11 @@ struct GamesaveHead
 
     //! Is episode was completed in last time
     bool gameCompleted = false;
+
+    //! Saved layers that are visible
+    PGELIST<PGESTRING> savedLayersVisible;
+    //! Saved layers that are hidden
+    PGELIST<PGESTRING> savedLayersHidden;
 };
 
 /*!
@@ -197,6 +202,10 @@ struct GamesaveData
 
     //! count of levels and paths (used for completion percent computation)
     unsigned int lvl_path_count = 0;
+    //! Saved layers that are visible
+    PGELIST<PGESTRING> savedLayersVisible;
+    //! Saved layers that are hidden
+    PGELIST<PGESTRING> savedLayersHidden;
 
     //! Extra data bank, saved via lua
     saveUserData userData;
