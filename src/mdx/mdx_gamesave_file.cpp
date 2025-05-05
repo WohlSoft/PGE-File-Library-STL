@@ -165,7 +165,7 @@ struct MDX_GamesaveFile : MDX_File<GamesaveLoadCallbacks, GamesaveSaveCallbacks>
 
     MDX_SECTION("STARS", starOnLevel, star);
 
-    MDX_SECTION("LAYERS", savedLayerSaveEntry, saved_layer);
+    MDX_SECTION("SAVED_LAYERS", savedLayerSaveEntry, saved_layer);
 
     MDX_SECTION("LEVEL_INFO", saveLevelInfo, level_info);
 
