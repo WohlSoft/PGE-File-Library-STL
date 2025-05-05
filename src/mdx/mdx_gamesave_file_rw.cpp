@@ -217,6 +217,27 @@ static bool s_save_star(const void* _FileData, starOnLevel& obj, pge_size_t inde
     return true;
 }
 
+static bool s_load_saved_layer(void* _FileData, savedLayerSaveEntry& obj)
+{
+    GamesaveData& FileData = *reinterpret_cast<GamesaveData*>(_FileData);
+
+    FileData.savedLayers.push_back(obj);
+
+    return true;
+}
+
+static bool s_save_saved_layer(const void* _FileData, savedLayerSaveEntry& obj, pge_size_t index)
+{
+    const GamesaveData& FileData = *reinterpret_cast<const GamesaveData*>(_FileData);
+
+    if(index >= FileData.savedLayers.size())
+        return false;
+
+    obj = FileData.savedLayers[index];
+
+    return true;
+}
+
 static bool s_load_level_info(void* _FileData, saveLevelInfo& obj)
 {
     GamesaveData& FileData = *reinterpret_cast<GamesaveData*>(_FileData);
@@ -288,6 +309,7 @@ bool MDX_load_gamesave(PGE_FileFormats_misc::TextInput &file, GamesaveData &File
     callbacks.load_vis_path = s_load_vis_path;
     callbacks.load_vis_scene = s_load_vis_scene;
     callbacks.load_star = s_load_star;
+    callbacks.load_saved_layer = s_load_saved_layer;
     callbacks.load_level_info = s_load_level_info;
     callbacks.load_userdata = s_load_userdata;
 
@@ -307,6 +329,7 @@ bool MDX_save_gamesave(PGE_FileFormats_misc::TextOutput &file, const GamesaveDat
     callbacks.save_vis_path = s_save_vis_path;
     callbacks.save_vis_scene = s_save_vis_scene;
     callbacks.save_star = s_save_star;
+    callbacks.save_saved_layer = s_save_saved_layer;
     callbacks.save_level_info = s_save_level_info;
     callbacks.save_userdata = s_save_userdata;
 

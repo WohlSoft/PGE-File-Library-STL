@@ -43,6 +43,8 @@
 typedef PGEPAIR<unsigned int, bool > visibleItem;
 //! Game Save specific gotten star entry <Level-Filename, Section-ID(SMBX64-Standard, one star per section) or NPC-ArrayID (PGE-X, multiple stars per section)>
 typedef PGEPAIR<PGESTRING, int > starOnLevel;
+//! Game save specific saved layer entry <Layer-Name, Visible> (1 if Visible, 0 if Hidden)
+using savedLayerSaveEntry = starOnLevel;
 
 /*!
  * \brief Recent state of each playable character
@@ -205,6 +207,8 @@ struct GamesaveData
     PGELIST<visibleItem > visibleScenery;
     //! Registry of taken per-level stars
     PGELIST<starOnLevel > gottenStars;
+    //! List of layers and whether they are Visible
+    PGELIST<savedLayerSaveEntry > savedLayers;
     //! Cached per-level information and medals registry
     PGELIST<saveLevelInfo > levelInfo;
 };
@@ -218,6 +222,7 @@ struct GamesaveLoadCallbacks : PGE_FileFormats_misc::LoadCallbacks
     callback<visibleItem>               load_vis_path = nullptr;
     callback<visibleItem>               load_vis_scene = nullptr;
     callback<starOnLevel>               load_star = nullptr;
+    callback<savedLayerSaveEntry>       load_saved_layer = nullptr;
     callback<saveLevelInfo>             load_level_info = nullptr;
     callback<saveUserData::DataSection> load_userdata = nullptr;
 };
@@ -231,6 +236,7 @@ struct GamesaveSaveCallbacks : PGE_FileFormats_misc::SaveCallbacks
     callback<visibleItem>               save_vis_path = nullptr;
     callback<visibleItem>               save_vis_scene = nullptr;
     callback<starOnLevel>               save_star = nullptr;
+    callback<savedLayerSaveEntry>       save_saved_layer = nullptr;
     callback<saveLevelInfo>             save_level_info = nullptr;
     callback<saveUserData::DataSection> save_userdata = nullptr;
 };
