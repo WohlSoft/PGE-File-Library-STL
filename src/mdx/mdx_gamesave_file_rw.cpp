@@ -62,8 +62,6 @@ static bool s_load_head(void* _FileData, GamesaveHead& dest)
     FileData.musicID = dest.musicID;
     FileData.musicFile = dest.musicFile;
     FileData.gameCompleted = dest.gameCompleted;
-    FileData.savedLayersVisible = std::move(dest.savedLayersVisible);
-    FileData.savedLayersHidden = std::move(dest.savedLayersHidden);
 
     return true;
 }
@@ -89,8 +87,6 @@ static bool s_save_head(const void* _FileData, GamesaveHead& dest, pge_size_t in
     dest.musicID = FileData.musicID;
     dest.musicFile = FileData.musicFile;
     dest.gameCompleted = FileData.gameCompleted;
-    dest.savedLayersVisible = FileData.savedLayersVisible;
-    dest.savedLayersHidden = FileData.savedLayersHidden;
 
     return true;
 }
