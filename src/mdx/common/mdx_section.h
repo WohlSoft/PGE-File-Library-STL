@@ -123,9 +123,10 @@ public:
     MDX_Section(MDX_BaseFile* parent, const char* section_name, bool combine_objects, load_callback_ptr_t load_callback, save_callback_ptr_t save_callback)
         : MDX_BaseSection(parent, section_name, combine_objects, m_obj_loader, &m_obj, &m_ref), m_load_callback(load_callback), m_save_callback(save_callback) {}
 
-    virtual void reset()
+    virtual void reset() noexcept
     {
-        m_obj = obj_t();
+        m_obj.~obj_t();
+        new(&m_obj) obj_t();
     }
 };
 
