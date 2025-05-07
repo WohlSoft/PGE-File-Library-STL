@@ -109,7 +109,7 @@ if(PGEFL_DISABLE_SMBX38A)
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(pgefl PRIVATE "-Wno-c++20-extensions")
+    target_compile_options(pgefl PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-Wno-c++20-extensions>")
 endif()
 
 if(PGEFL_QT_SUPPORT)
