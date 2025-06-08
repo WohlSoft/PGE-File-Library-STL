@@ -72,7 +72,7 @@ struct MDX_Object<OBJ_T> : MDX_BaseObject \
 struct MDX_Value<PGELIST<OBJ_T>> : public MDX_Value_ObjectList<MDX_Object<OBJ_T>> {}; \
 \
 template<> \
-const MDX_Object<OBJ_T> MDX_Value_ObjectList<MDX_Object<OBJ_T>>::s_obj_loader{}; \
+const MDX_Object<OBJ_T> MDX_Value_ObjectList<MDX_Object<OBJ_T>>::s_obj_loader{} \
 
 #define MDX_ENABLE_SUB_STRUCT(OBJ_T) template<> \
 struct MDX_Value<OBJ_T> : public MDX_Value_Object<MDX_Object<OBJ_T>> {}; \
