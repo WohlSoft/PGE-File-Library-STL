@@ -143,32 +143,35 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
             {
                 in[i] = '.'; //replace comma with a dot
                 decimal = true;
-                if(i == (in.size() - 1)) return false;
+                if(i == (in.size() - 1))
+                    return false;
                 continue;
             }
         }
+
         if(!pow10)
         {
             if((PGEGetChar(in[i]) == 'E') || (PGEGetChar(in[i]) == 'e'))
             {
                 pow10 = true;
-                if(i == (in.size() - 1)) return false;
+                if(i == (in.size() - 1))
+                    return false;
                 continue;
             }
         }
-        else
+        else if(!sign)
         {
-            if(!sign)
+            sign = true;
+            if((PGEGetChar(in[i]) == '+') || (PGEGetChar(in[i]) == '-'))
             {
-                sign = true;
-                if((PGEGetChar(in[i]) == '+') || (PGEGetChar(in[i]) == '-'))
-                {
-                    if(i == (in.size() - 1)) return false;
-                    continue;
-                }
+                if(i == (in.size() - 1))
+                    return false;
+                continue;
             }
         }
-        if(!isDegit(in[i])) return false;
+
+        if(!isDegit(in[i]))
+            return false;
     }
 
     return true;
