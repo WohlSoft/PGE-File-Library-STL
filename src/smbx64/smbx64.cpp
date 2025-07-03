@@ -143,7 +143,8 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
             {
                 in[i] = '.'; //replace comma with a dot
                 decimal = true;
-                if(i == (in.size() - 1)) return false;
+                if(i == (in.size() - 1))
+                    return false;
                 continue;
             }
         }
