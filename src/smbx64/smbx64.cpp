@@ -123,7 +123,7 @@ bool SMBX64::IsFloat(PGESTRING &in) // SIGNED FLOAT
     using namespace smbx64Format;
 
     if(IsEmpty(in))
-        return true;
+        return false;
 
     if((in.size() == 1) && (!isDegit(in[0])))
         return false;
