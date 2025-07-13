@@ -34,6 +34,7 @@
 #define PGE_BASE_CALLBACKS_H
 
 #include <cstddef>
+#include <string>
 #include <exception>
 
 #ifdef PGE_FILES_QT
@@ -50,9 +51,11 @@ namespace PGE_FileFormats_misc
 // error that callbacks may raise when unpacking object
 class callback_error : public std::exception
 {
+    const std::string m_messageStr;
     const char* const m_message = nullptr;
 public:
     callback_error(const char* message) noexcept : m_message(message) {}
+    callback_error(const std::string &message) noexcept : m_messageStr(message), m_message(m_messageStr.c_str()) {}
     virtual const char* what() const noexcept
     {
         return m_message;
