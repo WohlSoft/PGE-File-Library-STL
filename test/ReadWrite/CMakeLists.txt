@@ -1,19 +1,12 @@
 
-set(CMAKE_CXX_STANDARD 14)
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../common
-    ${CMAKE_SOURCE_DIR}
-)
-
 add_executable(ReadWriteTest read_write_test.cpp)
 
 if(PGEFL_QT_SUPPORT)
     target_include_directories(ReadWriteTest PUBLIC ${Qt5Core_INCLUDE_DIRS})
     target_compile_definitions(ReadWriteTest PUBLIC ${Qt5Core_DEFINITIONS})
-    target_link_libraries(ReadWriteTest PRIVATE pgefl_qt ${Qt5Core_LIBRARIES} catch2)
+    target_link_libraries(ReadWriteTest PRIVATE pgefl_qt ${Qt5Core_LIBRARIES} pgefl_test_common catch2)
 else()
-    target_link_libraries(ReadWriteTest PRIVATE pgefl catch2)
+    target_link_libraries(ReadWriteTest PRIVATE pgefl pgefl_test_common catch2)
 endif()
 
 target_compile_definitions(ReadWriteTest PRIVATE
