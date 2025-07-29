@@ -1,19 +1,12 @@
 
-set(CMAKE_CXX_STANDARD 14)
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../common
-    ${CMAKE_SOURCE_DIR}
-)
-
 add_executable(NpcTxtTest npctxt.cpp)
 
 if(PGEFL_QT_SUPPORT)
     target_include_directories(NpcTxtTest PUBLIC ${Qt5Core_INCLUDE_DIRS})
     target_compile_definitions(NpcTxtTest PUBLIC ${Qt5Core_DEFINITIONS})
-    target_link_libraries(NpcTxtTest PRIVATE pgefl_qt ${Qt5Core_LIBRARIES} catch2)
+    target_link_libraries(NpcTxtTest PRIVATE pgefl_qt ${Qt5Core_LIBRARIES} pgefl_test_common catch2)
 else()
-    target_link_libraries(NpcTxtTest PRIVATE pgefl catch2)
+    target_link_libraries(NpcTxtTest PRIVATE pgefl pgefl_test_common catch2)
 endif()
 
 target_compile_definitions(NpcTxtTest PRIVATE
