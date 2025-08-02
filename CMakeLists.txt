@@ -118,9 +118,8 @@ if(NOT HAS_STD_STOX_WRAPPED)
     target_compile_definitions(pgefl PRIVATE -DPGEFL_MISSING_STD_STOX_FUNCS)
 endif()
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    pgefl_target_disable_cxx_warning_flag(pgefl "c++20-extensions" CPP20EXTENSIONS)
-endif()
+pgefl_target_disable_cxx_warning_flag(pgefl "c++20-extensions" CPP20EXTENSIONS)
+pgefl_target_disable_cxx_warning_flag(pgefl "c++20-attribute-extensions" CPP20ATTRIBEXTENSIONS)
 
 if(PGEFL_QT_SUPPORT)
     add_library(pgefl_qt STATIC
