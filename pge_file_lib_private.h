@@ -300,24 +300,30 @@ static char ToLowerFun(char ch)
 namespace std
 {
 
-inline long stol(const char *str)
+inline long stol(const std::string &str, size_t* pos = nullptr, int base = 10)
 {
-    return ::atol(str);
+    (void)pos;
+    (void)base;
+    return ::atol(str.c_str());
 }
 
-inline unsigned long long stoull(const char *str)
+inline unsigned long long stoull(const std::string &str, size_t* pos = nullptr, int base = 10)
 {
-    return static_cast<unsigned long long>(::atoll(str));
+    (void)pos;
+    (void)base;
+    return static_cast<unsigned long long>(::atoll(str.c_str()));
 }
 
-inline float stof(const char *str)
+inline float stof(const std::string &str, size_t* pos= nullptr)
 {
-    return static_cast<float>(::atof(str));
+    (void)pos;
+    return static_cast<float>(::atof(str.c_str()));
 }
 
-inline float stod(const char *str)
+inline float stod(const std::string &str, size_t* pos= nullptr)
 {
-    return ::atof(str);
+    (void)pos;
+    return ::atof(str.c_str());
 }
 }
 #endif
