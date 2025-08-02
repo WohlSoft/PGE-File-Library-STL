@@ -303,27 +303,25 @@ namespace std
 inline long stol(const std::string &str, size_t* pos = nullptr, int base = 10)
 {
     (void)pos;
-    (void)base;
-    return ::atol(str.c_str());
+    return ::strtol(str.c_str(), nullptr, base);
 }
 
 inline unsigned long long stoull(const std::string &str, size_t* pos = nullptr, int base = 10)
 {
     (void)pos;
-    (void)base;
-    return static_cast<unsigned long long>(::atoll(str.c_str()));
+    return ::strtoull(str.c_str(), nullptr, base);
 }
 
 inline float stof(const std::string &str, size_t* pos= nullptr)
 {
     (void)pos;
-    return static_cast<float>(::atof(str.c_str()));
+    return ::strtof(str.c_str(), nullptr);
 }
 
 inline float stod(const std::string &str, size_t* pos= nullptr)
 {
     (void)pos;
-    return ::atof(str.c_str());
+    return ::strtod(str.c_str(), nullptr);
 }
 }
 #endif
