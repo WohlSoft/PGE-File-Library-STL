@@ -78,17 +78,17 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
     //        Don't make "zoo" of code styles in the same file.
     try
     {
-        int str_count = 0;
+        // int str_count = 0;
         bool valid = false;
         LevelHead head;
         head.RecentFormat = LevelData::PGEX;
 
-#define NextLine(line) str_count++; inf.readLine(line);
+#define NextLine(line) /*str_count++;*/ inf.readLine(line);
 
         //Find level header part
         do
         {
-            str_count++;
+            // str_count++;
             NextLine(line)
         }
         while((line != "HEAD") && (!IsNULL(line)));
@@ -103,7 +103,7 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
         while((line != "HEAD_END") && (!IsNULL(line)))
         {
             header.push_back(line);
-            str_count++;
+            // str_count++;
             NextLine(line)
             if(line == "HEAD_END")
                 closed = true;
