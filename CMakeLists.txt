@@ -108,13 +108,15 @@ if(PGEFL_DISABLE_SMBX38A)
     target_compile_definitions(pgefl PRIVATE -DPGEFL_DISABLE_SMBX38A)
 endif()
 
-try_compile(HAS_STD_STOX_WRAPPED
-    ${CMAKE_CURRENT_BINARY_DIR}/cmake-checks
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/checks/stdstrtoi/has_std_stol.cpp
-    CMAKE_FLAGS -DCMAKE_CXX_STANDARD=11
-)
+if(NOT EMSCRIPTEN)
+    try_compile(HAS_STD_STOX_WRAPPED
+        ${CMAKE_CURRENT_BINARY_DIR}/cmake-checks
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/checks/stdstrtoi/has_std_stol.cpp
+        CMAKE_FLAGS -DCMAKE_CXX_STANDARD=11
+    )
+endif()
 
-if(NOT HAS_STD_STOX_WRAPPED)
+if(NOT EMSCRIPTEN AND NOT HAS_STD_STOX_WRAPPED)
     target_compile_definitions(pgefl PRIVATE -DPGEFL_MISSING_STD_STOX_FUNCS)
 endif()
 
