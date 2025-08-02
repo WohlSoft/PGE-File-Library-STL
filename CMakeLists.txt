@@ -108,8 +108,18 @@ if(PGEFL_DISABLE_SMBX38A)
     target_compile_definitions(pgefl PRIVATE -DPGEFL_DISABLE_SMBX38A)
 endif()
 
+try_compile(HAS_STD_STOX_WRAPPED
+    ${CMAKE_CURRENT_BINARY_DIR}/cmake-checks
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/checks/stdstrtoi/has_std_stol.cpp
+    CMAKE_FLAGS -DCMAKE_CXX_STANDARD=11
+)
+
+if(NOT HAS_STD_STOX_WRAPPED)
+    target_compile_definitions(pgefl PRIVATE -DPGEFL_MISSING_STD_STOX_FUNCS)
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_compile_options(pgefl PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-Wno-c++20-extensions>")
+    pgefl_target_disable_cxx_warning_flag(pgefl "c++20-extensions" CPP20EXTENSIONS)
 endif()
 
 if(PGEFL_QT_SUPPORT)

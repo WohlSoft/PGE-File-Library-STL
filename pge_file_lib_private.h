@@ -270,6 +270,10 @@ inline PGESTRING PGE_URLDEC(const PGESTRING &src)
 
 #else /* ------ PGE_FILES_QT ------ */
 
+#ifndef __has_cpp_attribute
+#   define __has_cpp_attribute(x) 0 /* Don't fail on older compilers! */
+#endif
+
 #include <string>
 #include <vector>
 #include <utility>
@@ -288,6 +292,34 @@ static char ToLowerFun(char ch)
 }
 #else
 #define ToLowerFun ::tolower
+#endif
+
+#ifdef PGEFL_MISSING_STD_STOX_FUNCS
+#   include <stdlib.h>
+/* Workaround for toolchains that has these definitions missing */
+namespace std
+{
+
+inline long stol(const char *str)
+{
+    return ::atol(str);
+}
+
+inline unsigned long long stoull(const char *str)
+{
+    return static_cast<unsigned long long>(::atoll(str));
+}
+
+inline float stof(const char *str)
+{
+    return static_cast<float>(::atof(str));
+}
+
+inline float stod(const char *str)
+{
+    return ::atof(str);
+}
+}
 #endif
 
 typedef std::string::size_type pge_size_t;
