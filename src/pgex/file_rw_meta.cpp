@@ -72,107 +72,109 @@ bool FileFormats::ReadNonSMBX64MetaDataFile(PGE_FileFormats_misc::TextInput &in,
     if(!g_use_legacy_pgex_parser)
         return MDX_load_meta(in, FileData);
 
-  // indented 2 spaces to avoid large diff hunk
-  try
-  {
-    PGESTRING errorString;
-    int str_count = 0;      //Line Counter
-    PGESTRING line;           //Current Line data
-    ///////////////////////////////////////Begin file///////////////////////////////////////
-    PGEFile pgeX_Data(in.readAll());
-
-    if(!pgeX_Data.buildTreeFromRaw())
+    // BEFORE: indented 2 spaces to avoid large diff hunk
+    // REPLY: Spit on diff hung, do that just in next commit after :)
+    //        Don't make "zoo" of code styles in the same file.
+    try
     {
-        errorString = pgeX_Data.lastError();
-        goto badfile;
-    }
+        PGESTRING errorString;
+        int str_count = 0;      //Line Counter
+        PGESTRING line;           //Current Line data
+        ///////////////////////////////////////Begin file///////////////////////////////////////
+        PGEFile pgeX_Data(in.readAll());
 
-    for(pge_size_t section = 0; section < pgeX_Data.dataTree.size(); section++) //look sections
-    {
-        PGEFile::PGEX_Entry &f_section = pgeX_Data.dataTree[section];
-
-        if(f_section.name == "META_BOOKMARKS")
+        if(!pgeX_Data.buildTreeFromRaw())
         {
-            if(f_section.type != PGEFile::PGEX_Struct)
-            {
-                errorString = PGESTRING("Wrong section data syntax:\nSection [") + f_section.name + "%1]";
-                goto badfile;
-            }
+            errorString = pgeX_Data.lastError();
+            goto badfile;
+        }
 
-            for(pge_size_t sdata = 0; sdata < f_section.data.size(); sdata++)
+        for(pge_size_t section = 0; section < pgeX_Data.dataTree.size(); section++) //look sections
+        {
+            PGEFile::PGEX_Entry &f_section = pgeX_Data.dataTree[section];
+
+            if(f_section.name == "META_BOOKMARKS")
             {
-                if(f_section.data[sdata].type != PGEFile::PGEX_Struct)
+                if(f_section.type != PGEFile::PGEX_Struct)
                 {
-                    errorString = PGESTRING("Wrong data item syntax:\nSection [") +
-                                  f_section.name + "]\nData line " +
-                                  fromNum(sdata) + ")";
+                    errorString = PGESTRING("Wrong section data syntax:\nSection [") + f_section.name + "%1]";
                     goto badfile;
                 }
 
-                PGEFile::PGEX_Item x = f_section.data[sdata];
-                Bookmark meta_bookmark;
-                meta_bookmark.bookmarkName.clear();
-                meta_bookmark.x = 0;
-                meta_bookmark.y = 0;
-
-                for(const auto &v : x.values) //Look markers and values
+                for(pge_size_t sdata = 0; sdata < f_section.data.size(); sdata++)
                 {
-                    errorString = PGESTRING("Wrong value syntax\nSection [") +
-                                  f_section.name + "]\nData line " +
-                                  fromNum(sdata) + "\nMarker " +
-                                  v.marker + "\nValue " +
-                                  v.value;
+                    if(f_section.data[sdata].type != PGEFile::PGEX_Struct)
+                    {
+                        errorString = PGESTRING("Wrong data item syntax:\nSection [") +
+                                      f_section.name + "]\nData line " +
+                                      fromNum(sdata) + ")";
+                        goto badfile;
+                    }
 
-                    if(v.marker == "BM") //Bookmark name
+                    PGEFile::PGEX_Item x = f_section.data[sdata];
+                    Bookmark meta_bookmark;
+                    meta_bookmark.bookmarkName.clear();
+                    meta_bookmark.x = 0;
+                    meta_bookmark.y = 0;
+
+                    for(const auto &v : x.values) //Look markers and values
                     {
-                        if(PGEFile::IsQoutedString(v.value))
-                            meta_bookmark.bookmarkName = PGEFile::X2STRING(v.value);
-                        else
-                            goto badfile;
+                        errorString = PGESTRING("Wrong value syntax\nSection [") +
+                                      f_section.name + "]\nData line " +
+                                      fromNum(sdata) + "\nMarker " +
+                                      v.marker + "\nValue " +
+                                      v.value;
+
+                        if(v.marker == "BM") //Bookmark name
+                        {
+                            if(PGEFile::IsQoutedString(v.value))
+                                meta_bookmark.bookmarkName = PGEFile::X2STRING(v.value);
+                            else
+                                goto badfile;
+                        }
+                        else if(v.marker == "X") // Position X
+                        {
+                            if(PGEFile::IsFloat(v.value))
+                                meta_bookmark.x = toFloat(v.value);
+                            else
+                                goto badfile;
+                        }
+                        else if(v.marker == "Y") //Position Y
+                        {
+                            if(PGEFile::IsFloat(v.value))
+                                meta_bookmark.y = toFloat(v.value);
+                            else
+                                goto badfile;
+                        }
                     }
-                    else if(v.marker == "X") // Position X
-                    {
-                        if(PGEFile::IsFloat(v.value))
-                            meta_bookmark.x = toFloat(v.value);
-                        else
-                            goto badfile;
-                    }
-                    else if(v.marker == "Y") //Position Y
-                    {
-                        if(PGEFile::IsFloat(v.value))
-                            meta_bookmark.y = toFloat(v.value);
-                        else
-                            goto badfile;
-                    }
+
+                    FileData.bookmarks.push_back(meta_bookmark);
                 }
-
-                FileData.bookmarks.push_back(meta_bookmark);
             }
         }
-    }
 
-    ///////////////////////////////////////EndFile///////////////////////////////////////
-    errorString.clear(); //If no errors, clear string;
-    FileData.meta.ReadFileValid = true;
-    return true;
+        ///////////////////////////////////////EndFile///////////////////////////////////////
+        errorString.clear(); //If no errors, clear string;
+        FileData.meta.ReadFileValid = true;
+        return true;
 
 badfile:    //If file format is not correct
-    //BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
-    FileData.meta.ERROR_info = errorString;
-    FileData.meta.ERROR_linenum = str_count;
-    FileData.meta.ERROR_linedata = line;
-    FileData.meta.ReadFileValid = false;
-    FileData.bookmarks.clear();
-    return false;
-  }
-  catch(const std::exception& e)
-  {
-    FileData.meta.ERROR_info = e.what();
-    FileData.meta.ERROR_linedata.clear();
-    FileData.meta.ERROR_linenum = -1;
-    FileData.meta.ReadFileValid = false;
-    return false;
-  }
+        //BadFileMsg(filePath+"\nError message: "+errorString, str_count, line);
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linenum = str_count;
+        FileData.meta.ERROR_linedata = line;
+        FileData.meta.ReadFileValid = false;
+        FileData.bookmarks.clear();
+        return false;
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 

@@ -72,154 +72,156 @@ bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &in
     if(!g_use_legacy_pgex_parser)
         return MDX_load_level(inf, cb);
 
-  PGESTRING line;
-  // indented 2 spaces to avoid large diff hunk
-  try
-  {
-    int str_count = 0;
-    bool valid = false;
-    LevelHead head;
-    head.RecentFormat = LevelData::PGEX;
+    PGESTRING line;
+    // BEFORE: indented 2 spaces to avoid large diff hunk
+    // REPLY: Spit on diff hung, do that just in next commit after :)
+    //        Don't make "zoo" of code styles in the same file.
+    try
+    {
+        int str_count = 0;
+        bool valid = false;
+        LevelHead head;
+        head.RecentFormat = LevelData::PGEX;
 
 #define NextLine(line) str_count++; inf.readLine(line);
 
-    //Find level header part
-    do
-    {
-        str_count++;
-        NextLine(line)
-    }
-    while((line != "HEAD") && (!IsNULL(line)));
-
-    PGESTRINGList header;
-    bool closed = false;
-
-    if(line != "HEAD")//Header not found, this level is head-less
-        goto skipHeaderParse;
-
-    NextLine(line)
-    while((line != "HEAD_END") && (!IsNULL(line)))
-    {
-        header.push_back(line);
-        str_count++;
-        NextLine(line)
-        if(line == "HEAD_END")
-            closed = true;
-    }
-
-    if(!closed)
-        goto bad_file;
-
-    for(const auto &header_line : header)
-    {
-        PGELIST<PGESTRINGList >data = PGEFile::splitDataLine(header_line, &valid);
-
-        for(const auto &val : data)
+        //Find level header part
+        do
         {
-            if(val.size() != 2)
-                goto bad_file;
+            str_count++;
+            NextLine(line)
+        }
+        while((line != "HEAD") && (!IsNULL(line)));
 
-            if(val[0] == "TL") //Level Title
+        PGESTRINGList header;
+        bool closed = false;
+
+        if(line != "HEAD")//Header not found, this level is head-less
+            goto skipHeaderParse;
+
+        NextLine(line)
+        while((line != "HEAD_END") && (!IsNULL(line)))
+        {
+            header.push_back(line);
+            str_count++;
+            NextLine(line)
+            if(line == "HEAD_END")
+                closed = true;
+        }
+
+        if(!closed)
+            goto bad_file;
+
+        for(const auto &header_line : header)
+        {
+            PGELIST<PGESTRINGList >data = PGEFile::splitDataLine(header_line, &valid);
+
+            for(const auto &val : data)
             {
-                if(PGEFile::IsQoutedString(val[1]))
-                    head.LevelName = PGEFile::X2STRING(val[1]);
-                else
+                if(val.size() != 2)
                     goto bad_file;
-            }
-            else if(val[0] == "SZ") //Starz number
-            {
-                if(PGEFile::IsIntU(val[1]))
-                    head.stars = toInt(val[1]);
-                else
-                    goto bad_file;
-            }
-            else if(val[0] == "DL") //Open Level on player's fail
-            {
-                if(PGEFile::IsQoutedString(val[1]))
-                    head.open_level_on_fail = PGEFile::X2STRING(val[1]);
-                else
-                    goto bad_file;
-            }
-            else if(val[0] == "DE") //Target WarpID of fail-level entrace
-            {
-                if(PGEFile::IsIntU(val[1]))
-                    head.open_level_on_fail_warpID = toUInt(val[1]);
-                else
-                    goto bad_file;
-            }
-            else if(val[0] == "NO") //Overrides of player names
-            {
-                if(PGEFile::IsStringArray(val[1]))
-                    head.player_names_overrides = PGEFile::X2STRArr(val[1]);
-                else
-                    goto bad_file;
-            }
-            else if(val[0] == "XTRA") //Extra settings
-            {
-                if(PGEFile::IsQoutedString(val[1]))
-                    head.custom_params = PGEFile::X2STRING(val[1]);
-                else
-                    goto bad_file;
-            }
-            else if(val[0] == "CPID") //Config pack ID string
-            {
-                if(PGEFile::IsQoutedString(val[1]))
-                    head.configPackId = PGEFile::X2STRING(val[1]);
-                else
-                    goto bad_file;
-            }
-            else if(val[0] == "EFL") //Engine feature level
-            {
-                if(PGEFile::IsIntU(val[1]))
-                    head.engineFeatureLevel = toUInt(val[1]);
-                else
-                    goto bad_file;
-            }
-            else if(val[0] == "MUS") // Level-wide list of external music files
-            {
-                if(PGEFile::IsStringArray(val[1]))
-                    head.music_files = PGEFile::X2STRArr(val[1]);
-                else
-                    goto bad_file;
+
+                if(val[0] == "TL") //Level Title
+                {
+                    if(PGEFile::IsQoutedString(val[1]))
+                        head.LevelName = PGEFile::X2STRING(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "SZ") //Starz number
+                {
+                    if(PGEFile::IsIntU(val[1]))
+                        head.stars = toInt(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "DL") //Open Level on player's fail
+                {
+                    if(PGEFile::IsQoutedString(val[1]))
+                        head.open_level_on_fail = PGEFile::X2STRING(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "DE") //Target WarpID of fail-level entrace
+                {
+                    if(PGEFile::IsIntU(val[1]))
+                        head.open_level_on_fail_warpID = toUInt(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "NO") //Overrides of player names
+                {
+                    if(PGEFile::IsStringArray(val[1]))
+                        head.player_names_overrides = PGEFile::X2STRArr(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "XTRA") //Extra settings
+                {
+                    if(PGEFile::IsQoutedString(val[1]))
+                        head.custom_params = PGEFile::X2STRING(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "CPID") //Config pack ID string
+                {
+                    if(PGEFile::IsQoutedString(val[1]))
+                        head.configPackId = PGEFile::X2STRING(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "EFL") //Engine feature level
+                {
+                    if(PGEFile::IsIntU(val[1]))
+                        head.engineFeatureLevel = toUInt(val[1]);
+                    else
+                        goto bad_file;
+                }
+                else if(val[0] == "MUS") // Level-wide list of external music files
+                {
+                    if(PGEFile::IsStringArray(val[1]))
+                        head.music_files = PGEFile::X2STRArr(val[1]);
+                    else
+                        goto bad_file;
+                }
             }
         }
-    }
 
 skipHeaderParse:
-    if(cb.load_head)
-        cb.load_head(cb.userdata, head);
+        if(cb.load_head)
+            cb.load_head(cb.userdata, head);
 
-    return true;
+        return true;
 
 bad_file:
-    if(cb.on_error)
-    {
-        FileFormatsError error;
-        error.ERROR_info = "Invalid file format";
-        error.ERROR_linenum = inf.getCurrentLineNumber();
-        error.ERROR_linedata = std::move(line);
-        PGE_CutLength(error.ERROR_linedata, 50);
-        PGE_FilterBinary(error.ERROR_linedata);
-        cb.on_error(cb.userdata, error);
+        if(cb.on_error)
+        {
+            FileFormatsError error;
+            error.ERROR_info = "Invalid file format";
+            error.ERROR_linenum = inf.getCurrentLineNumber();
+            error.ERROR_linedata = std::move(line);
+            PGE_CutLength(error.ERROR_linedata, 50);
+            PGE_FilterBinary(error.ERROR_linedata);
+            cb.on_error(cb.userdata, error);
+        }
+        return false;
     }
-    return false;
-  }
-  catch(const PGE_FileFormats_misc::callback_interrupt& e)
-  {
-    return true;
-  }
-  catch(const std::exception& e)
-  {
-    if(cb.on_error)
+    catch(const PGE_FileFormats_misc::callback_interrupt& e)
     {
-        FileFormatsError error;
-        error.ERROR_info.clear();
-        error.add_exc_info(e, inf.getCurrentLineNumber(), std::move(line));
-        cb.on_error(cb.userdata, error);
+        return true;
     }
+    catch(const std::exception& e)
+    {
+        if(cb.on_error)
+        {
+            FileFormatsError error;
+            error.ERROR_info.clear();
+            error.add_exc_info(e, inf.getCurrentLineNumber(), std::move(line));
+            cb.on_error(cb.userdata, error);
+        }
 
-    return false;
-  }
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedLvlFileHeaderT(PGE_FileFormats_misc::TextInput &inf, LevelData &FileData)
@@ -284,1386 +286,1388 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
     if(!g_use_legacy_pgex_parser)
         return MDX_load_level(in, cb);
 
-  PGESTRING line;  /*Current Line data*/
-  // indented 2 spaces to avoid large diff hunk
-  try
-  {
-    PGESTRING errorString;
-    PGESTRING filePath = in.getFilePath();
-
-    LevelHead head;
-    CrashData crash;
-    LevelSection lvl_section;
-    PlayerPoint player;
-    LevelBlock block;
-    LevelBGO bgodata;
-    LevelNPC npcdata;
-    LevelDoor door;
-    LevelPhysEnv physiczone;
-    LevelLayer layer;
-    LevelSMBX64Event event;
-    LevelVariable variable;
-    LevelArray array_field;
-    LevelScript script;
-    LevelItemSetup38A customcfg38A;
-    ///////////////////////////////////////Begin file///////////////////////////////////////
-    PGEX_FileParseTree(in.readAll())
-    PGEX_FetchSection() //look sections
+    PGESTRING line;  /*Current Line data*/
+    // BEFORE: indented 2 spaces to avoid large diff hunk
+    // REPLY: Spit on diff hung, do that just in next commit after :)
+    //        Don't make "zoo" of code styles in the same file.
+    try
     {
-        PGEX_FetchSection_begin()
-        ///////////////////HEADER//////////////////////
-        PGEX_Section("HEAD")
+        PGESTRING errorString;
+        PGESTRING filePath = in.getFilePath();
+
+        LevelHead head;
+        CrashData crash;
+        LevelSection lvl_section;
+        PlayerPoint player;
+        LevelBlock block;
+        LevelBGO bgodata;
+        LevelNPC npcdata;
+        LevelDoor door;
+        LevelPhysEnv physiczone;
+        LevelLayer layer;
+        LevelSMBX64Event event;
+        LevelVariable variable;
+        LevelArray array_field;
+        LevelScript script;
+        LevelItemSetup38A customcfg38A;
+        ///////////////////////////////////////Begin file///////////////////////////////////////
+        PGEX_FileParseTree(in.readAll())
+        PGEX_FetchSection() //look sections
         {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
+            PGEX_FetchSection_begin()
+            ///////////////////HEADER//////////////////////
+            PGEX_Section("HEAD")
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                PGEX_Values() //Look markers and values
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
                 {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("TL", head.LevelName) //Level Title
-                    PGEX_USIntVal("SZ", head.stars) //Starz number
-                    PGEX_StrVal("DL", head.open_level_on_fail) //Open level on fail
-                    PGEX_UIntVal("DE", head.open_level_on_fail_warpID) //Open level's warpID on fail
-                    PGEX_StrArrVal("NO", head.player_names_overrides) //Overrides of player names
-                    PGEX_StrVal("XTRA", head.custom_params) //Level-wide Extra settings
-                    PGEX_StrVal("CPID", head.configPackId)//Config pack ID string
-                    PGEX_UIntVal("EFL", head.engineFeatureLevel) //Target engine version
-                    PGEX_StrArrVal("MUS", head.music_files)// Level-wide list of external music files
-                }
-            }
-
-            if(cb.load_head)
-                cb.load_head(cb.userdata, head);
-        }//HEADER
-        ///////////////////////////////MetaDATA/////////////////////////////////////////////
-        PGEX_Section("META_BOOKMARKS")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                Bookmark meta_bookmark;
-                meta_bookmark.bookmarkName.clear();
-                meta_bookmark.x = 0;
-                meta_bookmark.y = 0;
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("BM", meta_bookmark.bookmarkName) //Bookmark name
-                    PGEX_FloatVal("X", meta_bookmark.x) // Position X
-                    PGEX_FloatVal("Y", meta_bookmark.y) // Position Y
-                }
-
-                if(cb.load_bookmark)
-                    cb.load_bookmark(cb.userdata, meta_bookmark);
-            }
-        }
-        ////////////////////////meta bookmarks////////////////////////
-        PGEX_Section("META_SYS_CRASH")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                crash.used = true;
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_BoolVal("UT", crash.untitled) //Untitled
-                    PGEX_BoolVal("MD", crash.modifyed) //Modyfied
-                    PGEX_SIntVal("FF", crash.fmtID) //Recent File format
-                    PGEX_UIntVal("FV", crash.fmtVer) //Recent File format version
-                    PGEX_StrVal("N",  crash.filename)  //Filename
-                    PGEX_StrVal("P",  crash.path)  //Path
-                    PGEX_StrVal("FP", crash.fullPath)  //Full file Path
-                }
-            }
-
-            if(cb.load_crash_data)
-                cb.load_crash_data(cb.userdata, crash);
-        }//meta sys crash
-        ///////////////////////////////MetaDATA//End////////////////////////////////////////
-        ///////////////////SECTION//////////////////////
-        PGEX_Section("SECTION")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                lvl_section = CreateLvlSection();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_USIntVal("SC", lvl_section.id) //Section ID
-                    PGEX_SLongVal("L",  lvl_section.size_left) //Left side
-                    PGEX_SLongVal("R",  lvl_section.size_right)//Right side
-                    PGEX_SLongVal("T",  lvl_section.size_top) //Top side
-                    PGEX_SLongVal("B",  lvl_section.size_bottom)//Bottom side
-                    PGEX_UIntVal("MZ", lvl_section.music_id)//Built-in music ID
-                    PGEX_UIntVal("BG", lvl_section.background)//Built-in background ID
-                    PGEX_SIntVal("LT", lvl_section.lighting_value)//Lighting value
-                    PGEX_StrVal("MF", lvl_section.music_file) //External music file path
-                    PGEX_SIntVal("ME", lvl_section.music_file_idx) //External music entry from level list
-                    PGEX_BoolVal("CS", lvl_section.wrap_h)//Connect sides horizontally
-                    PGEX_BoolVal("CSV", lvl_section.wrap_v)//Connect sides vertically
-                    PGEX_BoolVal("OE", lvl_section.OffScreenEn)//Offscreen exit
-                    PGEX_BoolVal("SR", lvl_section.lock_left_scroll)//Right-way scroll only (No Turn-back)
-                    PGEX_BoolVal("SL", lvl_section.lock_right_scroll)//Left-way scroll only (No Turn-forward)
-                    PGEX_BoolVal("SD", lvl_section.lock_up_scroll)//Down-way scroll only (No Turn-forward)
-                    PGEX_BoolVal("SU", lvl_section.lock_down_scroll)//Up-way scroll only (No Turn-forward)
-                    PGEX_BoolVal("UW", lvl_section.underwater)//Underwater bit
-                    PGEX_StrVal("XTRA", lvl_section.custom_params)//Custom JSON data tree
-                }
-
-                if(cb.load_section)
-                    cb.load_section(cb.userdata, lvl_section);
-            }
-        }//SECTION
-        ///////////////////STARTPOINT//////////////////////
-        PGEX_Section("STARTPOINT")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                player = CreateLvlPlayerPoint();
-
-                // default player dimensions overridden in the callback below
-                player.w = 0;
-                player.h = 0;
-
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_UIntVal("ID", player.id) //ID of player point
-                    PGEX_SLongVal("X", player.x)
-                    PGEX_SLongVal("Y", player.y)
-                    PGEX_SIntVal("D",  player.direction)
-                }
-
-                if(cb.load_startpoint)
-                    cb.load_startpoint(cb.userdata, player);
-            }
-        }//STARTPOINT
-        ///////////////////BLOCK//////////////////////
-        PGEX_Section("BLOCK")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                block = CreateLvlBlock();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", block.id) //Block ID
-                    PGEX_SLongVal("X", block.x) // Position X
-                    PGEX_SLongVal("Y", block.y) //Position Y
-                    PGEX_USLongVal("W", block.w) //Width
-                    PGEX_USLongVal("H", block.h) //Height
-                    PGEX_BoolVal("AS", block.autoscale)//Enable auto-Scaling
-                    PGEX_StrVal("GXN", block.gfx_name) //38A GFX-Name
-                    PGEX_SLongVal("GXX", block.gfx_dx) //38A graphics extend x
-                    PGEX_SLongVal("GXY", block.gfx_dy) //38A graphics extend y
-                    PGEX_SLongVal("CN", block.npc_id) //Contains (coins/NPC)
-                    PGEX_SLongVal("CS", block.npc_special_value) //Special value for contained NPC
-                    PGEX_BoolVal("IV", block.invisible) //Invisible
-                    PGEX_BoolVal("SL", block.slippery) //Slippery
-                    PGEX_UInt32Val("MA", block.motion_ai_id) //Motion AI type
-                    PGEX_SLongVal("S1", block.special_data) //Special value 1
-                    PGEX_SLongVal("S2", block.special_data2) //Special value 2
-                    PGEX_StrVal("LR", block.layer) //Layer name
-                    PGEX_StrVal("ED", block.event_destroy) //Destroy event slot
-                    PGEX_StrVal("EH", block.event_hit) //Hit event slot
-                    PGEX_StrVal("EE", block.event_emptylayer) //Hit event slot
-                    PGEX_StrVal("XTRA", block.meta.custom_params)//Custom JSON data tree
-                }
-
-                if(cb.load_block)
-                    cb.load_block(cb.userdata, block);
-            }
-        }//BLOCK
-        ///////////////////BGO//////////////////////
-        PGEX_Section("BGO")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                bgodata = CreateLvlBgo();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", bgodata.id)  //BGO ID
-                    PGEX_SLongVal("X",  bgodata.x)  //X Position
-                    PGEX_SLongVal("Y",  bgodata.y)  //Y Position
-                    PGEX_SLongVal("GXX", bgodata.gfx_dx) //38A graphics extend x
-                    PGEX_SLongVal("GXY", bgodata.gfx_dy) //38A graphics extend y
-                    PGEX_FloatVal("ZO", bgodata.z_offset) //Z Offset
-                    PGEX_SIntVal("ZP", bgodata.z_mode)  //Z Position
-                    PGEX_SLongVal("SP", bgodata.smbx64_sp)  //SMBX64 Sorting priority
-                    PGEX_StrVal("LR", bgodata.layer)   //Layer name
-                    PGEX_StrVal("XTRA", bgodata.meta.custom_params)//Custom JSON data tree
-                }
-
-                if(cb.load_bgo)
-                    cb.load_bgo(cb.userdata, bgodata);
-            }
-        }//BGO
-        ///////////////////NPC//////////////////////
-        PGEX_Section("NPC")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                npcdata = CreateLvlNpc();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_UInt64Val("ID", npcdata.id) //NPC ID
-                    PGEX_SLongVal("X", npcdata.x) //X position
-                    PGEX_SLongVal("Y", npcdata.y) //Y position
-                    PGEX_StrVal("GXN", npcdata.gfx_name) //38A GFX-Name
-                    PGEX_SLongVal("GXX", npcdata.gfx_dx) //38A graphics extend x
-                    PGEX_SLongVal("GXY", npcdata.gfx_dy) //38A graphics extend y
-                    PGEX_SLongVal("OW", npcdata.override_width) //Override width
-                    PGEX_SLongVal("OH", npcdata.override_height) //Override height
-                    PGEX_BoolVal("GAS", npcdata.gfx_autoscale) //Autoscale GFX on size override
-                    PGEX_SLongVal("WGT", npcdata.wings_type) //38A: Wings type
-                    PGEX_SLongVal("WGS", npcdata.wings_style) //38A: Wings style
-                    PGEX_SIntVal("D", npcdata.direct) //Direction
-                    PGEX_SLongVal("CN", npcdata.contents) //Contents of container-NPC
-                    PGEX_SLongVal("S1", npcdata.special_data) //Special value 1
-                    PGEX_SLongVal("S2", npcdata.special_data2) //Special value 2
-                    PGEX_BoolVal("GE", npcdata.generator) //Generator
-                    PGEX_SIntVal("GT", npcdata.generator_type) //Generator type
-                    PGEX_SIntVal("GD", npcdata.generator_direct) //Generator direction
-                    PGEX_USIntVal("GM", npcdata.generator_period) //Generator period
-                    PGEX_FloatVal("GA", npcdata.generator_custom_angle) //Generator custom angle
-                    PGEX_USIntVal("GB",  npcdata.generator_branches) //Generator number of branches
-                    PGEX_FloatVal("GR", npcdata.generator_angle_range) //Generator angle range
-                    PGEX_FloatVal("GS", npcdata.generator_initial_speed) //Generator custom initial speed
-                    PGEX_StrVal("MG", npcdata.msg) //Message
-                    PGEX_BoolVal("FD", npcdata.friendly) //Friendly
-                    PGEX_BoolVal("NM", npcdata.nomove) //Don't move
-                    PGEX_BoolVal("BS", npcdata.is_boss) //Enable boss mode!
-                    PGEX_StrVal("LR", npcdata.layer) //Layer
-                    PGEX_StrVal("LA", npcdata.attach_layer) //Attach Layer
-                    PGEX_StrVal("SV", npcdata.send_id_to_variable) //Send ID to variable
-                    PGEX_StrVal("EA", npcdata.event_activate) //Event slot "Activated"
-                    PGEX_StrVal("ED", npcdata.event_die) //Event slot "Death/Take/Destroy"
-                    PGEX_StrVal("ET", npcdata.event_talk) //Event slot "Talk"
-                    PGEX_StrVal("EE", npcdata.event_emptylayer) //Event slot "Layer is empty"
-                    PGEX_StrVal("EG", npcdata.event_grab)//Event slot "On grab"
-                    PGEX_StrVal("EO", npcdata.event_touch)//Event slot "On touch"
-                    PGEX_StrVal("EF", npcdata.event_nextframe)//Evemt slot "Trigger every frame"
-                    PGEX_StrVal("XTRA", npcdata.meta.custom_params)//Custom JSON data tree
-                }
-
-                if(cb.load_npc)
-                    cb.load_npc(cb.userdata, npcdata);
-            }
-        }//TILES
-        ///////////////////PHYSICS//////////////////////
-        PGEX_Section("PHYSICS")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                physiczone = CreateLvlPhysEnv();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_USIntVal("ET", physiczone.env_type) //Environment type
-                    PGEX_SLongVal("X",  physiczone.x) //X position
-                    PGEX_SLongVal("Y",  physiczone.y) //Y position
-                    PGEX_USLongVal("W",  physiczone.w) //Width or circle Radius
-                    PGEX_USLongVal("H",  physiczone.h) //Height or -1 to turn the shape into circle
-                    PGEX_StrVal("LR", physiczone.layer)  //Layer
-                    PGEX_FloatVal("FR", physiczone.friction) //Friction
-                    PGEX_FloatVal("AD", physiczone.accel_direct) //Custom acceleration direction
-                    PGEX_FloatVal("AC", physiczone.accel) //Custom acceleration
-                    PGEX_FloatVal("MV", physiczone.max_velocity) //Maximal velocity
-                    PGEX_StrVal("EO",  physiczone.touch_event) //Touch event/script
-                    PGEX_StrVal("XTRA", physiczone.meta.custom_params)//Custom JSON data tree
-                }
-
-                if(cb.load_phys)
-                    cb.load_phys(cb.userdata, physiczone);
-            }
-        }//PHYSICS
-        ///////////////////DOORS//////////////////////
-        PGEX_Section("DOORS")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                door = CreateLvlWarp();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_SLongVal("IX", door.ix) //Input point
-                    PGEX_SLongVal("IY", door.iy) //Input point
-                    PGEX_SLongVal("OX", door.ox) //Output point
-                    PGEX_SLongVal("OY", door.oy) //Output point
-                    PGEX_UIntVal("IL", door.length_i) //Length of entrance (input) point
-                    PGEX_UIntVal("OL", door.length_o) //Length of exit (output) point
-                    PGEX_USIntVal("DT", door.type) //Input point
-                    PGEX_USIntVal("ID", door.idirect) //Input direction
-                    PGEX_USIntVal("OD", door.odirect) //Output direction
-                    PGEX_SLongVal("WX", door.world_x) //Target world map point
-                    PGEX_SLongVal("WY", door.world_y) //Target world map point
-                    PGEX_StrVal("LF", door.lname)  //Target level file
-                    PGEX_USLongVal("LI", door.warpto) //Target level file's input warp
-                    PGEX_BoolVal("ET", door.lvl_i) //Level Entrance
-                    PGEX_BoolVal("EX", door.lvl_o) //Level exit
-                    PGEX_USIntVal("SL", door.stars) //Stars limit
-                    PGEX_StrVal("SM", door.stars_msg)  //Message about stars/leeks
-                    PGEX_BoolVal("NV", door.novehicles) //No Vehicles
-                    PGEX_BoolVal("SH", door.star_num_hide) //Don't show stars number
-                    PGEX_BoolVal("AI", door.allownpc) //Allow grabbed items
-                    PGEX_BoolVal("LC", door.locked) //Door is locked
-                    PGEX_BoolVal("LB", door.need_a_bomb) //Door is blocked, need bomb to unlock
-                    PGEX_BoolVal("HS", door.hide_entering_scene) //Don't show entering scene
-                    PGEX_BoolVal("AL", door.allownpc_interlevel) //Allow NPC's inter-level
-                    PGEX_BoolVal("SR", door.special_state_required) //Required a special state to enter
-                    PGEX_BoolVal("STR", door.stood_state_required) //Required a stood state to enter
-                    PGEX_SIntVal("TE", door.transition_effect) //Transition effect
-                    PGEX_BoolVal("PT", door.cannon_exit) //Cannon exit
-                    PGEX_FloatVal("PS", door.cannon_exit_speed) //Cannon exit speed
-                    PGEX_StrVal("LR", door.layer)  //Layer
-                    PGEX_StrVal("EE", door.event_enter)  //On-Enter event slot
-                    PGEX_StrVal("EEX", door.event_exit)  //On-Exit event slot
-                    PGEX_BoolVal("TW", door.two_way) //Two-way warp
-                    PGEX_StrVal("XTRA", door.meta.custom_params)//Custom JSON data tree
-                }
-
-                if(cb.load_warp)
-                    cb.load_warp(cb.userdata, door);
-            }
-        }//DOORS
-        ///////////////////LAYERS//////////////////////
-        PGEX_Section("LAYERS")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                layer = CreateLvlLayer();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("LR", layer.name)  //Layer name
-                    PGEX_BoolVal("HD", layer.hidden) //Hidden
-                    PGEX_BoolVal("LC", layer.locked) //Locked
-                }
-
-                if(cb.load_layer)
-                    cb.load_layer(cb.userdata, layer);
-            }
-        }//LAYERS
-        //EVENTS comming soon
-        //                else
-        //                if(sct.first=="EVENTS_CLASSIC") //Action-styled events
-        //                {
-        //                    foreach(PGESTRINGList value, sectData) //Look markers and values
-        //                    {
-        //                            //  if(v.marker=="TL") //Level Title
-        //                            //  {
-        //                            //      if(PGEFile::IsQStr(v.value))
-        //                            //          FileData.LevelName = PGEFile::X2STR(v.value);
-        //                            //      else
-        //                            //          goto badfile;
-        //                            //  }
-        //                            //  else
-        //                            //  if(v.marker=="SZ") //Starz number
-        //                            //  {
-        //                            //      if(PGEFile::IsIntU(v.value))
-        //                            //          FileData.stars = toInt(v.value);
-        //                            //      else
-        //                            //          goto badfile;
-        //                            //  }
-        //                    }
-        //                }//EVENTS
-        ///////////////////EVENTS_CLASSIC//////////////////////
-        PGEX_Section("EVENTS_CLASSIC")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                event = CreateLvlEvent();
-                PGESTRINGList musicSets;
-                pge_size_t musicSets_begin = 0;
-                PGESTRINGList bgSets;
-                pge_size_t bgSets_begin = 0;
-                PGESTRINGList ssSets;
-                pge_size_t ssSets_begin = 0;
-                PGESTRINGList movingLayers;
-                pge_size_t movingLayers_begin = 0;
-                PGESTRINGList newSectionSettingsSets;
-                int newSectionSettingsSets_begin = -1;
-                PGESTRINGList spawnNPCs;
-                pge_size_t spawnNPCs_begin = 0;
-                PGESTRINGList spawnEffectss;
-                pge_size_t spawnEffectss_begin = 0;
-                PGESTRINGList variablesToUpdate;
-                pge_size_t variablesToUpdate_begin = 0;
-                PGELIST<bool > controls;
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("ET", event.name)  //Event Title
-                    PGEX_StrVal("MG", event.msg)  //Event Message
-                    PGEX_USLongVal("SD", event.sound_id) //Play Sound ID
-                    PGEX_USLongVal("EG", event.end_game) //End game algorithm
-                    PGEX_StrArrVal("LH", event.layers_hide) //Hide layers
-                    PGEX_StrArrVal("LS", event.layers_show) //Show layers
-                    PGEX_StrArrVal("LT", event.layers_toggle) //Toggle layers
-                    //Legacy values (without SMBX-38A values support)
-                    PGEX_StrArrVal_Validate("SM", musicSets, musicSets_begin)  //Switch music
-                    PGEX_StrArrVal_Validate("SB", bgSets, bgSets_begin)     //Switch background
-                    PGEX_StrArrVal_Validate("SS", ssSets, ssSets_begin)     //Section Size
-                    //-------------------
-                    //New values (with SMBX-38A values support)
-                    PGEX_StrArrVal_Validate("SSS", newSectionSettingsSets, newSectionSettingsSets_begin) //Section settings in new format
-                    //-------------------
-                    //---SMBX-38A entries-----
-                    PGEX_StrArrVal_Validate("MLA",  movingLayers, movingLayers_begin)       //NPC's to spawn
-                    PGEX_StrArrVal_Validate("SNPC", spawnNPCs, spawnNPCs_begin)       //NPC's to spawn
-                    PGEX_StrArrVal_Validate("SEF",  spawnEffectss, spawnEffectss_begin)    //Effects to spawn
-                    PGEX_StrArrVal_Validate("UV",   variablesToUpdate, variablesToUpdate_begin) //Variables to update
-                    PGEX_StrVal("TSCR", event.trigger_script) //Trigger script
-                    PGEX_USIntVal("TAPI", event.trigger_api_id) //Trigger script
-                    PGEX_BoolVal("TMR", event.timer_def.enable) //Enable timer
-                    PGEX_USLongVal("TMC", event.timer_def.count) //Count of timer units
-                    PGEX_FloatVal("TMI", event.timer_def.interval) //Interval of timer tick
-                    PGEX_USIntVal("TMD", event.timer_def.count_dir) //Direction of count
-                    PGEX_BoolVal("TMV", event.timer_def.show) //Show timer on screen
-                    //-------------------
-                    PGEX_StrVal("TE", event.trigger) //Trigger event
-                    PGEX_USLongVal("TD", event.trigger_timer) //Trigger delay
-                    PGEX_BoolVal("DS", event.nosmoke) //Disable smoke
-                    PGEX_USIntVal("AU", event.autostart) //Auto start
-                    PGEX_StrVal("AUC", event.autostart_condition) //Auto start condition
-                    PGEX_BoolArrVal("PC", controls) //Player controls
-                    PGEX_StrVal("ML", event.movelayer)   //Move layer
-                    PGEX_FloatVal("MX", event.layer_speed_x) //Layer motion speed X
-                    PGEX_FloatVal("MY", event.layer_speed_y) //Layer motion speed Y
-                    PGEX_SLongVal("AS", event.scroll_section) //Autoscroll section ID
-                    PGEX_FloatVal("AX", event.move_camera_x) //Autoscroll speed X
-                    PGEX_FloatVal("AY", event.move_camera_y) //Autoscroll speed Y
-                }
-
-                //Parse new-style parameters
-                if(newSectionSettingsSets_begin != -1)
-                {
-                    for(pge_size_t i = 0; i < newSectionSettingsSets.size(); i++)
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    PGEX_Values() //Look markers and values
                     {
-                        const auto &newSectionSettingsSet = newSectionSettingsSets[i];
-
-                        LevelEvent_Sets sectionSet;
-                        bool valid = false;
-                        PGELIST<PGESTRINGList> sssData = PGEFile::splitDataLine(newSectionSettingsSet, &valid);
-
-                        if(!valid)
-                        {
-                            errorString = "Wrong section settings event encoded sub-entry";
-                            goto badfile;
-                        }
-
-                        for(auto &param : sssData)
-                        {
-                            if(param[0] == "ID")
-                            {
-                                errorString = "Invalid sectionID value type";
-
-                                if(PGEFile::IsIntU(param[1]))
-                                    sectionSet.id = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SL")
-                            {
-                                errorString = "Invalid Section size left value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_left = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "ST")
-                            {
-                                errorString = "Invalid Section size top value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_top = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SB")
-                            {
-                                errorString = "Invalid Section size bottom value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_bottom = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SR")
-                            {
-                                errorString = "Invalid Section size right value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.position_right = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SXX")
-                            {
-                                errorString = "Invalid Section pos x expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    sectionSet.expression_pos_x = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SYX")
-                            {
-                                errorString = "Invalid Section pos y expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    sectionSet.expression_pos_y = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SWX")
-                            {
-                                errorString = "Invalid Section pos w expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    sectionSet.expression_pos_w = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SHX")
-                            {
-                                errorString = "Invalid Section pos h expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    sectionSet.expression_pos_h = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "MI")
-                            {
-                                errorString = "Invalid Section music ID value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.music_id = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "MF")
-                            {
-                                errorString = "Invalid Section music file value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    sectionSet.music_file = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "ME")
-                            {
-                                errorString = "Invalid Section music file value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.music_file_idx = toInt(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "BG")
-                            {
-                                errorString = "Invalid Section background ID value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    sectionSet.background_id = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "AS")
-                            {
-                                errorString = "Invalid Section Autoscroll value type";
-
-                                if(PGEFile::IsBool(param[1]))
-                                    sectionSet.autoscrol = static_cast<bool>(toInt(param[1]) != 0);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "AST")
-                            {
-                                errorString = "Invalid Section Autoscroll type value type";
-
-                                if(PGEFile::IsIntU(param[1]))
-                                    sectionSet.autoscroll_style = toInt(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "ASP")
-                            {
-                                errorString = "Invalid Section Autoscroll path value type";
-
-                                if(PGEFile::IsIntArray(param[1]))
-                                {
-                                    bool valid2 = false;
-                                    PGELIST<long> arr = PGEFile::X2IntArr(param[1], &valid2);
-                                    if(!valid2)
-                                        goto badfile;
-                                    if(arr.size() % 4)
-                                    {
-                                        errorString = "Invalid Section Autoscroll path data contains non-multiple 4 entries";
-                                        goto badfile;
-                                    }
-                                    for(pge_size_t pe = 0; pe < arr.size(); pe += 4)
-                                    {
-                                        LevelEvent_Sets::AutoScrollStopPoint stop;
-                                        stop.x =     arr[pe + 0];
-                                        stop.y =     arr[pe + 1];
-                                        stop.type =  (int)arr[pe + 2];
-                                        stop.speed = arr[pe + 3];
-                                        sectionSet.autoscroll_path.push_back(stop);
-                                    }
-                                }
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "AX")
-                            {
-                                errorString = "Invalid Section Autoscroll X value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    sectionSet.autoscrol_x = toFloat(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "AY")
-                            {
-                                errorString = "Invalid Section Autoscroll Y value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    sectionSet.autoscrol_y = toFloat(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "AXX")
-                            {
-                                errorString = "Invalid Section Autoscroll X expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    sectionSet.expression_autoscrool_x = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "AYX")
-                            {
-                                errorString = "Invalid Section Autoscroll y expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    sectionSet.expression_autoscrool_y = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                        }//for parameters
-
-                        // skip after validating if the field got duplicated
-                        if(i < (pge_size_t)newSectionSettingsSets_begin)
-                            continue;
-
-                        // removed this logic (duplicated in the event load callback)
-#if 0
-                        if(
-                            ((sectionSet.id < 0) || (sectionSet.id >= static_cast<long>(event.sets.size())))
-                        )//Append sections
-                        {
-                            if((sectionSet.id < 0) || (sectionSet.id > 1000))
-                            {
-                                errorString = "Section settings event contains negative section ID value or missed!";
-                                goto badfile;//Missmatched section ID!
-                            }
-
-                            long last = static_cast<long>(event.sets.size() - 1);
-
-                            while(sectionSet.id >= static_cast<long>(event.sets.size()))
-                            {
-                                LevelEvent_Sets set;
-                                set.id = last;
-                                event.sets.push_back(set);
-                                last++;
-                            }
-                        }
-
-                        event.sets[static_cast<pge_size_t>(sectionSet.id)] = sectionSet;
-#endif
-                        event.sets.push_back(sectionSet);
-                    }//for section settings entries
-
-                    // skip over (but validate) legacy arrays
-                    musicSets_begin = musicSets.size();
-                    bgSets_begin = bgSets.size();
-                    ssSets_begin = ssSets.size();
-                }//If new-styled section settings are gotten
-
-                //Apply old MusicSets (if presented)
-                for(pge_size_t q = 0; q < musicSets.size(); q++)
-                {
-                    if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
-                    long got = toLong(musicSets[q]);
-
-                    if(q < musicSets_begin)
-                        continue;
-
-                    pge_size_t s_i = q - musicSets_begin;
-                    if(s_i >= event.sets.size())
-                        continue;
-
-                    auto &s = event.sets[s_i];
-                    s.id = static_cast<long>(q);
-                    s.music_id = got;
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("TL", head.LevelName) //Level Title
+                        PGEX_USIntVal("SZ", head.stars) //Starz number
+                        PGEX_StrVal("DL", head.open_level_on_fail) //Open level on fail
+                        PGEX_UIntVal("DE", head.open_level_on_fail_warpID) //Open level's warpID on fail
+                        PGEX_StrArrVal("NO", head.player_names_overrides) //Overrides of player names
+                        PGEX_StrVal("XTRA", head.custom_params) //Level-wide Extra settings
+                        PGEX_StrVal("CPID", head.configPackId)//Config pack ID string
+                        PGEX_UIntVal("EFL", head.engineFeatureLevel) //Target engine version
+                        PGEX_StrArrVal("MUS", head.music_files)// Level-wide list of external music files
+                    }
                 }
 
-                //Apply old Background sets (if presented)
-                for(pge_size_t q = 0; q < bgSets.size(); q++)
+                if(cb.load_head)
+                    cb.load_head(cb.userdata, head);
+            }//HEADER
+            ///////////////////////////////MetaDATA/////////////////////////////////////////////
+            PGEX_Section("META_BOOKMARKS")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
                 {
-                    if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
-                    long got = toLong(bgSets[q]);
-
-                    if(q < bgSets_begin)
-                        continue;
-
-                    pge_size_t s_i = q - bgSets_begin;
-                    if(s_i >= event.sets.size())
-                        continue;
-
-                    auto &s = event.sets[s_i];
-                    s.id = static_cast<long>(q);
-                    s.background_id = got;
-                }
-
-                //Apply old Background sets (if presented)
-                for(pge_size_t q = 0; q < ssSets.size(); q++)
-                {
-                    PGESTRINGList sizes;
-                    PGE_SPLITSTRING(sizes, ssSets[q], ",");
-
-                    if(sizes.size() != 4) goto badfile; //-V112
-
-                    if(!PGEFile::IsIntS(sizes[0])) goto badfile;
-                    if(!PGEFile::IsIntS(sizes[1])) goto badfile;
-                    if(!PGEFile::IsIntS(sizes[2])) goto badfile;
-                    if(!PGEFile::IsIntS(sizes[3])) goto badfile;
-
-                    long got[4];
-                    for(int i = 0; i < 4; i++)
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    Bookmark meta_bookmark;
+                    meta_bookmark.bookmarkName.clear();
+                    meta_bookmark.x = 0;
+                    meta_bookmark.y = 0;
+                    PGEX_Values() //Look markers and values
                     {
-                        if(!PGEFile::IsIntS(sizes[i])) goto badfile;
-                        got[i] = toLong(sizes[i]);
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("BM", meta_bookmark.bookmarkName) //Bookmark name
+                        PGEX_FloatVal("X", meta_bookmark.x) // Position X
+                        PGEX_FloatVal("Y", meta_bookmark.y) // Position Y
                     }
 
-                    if(q < ssSets_begin)
-                        continue;
-
-                    pge_size_t s_i = q - ssSets_begin;
-                    if(s_i >= event.sets.size())
-                        continue;
-
-                    auto &s = event.sets[s_i];
-                    s.id = static_cast<long>(q);
-                    s.position_left = got[0];
-                    s.position_top = toLong(sizes[1]);
-                    s.position_bottom = toLong(sizes[2]);
-                    s.position_right = toLong(sizes[3]);
+                    if(cb.load_bookmark)
+                        cb.load_bookmark(cb.userdata, meta_bookmark);
+                }
+            }
+            ////////////////////////meta bookmarks////////////////////////
+            PGEX_Section("META_SYS_CRASH")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    crash.used = true;
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_BoolVal("UT", crash.untitled) //Untitled
+                        PGEX_BoolVal("MD", crash.modifyed) //Modyfied
+                        PGEX_SIntVal("FF", crash.fmtID) //Recent File format
+                        PGEX_UIntVal("FV", crash.fmtVer) //Recent File format version
+                        PGEX_StrVal("N",  crash.filename)  //Filename
+                        PGEX_StrVal("P",  crash.path)  //Path
+                        PGEX_StrVal("FP", crash.fullPath)  //Full file Path
+                    }
                 }
 
-
-                //Parse Moving layers
-                if(!movingLayers.empty())
+                if(cb.load_crash_data)
+                    cb.load_crash_data(cb.userdata, crash);
+            }//meta sys crash
+            ///////////////////////////////MetaDATA//End////////////////////////////////////////
+            ///////////////////SECTION//////////////////////
+            PGEX_Section("SECTION")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
                 {
-                    for(pge_size_t i = 0; i < movingLayers.size(); i++)
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    lvl_section = CreateLvlSection();
+                    PGEX_Values() //Look markers and values
                     {
-                        const auto &movingLayer = movingLayers[i];
+                        PGEX_ValueBegin()
+                        PGEX_USIntVal("SC", lvl_section.id) //Section ID
+                        PGEX_SLongVal("L",  lvl_section.size_left) //Left side
+                        PGEX_SLongVal("R",  lvl_section.size_right)//Right side
+                        PGEX_SLongVal("T",  lvl_section.size_top) //Top side
+                        PGEX_SLongVal("B",  lvl_section.size_bottom)//Bottom side
+                        PGEX_UIntVal("MZ", lvl_section.music_id)//Built-in music ID
+                        PGEX_UIntVal("BG", lvl_section.background)//Built-in background ID
+                        PGEX_SIntVal("LT", lvl_section.lighting_value)//Lighting value
+                        PGEX_StrVal("MF", lvl_section.music_file) //External music file path
+                        PGEX_SIntVal("ME", lvl_section.music_file_idx) //External music entry from level list
+                        PGEX_BoolVal("CS", lvl_section.wrap_h)//Connect sides horizontally
+                        PGEX_BoolVal("CSV", lvl_section.wrap_v)//Connect sides vertically
+                        PGEX_BoolVal("OE", lvl_section.OffScreenEn)//Offscreen exit
+                        PGEX_BoolVal("SR", lvl_section.lock_left_scroll)//Right-way scroll only (No Turn-back)
+                        PGEX_BoolVal("SL", lvl_section.lock_right_scroll)//Left-way scroll only (No Turn-forward)
+                        PGEX_BoolVal("SD", lvl_section.lock_up_scroll)//Down-way scroll only (No Turn-forward)
+                        PGEX_BoolVal("SU", lvl_section.lock_down_scroll)//Up-way scroll only (No Turn-forward)
+                        PGEX_BoolVal("UW", lvl_section.underwater)//Underwater bit
+                        PGEX_StrVal("XTRA", lvl_section.custom_params)//Custom JSON data tree
+                    }
 
-                        LevelEvent_MoveLayer moveLayer;
-                        bool valid = false;
-                        PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(movingLayer, &valid);
+                    if(cb.load_section)
+                        cb.load_section(cb.userdata, lvl_section);
+                }
+            }//SECTION
+            ///////////////////STARTPOINT//////////////////////
+            PGEX_Section("STARTPOINT")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    player = CreateLvlPlayerPoint();
 
-                        if(!valid)
+                    // default player dimensions overridden in the callback below
+                    player.w = 0;
+                    player.h = 0;
+
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_UIntVal("ID", player.id) //ID of player point
+                        PGEX_SLongVal("X", player.x)
+                        PGEX_SLongVal("Y", player.y)
+                        PGEX_SIntVal("D",  player.direction)
+                    }
+
+                    if(cb.load_startpoint)
+                        cb.load_startpoint(cb.userdata, player);
+                }
+            }//STARTPOINT
+            ///////////////////BLOCK//////////////////////
+            PGEX_Section("BLOCK")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    block = CreateLvlBlock();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_ULongVal("ID", block.id) //Block ID
+                        PGEX_SLongVal("X", block.x) // Position X
+                        PGEX_SLongVal("Y", block.y) //Position Y
+                        PGEX_USLongVal("W", block.w) //Width
+                        PGEX_USLongVal("H", block.h) //Height
+                        PGEX_BoolVal("AS", block.autoscale)//Enable auto-Scaling
+                        PGEX_StrVal("GXN", block.gfx_name) //38A GFX-Name
+                        PGEX_SLongVal("GXX", block.gfx_dx) //38A graphics extend x
+                        PGEX_SLongVal("GXY", block.gfx_dy) //38A graphics extend y
+                        PGEX_SLongVal("CN", block.npc_id) //Contains (coins/NPC)
+                        PGEX_SLongVal("CS", block.npc_special_value) //Special value for contained NPC
+                        PGEX_BoolVal("IV", block.invisible) //Invisible
+                        PGEX_BoolVal("SL", block.slippery) //Slippery
+                        PGEX_UInt32Val("MA", block.motion_ai_id) //Motion AI type
+                        PGEX_SLongVal("S1", block.special_data) //Special value 1
+                        PGEX_SLongVal("S2", block.special_data2) //Special value 2
+                        PGEX_StrVal("LR", block.layer) //Layer name
+                        PGEX_StrVal("ED", block.event_destroy) //Destroy event slot
+                        PGEX_StrVal("EH", block.event_hit) //Hit event slot
+                        PGEX_StrVal("EE", block.event_emptylayer) //Hit event slot
+                        PGEX_StrVal("XTRA", block.meta.custom_params)//Custom JSON data tree
+                    }
+
+                    if(cb.load_block)
+                        cb.load_block(cb.userdata, block);
+                }
+            }//BLOCK
+            ///////////////////BGO//////////////////////
+            PGEX_Section("BGO")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    bgodata = CreateLvlBgo();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_ULongVal("ID", bgodata.id)  //BGO ID
+                        PGEX_SLongVal("X",  bgodata.x)  //X Position
+                        PGEX_SLongVal("Y",  bgodata.y)  //Y Position
+                        PGEX_SLongVal("GXX", bgodata.gfx_dx) //38A graphics extend x
+                        PGEX_SLongVal("GXY", bgodata.gfx_dy) //38A graphics extend y
+                        PGEX_FloatVal("ZO", bgodata.z_offset) //Z Offset
+                        PGEX_SIntVal("ZP", bgodata.z_mode)  //Z Position
+                        PGEX_SLongVal("SP", bgodata.smbx64_sp)  //SMBX64 Sorting priority
+                        PGEX_StrVal("LR", bgodata.layer)   //Layer name
+                        PGEX_StrVal("XTRA", bgodata.meta.custom_params)//Custom JSON data tree
+                    }
+
+                    if(cb.load_bgo)
+                        cb.load_bgo(cb.userdata, bgodata);
+                }
+            }//BGO
+            ///////////////////NPC//////////////////////
+            PGEX_Section("NPC")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    npcdata = CreateLvlNpc();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_UInt64Val("ID", npcdata.id) //NPC ID
+                        PGEX_SLongVal("X", npcdata.x) //X position
+                        PGEX_SLongVal("Y", npcdata.y) //Y position
+                        PGEX_StrVal("GXN", npcdata.gfx_name) //38A GFX-Name
+                        PGEX_SLongVal("GXX", npcdata.gfx_dx) //38A graphics extend x
+                        PGEX_SLongVal("GXY", npcdata.gfx_dy) //38A graphics extend y
+                        PGEX_SLongVal("OW", npcdata.override_width) //Override width
+                        PGEX_SLongVal("OH", npcdata.override_height) //Override height
+                        PGEX_BoolVal("GAS", npcdata.gfx_autoscale) //Autoscale GFX on size override
+                        PGEX_SLongVal("WGT", npcdata.wings_type) //38A: Wings type
+                        PGEX_SLongVal("WGS", npcdata.wings_style) //38A: Wings style
+                        PGEX_SIntVal("D", npcdata.direct) //Direction
+                        PGEX_SLongVal("CN", npcdata.contents) //Contents of container-NPC
+                        PGEX_SLongVal("S1", npcdata.special_data) //Special value 1
+                        PGEX_SLongVal("S2", npcdata.special_data2) //Special value 2
+                        PGEX_BoolVal("GE", npcdata.generator) //Generator
+                        PGEX_SIntVal("GT", npcdata.generator_type) //Generator type
+                        PGEX_SIntVal("GD", npcdata.generator_direct) //Generator direction
+                        PGEX_USIntVal("GM", npcdata.generator_period) //Generator period
+                        PGEX_FloatVal("GA", npcdata.generator_custom_angle) //Generator custom angle
+                        PGEX_USIntVal("GB",  npcdata.generator_branches) //Generator number of branches
+                        PGEX_FloatVal("GR", npcdata.generator_angle_range) //Generator angle range
+                        PGEX_FloatVal("GS", npcdata.generator_initial_speed) //Generator custom initial speed
+                        PGEX_StrVal("MG", npcdata.msg) //Message
+                        PGEX_BoolVal("FD", npcdata.friendly) //Friendly
+                        PGEX_BoolVal("NM", npcdata.nomove) //Don't move
+                        PGEX_BoolVal("BS", npcdata.is_boss) //Enable boss mode!
+                        PGEX_StrVal("LR", npcdata.layer) //Layer
+                        PGEX_StrVal("LA", npcdata.attach_layer) //Attach Layer
+                        PGEX_StrVal("SV", npcdata.send_id_to_variable) //Send ID to variable
+                        PGEX_StrVal("EA", npcdata.event_activate) //Event slot "Activated"
+                        PGEX_StrVal("ED", npcdata.event_die) //Event slot "Death/Take/Destroy"
+                        PGEX_StrVal("ET", npcdata.event_talk) //Event slot "Talk"
+                        PGEX_StrVal("EE", npcdata.event_emptylayer) //Event slot "Layer is empty"
+                        PGEX_StrVal("EG", npcdata.event_grab)//Event slot "On grab"
+                        PGEX_StrVal("EO", npcdata.event_touch)//Event slot "On touch"
+                        PGEX_StrVal("EF", npcdata.event_nextframe)//Evemt slot "Trigger every frame"
+                        PGEX_StrVal("XTRA", npcdata.meta.custom_params)//Custom JSON data tree
+                    }
+
+                    if(cb.load_npc)
+                        cb.load_npc(cb.userdata, npcdata);
+                }
+            }//TILES
+            ///////////////////PHYSICS//////////////////////
+            PGEX_Section("PHYSICS")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    physiczone = CreateLvlPhysEnv();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_USIntVal("ET", physiczone.env_type) //Environment type
+                        PGEX_SLongVal("X",  physiczone.x) //X position
+                        PGEX_SLongVal("Y",  physiczone.y) //Y position
+                        PGEX_USLongVal("W",  physiczone.w) //Width or circle Radius
+                        PGEX_USLongVal("H",  physiczone.h) //Height or -1 to turn the shape into circle
+                        PGEX_StrVal("LR", physiczone.layer)  //Layer
+                        PGEX_FloatVal("FR", physiczone.friction) //Friction
+                        PGEX_FloatVal("AD", physiczone.accel_direct) //Custom acceleration direction
+                        PGEX_FloatVal("AC", physiczone.accel) //Custom acceleration
+                        PGEX_FloatVal("MV", physiczone.max_velocity) //Maximal velocity
+                        PGEX_StrVal("EO",  physiczone.touch_event) //Touch event/script
+                        PGEX_StrVal("XTRA", physiczone.meta.custom_params)//Custom JSON data tree
+                    }
+
+                    if(cb.load_phys)
+                        cb.load_phys(cb.userdata, physiczone);
+                }
+            }//PHYSICS
+            ///////////////////DOORS//////////////////////
+            PGEX_Section("DOORS")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    door = CreateLvlWarp();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_SLongVal("IX", door.ix) //Input point
+                        PGEX_SLongVal("IY", door.iy) //Input point
+                        PGEX_SLongVal("OX", door.ox) //Output point
+                        PGEX_SLongVal("OY", door.oy) //Output point
+                        PGEX_UIntVal("IL", door.length_i) //Length of entrance (input) point
+                        PGEX_UIntVal("OL", door.length_o) //Length of exit (output) point
+                        PGEX_USIntVal("DT", door.type) //Input point
+                        PGEX_USIntVal("ID", door.idirect) //Input direction
+                        PGEX_USIntVal("OD", door.odirect) //Output direction
+                        PGEX_SLongVal("WX", door.world_x) //Target world map point
+                        PGEX_SLongVal("WY", door.world_y) //Target world map point
+                        PGEX_StrVal("LF", door.lname)  //Target level file
+                        PGEX_USLongVal("LI", door.warpto) //Target level file's input warp
+                        PGEX_BoolVal("ET", door.lvl_i) //Level Entrance
+                        PGEX_BoolVal("EX", door.lvl_o) //Level exit
+                        PGEX_USIntVal("SL", door.stars) //Stars limit
+                        PGEX_StrVal("SM", door.stars_msg)  //Message about stars/leeks
+                        PGEX_BoolVal("NV", door.novehicles) //No Vehicles
+                        PGEX_BoolVal("SH", door.star_num_hide) //Don't show stars number
+                        PGEX_BoolVal("AI", door.allownpc) //Allow grabbed items
+                        PGEX_BoolVal("LC", door.locked) //Door is locked
+                        PGEX_BoolVal("LB", door.need_a_bomb) //Door is blocked, need bomb to unlock
+                        PGEX_BoolVal("HS", door.hide_entering_scene) //Don't show entering scene
+                        PGEX_BoolVal("AL", door.allownpc_interlevel) //Allow NPC's inter-level
+                        PGEX_BoolVal("SR", door.special_state_required) //Required a special state to enter
+                        PGEX_BoolVal("STR", door.stood_state_required) //Required a stood state to enter
+                        PGEX_SIntVal("TE", door.transition_effect) //Transition effect
+                        PGEX_BoolVal("PT", door.cannon_exit) //Cannon exit
+                        PGEX_FloatVal("PS", door.cannon_exit_speed) //Cannon exit speed
+                        PGEX_StrVal("LR", door.layer)  //Layer
+                        PGEX_StrVal("EE", door.event_enter)  //On-Enter event slot
+                        PGEX_StrVal("EEX", door.event_exit)  //On-Exit event slot
+                        PGEX_BoolVal("TW", door.two_way) //Two-way warp
+                        PGEX_StrVal("XTRA", door.meta.custom_params)//Custom JSON data tree
+                    }
+
+                    if(cb.load_warp)
+                        cb.load_warp(cb.userdata, door);
+                }
+            }//DOORS
+            ///////////////////LAYERS//////////////////////
+            PGEX_Section("LAYERS")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    layer = CreateLvlLayer();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("LR", layer.name)  //Layer name
+                        PGEX_BoolVal("HD", layer.hidden) //Hidden
+                        PGEX_BoolVal("LC", layer.locked) //Locked
+                    }
+
+                    if(cb.load_layer)
+                        cb.load_layer(cb.userdata, layer);
+                }
+            }//LAYERS
+            //EVENTS comming soon
+            //                else
+            //                if(sct.first=="EVENTS_CLASSIC") //Action-styled events
+            //                {
+            //                    foreach(PGESTRINGList value, sectData) //Look markers and values
+            //                    {
+            //                            //  if(v.marker=="TL") //Level Title
+            //                            //  {
+            //                            //      if(PGEFile::IsQStr(v.value))
+            //                            //          FileData.LevelName = PGEFile::X2STR(v.value);
+            //                            //      else
+            //                            //          goto badfile;
+            //                            //  }
+            //                            //  else
+            //                            //  if(v.marker=="SZ") //Starz number
+            //                            //  {
+            //                            //      if(PGEFile::IsIntU(v.value))
+            //                            //          FileData.stars = toInt(v.value);
+            //                            //      else
+            //                            //          goto badfile;
+            //                            //  }
+            //                    }
+            //                }//EVENTS
+            ///////////////////EVENTS_CLASSIC//////////////////////
+            PGEX_Section("EVENTS_CLASSIC")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    event = CreateLvlEvent();
+                    PGESTRINGList musicSets;
+                    pge_size_t musicSets_begin = 0;
+                    PGESTRINGList bgSets;
+                    pge_size_t bgSets_begin = 0;
+                    PGESTRINGList ssSets;
+                    pge_size_t ssSets_begin = 0;
+                    PGESTRINGList movingLayers;
+                    pge_size_t movingLayers_begin = 0;
+                    PGESTRINGList newSectionSettingsSets;
+                    int newSectionSettingsSets_begin = -1;
+                    PGESTRINGList spawnNPCs;
+                    pge_size_t spawnNPCs_begin = 0;
+                    PGESTRINGList spawnEffectss;
+                    pge_size_t spawnEffectss_begin = 0;
+                    PGESTRINGList variablesToUpdate;
+                    pge_size_t variablesToUpdate_begin = 0;
+                    PGELIST<bool > controls;
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("ET", event.name)  //Event Title
+                        PGEX_StrVal("MG", event.msg)  //Event Message
+                        PGEX_USLongVal("SD", event.sound_id) //Play Sound ID
+                        PGEX_USLongVal("EG", event.end_game) //End game algorithm
+                        PGEX_StrArrVal("LH", event.layers_hide) //Hide layers
+                        PGEX_StrArrVal("LS", event.layers_show) //Show layers
+                        PGEX_StrArrVal("LT", event.layers_toggle) //Toggle layers
+                        //Legacy values (without SMBX-38A values support)
+                        PGEX_StrArrVal_Validate("SM", musicSets, musicSets_begin)  //Switch music
+                        PGEX_StrArrVal_Validate("SB", bgSets, bgSets_begin)     //Switch background
+                        PGEX_StrArrVal_Validate("SS", ssSets, ssSets_begin)     //Section Size
+                        //-------------------
+                        //New values (with SMBX-38A values support)
+                        PGEX_StrArrVal_Validate("SSS", newSectionSettingsSets, newSectionSettingsSets_begin) //Section settings in new format
+                        //-------------------
+                        //---SMBX-38A entries-----
+                        PGEX_StrArrVal_Validate("MLA",  movingLayers, movingLayers_begin)       //NPC's to spawn
+                        PGEX_StrArrVal_Validate("SNPC", spawnNPCs, spawnNPCs_begin)       //NPC's to spawn
+                        PGEX_StrArrVal_Validate("SEF",  spawnEffectss, spawnEffectss_begin)    //Effects to spawn
+                        PGEX_StrArrVal_Validate("UV",   variablesToUpdate, variablesToUpdate_begin) //Variables to update
+                        PGEX_StrVal("TSCR", event.trigger_script) //Trigger script
+                        PGEX_USIntVal("TAPI", event.trigger_api_id) //Trigger script
+                        PGEX_BoolVal("TMR", event.timer_def.enable) //Enable timer
+                        PGEX_USLongVal("TMC", event.timer_def.count) //Count of timer units
+                        PGEX_FloatVal("TMI", event.timer_def.interval) //Interval of timer tick
+                        PGEX_USIntVal("TMD", event.timer_def.count_dir) //Direction of count
+                        PGEX_BoolVal("TMV", event.timer_def.show) //Show timer on screen
+                        //-------------------
+                        PGEX_StrVal("TE", event.trigger) //Trigger event
+                        PGEX_USLongVal("TD", event.trigger_timer) //Trigger delay
+                        PGEX_BoolVal("DS", event.nosmoke) //Disable smoke
+                        PGEX_USIntVal("AU", event.autostart) //Auto start
+                        PGEX_StrVal("AUC", event.autostart_condition) //Auto start condition
+                        PGEX_BoolArrVal("PC", controls) //Player controls
+                        PGEX_StrVal("ML", event.movelayer)   //Move layer
+                        PGEX_FloatVal("MX", event.layer_speed_x) //Layer motion speed X
+                        PGEX_FloatVal("MY", event.layer_speed_y) //Layer motion speed Y
+                        PGEX_SLongVal("AS", event.scroll_section) //Autoscroll section ID
+                        PGEX_FloatVal("AX", event.move_camera_x) //Autoscroll speed X
+                        PGEX_FloatVal("AY", event.move_camera_y) //Autoscroll speed Y
+                    }
+
+                    //Parse new-style parameters
+                    if(newSectionSettingsSets_begin != -1)
+                    {
+                        for(pge_size_t i = 0; i < newSectionSettingsSets.size(); i++)
                         {
-                            errorString = "Wrong Move layer event encoded sub-entry";
-                            goto badfile;
-                        }
+                            const auto &newSectionSettingsSet = newSectionSettingsSets[i];
 
-                        for(auto &param : mlaData)
-                        {
-                            if(param[0] == "LN")
+                            LevelEvent_Sets sectionSet;
+                            bool valid = false;
+                            PGELIST<PGESTRINGList> sssData = PGEFile::splitDataLine(newSectionSettingsSet, &valid);
+
+                            if(!valid)
                             {
-                                errorString = "Invalid Moving layer name value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    moveLayer.name = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
+                                errorString = "Wrong section settings event encoded sub-entry";
+                                goto badfile;
                             }
-                            else if(param[0] == "SX")
+
+                            for(auto &param : sssData)
                             {
-                                errorString = "Invalid movelayer speed X value type";
+                                if(param[0] == "ID")
+                                {
+                                    errorString = "Invalid sectionID value type";
 
-                                if(PGEFile::IsFloat(param[1]))
-                                    moveLayer.speed_x = toDouble(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SY")
+                                    if(PGEFile::IsIntU(param[1]))
+                                        sectionSet.id = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SL")
+                                {
+                                    errorString = "Invalid Section size left value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        sectionSet.position_left = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "ST")
+                                {
+                                    errorString = "Invalid Section size top value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        sectionSet.position_top = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SB")
+                                {
+                                    errorString = "Invalid Section size bottom value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        sectionSet.position_bottom = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SR")
+                                {
+                                    errorString = "Invalid Section size right value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        sectionSet.position_right = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SXX")
+                                {
+                                    errorString = "Invalid Section pos x expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        sectionSet.expression_pos_x = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SYX")
+                                {
+                                    errorString = "Invalid Section pos y expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        sectionSet.expression_pos_y = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SWX")
+                                {
+                                    errorString = "Invalid Section pos w expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        sectionSet.expression_pos_w = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SHX")
+                                {
+                                    errorString = "Invalid Section pos h expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        sectionSet.expression_pos_h = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "MI")
+                                {
+                                    errorString = "Invalid Section music ID value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        sectionSet.music_id = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "MF")
+                                {
+                                    errorString = "Invalid Section music file value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        sectionSet.music_file = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "ME")
+                                {
+                                    errorString = "Invalid Section music file value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        sectionSet.music_file_idx = toInt(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "BG")
+                                {
+                                    errorString = "Invalid Section background ID value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        sectionSet.background_id = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "AS")
+                                {
+                                    errorString = "Invalid Section Autoscroll value type";
+
+                                    if(PGEFile::IsBool(param[1]))
+                                        sectionSet.autoscrol = static_cast<bool>(toInt(param[1]) != 0);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "AST")
+                                {
+                                    errorString = "Invalid Section Autoscroll type value type";
+
+                                    if(PGEFile::IsIntU(param[1]))
+                                        sectionSet.autoscroll_style = toInt(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "ASP")
+                                {
+                                    errorString = "Invalid Section Autoscroll path value type";
+
+                                    if(PGEFile::IsIntArray(param[1]))
+                                    {
+                                        bool valid2 = false;
+                                        PGELIST<long> arr = PGEFile::X2IntArr(param[1], &valid2);
+                                        if(!valid2)
+                                            goto badfile;
+                                        if(arr.size() % 4)
+                                        {
+                                            errorString = "Invalid Section Autoscroll path data contains non-multiple 4 entries";
+                                            goto badfile;
+                                        }
+                                        for(pge_size_t pe = 0; pe < arr.size(); pe += 4)
+                                        {
+                                            LevelEvent_Sets::AutoScrollStopPoint stop;
+                                            stop.x =     arr[pe + 0];
+                                            stop.y =     arr[pe + 1];
+                                            stop.type =  (int)arr[pe + 2];
+                                            stop.speed = arr[pe + 3];
+                                            sectionSet.autoscroll_path.push_back(stop);
+                                        }
+                                    }
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "AX")
+                                {
+                                    errorString = "Invalid Section Autoscroll X value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        sectionSet.autoscrol_x = toFloat(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "AY")
+                                {
+                                    errorString = "Invalid Section Autoscroll Y value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        sectionSet.autoscrol_y = toFloat(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "AXX")
+                                {
+                                    errorString = "Invalid Section Autoscroll X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        sectionSet.expression_autoscrool_x = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "AYX")
+                                {
+                                    errorString = "Invalid Section Autoscroll y expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        sectionSet.expression_autoscrool_y = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                            }//for parameters
+
+                            // skip after validating if the field got duplicated
+                            if(i < (pge_size_t)newSectionSettingsSets_begin)
+                                continue;
+
+                            // removed this logic (duplicated in the event load callback)
+#if 0
+                            if(
+                                ((sectionSet.id < 0) || (sectionSet.id >= static_cast<long>(event.sets.size())))
+                            )//Append sections
                             {
-                                errorString = "Invalid movelayer speed Y value type";
+                                if((sectionSet.id < 0) || (sectionSet.id > 1000))
+                                {
+                                    errorString = "Section settings event contains negative section ID value or missed!";
+                                    goto badfile;//Missmatched section ID!
+                                }
 
-                                if(PGEFile::IsFloat(param[1]))
-                                    moveLayer.speed_y = toDouble(param[1]);
-                                else
-                                    goto badfile;
+                                long last = static_cast<long>(event.sets.size() - 1);
+
+                                while(sectionSet.id >= static_cast<long>(event.sets.size()))
+                                {
+                                    LevelEvent_Sets set;
+                                    set.id = last;
+                                    event.sets.push_back(set);
+                                    last++;
+                                }
                             }
-                            else if(param[0] == "SXX")
-                            {
-                                errorString = "Invalid movelayer speed X expression value type";
 
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    moveLayer.expression_x = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SYX")
-                            {
-                                errorString = "Invalid movelayer speed Y expression value type";
+                            event.sets[static_cast<pge_size_t>(sectionSet.id)] = sectionSet;
+#endif
+                            event.sets.push_back(sectionSet);
+                        }//for section settings entries
 
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    moveLayer.expression_y = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "MW")
-                            {
-                                errorString = "Invalid movelayer way type value type";
+                        // skip over (but validate) legacy arrays
+                        musicSets_begin = musicSets.size();
+                        bgSets_begin = bgSets.size();
+                        ssSets_begin = ssSets.size();
+                    }//If new-styled section settings are gotten
 
-                                if(PGEFile::IsIntU(param[1]))
-                                    moveLayer.way = toInt(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                        }//for parameters
+                    //Apply old MusicSets (if presented)
+                    for(pge_size_t q = 0; q < musicSets.size(); q++)
+                    {
+                        if(!PGEFile::IsIntS(musicSets[q])) goto badfile;
+                        long got = toLong(musicSets[q]);
 
-                        // skip after validating if the field got duplicated
-                        if(i < movingLayers_begin)
+                        if(q < musicSets_begin)
                             continue;
 
-                        event.moving_layers.push_back(moveLayer);
-                    }//for moving layers entries
-                }//If SMBX38A moving layers are gotten
-
-                //Parse NPCs to spawn
-                if(!spawnNPCs.empty())
-                {
-                    for(pge_size_t i = 0; i < spawnNPCs.size(); i++)
-                    {
-                        auto &spawnNpc = spawnNPCs[i];
-
-                        LevelEvent_SpawnNPC spawnNPC;
-                        bool valid = false;
-                        PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(spawnNpc, &valid);
-
-                        if(!valid)
-                        {
-                            errorString = "Wrong Spawn NPC event encoded sub-entry";
-                            goto badfile;
-                        }
-
-                        for(auto &param : mlaData)
-                        {
-                            if(param[0] == "ID")
-                            {
-                                errorString = "Invalid Spawn NPC ID value type";
-
-                                if(PGEFile::IsIntU(param[1]))
-                                    spawnNPC.id = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SX")
-                            {
-                                errorString = "Invalid Spawn NPC X value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.x = static_cast<long>(toFloat(param[1]));
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SY")
-                            {
-                                errorString = "Invalid Spawn NPC Y value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.y = static_cast<long>(toFloat(param[1]));
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SXX")
-                            {
-                                errorString = "Invalid  Spawn NPC X expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnNPC.expression_x = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SYX")
-                            {
-                                errorString = "Invalid Spawn NPC X expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnNPC.expression_y = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSX")
-                            {
-                                errorString = "Invalid Spawn NPC X value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.speed_x = toFloat(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSY")
-                            {
-                                errorString = "Invalid Spawn NPC Y value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnNPC.speed_y = toFloat(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSXX")
-                            {
-                                errorString = "Invalid  Spawn NPC Speed X expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnNPC.expression_sx = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSYX")
-                            {
-                                errorString = "Invalid Spawn NPC Speed Y expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnNPC.expression_sy = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSS")
-                            {
-                                errorString = "Invalid  Spawn NPC Special value type";
-
-                                if(PGEFile::IsIntU(param[1]))
-                                    spawnNPC.special = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                        }//for parameters
-
-                        // skip after validating if the field got duplicated
-                        if(i < spawnNPCs_begin)
+                        pge_size_t s_i = q - musicSets_begin;
+                        if(s_i >= event.sets.size())
                             continue;
 
-                        event.spawn_npc.push_back(spawnNPC);
-                    }//for Spawn NPC
-                }//If SMBX38A NPC Spawning lists are gotten
+                        auto &s = event.sets[s_i];
+                        s.id = static_cast<long>(q);
+                        s.music_id = got;
+                    }
 
-                //Parse Effects to spawn
-                if(!spawnEffectss.empty())
-                {
-                    for(pge_size_t i = 0; i < spawnEffectss.size(); i++)
+                    //Apply old Background sets (if presented)
+                    for(pge_size_t q = 0; q < bgSets.size(); q++)
                     {
-                        const auto &spawnEffects = spawnEffectss[i];
+                        if(!PGEFile::IsIntS(bgSets[q])) goto badfile;
+                        long got = toLong(bgSets[q]);
 
-                        LevelEvent_SpawnEffect spawnEffect;
-                        bool valid = false;
-                        PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(spawnEffects, &valid);
-
-                        if(!valid)
-                        {
-                            errorString = "Wrong Spawn Effect event encoded sub-entry";
-                            goto badfile;
-                        }
-
-                        for(auto &param : mlaData)
-                        {
-                            if(param[0] == "ID")
-                            {
-                                errorString = "Invalid Spawn Effect ID value type";
-
-                                if(PGEFile::IsIntU(param[1]))
-                                    spawnEffect.id = toLong(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SX")
-                            {
-                                errorString = "Invalid Spawn Effect X value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.x = static_cast<long>(toFloat(param[1]));
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SY")
-                            {
-                                errorString = "Invalid Spawn Effect Y value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.y = static_cast<long>(toFloat(param[1]));
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SXX")
-                            {
-                                errorString = "Invalid  Spawn NPC X expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnEffect.expression_x = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SYX")
-                            {
-                                errorString = "Invalid Spawn NPC X expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnEffect.expression_y = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSX")
-                            {
-                                errorString = "Invalid Spawn NPC X value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.speed_x = toDouble(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSY")
-                            {
-                                errorString = "Invalid Spawn NPC Y value type";
-
-                                if(PGEFile::IsFloat(param[1]))
-                                    spawnEffect.speed_y = toDouble(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSXX")
-                            {
-                                errorString = "Invalid  Spawn NPC Speed X expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnEffect.expression_sx = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "SSYX")
-                            {
-                                errorString = "Invalid Spawn NPC Speed Y expression value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    spawnEffect.expression_sy = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "FP")
-                            {
-                                errorString = "Invalid  Spawn Effect FPS value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    spawnEffect.fps = toInt(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "TTL")
-                            {
-                                errorString = "Invalid Spawn Effect time to live value type";
-
-                                if(PGEFile::IsIntS(param[1]))
-                                    spawnEffect.max_life_time = toInt(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "GT")
-                            {
-                                errorString = "Invalid Spawn Effect Gravity value type";
-
-                                if(PGEFile::IsBool(param[1]))
-                                    spawnEffect.gravity = static_cast<bool>(toInt(param[1]) != 0);
-                                else
-                                    goto badfile;
-                            }
-                        }//for parameters
-
-                        // skip after validating if the field got duplicated
-                        if(i < spawnEffectss_begin)
+                        if(q < bgSets_begin)
                             continue;
 
-                        event.spawn_effects.push_back(spawnEffect);
-                    }//for Spawn Effect
-                }//If SMBX38A Effect Spawning lists are gotten
-
-                //Parse Variables to update
-                if(!variablesToUpdate.empty())
-                {
-                    for(pge_size_t i = 0; i < variablesToUpdate.size(); i++)
-                    {
-                        const auto &updVar = variablesToUpdate[i];
-
-                        LevelEvent_UpdateVariable variableToUpdate;
-                        bool valid = false;
-                        PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(updVar, &valid);
-
-                        if(!valid)
-                        {
-                            errorString = "Wrong Variable to update event encoded sub-entry";
-                            goto badfile;
-                        }
-
-                        for(auto &param : mlaData)
-                        {
-                            if(param[0] == "N")
-                            {
-                                errorString = "Invalid Variable to update name value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    variableToUpdate.name = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                            else if(param[0] == "V")
-                            {
-                                errorString = "Invalid Variable to update new value type";
-
-                                if(PGEFile::IsQoutedString(param[1]))
-                                    variableToUpdate.newval = PGEFile::X2STRING(param[1]);
-                                else
-                                    goto badfile;
-                            }
-                        }//for parameters
-
-                        // skip after validating if the field got duplicated
-                        if(i < variablesToUpdate_begin)
+                        pge_size_t s_i = q - bgSets_begin;
+                        if(s_i >= event.sets.size())
                             continue;
 
-                        event.update_variable.push_back(variableToUpdate);
-                    }//for Variable update events
-                }//If SMBX38A variable update lists are gotten
+                        auto &s = event.sets[s_i];
+                        s.id = static_cast<long>(q);
+                        s.background_id = got;
+                    }
 
-                //Convert boolean array into control flags
-                bool *co [] =
-                {
-                    // SMBX64-only
-                    &event.ctrl_up,
-                    &event.ctrl_down,
-                    &event.ctrl_left,
-                    &event.ctrl_right,
-                    &event.ctrl_run,
-                    &event.ctrl_jump,
-                    &event.ctrl_drop,
-                    &event.ctrl_start,
-                    &event.ctrl_altrun,
-                    &event.ctrl_altjump,
-                    // SMBX64-only end
-                    // SMBX-38A begin
-                    &event.ctrls_enable,
-                    &event.ctrl_lock_keyboard
-                    // SMBX-38A end
-                };
+                    //Apply old Background sets (if presented)
+                    for(pge_size_t q = 0; q < ssSets.size(); q++)
+                    {
+                        PGESTRINGList sizes;
+                        PGE_SPLITSTRING(sizes, ssSets[q], ",");
 
-                for(pge_size_t c = 0; c < controls.size() && c < 12; ++c)
-                    *(co[c]) = controls[c];
+                        if(sizes.size() != 4) goto badfile; //-V112
 
-                if(cb.load_event)
-                    cb.load_event(cb.userdata, event);
-            }
-        }//EVENTS_CLASSIC
-        ///////////////////VARIABLES//////////////////////
-        PGEX_Section("VARIABLES")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
-            {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                variable = CreateLvlVariable("unknown");
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("N", variable.name) //Variable name
-                    PGEX_StrVal("V", variable.value) //Variable value
-                    PGEX_BoolVal("G", variable.is_global) //Is global variable
+                        if(!PGEFile::IsIntS(sizes[0])) goto badfile;
+                        if(!PGEFile::IsIntS(sizes[1])) goto badfile;
+                        if(!PGEFile::IsIntS(sizes[2])) goto badfile;
+                        if(!PGEFile::IsIntS(sizes[3])) goto badfile;
+
+                        long got[4];
+                        for(int i = 0; i < 4; i++)
+                        {
+                            if(!PGEFile::IsIntS(sizes[i])) goto badfile;
+                            got[i] = toLong(sizes[i]);
+                        }
+
+                        if(q < ssSets_begin)
+                            continue;
+
+                        pge_size_t s_i = q - ssSets_begin;
+                        if(s_i >= event.sets.size())
+                            continue;
+
+                        auto &s = event.sets[s_i];
+                        s.id = static_cast<long>(q);
+                        s.position_left = got[0];
+                        s.position_top = toLong(sizes[1]);
+                        s.position_bottom = toLong(sizes[2]);
+                        s.position_right = toLong(sizes[3]);
+                    }
+
+
+                    //Parse Moving layers
+                    if(!movingLayers.empty())
+                    {
+                        for(pge_size_t i = 0; i < movingLayers.size(); i++)
+                        {
+                            const auto &movingLayer = movingLayers[i];
+
+                            LevelEvent_MoveLayer moveLayer;
+                            bool valid = false;
+                            PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(movingLayer, &valid);
+
+                            if(!valid)
+                            {
+                                errorString = "Wrong Move layer event encoded sub-entry";
+                                goto badfile;
+                            }
+
+                            for(auto &param : mlaData)
+                            {
+                                if(param[0] == "LN")
+                                {
+                                    errorString = "Invalid Moving layer name value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        moveLayer.name = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SX")
+                                {
+                                    errorString = "Invalid movelayer speed X value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        moveLayer.speed_x = toDouble(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SY")
+                                {
+                                    errorString = "Invalid movelayer speed Y value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        moveLayer.speed_y = toDouble(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SXX")
+                                {
+                                    errorString = "Invalid movelayer speed X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        moveLayer.expression_x = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SYX")
+                                {
+                                    errorString = "Invalid movelayer speed Y expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        moveLayer.expression_y = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "MW")
+                                {
+                                    errorString = "Invalid movelayer way type value type";
+
+                                    if(PGEFile::IsIntU(param[1]))
+                                        moveLayer.way = toInt(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                            }//for parameters
+
+                            // skip after validating if the field got duplicated
+                            if(i < movingLayers_begin)
+                                continue;
+
+                            event.moving_layers.push_back(moveLayer);
+                        }//for moving layers entries
+                    }//If SMBX38A moving layers are gotten
+
+                    //Parse NPCs to spawn
+                    if(!spawnNPCs.empty())
+                    {
+                        for(pge_size_t i = 0; i < spawnNPCs.size(); i++)
+                        {
+                            auto &spawnNpc = spawnNPCs[i];
+
+                            LevelEvent_SpawnNPC spawnNPC;
+                            bool valid = false;
+                            PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(spawnNpc, &valid);
+
+                            if(!valid)
+                            {
+                                errorString = "Wrong Spawn NPC event encoded sub-entry";
+                                goto badfile;
+                            }
+
+                            for(auto &param : mlaData)
+                            {
+                                if(param[0] == "ID")
+                                {
+                                    errorString = "Invalid Spawn NPC ID value type";
+
+                                    if(PGEFile::IsIntU(param[1]))
+                                        spawnNPC.id = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SX")
+                                {
+                                    errorString = "Invalid Spawn NPC X value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnNPC.x = static_cast<long>(toFloat(param[1]));
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SY")
+                                {
+                                    errorString = "Invalid Spawn NPC Y value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnNPC.y = static_cast<long>(toFloat(param[1]));
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SXX")
+                                {
+                                    errorString = "Invalid  Spawn NPC X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnNPC.expression_x = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SYX")
+                                {
+                                    errorString = "Invalid Spawn NPC X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnNPC.expression_y = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSX")
+                                {
+                                    errorString = "Invalid Spawn NPC X value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnNPC.speed_x = toFloat(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSY")
+                                {
+                                    errorString = "Invalid Spawn NPC Y value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnNPC.speed_y = toFloat(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSXX")
+                                {
+                                    errorString = "Invalid  Spawn NPC Speed X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnNPC.expression_sx = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSYX")
+                                {
+                                    errorString = "Invalid Spawn NPC Speed Y expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnNPC.expression_sy = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSS")
+                                {
+                                    errorString = "Invalid  Spawn NPC Special value type";
+
+                                    if(PGEFile::IsIntU(param[1]))
+                                        spawnNPC.special = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                            }//for parameters
+
+                            // skip after validating if the field got duplicated
+                            if(i < spawnNPCs_begin)
+                                continue;
+
+                            event.spawn_npc.push_back(spawnNPC);
+                        }//for Spawn NPC
+                    }//If SMBX38A NPC Spawning lists are gotten
+
+                    //Parse Effects to spawn
+                    if(!spawnEffectss.empty())
+                    {
+                        for(pge_size_t i = 0; i < spawnEffectss.size(); i++)
+                        {
+                            const auto &spawnEffects = spawnEffectss[i];
+
+                            LevelEvent_SpawnEffect spawnEffect;
+                            bool valid = false;
+                            PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(spawnEffects, &valid);
+
+                            if(!valid)
+                            {
+                                errorString = "Wrong Spawn Effect event encoded sub-entry";
+                                goto badfile;
+                            }
+
+                            for(auto &param : mlaData)
+                            {
+                                if(param[0] == "ID")
+                                {
+                                    errorString = "Invalid Spawn Effect ID value type";
+
+                                    if(PGEFile::IsIntU(param[1]))
+                                        spawnEffect.id = toLong(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SX")
+                                {
+                                    errorString = "Invalid Spawn Effect X value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnEffect.x = static_cast<long>(toFloat(param[1]));
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SY")
+                                {
+                                    errorString = "Invalid Spawn Effect Y value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnEffect.y = static_cast<long>(toFloat(param[1]));
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SXX")
+                                {
+                                    errorString = "Invalid  Spawn NPC X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnEffect.expression_x = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SYX")
+                                {
+                                    errorString = "Invalid Spawn NPC X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnEffect.expression_y = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSX")
+                                {
+                                    errorString = "Invalid Spawn NPC X value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnEffect.speed_x = toDouble(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSY")
+                                {
+                                    errorString = "Invalid Spawn NPC Y value type";
+
+                                    if(PGEFile::IsFloat(param[1]))
+                                        spawnEffect.speed_y = toDouble(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSXX")
+                                {
+                                    errorString = "Invalid  Spawn NPC Speed X expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnEffect.expression_sx = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "SSYX")
+                                {
+                                    errorString = "Invalid Spawn NPC Speed Y expression value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        spawnEffect.expression_sy = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "FP")
+                                {
+                                    errorString = "Invalid  Spawn Effect FPS value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        spawnEffect.fps = toInt(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "TTL")
+                                {
+                                    errorString = "Invalid Spawn Effect time to live value type";
+
+                                    if(PGEFile::IsIntS(param[1]))
+                                        spawnEffect.max_life_time = toInt(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "GT")
+                                {
+                                    errorString = "Invalid Spawn Effect Gravity value type";
+
+                                    if(PGEFile::IsBool(param[1]))
+                                        spawnEffect.gravity = static_cast<bool>(toInt(param[1]) != 0);
+                                    else
+                                        goto badfile;
+                                }
+                            }//for parameters
+
+                            // skip after validating if the field got duplicated
+                            if(i < spawnEffectss_begin)
+                                continue;
+
+                            event.spawn_effects.push_back(spawnEffect);
+                        }//for Spawn Effect
+                    }//If SMBX38A Effect Spawning lists are gotten
+
+                    //Parse Variables to update
+                    if(!variablesToUpdate.empty())
+                    {
+                        for(pge_size_t i = 0; i < variablesToUpdate.size(); i++)
+                        {
+                            const auto &updVar = variablesToUpdate[i];
+
+                            LevelEvent_UpdateVariable variableToUpdate;
+                            bool valid = false;
+                            PGELIST<PGESTRINGList> mlaData = PGEFile::splitDataLine(updVar, &valid);
+
+                            if(!valid)
+                            {
+                                errorString = "Wrong Variable to update event encoded sub-entry";
+                                goto badfile;
+                            }
+
+                            for(auto &param : mlaData)
+                            {
+                                if(param[0] == "N")
+                                {
+                                    errorString = "Invalid Variable to update name value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        variableToUpdate.name = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                                else if(param[0] == "V")
+                                {
+                                    errorString = "Invalid Variable to update new value type";
+
+                                    if(PGEFile::IsQoutedString(param[1]))
+                                        variableToUpdate.newval = PGEFile::X2STRING(param[1]);
+                                    else
+                                        goto badfile;
+                                }
+                            }//for parameters
+
+                            // skip after validating if the field got duplicated
+                            if(i < variablesToUpdate_begin)
+                                continue;
+
+                            event.update_variable.push_back(variableToUpdate);
+                        }//for Variable update events
+                    }//If SMBX38A variable update lists are gotten
+
+                    //Convert boolean array into control flags
+                    bool *co [] =
+                    {
+                        // SMBX64-only
+                        &event.ctrl_up,
+                        &event.ctrl_down,
+                        &event.ctrl_left,
+                        &event.ctrl_right,
+                        &event.ctrl_run,
+                        &event.ctrl_jump,
+                        &event.ctrl_drop,
+                        &event.ctrl_start,
+                        &event.ctrl_altrun,
+                        &event.ctrl_altjump,
+                        // SMBX64-only end
+                        // SMBX-38A begin
+                        &event.ctrls_enable,
+                        &event.ctrl_lock_keyboard
+                        // SMBX-38A end
+                    };
+
+                    for(pge_size_t c = 0; c < controls.size() && c < 12; ++c)
+                        *(co[c]) = controls[c];
+
+                    if(cb.load_event)
+                        cb.load_event(cb.userdata, event);
                 }
-
-                if(cb.load_var)
-                    cb.load_var(cb.userdata, variable);
-            }
-        }//VARIABLES
-        ///////////////////ARRAYS//////////////////////
-        PGEX_Section("ARRAYS")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
+            }//EVENTS_CLASSIC
+            ///////////////////VARIABLES//////////////////////
+            PGEX_Section("VARIABLES")
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                array_field = LevelArray();
-                PGEX_Values() //Look markers and values
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
                 {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("N", array_field.name) //Variable name
-                }
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    variable = CreateLvlVariable("unknown");
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("N", variable.name) //Variable name
+                        PGEX_StrVal("V", variable.value) //Variable value
+                        PGEX_BoolVal("G", variable.is_global) //Is global variable
+                    }
 
-                if(cb.load_arr)
-                    cb.load_arr(cb.userdata, array_field);
-            }
-        }//ARRAYS
-        ///////////////////SCRIPTS//////////////////////
-        PGEX_Section("SCRIPTS")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
+                    if(cb.load_var)
+                        cb.load_var(cb.userdata, variable);
+                }
+            }//VARIABLES
+            ///////////////////ARRAYS//////////////////////
+            PGEX_Section("ARRAYS")
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                script = CreateLvlScript("unknown", LevelScript::LANG_LUA);
-                PGEX_Values() //Look markers and values
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
                 {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("N", script.name)  //Variable name
-                    PGEX_SIntVal("L", script.language)  //Variable name
-                    PGEX_StrVal("S", script.script) //Script text
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    array_field = LevelArray();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("N", array_field.name) //Variable name
+                    }
+
+                    if(cb.load_arr)
+                        cb.load_arr(cb.userdata, array_field);
                 }
-
-                switch(script.language)
-                {
-                case LevelScript::LANG_LUA:
-                case LevelScript::LANG_TEASCRIPT:
-                case LevelScript::LANG_AUTOCODE:
-                    break;
-
-                default:
-                    script.language = LevelScript::LANG_LUA; //LUA by default if any other language code!
-                }
-
-                if(cb.load_script)
-                    cb.load_script(cb.userdata, script);
-            }
-        }//SCRIPTS
-        ///////////////////CUSTOM ITEM CONFIGS (38A)//////////////////////
-        PGEX_Section("CUSTOM_ITEMS_38A")
-        {
-            PGEX_SectionBegin(PGEFile::PGEX_Struct)
-            PGEX_Items()
+            }//ARRAYS
+            ///////////////////SCRIPTS//////////////////////
+            PGEX_Section("SCRIPTS")
             {
-                PGEX_ItemBegin(PGEFile::PGEX_Struct)
-                customcfg38A = LevelItemSetup38A();
-                PGESTRINGList data;
-                pge_size_t data_begin = 0;
-                int type = -1;
-                errorString = "Wrong type";
-                PGEX_Values() //Look markers and values
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
                 {
-                    PGEX_ValueBegin()
-                    PGEX_USIntVal("T",  type) //Type of item
-                    PGEX_USInt64Val("ID", customcfg38A.id)
-                    PGEX_StrArrVal_Validate("D", data, data_begin) //Variable value
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    script = CreateLvlScript("unknown", LevelScript::LANG_LUA);
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("N", script.name)  //Variable name
+                        PGEX_SIntVal("L", script.language)  //Variable name
+                        PGEX_StrVal("S", script.script) //Script text
+                    }
 
-                    // check type for every value (instead of only the final stored type)
-                    if(type <= LevelItemSetup38A::UNKNOWN || type >= LevelItemSetup38A::ITEM_TYPE_MAX)
+                    switch(script.language)
+                    {
+                    case LevelScript::LANG_LUA:
+                    case LevelScript::LANG_TEASCRIPT:
+                    case LevelScript::LANG_AUTOCODE:
+                        break;
+
+                    default:
+                        script.language = LevelScript::LANG_LUA; //LUA by default if any other language code!
+                    }
+
+                    if(cb.load_script)
+                        cb.load_script(cb.userdata, script);
+                }
+            }//SCRIPTS
+            ///////////////////CUSTOM ITEM CONFIGS (38A)//////////////////////
+            PGEX_Section("CUSTOM_ITEMS_38A")
+            {
+                PGEX_SectionBegin(PGEFile::PGEX_Struct)
+                PGEX_Items()
+                {
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct)
+                    customcfg38A = LevelItemSetup38A();
+                    PGESTRINGList data;
+                    pge_size_t data_begin = 0;
+                    int type = -1;
+                    errorString = "Wrong type";
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_USIntVal("T",  type) //Type of item
+                        PGEX_USInt64Val("ID", customcfg38A.id)
+                        PGEX_StrArrVal_Validate("D", data, data_begin) //Variable value
+
+                        // check type for every value (instead of only the final stored type)
+                        if(type <= LevelItemSetup38A::UNKNOWN || type >= LevelItemSetup38A::ITEM_TYPE_MAX)
+                            goto badfile;
+                    }
+
+                    if(type == -1)
                         goto badfile;
+
+                    errorString = "Wrong pair syntax";
+                    for(pge_size_t i = 0; i < data.size(); i++)
+                    {
+                        PGESTRING &s = data[i];
+
+                        LevelItemSetup38A::Entry e;
+                        PGESTRINGList pair;
+                        PGE_SPLITSTRING(pair, s, "=");
+                        if(pair.size() != 2)
+                            goto badfile;
+
+                        if(PGEFile::IsIntU(pair[0]))
+                            e.key = toInt(pair[0]);
+                        else goto badfile;
+
+                        if(PGEFile::IsIntS(pair[1]))
+                            e.value = toLong(pair[1]);
+                        else goto badfile;
+
+                        if(i < data_begin)
+                            continue;
+
+                        customcfg38A.data.push_back(e);
+                    }
+                    customcfg38A.type = (LevelItemSetup38A::ItemType)type;
+
+                    if(cb.load_levelitem38a)
+                        cb.load_levelitem38a(cb.userdata, customcfg38A);
                 }
-
-                if(type == -1)
-                    goto badfile;
-
-                errorString = "Wrong pair syntax";
-                for(pge_size_t i = 0; i < data.size(); i++)
-                {
-                    PGESTRING &s = data[i];
-
-                    LevelItemSetup38A::Entry e;
-                    PGESTRINGList pair;
-                    PGE_SPLITSTRING(pair, s, "=");
-                    if(pair.size() != 2)
-                        goto badfile;
-
-                    if(PGEFile::IsIntU(pair[0]))
-                        e.key = toInt(pair[0]);
-                    else goto badfile;
-
-                    if(PGEFile::IsIntS(pair[1]))
-                        e.value = toLong(pair[1]);
-                    else goto badfile;
-
-                    if(i < data_begin)
-                        continue;
-
-                    customcfg38A.data.push_back(e);
-                }
-                customcfg38A.type = (LevelItemSetup38A::ItemType)type;
-
-                if(cb.load_levelitem38a)
-                    cb.load_levelitem38a(cb.userdata, customcfg38A);
-            }
-        }//CUSTOM_ITEMS_38A
-    }
-    ///////////////////////////////////////EndFile///////////////////////////////////////
-    errorString.clear(); //If no errors, clear string;
-    return true;
+            }//CUSTOM_ITEMS_38A
+        }
+        ///////////////////////////////////////EndFile///////////////////////////////////////
+        errorString.clear(); //If no errors, clear string;
+        return true;
 
 badfile:    //If file format is not correct
-    if(cb.on_error)
-    {
-        FileFormatsError error;
-        error.ERROR_info = errorString;
-        error.ERROR_linenum = in.getCurrentLineNumber();
-        error.ERROR_linedata = std::move(line);
-        PGE_CutLength(error.ERROR_linedata, 50);
-        PGE_FilterBinary(error.ERROR_linedata);
-        cb.on_error(cb.userdata, error);
-    }
+        if(cb.on_error)
+        {
+            FileFormatsError error;
+            error.ERROR_info = errorString;
+            error.ERROR_linenum = in.getCurrentLineNumber();
+            error.ERROR_linedata = std::move(line);
+            PGE_CutLength(error.ERROR_linedata, 50);
+            PGE_FilterBinary(error.ERROR_linedata);
+            cb.on_error(cb.userdata, error);
+        }
 
-    return false;
-  }
-  catch(const PGE_FileFormats_misc::callback_interrupt& e)
-  {
-    return true;
-  }
-  catch(const std::exception& e)
-  {
-    if(cb.on_error)
-    {
-        FileFormatsError error;
-        error.ERROR_info.clear();
-        error.add_exc_info(e, in.getCurrentLineNumber(), std::move(line));
-        cb.on_error(cb.userdata, error);
+        return false;
     }
+    catch(const PGE_FileFormats_misc::callback_interrupt& e)
+    {
+        return true;
+    }
+    catch(const std::exception& e)
+    {
+        if(cb.on_error)
+        {
+            FileFormatsError error;
+            error.ERROR_info.clear();
+            error.add_exc_info(e, in.getCurrentLineNumber(), std::move(line));
+            cb.on_error(cb.userdata, error);
+        }
 
-    return false;
-  }
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, LevelData &FileData)

@@ -83,174 +83,176 @@ bool FileFormats::ReadExtendedWldFileHeaderT(PGE_FileFormats_misc::TextInput &in
     if(!g_use_legacy_pgex_parser)
         return MDX_load_world_header(inf, FileData);
 
-  // indented 2 spaces to avoid large diff hunk
-  try
-  {
-    PGESTRING line;
-    int str_count = 0;
-    bool valid = false;
-    PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
-    FileData.meta.filename = in_1.basename();
-    FileData.meta.path = in_1.dirpath();
-    FileData.meta.RecentFormat = LevelData::PGEX;
-
-    FileData.nocharacter.clear();
-
-    //Find level header part
-    do
+    // BEFORE: indented 2 spaces to avoid large diff hunk
+    // REPLY: Spit on diff hung, do that just in next commit after :)
+    //        Don't make "zoo" of code styles in the same file.
+    try
     {
-        str_count++;
-        inf.readLine(line);
-    }
-    while((line != "HEAD") && (!inf.eof()));
+        PGESTRING line;
+        int str_count = 0;
+        bool valid = false;
+        PGE_FileFormats_misc::FileInfo in_1(inf.getFilePath());
+        FileData.meta.filename = in_1.basename();
+        FileData.meta.path = in_1.dirpath();
+        FileData.meta.RecentFormat = LevelData::PGEX;
 
-    PGESTRINGList header;
-    bool closed = false;
+        FileData.nocharacter.clear();
 
-    if(line != "HEAD")//Header not found, this world map is head-less
-        goto skipHeaderParse;
-
-    str_count++;
-    inf.readLine(line);
-
-    while((line != "HEAD_END") && (!inf.eof()))
-    {
-        header.push_back(line);
-        str_count++;
-        inf.readLine(line);
-
-        if(line == "HEAD_END")
-            closed = true;
-    }
-
-    if(!closed)
-        goto badfile;
-
-    for(pge_size_t zzz = 0; zzz < header.size(); zzz++)
-    {
-        PGESTRING &header_line = header[zzz];
-        PGELIST<PGESTRINGList >data = PGEFile::splitDataLine(header_line, &valid);
-
-        for(pge_size_t i = 0; i < data.size(); i++)
+        //Find level header part
+        do
         {
-            if(data[i].size() != 2) goto badfile;
+            str_count++;
+            inf.readLine(line);
+        }
+        while((line != "HEAD") && (!inf.eof()));
 
-            if(data[i][0] == "TL") //Episode Title
+        PGESTRINGList header;
+        bool closed = false;
+
+        if(line != "HEAD")//Header not found, this world map is head-less
+            goto skipHeaderParse;
+
+        str_count++;
+        inf.readLine(line);
+
+        while((line != "HEAD_END") && (!inf.eof()))
+        {
+            header.push_back(line);
+            str_count++;
+            inf.readLine(line);
+
+            if(line == "HEAD_END")
+                closed = true;
+        }
+
+        if(!closed)
+            goto badfile;
+
+        for(pge_size_t zzz = 0; zzz < header.size(); zzz++)
+        {
+            PGESTRING &header_line = header[zzz];
+            PGELIST<PGESTRINGList >data = PGEFile::splitDataLine(header_line, &valid);
+
+            for(pge_size_t i = 0; i < data.size(); i++)
             {
-                if(PGEFile::IsQoutedString(data[i][1]))
-                    FileData.EpisodeTitle = PGEFile::X2STRING(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "DC") //Disabled characters
-            {
-                if(PGEFile::IsBoolArray(data[i][1]))
-                    FileData.nocharacter = PGEFile::X2BollArr(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "IT") //Intro level
-            {
-                if(PGEFile::IsQoutedString(data[i][1]))
-                    FileData.IntroLevel_file = PGEFile::X2STRING(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "GO") //Game Over level
-            {
-                if(PGEFile::IsQoutedString(data[i][1]))
-                    FileData.GameOverLevel_file = PGEFile::X2STRING(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "HB") //Hub Styled
-            {
-                if(PGEFile::IsBool(data[i][1]))
-                    FileData.HubStyledWorld = static_cast<bool>(toInt(data[i][1]) != 0);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "RL") //Restart level on fail
-            {
-                if(PGEFile::IsBool(data[i][1]))
-                    FileData.restartlevel = static_cast<bool>(toInt(data[i][1]) != 0);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "SZ") //Starz number
-            {
-                if(PGEFile::IsIntU(data[i][1]))
-                    FileData.stars = toUInt(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "CD") //Credits list
-            {
-                if(PGEFile::IsQoutedString(data[i][1]))
-                    FileData.authors = PGEFile::X2STRING(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "CM") //Credits scene background music
-            {
-                if(PGEFile::IsQoutedString(data[i][1]))
-                    FileData.authors_music = PGEFile::X2STRING(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "SSS") //Per-level stars count showing policy
-            {
-                if(PGEFile::IsIntS(data[i][1]))
-                    FileData.starsShowPolicy = toInt(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "XTRA") //Extra settings
-            {
-                if(PGEFile::IsQoutedString(data[i][1]))
-                    FileData.custom_params = PGEFile::X2STRING(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "CPID") //Config pack ID string
-            {
-                if(PGEFile::IsQoutedString(data[i][1]))
-                    FileData.meta.configPackId = PGEFile::X2STRING(data[i][1]);
-                else
-                    goto badfile;
-            }
-            else if(data[i][0] == "EFL") //Engine feature level
-            {
-                if(PGEFile::IsIntU(data[i][1]))
-                    FileData.meta.engineFeatureLevel = toUInt(data[i][1]);
-                else
-                    goto badfile;
+                if(data[i].size() != 2) goto badfile;
+
+                if(data[i][0] == "TL") //Episode Title
+                {
+                    if(PGEFile::IsQoutedString(data[i][1]))
+                        FileData.EpisodeTitle = PGEFile::X2STRING(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "DC") //Disabled characters
+                {
+                    if(PGEFile::IsBoolArray(data[i][1]))
+                        FileData.nocharacter = PGEFile::X2BollArr(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "IT") //Intro level
+                {
+                    if(PGEFile::IsQoutedString(data[i][1]))
+                        FileData.IntroLevel_file = PGEFile::X2STRING(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "GO") //Game Over level
+                {
+                    if(PGEFile::IsQoutedString(data[i][1]))
+                        FileData.GameOverLevel_file = PGEFile::X2STRING(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "HB") //Hub Styled
+                {
+                    if(PGEFile::IsBool(data[i][1]))
+                        FileData.HubStyledWorld = static_cast<bool>(toInt(data[i][1]) != 0);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "RL") //Restart level on fail
+                {
+                    if(PGEFile::IsBool(data[i][1]))
+                        FileData.restartlevel = static_cast<bool>(toInt(data[i][1]) != 0);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "SZ") //Starz number
+                {
+                    if(PGEFile::IsIntU(data[i][1]))
+                        FileData.stars = toUInt(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "CD") //Credits list
+                {
+                    if(PGEFile::IsQoutedString(data[i][1]))
+                        FileData.authors = PGEFile::X2STRING(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "CM") //Credits scene background music
+                {
+                    if(PGEFile::IsQoutedString(data[i][1]))
+                        FileData.authors_music = PGEFile::X2STRING(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "SSS") //Per-level stars count showing policy
+                {
+                    if(PGEFile::IsIntS(data[i][1]))
+                        FileData.starsShowPolicy = toInt(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "XTRA") //Extra settings
+                {
+                    if(PGEFile::IsQoutedString(data[i][1]))
+                        FileData.custom_params = PGEFile::X2STRING(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "CPID") //Config pack ID string
+                {
+                    if(PGEFile::IsQoutedString(data[i][1]))
+                        FileData.meta.configPackId = PGEFile::X2STRING(data[i][1]);
+                    else
+                        goto badfile;
+                }
+                else if(data[i][0] == "EFL") //Engine feature level
+                {
+                    if(PGEFile::IsIntU(data[i][1]))
+                        FileData.meta.engineFeatureLevel = toUInt(data[i][1]);
+                    else
+                        goto badfile;
+                }
             }
         }
-    }
 
 skipHeaderParse:
-    FileData.CurSection = 0;
-    FileData.playmusic = 0;
-    FileData.meta.ReadFileValid = true;
-    return true;
+        FileData.CurSection = 0;
+        FileData.playmusic = 0;
+        FileData.meta.ReadFileValid = true;
+        return true;
 badfile:
-    FileData.meta.ERROR_info = "Invalid file format";
-    FileData.meta.ERROR_linenum = str_count;
-    FileData.meta.ERROR_linedata = line;
-    FileData.meta.ReadFileValid = false;
-    PGE_CutLength(FileData.meta.ERROR_linedata, 50);
-    PGE_FilterBinary(FileData.meta.ERROR_linedata);
-    return false;
-  }
-  catch(const std::exception& e)
-  {
-    FileData.meta.ERROR_info = e.what();
-    FileData.meta.ERROR_linedata.clear();
-    FileData.meta.ERROR_linenum = -1;
-    FileData.meta.ReadFileValid = false;
-    return false;
-  }
+        FileData.meta.ERROR_info = "Invalid file format";
+        FileData.meta.ERROR_linenum = str_count;
+        FileData.meta.ERROR_linedata = line;
+        FileData.meta.ReadFileValid = false;
+        PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+        PGE_FilterBinary(FileData.meta.ERROR_linedata);
+        return false;
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 bool FileFormats::ReadExtendedWldFileF(const PGESTRING &filePath, WorldData &FileData)
@@ -297,298 +299,300 @@ bool FileFormats::ReadExtendedWldFile(PGE_FileFormats_misc::TextInput &in, World
     if(!g_use_legacy_pgex_parser)
         return MDX_load_world(in, FileData);
 
-  // indented 2 spaces to avoid large diff hunk
-  try
-  {
-    PGESTRING errorString;
-    PGEX_FileBegin();
-    PGESTRING filePath = in.getFilePath();
-    CreateWorldData(FileData);
-    FileData.meta.RecentFormat = WorldData::PGEX;
-
-    //Add path data
-    if(!IsEmpty(filePath))
+    // BEFORE: indented 2 spaces to avoid large diff hunk
+    // REPLY: Spit on diff hung, do that just in next commit after :)
+    //        Don't make "zoo" of code styles in the same file.
+    try
     {
-        PGE_FileFormats_misc::FileInfo in_1(filePath);
-        FileData.meta.filename = in_1.basename();
-        FileData.meta.path = in_1.dirpath();
-    }
+        PGESTRING errorString;
+        PGEX_FileBegin();
+        PGESTRING filePath = in.getFilePath();
+        CreateWorldData(FileData);
+        FileData.meta.RecentFormat = WorldData::PGEX;
 
-    FileData.meta.untitled = false;
-    FileData.meta.modified = false;
-    WorldTerrainTile tile;
-    WorldScenery scen;
-    WorldPathTile pathitem;
-    WorldMusicBox musicbox;
-    WorldAreaRect arearect;
-    WorldLevelTile lvlitem;
-    ///////////////////////////////////////Begin file///////////////////////////////////////
-    PGEX_FileParseTree(in.readAll());
-    PGEX_FetchSection() //look sections
-    {
-        PGEX_FetchSection_begin()
-        ///////////////////HEADER//////////////////////
-        PGEX_Section("HEAD")
+        //Add path data
+        if(!IsEmpty(filePath))
         {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count += 8;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("TL", FileData.EpisodeTitle)        //Episode Title
-                    PGEX_BoolArrVal("DC", FileData.nocharacter)     //Disabled characters
-                    PGEX_StrVal("IT", FileData.IntroLevel_file)     //Intro level
-                    PGEX_StrVal("GO", FileData.GameOverLevel_file)  //Game Over level
-                    PGEX_BoolVal("HB", FileData.HubStyledWorld)     //Hub Styled
-                    PGEX_BoolVal("RL", FileData.restartlevel)       //Restart level on fail
-                    PGEX_UIntVal("SZ", FileData.stars)              //Starz number
-                    PGEX_StrVal("CD", FileData.authors)     //Credits list
-                    PGEX_StrVal("CM", FileData.authors_music)     //Credits scene background music
-                    PGEX_SIntVal("SSS", FileData.starsShowPolicy) //Per-level stars count showing policy
-                    PGEX_StrVal("XTRA", FileData.custom_params)     //World-wide Extra settings
-                    PGEX_StrVal("CPID", FileData.meta.configPackId)//Config pack ID string
-                    PGEX_UIntVal("EFL", FileData.meta.engineFeatureLevel) //Target engine version
-                }
-            }
-        }//head
-        ///////////////////////////////MetaDATA/////////////////////////////////////////////
-        PGEX_Section("META_BOOKMARKS")
-        {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                Bookmark meta_bookmark;
-                meta_bookmark.bookmarkName.clear();
-                meta_bookmark.x = 0;
-                meta_bookmark.y = 0;
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_StrVal("BM", meta_bookmark.bookmarkName) //Bookmark name
-                    PGEX_FloatVal("X", meta_bookmark.x) // Position X
-                    PGEX_FloatVal("Y", meta_bookmark.y) // Position Y
-                }
-                FileData.metaData.bookmarks.push_back(meta_bookmark);
-            }
+            PGE_FileFormats_misc::FileInfo in_1(filePath);
+            FileData.meta.filename = in_1.basename();
+            FileData.meta.path = in_1.dirpath();
         }
-        ////////////////////////meta bookmarks////////////////////////
-        PGEX_Section("META_SYS_CRASH")
-        {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                PGEX_Values() //Look markers and values
-                {
-                    FileData.metaData.crash.used = true;
-                    PGEX_ValueBegin()
-                    PGEX_BoolVal("UT", FileData.metaData.crash.untitled) //Untitled
-                    PGEX_BoolVal("MD", FileData.metaData.crash.modifyed) //Modyfied
-                    PGEX_SIntVal("FF", FileData.metaData.crash.fmtID) //Recent File format
-                    PGEX_UIntVal("FV", FileData.metaData.crash.fmtVer) //Recent File format version
-                    PGEX_StrVal("N",  FileData.metaData.crash.filename)  //Filename
-                    PGEX_StrVal("P",  FileData.metaData.crash.path)  //Path
-                    PGEX_StrVal("FP", FileData.metaData.crash.fullPath)  //Full file Path
-                }
-            }
-        }//meta sys crash
-        ///////////////////////////////MetaDATA//End////////////////////////////////////////
-        ///////////////////TILES//////////////////////
-        PGEX_Section("TILES")
-        {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                tile = CreateWldTile();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", tile.id) //Tile ID
-                    PGEX_SLongVal("X",  tile.x) //X Position
-                    PGEX_SLongVal("Y",  tile.y) //Y Position
-                    PGEX_StrVal("XTRA", tile.meta.custom_params)//Custom JSON data tree
-                }
-                tile.meta.array_id = FileData.tile_array_id++;
-                tile.meta.index = static_cast<unsigned int>(FileData.tiles.size());
-                FileData.tiles.push_back(tile);
-            }
-        }//TILES
-        ///////////////////SCENERY//////////////////////
-        PGEX_Section("SCENERY")
-        {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                scen = CreateWldScenery();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", scen.id)  //Scenery ID
-                    PGEX_SLongVal("X", scen.x) //X Position
-                    PGEX_SLongVal("Y", scen.y) //Y Position
-                    PGEX_StrVal("XTRA", scen.meta.custom_params)//Custom JSON data tree
-                }
-                scen.meta.array_id = FileData.scene_array_id++;
-                scen.meta.index = static_cast<unsigned int>(FileData.scenery.size());
-                FileData.scenery.push_back(scen);
-            }
-        }//SCENERY
-        ///////////////////PATHS//////////////////////
-        PGEX_Section("PATHS")
-        {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                pathitem = CreateWldPath();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", pathitem.id)  //Path ID
-                    PGEX_SLongVal("X", pathitem.x) //X Position
-                    PGEX_SLongVal("Y", pathitem.y) //Y Position
-                    PGEX_StrVal("XTRA", pathitem.meta.custom_params)//Custom JSON data tree
-                }
-                pathitem.meta.array_id = FileData.path_array_id++;
-                pathitem.meta.index =  static_cast<unsigned int>(FileData.paths.size());
-                FileData.paths.push_back(pathitem);
-            }
-        }//PATHS
-        ///////////////////MUSICBOXES//////////////////////
-        PGEX_Section("MUSICBOXES")
-        {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                musicbox = CreateWldMusicbox();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", musicbox.id) //MISICBOX ID
-                    PGEX_SLongVal("X", musicbox.x) //X Position
-                    PGEX_SLongVal("Y", musicbox.y) //X Position
-                    PGEX_StrVal("MF", musicbox.music_file)  //Custom music file
-                    PGEX_StrVal("XTRA", musicbox.meta.custom_params)//Custom JSON data tree
-                }
-                musicbox.meta.array_id = FileData.musicbox_array_id++;
-                musicbox.meta.index =  static_cast<unsigned int>(FileData.music.size());
-                FileData.music.push_back(musicbox);
-            }
-        }//MUSICBOXES
-        ///////////////////AREARECTS//////////////////////
-        PGEX_Section("AREARECTS")
-        {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
-            {
-                str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                arearect = WorldAreaRect();
-                PGEX_Values() //Look markers and values
-                {
-                    PGEX_ValueBegin()
-                    PGEX_UIntVal("F", arearect.flags)  //Flags
-                    PGEX_SLongVal("X", arearect.x) //X Position
-                    PGEX_SLongVal("Y", arearect.y) //X Position
-                    PGEX_USLongVal("W", arearect.w) //Width
-                    PGEX_USLongVal("H", arearect.h) //Height
 
-                    // unused stuff
-                    PGEX_ULongVal("MI", arearect.music_id) //MUSICBOX ID
-                    PGEX_StrVal("MF", arearect.music_file)  //Custom music file
-                    PGEX_StrVal("LR", arearect.layer)
-                    PGEX_StrVal("EB", arearect.eventBreak)
-                    PGEX_StrVal("EW", arearect.eventWarp)
-                    PGEX_StrVal("EA", arearect.eventAnchor)
-                    PGEX_StrVal("ET", arearect.eventTouch)
-                    PGEX_UIntVal("TP", arearect.eventTouchPolicy)
-                    PGEX_StrVal("XTRA", arearect.meta.custom_params)//Custom JSON data tree
-                }
-                arearect.meta.array_id = FileData.arearect_array_id++;
-                arearect.meta.index =  static_cast<unsigned int>(FileData.arearects.size());
-                FileData.arearects.push_back(arearect);
-            }
-        }//AREARECTS
-        ///////////////////LEVELS//////////////////////
-        PGEX_Section("LEVELS")
+        FileData.meta.untitled = false;
+        FileData.meta.modified = false;
+        WorldTerrainTile tile;
+        WorldScenery scen;
+        WorldPathTile pathitem;
+        WorldMusicBox musicbox;
+        WorldAreaRect arearect;
+        WorldLevelTile lvlitem;
+        ///////////////////////////////////////Begin file///////////////////////////////////////
+        PGEX_FileParseTree(in.readAll());
+        PGEX_FetchSection() //look sections
         {
-            str_count++;
-            PGEX_SectionBegin(PGEFile::PGEX_Struct);
-            PGEX_Items()
+            PGEX_FetchSection_begin()
+            ///////////////////HEADER//////////////////////
+            PGEX_Section("HEAD")
             {
                 str_count++;
-                PGEX_ItemBegin(PGEFile::PGEX_Struct);
-                lvlitem = CreateWldLevel();
-                PGEX_Values() //Look markers and values
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
                 {
-                    PGEX_ValueBegin()
-                    PGEX_ULongVal("ID", lvlitem.id) //LEVEL IMAGE ID
-                    PGEX_SLongVal("X",  lvlitem.x) //X Position
-                    PGEX_SLongVal("Y",  lvlitem.y) //X Position
-                    PGEX_StrVal("LF", lvlitem.lvlfile)  //Target level file
-                    PGEX_StrVal("LT", lvlitem.title)   //Level title
-                    PGEX_ULongVal("EI", lvlitem.entertowarp) //Entrance Warp ID (if 0 - start level from default points)
-                    PGEX_SIntVal("ET", lvlitem.top_exit) //Open top path on exit type
-                    PGEX_SIntVal("EL", lvlitem.left_exit) //Open left path on exit type
-                    PGEX_SIntVal("ER", lvlitem.right_exit) //Open right path on exit type
-                    PGEX_SIntVal("EB", lvlitem.bottom_exit) //Open bottom path on exit type
-                    PGEX_SLongVal("WX", lvlitem.gotox) //Goto world map X
-                    PGEX_SLongVal("WY", lvlitem.gotoy) //Goto world map Y
-                    PGEX_BoolVal("AV", lvlitem.alwaysVisible) //Always visible
-                    PGEX_BoolVal("SP", lvlitem.gamestart) //Is Game start point
-                    PGEX_BoolVal("BP", lvlitem.pathbg) //Path background
-                    PGEX_BoolVal("BG", lvlitem.bigpathbg) //Big path background
-                    PGEX_SIntVal("SSS", lvlitem.starsShowPolicy) // Stars count showing policy
-                    PGEX_StrVal("XTRA", lvlitem.meta.custom_params)//Custom JSON data tree
+                    str_count += 8;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("TL", FileData.EpisodeTitle)        //Episode Title
+                        PGEX_BoolArrVal("DC", FileData.nocharacter)     //Disabled characters
+                        PGEX_StrVal("IT", FileData.IntroLevel_file)     //Intro level
+                        PGEX_StrVal("GO", FileData.GameOverLevel_file)  //Game Over level
+                        PGEX_BoolVal("HB", FileData.HubStyledWorld)     //Hub Styled
+                        PGEX_BoolVal("RL", FileData.restartlevel)       //Restart level on fail
+                        PGEX_UIntVal("SZ", FileData.stars)              //Starz number
+                        PGEX_StrVal("CD", FileData.authors)     //Credits list
+                        PGEX_StrVal("CM", FileData.authors_music)     //Credits scene background music
+                        PGEX_SIntVal("SSS", FileData.starsShowPolicy) //Per-level stars count showing policy
+                        PGEX_StrVal("XTRA", FileData.custom_params)     //World-wide Extra settings
+                        PGEX_StrVal("CPID", FileData.meta.configPackId)//Config pack ID string
+                        PGEX_UIntVal("EFL", FileData.meta.engineFeatureLevel) //Target engine version
+                    }
                 }
-                lvlitem.meta.array_id = FileData.level_array_id++;
-                lvlitem.meta.index = static_cast<unsigned int>(FileData.levels.size());
-                FileData.levels.push_back(lvlitem);
+            }//head
+            ///////////////////////////////MetaDATA/////////////////////////////////////////////
+            PGEX_Section("META_BOOKMARKS")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    Bookmark meta_bookmark;
+                    meta_bookmark.bookmarkName.clear();
+                    meta_bookmark.x = 0;
+                    meta_bookmark.y = 0;
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_StrVal("BM", meta_bookmark.bookmarkName) //Bookmark name
+                        PGEX_FloatVal("X", meta_bookmark.x) // Position X
+                        PGEX_FloatVal("Y", meta_bookmark.y) // Position Y
+                    }
+                    FileData.metaData.bookmarks.push_back(meta_bookmark);
+                }
             }
-        }//LEVELS
-    }
-    ///////////////////////////////////////EndFile///////////////////////////////////////
-    FileData.meta.ERROR_info.clear(); //If no errors, clear string;
-    FileData.meta.ReadFileValid = true;
-    return true;
+            ////////////////////////meta bookmarks////////////////////////
+            PGEX_Section("META_SYS_CRASH")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    PGEX_Values() //Look markers and values
+                    {
+                        FileData.metaData.crash.used = true;
+                        PGEX_ValueBegin()
+                        PGEX_BoolVal("UT", FileData.metaData.crash.untitled) //Untitled
+                        PGEX_BoolVal("MD", FileData.metaData.crash.modifyed) //Modyfied
+                        PGEX_SIntVal("FF", FileData.metaData.crash.fmtID) //Recent File format
+                        PGEX_UIntVal("FV", FileData.metaData.crash.fmtVer) //Recent File format version
+                        PGEX_StrVal("N",  FileData.metaData.crash.filename)  //Filename
+                        PGEX_StrVal("P",  FileData.metaData.crash.path)  //Path
+                        PGEX_StrVal("FP", FileData.metaData.crash.fullPath)  //Full file Path
+                    }
+                }
+            }//meta sys crash
+            ///////////////////////////////MetaDATA//End////////////////////////////////////////
+            ///////////////////TILES//////////////////////
+            PGEX_Section("TILES")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    tile = CreateWldTile();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_ULongVal("ID", tile.id) //Tile ID
+                        PGEX_SLongVal("X",  tile.x) //X Position
+                        PGEX_SLongVal("Y",  tile.y) //Y Position
+                        PGEX_StrVal("XTRA", tile.meta.custom_params)//Custom JSON data tree
+                    }
+                    tile.meta.array_id = FileData.tile_array_id++;
+                    tile.meta.index = static_cast<unsigned int>(FileData.tiles.size());
+                    FileData.tiles.push_back(tile);
+                }
+            }//TILES
+            ///////////////////SCENERY//////////////////////
+            PGEX_Section("SCENERY")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    scen = CreateWldScenery();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_ULongVal("ID", scen.id)  //Scenery ID
+                        PGEX_SLongVal("X", scen.x) //X Position
+                        PGEX_SLongVal("Y", scen.y) //Y Position
+                        PGEX_StrVal("XTRA", scen.meta.custom_params)//Custom JSON data tree
+                    }
+                    scen.meta.array_id = FileData.scene_array_id++;
+                    scen.meta.index = static_cast<unsigned int>(FileData.scenery.size());
+                    FileData.scenery.push_back(scen);
+                }
+            }//SCENERY
+            ///////////////////PATHS//////////////////////
+            PGEX_Section("PATHS")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    pathitem = CreateWldPath();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_ULongVal("ID", pathitem.id)  //Path ID
+                        PGEX_SLongVal("X", pathitem.x) //X Position
+                        PGEX_SLongVal("Y", pathitem.y) //Y Position
+                        PGEX_StrVal("XTRA", pathitem.meta.custom_params)//Custom JSON data tree
+                    }
+                    pathitem.meta.array_id = FileData.path_array_id++;
+                    pathitem.meta.index =  static_cast<unsigned int>(FileData.paths.size());
+                    FileData.paths.push_back(pathitem);
+                }
+            }//PATHS
+            ///////////////////MUSICBOXES//////////////////////
+            PGEX_Section("MUSICBOXES")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    musicbox = CreateWldMusicbox();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_ULongVal("ID", musicbox.id) //MISICBOX ID
+                        PGEX_SLongVal("X", musicbox.x) //X Position
+                        PGEX_SLongVal("Y", musicbox.y) //X Position
+                        PGEX_StrVal("MF", musicbox.music_file)  //Custom music file
+                        PGEX_StrVal("XTRA", musicbox.meta.custom_params)//Custom JSON data tree
+                    }
+                    musicbox.meta.array_id = FileData.musicbox_array_id++;
+                    musicbox.meta.index =  static_cast<unsigned int>(FileData.music.size());
+                    FileData.music.push_back(musicbox);
+                }
+            }//MUSICBOXES
+            ///////////////////AREARECTS//////////////////////
+            PGEX_Section("AREARECTS")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    arearect = WorldAreaRect();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_UIntVal("F", arearect.flags)  //Flags
+                        PGEX_SLongVal("X", arearect.x) //X Position
+                        PGEX_SLongVal("Y", arearect.y) //X Position
+                        PGEX_USLongVal("W", arearect.w) //Width
+                        PGEX_USLongVal("H", arearect.h) //Height
+
+                        // unused stuff
+                        PGEX_ULongVal("MI", arearect.music_id) //MUSICBOX ID
+                        PGEX_StrVal("MF", arearect.music_file)  //Custom music file
+                        PGEX_StrVal("LR", arearect.layer)
+                        PGEX_StrVal("EB", arearect.eventBreak)
+                        PGEX_StrVal("EW", arearect.eventWarp)
+                        PGEX_StrVal("EA", arearect.eventAnchor)
+                        PGEX_StrVal("ET", arearect.eventTouch)
+                        PGEX_UIntVal("TP", arearect.eventTouchPolicy)
+                        PGEX_StrVal("XTRA", arearect.meta.custom_params)//Custom JSON data tree
+                    }
+                    arearect.meta.array_id = FileData.arearect_array_id++;
+                    arearect.meta.index =  static_cast<unsigned int>(FileData.arearects.size());
+                    FileData.arearects.push_back(arearect);
+                }
+            }//AREARECTS
+            ///////////////////LEVELS//////////////////////
+            PGEX_Section("LEVELS")
+            {
+                str_count++;
+                PGEX_SectionBegin(PGEFile::PGEX_Struct);
+                PGEX_Items()
+                {
+                    str_count++;
+                    PGEX_ItemBegin(PGEFile::PGEX_Struct);
+                    lvlitem = CreateWldLevel();
+                    PGEX_Values() //Look markers and values
+                    {
+                        PGEX_ValueBegin()
+                        PGEX_ULongVal("ID", lvlitem.id) //LEVEL IMAGE ID
+                        PGEX_SLongVal("X",  lvlitem.x) //X Position
+                        PGEX_SLongVal("Y",  lvlitem.y) //X Position
+                        PGEX_StrVal("LF", lvlitem.lvlfile)  //Target level file
+                        PGEX_StrVal("LT", lvlitem.title)   //Level title
+                        PGEX_ULongVal("EI", lvlitem.entertowarp) //Entrance Warp ID (if 0 - start level from default points)
+                        PGEX_SIntVal("ET", lvlitem.top_exit) //Open top path on exit type
+                        PGEX_SIntVal("EL", lvlitem.left_exit) //Open left path on exit type
+                        PGEX_SIntVal("ER", lvlitem.right_exit) //Open right path on exit type
+                        PGEX_SIntVal("EB", lvlitem.bottom_exit) //Open bottom path on exit type
+                        PGEX_SLongVal("WX", lvlitem.gotox) //Goto world map X
+                        PGEX_SLongVal("WY", lvlitem.gotoy) //Goto world map Y
+                        PGEX_BoolVal("AV", lvlitem.alwaysVisible) //Always visible
+                        PGEX_BoolVal("SP", lvlitem.gamestart) //Is Game start point
+                        PGEX_BoolVal("BP", lvlitem.pathbg) //Path background
+                        PGEX_BoolVal("BG", lvlitem.bigpathbg) //Big path background
+                        PGEX_SIntVal("SSS", lvlitem.starsShowPolicy) // Stars count showing policy
+                        PGEX_StrVal("XTRA", lvlitem.meta.custom_params)//Custom JSON data tree
+                    }
+                    lvlitem.meta.array_id = FileData.level_array_id++;
+                    lvlitem.meta.index = static_cast<unsigned int>(FileData.levels.size());
+                    FileData.levels.push_back(lvlitem);
+                }
+            }//LEVELS
+        }
+        ///////////////////////////////////////EndFile///////////////////////////////////////
+        FileData.meta.ERROR_info.clear(); //If no errors, clear string;
+        FileData.meta.ReadFileValid = true;
+        return true;
 badfile:    //If file format not corrects
-    FileData.meta.ERROR_info = errorString;
-    FileData.meta.ERROR_linenum = str_count;
-    FileData.meta.ERROR_linedata = line;
-    FileData.meta.ReadFileValid = false;
-    PGE_CutLength(FileData.meta.ERROR_linedata, 50);
-    PGE_FilterBinary(FileData.meta.ERROR_linedata);
-    return false;
-  }
-  catch(const std::exception& e)
-  {
-    FileData.meta.ERROR_info = e.what();
-    FileData.meta.ERROR_linedata.clear();
-    FileData.meta.ERROR_linenum = -1;
-    FileData.meta.ReadFileValid = false;
-    return false;
-  }
+        FileData.meta.ERROR_info = errorString;
+        FileData.meta.ERROR_linenum = str_count;
+        FileData.meta.ERROR_linedata = line;
+        FileData.meta.ReadFileValid = false;
+        PGE_CutLength(FileData.meta.ERROR_linedata, 50);
+        PGE_FilterBinary(FileData.meta.ERROR_linedata);
+        return false;
+    }
+    catch(const std::exception& e)
+    {
+        FileData.meta.ERROR_info = e.what();
+        FileData.meta.ERROR_linedata.clear();
+        FileData.meta.ERROR_linenum = -1;
+        FileData.meta.ReadFileValid = false;
+        return false;
+    }
 }
 
 
