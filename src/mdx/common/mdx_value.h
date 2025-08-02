@@ -30,7 +30,7 @@
 
 #include <string>
 
-#include "pge_file_lib_globs.h"
+#include "../../../pge_file_lib_globs.h"
 
 /*! \file mdx_value.h
  *
