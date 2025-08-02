@@ -78,8 +78,8 @@ inline bool MDX_save_value(std::string& out, const value_t& src)
     return MDX_Value<value_t>::save(out, src);
 }
 
-#include "mdx/common/value/mdx_value_list.hpp"
-#include "mdx/common/value/mdx_value_object.hpp"
-#include "mdx/common/value/mdx_value_objectlist.hpp"
+#include "value/mdx_value_list.hpp"
+#include "value/mdx_value_object.hpp"
+#include "value/mdx_value_objectlist.hpp"
 
 #endif // #ifndef MDX_VALUE_H

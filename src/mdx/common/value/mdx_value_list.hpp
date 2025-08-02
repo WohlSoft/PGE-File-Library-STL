@@ -36,8 +36,8 @@
 #ifndef MDX_VALUE_LIST_HPP
 #define MDX_VALUE_LIST_HPP
 
-#include "mdx/common/mdx_value.h"
-#include "mdx/common/mdx_exception.h"
+#include "../mdx_value.h"
+#include "../mdx_exception.h"
 
 inline const char* MDX_finish_list_item(const char* line)
 {
