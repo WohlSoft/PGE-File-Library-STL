@@ -34,8 +34,8 @@
 #ifndef MDX_VALUE_OBJECTLIST_HPP
 #define MDX_VALUE_OBJECTLIST_HPP
 
-#include "mdx/common/mdx_value.h"
-#include "mdx/common/mdx_exception.h"
+#include "../mdx_value.h"
+#include "../mdx_exception.h"
 
 /************************
  * MDX_Value_ObjectList *

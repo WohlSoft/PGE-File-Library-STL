@@ -34,7 +34,7 @@
 #ifndef MDX_VALUE_OBJECT_HPP
 #define MDX_VALUE_OBJECT_HPP
 
-#include "mdx/common/mdx_value.h"
+#include "../mdx_value.h"
 
 /********************
  * MDX_Value_Object *
