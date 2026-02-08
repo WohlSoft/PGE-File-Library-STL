@@ -514,8 +514,12 @@ struct LevelDoor
     bool special_state_required = false;
     //! Length of entrance zone: How wide will be entrance point
     unsigned int length_i = 32u;
+    //! Height of entrance zone: How tall will be entrance point
+    unsigned int height_i = 32u;
     //! Length of exit zone: How wide will be exit point
     unsigned int length_o = 32u;
+    //! Height of exit zone: How tall will be exit point
+    unsigned int height_o = 32u;
     //! Trigger event on enter
     PGESTRING event_enter;
     //! Trigger event after player exits the warp
