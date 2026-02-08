@@ -182,6 +182,8 @@ MDX_SETUP_OBJECT(LevelDoor,
     MDX_FIELD("OY", oy); //Output point
     MDX_FIELD("IL", length_i); //Length of entrance (input) point
     MDX_FIELD("OL", length_o); //Length of exit (output) point
+    MDX_FIELD("IH", height_i); //Height of entrance (input) point
+    MDX_FIELD("OH", height_o); //Height of exit (output) point
     MDX_FIELD_NONNEG("DT", type); //Input point
     MDX_FIELD_NONNEG("ID", idirect); //Input direction
     MDX_FIELD_NONNEG("OD", odirect); //Output direction

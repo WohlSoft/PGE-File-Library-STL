@@ -616,6 +616,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, const
                         PGEX_SLongVal("OY", door.oy) //Output point
                         PGEX_UIntVal("IL", door.length_i) //Length of entrance (input) point
                         PGEX_UIntVal("OL", door.length_o) //Length of exit (output) point
+                        PGEX_UIntVal("IH", door.height_i) //Height of entrance (input) point
+                        PGEX_UIntVal("OH", door.height_o) //Height of exit (output) point
                         PGEX_USIntVal("DT", door.type) //Input point
                         PGEX_USIntVal("ID", door.idirect) //Input direction
                         PGEX_USIntVal("OD", door.odirect) //Output direction
