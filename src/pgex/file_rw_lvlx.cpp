@@ -618,6 +618,8 @@ bool FileFormats::ReadExtendedLvlFile(PGE_FileFormats_misc::TextInput &in, Level
                     PGEX_SLongVal("OY", door.oy) //Output point
                     PGEX_UIntVal("IL", door.length_i) //Length of entrance (input) point
                     PGEX_UIntVal("OL", door.length_o) //Length of exit (output) point
+                    PGEX_UIntVal("IH", door.height_i) //Height of entrance (input) point
+                    PGEX_UIntVal("OH", door.height_o) //Height of exit (output) point
                     PGEX_USIntVal("DT", door.type) //Input point
                     PGEX_USIntVal("ID", door.idirect) //Input direction
                     PGEX_USIntVal("OD", door.odirect) //Output direction
@@ -2199,6 +2201,12 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
 
             if(warp.length_o != 32) //-V112
                 out << PGEFile::value("OL", PGEFile::WriteInt(warp.length_o));  //Length of exit
+
+            if(warp.height_i != 32) //-V112
+                out << PGEFile::value("IH", PGEFile::WriteInt(warp.height_i));  //Height of entrance
+
+            if(warp.height_o != 32) //-V112
+                out << PGEFile::value("OH", PGEFile::WriteInt(warp.height_o));  //Height of exit
 
             out << PGEFile::value("DT", PGEFile::WriteInt(warp.type));  // Warp type
             out << PGEFile::value("ID", PGEFile::WriteInt(warp.idirect));  // Warp Input direction
