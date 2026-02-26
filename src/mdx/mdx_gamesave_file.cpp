@@ -69,8 +69,8 @@ MDX_SETUP_OBJECT(savePlayerState,
 );
 
 MDX_SETUP_OBJECT(visibleItem,
-    MDX_FIELD_NO_SKIP("ID", first);
-    MDX_FIELD("V", second);
+    MDX_FIELD("ID", first);
+    MDX_FIELD_NO_SKIP("V", second);
 );
 
 MDX_SETUP_OBJECT(starOnLevel,
