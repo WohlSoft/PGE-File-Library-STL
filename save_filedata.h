@@ -156,6 +156,9 @@ struct GamesaveHead
 
     //! Is episode was completed in last time
     bool gameCompleted = false;
+
+    //! count of levels and paths (used for completion percent computation)
+    unsigned int lvl_path_count = 0;
 };
 
 /*!

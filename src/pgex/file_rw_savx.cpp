@@ -132,6 +132,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                         PGEX_UIntVal("MI", FileData.musicID)
                         PGEX_StrVal("MF", FileData.musicFile)
                         PGEX_BoolVal("GC", FileData.gameCompleted)
+                        PGEX_UIntVal("TI", FileData.lvl_path_count)
                     }
                 }
             }//Header

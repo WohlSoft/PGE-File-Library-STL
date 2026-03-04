@@ -62,6 +62,7 @@ static bool s_load_head(void* _FileData, GamesaveHead& dest)
     FileData.musicID = dest.musicID;
     FileData.musicFile = dest.musicFile;
     FileData.gameCompleted = dest.gameCompleted;
+    FileData.lvl_path_count = dest.lvl_path_count;
 
     return true;
 }
@@ -87,6 +88,7 @@ static bool s_save_head(const void* _FileData, GamesaveHead& dest, pge_size_t in
     dest.musicID = FileData.musicID;
     dest.musicFile = FileData.musicFile;
     dest.gameCompleted = FileData.gameCompleted;
+    dest.lvl_path_count = FileData.lvl_path_count;
 
     return true;
 }
