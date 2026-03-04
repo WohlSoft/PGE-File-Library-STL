@@ -53,6 +53,7 @@ MDX_SETUP_OBJECT(GamesaveHead,
     MDX_FIELD("MI", musicID);
     MDX_FIELD("MF", musicFile);
     MDX_FIELD("GC", gameCompleted);
+    MDX_FIELD("TI", lvl_path_count);
 );
 
 MDX_SETUP_OBJECT(saveCharState,
