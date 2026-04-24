@@ -47,7 +47,7 @@ macro(pgeflFindQt)
     endif()
 endmacro()
 
-if(NOT DEFINED PGEFL_QT_SUPPORT AND NOT VITA)
+if(NOT DEFINED PGEFL_QT_SUPPORT AND NOT VITA AND NOT PS2)
     pgeflFindQt()
 endif()
 
@@ -55,7 +55,7 @@ if(PGEFL_QT_SUPPORT)
     pgeflFindQt()
 endif()
 
-if(VITA OR PGEFL_USE_QT5 OR PGEFL_USE_QT6)
+if(VITA OR PS2 OR PGEFL_USE_QT5 OR PGEFL_USE_QT6)
     set(OPT_DEF_PGEFL_QT_SUPPORT OFF)
 else()
     set(OPT_DEF_PGEFL_QT_SUPPORT ON)
