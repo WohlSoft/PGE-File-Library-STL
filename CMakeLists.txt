@@ -48,7 +48,7 @@ macro(pgeflFindQt)
     endif()
 endmacro()
 
-if(NOT DEFINED PGEFL_QT_SUPPORT AND NOT VITA AND NOT PSP NOT PS2)
+if(NOT DEFINED PGEFL_QT_SUPPORT AND NOT VITA AND NOT PSP AND NOT PS2)
     pgeflFindQt()
 endif()
 
