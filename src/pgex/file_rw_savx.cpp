@@ -395,10 +395,6 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     out << PGEFile::value("MF", PGEFile::WriteStr(FileData.musicFile));
     out << PGEFile::value("GC", PGEFile::WriteBool(FileData.gameCompleted));
     out << PGEFile::value("TI", PGEFile::WriteInt(FileData.lvl_path_count));
-    if(!IsEmpty(FileData.savedLayersVisible))
-        out << PGEFile::value("SLV", PGEFile::WriteStrArr(FileData.savedLayersVisible));
-    if(!IsEmpty(FileData.savedLayersHidden))
-        out << PGEFile::value("SLH", PGEFile::WriteStrArr(FileData.savedLayersHidden));
     out << "\n";
     out << "SAVE_HEADER_END\n";
 
