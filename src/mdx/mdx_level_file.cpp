@@ -310,6 +310,21 @@ static const char* MDX_LevelEvent_load_autoscroll_path(LevelEvent_Sets& set, con
     return next;
 }
 
+static bool MDX_LevelEvent_save_autoscroll_path(std::string& out, const LevelEvent_Sets& set)
+{
+    PGELIST<long> arr;
+
+    for(const LevelEvent_Sets::AutoScrollStopPoint& stop : set.autoscroll_path)
+    {
+        arr.push_back(stop.x);
+        arr.push_back(stop.y);
+        arr.push_back((long)stop.type);
+        arr.push_back(stop.speed);
+    }
+
+    return MDX_save_value(out, arr);
+}
+
 MDX_SETUP_OBJECT(LevelEvent_Sets,
     MDX_FIELD_NONNEG_NOT_ONLY("ID", id);
     MDX_FIELD("SL", position_left);
@@ -326,7 +341,7 @@ MDX_SETUP_OBJECT(LevelEvent_Sets,
     MDX_FIELD("BG", background_id);
     MDX_FIELD("AS", autoscrol);
     MDX_FIELD_NONNEG("AST", autoscroll_style);
-    MDX_UNIQUE_FIELD("ASP", MDX_LevelEvent_load_autoscroll_path, nullptr); // FIXME
+    MDX_UNIQUE_FIELD("ASP", MDX_LevelEvent_load_autoscroll_path, MDX_LevelEvent_save_autoscroll_path);
     MDX_FIELD("AX", autoscrol_x);
     MDX_FIELD("AY", autoscrol_y);
     MDX_FIELD("AXX", expression_autoscrool_x);
