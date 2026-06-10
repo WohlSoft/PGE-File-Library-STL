@@ -1356,11 +1356,11 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, const 
             // First we try to extract the line number out of the nested exception.
             const auto *possibleNestedException = dynamic_cast<const std::nested_exception *>(&err); //-V641
 
-        if(possibleNestedException)
-        {
-            try
+            if(possibleNestedException)
             {
-                std::rethrow_exception(possibleNestedException->nested_ptr());
+                try
+                {
+                    std::rethrow_exception(possibleNestedException->nested_ptr());
                 }
                 catch(const parse_error &parseErr)
                 {
