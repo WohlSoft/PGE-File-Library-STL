@@ -35,108 +35,132 @@
 #include "pge_file_lib_globs.h"
 #include "pge_file_lib_private.h"
 
+#include "src/mdx/mdx_utils.h"
+
 /*!
  * \brief SMBX64 Standard validation and raw data conversion functions
  */
 namespace SMBX64
 {
     /*******************Readers With Exception throwers********************/
-    inline void ReadUInt(unsigned int*out, PGESTRING &input)
+    inline void ReadUInt(unsigned int *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = input.toUInt(&ok);
-        if(!ok) throw std::invalid_argument("Could not convert to unsigned int");
-        #else
-        *out = static_cast<unsigned int>(std::stoul(input));
-        #endif
+        if(!ok) throw std::invalid_argument("Could not convert number (unsigned int)");
+#else
+        if(input.size() != 0 && MDX_load_uint(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (unsigned int)");
+#endif
     }
 
-    inline void ReadUInt(unsigned long*out, PGESTRING &input)
+    inline void ReadUInt(unsigned long *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = input.toULong(&ok);
-        if(!ok) throw std::invalid_argument("Could not convert to unsigned long");
-        #else
-        *out = std::stoul(input);
-        #endif
+        if(!ok) throw std::invalid_argument("Could not convert number (unsigned long)");
+#else
+        if(input.size() != 0 && MDX_load_ulong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (unsigned long)");
+#endif
     }
 
-    inline void ReadUInt(unsigned long long*out, PGESTRING &input)
+    inline void ReadUInt(unsigned long long *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = input.toULongLong(&ok);
-        if(!ok) throw std::invalid_argument("Could not convert to unsigned long long");
-        #else
-        *out = std::stoull(input);
-        #endif
+        if(!ok) throw std::invalid_argument("Could not convert number (unsigned long long)");
+#else
+        if(input.size() != 0 && MDX_load_ulonglong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (unsigned long long)");
+#endif
     }
-    inline void ReadUInt(int*out, PGESTRING &input)
+
+    inline void ReadUInt(int *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = static_cast<int>(input.toUInt(&ok));
-        if(!ok) throw std::invalid_argument("Could not convert to unsigned int");
-        #else
-        *out = static_cast<int>(static_cast<unsigned int>(std::stoul(input)));
-        #endif
+        if(!ok) throw std::invalid_argument("Could not convert number (unsigned int through signed)");
+#else
+        if(input.size() != 0 && MDX_load_uint(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (unsigned int through signed)");
+#endif
     }
-    inline void ReadUInt(long*out, PGESTRING &input)
+
+    inline void ReadUInt(long *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = static_cast<long>(input.toULong(&ok));
-        if(!ok) throw std::invalid_argument("Could not convert to unsigned long");
-        #else
-        *out = static_cast<long>(std::stoul(input));
-        #endif
+        if(!ok) throw std::invalid_argument("Could not convert number (unsigned long through signed)");
+#else
+        if(input.size() != 0 && MDX_load_ulong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (unsigned long through signed)");
+#endif
     }
-    inline void ReadUInt(long long*out, PGESTRING &input)
+
+    inline void ReadUInt(long long *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = static_cast<long long>(input.toULongLong(&ok));
-        if(!ok) throw std::invalid_argument("Could not convert to unsigned long long");
-        #else
-        *out = static_cast<long long>(std::stoull(input));
-        #endif
+        if(!ok) throw throw std::invalid_argument("Could not convert number (unsigned long long through signed)");
+#else
+        if(input.size() != 0 && MDX_load_ulonglong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (unsigned long long through signed)");
+#endif
     }
 
-    inline void ReadSInt(int*out, PGESTRING &input)
+    inline void ReadSInt(int *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = input.toInt(&ok);
-        if(!ok) throw std::invalid_argument("Could not convert to int");
-        #else
-        *out = std::stoi(input);
-        #endif
+        if(!ok) throw std::invalid_argument("Could not convert number (int)");
+#else
+        if(input.size() != 0 && MDX_load_int(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (int)");
+#endif
     }
 
-    inline void ReadSInt(long*out, PGESTRING &input)
+    inline void ReadSInt(long *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = input.toLong(&ok);
-        if(!ok) throw std::invalid_argument("Could not convert to long");
-        #else
-        *out = std::stol(input);
-        #endif
-    }
-    inline void ReadSInt(long long*out, PGESTRING &input)
-    {
-        #ifdef PGE_FILES_QT
-        bool ok=true;
-        *out = input.toLongLong(&ok);
-        if(!ok) throw std::invalid_argument("Could not convert to long long");
-        #else
-        *out = std::stoll(input);
-        #endif
+        if(!ok) throw std::invalid_argument("Could not convert number (long)");
+#else
+        if(input.size() != 0 && MDX_load_long(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (long)");
+#endif
     }
 
-    inline void ReadFloat(float*out, PGESTRING &input)
+    inline void ReadSInt(long long *out, PGESTRING &input)
+    {
+#ifdef PGE_FILES_QT
+        bool ok=true;
+        *out = input.toLongLong(&ok);
+        if(!ok) throw std::invalid_argument("Could not convert number (long long)");
+#else
+        if(input.size() != 0 && MDX_load_longlong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
+        throw std::invalid_argument("Could not convert number (long long)");
+#endif
+    }
+
+    inline void ReadFloat(float *out, PGESTRING &input)
     {
         PGE_ReplSTRING(input, ",", ".");//Allow to parse floats of both comma and dot standard
 #ifdef PGE_FILES_QT
@@ -160,7 +184,7 @@ namespace SMBX64
 #endif
     }
 
-    inline void ReadBool(bool*out, const PGESTRING &input)
+    inline void ReadBool(bool *out, const PGESTRING &input)
     {
         if(input == "0" || IsEmpty(input)) // FIXME: Is it correct? Or too hackish?
             *out = false;
@@ -224,26 +248,30 @@ namespace SMBX64
             throw std::invalid_argument(std::string("Could not convert CSV Bool (must be #TRUE# or #FALSE#)"));
     }
 
-    inline void ReadSIntFromFloat(int*out, PGESTRING &input)
+    inline void ReadSIntFromFloat(int *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = qRound(input.toDouble(&ok));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
-        #else
+#else
+        if(input.size() != 0 && MDX_load_int(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
         *out = static_cast<int>(std::round(std::stod(input)));
-        #endif
+#endif
     }
 
-    inline void ReadSIntFromFloat(long*out, PGESTRING &input)
+    inline void ReadSIntFromFloat(long *out, PGESTRING &input)
     {
-        #ifdef PGE_FILES_QT
+#ifdef PGE_FILES_QT
         bool ok=true;
         *out = static_cast<long>(std::round(input.toDouble(&ok)));
         if(!ok) throw std::invalid_argument("Could not convert to Double");
-        #else
+#else
+        if(input.size() != 0 && MDX_load_long(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
+            return;
         *out = static_cast<long>(std::round(std::stod(input)));
-        #endif
+#endif
     }
 
     inline void ReadStr(PGESTRING*out, PGESTRING &input)
@@ -253,13 +281,26 @@ namespace SMBX64
             out->clear();
             return;
         }
-        *out = input;
+
         PGESTRING &target = *out;
-        if(target[0] == PGEChar('\"'))
-            PGE_RemStrRng(target, 0, 1);
-        if( (!IsEmpty(target)) && (target[target.size()-1] == PGEChar('\"')) )
+
+        if(input[0] != PGEChar('\"') && input[input.size() - 1] != PGEChar('\"'))
+            target = std::move(input);
+        else if(input[0] != PGEChar('\"'))
+        {
+            target = std::move(input);
             PGE_RemStrRng(target, int(target.size() - 1), 1);
-        target = PGE_ReplSTRING(target, "\"", "\'");//Correct damaged by SMBX line
+        }
+        else
+        {
+            target = input;
+            PGE_RemStrRng(target, 0, 1);
+
+            if( (!IsEmpty(target)) && (target[target.size()-1] == PGEChar('\"')) )
+                PGE_RemStrRng(target, int(target.size() - 1), 1);
+        }
+
+        PGE_ReplSTRING_inline(target, "\"", "\'");//Correct damaged by SMBX line
     }
 
 
@@ -357,7 +398,9 @@ namespace SMBX64
      */
     template<typename T>
     inline PGESTRING WriteSInt(T input)
-    {  return fromNum(static_cast<long long>(input))+"\n"; }
+    {
+        return fromNum(static_cast<long long>(input))+"\n";
+    }
 
     /*!
      * \brief Generate raw string from unsigned integer value
@@ -366,7 +409,9 @@ namespace SMBX64
      */
     template<typename T>
     inline PGESTRING WriteUInt(T input)
-    {  return fromNum(static_cast<unsigned long long>(input))+"\n"; }
+    {
+        return fromNum(static_cast<unsigned long long>(input))+"\n";
+    }
 
     /*!
      * \brief Generate raw CVS-bool string from boolean value
@@ -374,7 +419,9 @@ namespace SMBX64
      * \return ASCII encoded CVS-bool value
      */
     inline PGESTRING WriteCSVBool(bool input)
-    {  return PGESTRING( (input)?"#TRUE#":"#FALSE#" )+"\n"; }
+    {
+        return PGESTRING( (input)?"#TRUE#":"#FALSE#" )+"\n"; 
+    }
 
     /*!
      * \brief Convert string into valid CVS string line (line feeds are will be removed)
@@ -408,7 +455,9 @@ namespace SMBX64
      * \return ASCII encoded floating point value
      */
     inline PGESTRING WriteFloat(float input)
-    {  return fromNum(input)+"\n"; }
+    {
+        return fromNum(input)+"\n";
+    }
 
     /*!
      * \brief Generate raw string from double floating point value
@@ -416,7 +465,9 @@ namespace SMBX64
      * \return ASCII encoded floating point value
      */
     inline PGESTRING WriteFloat(double input)
-    {  return fromNum(input)+"\n"; }
+    {
+        return fromNum(input)+"\n";
+    }
 
 
     /******************Units converters**********************/
@@ -426,7 +477,9 @@ namespace SMBX64
      * \return millisecond time equivalent
      */
     inline double t65_to_ms(double t65)
-    { return t65 * (1000.0/65.0); }
+    {
+        return t65 * (1000.0/65.0);
+    }
 
     /*!
      * \brief Convert milliseconds into 1/65 seconds
@@ -434,7 +487,9 @@ namespace SMBX64
      * \return 1/65 second time equivalent
      */
     inline double ms_to_65(double ms)
-    { return ms * (65.0/1000.0); }
+    {
+        return ms * (65.0/1000.0);
+    }
 
 }
 

@@ -23,6 +23,7 @@ if(NOT CMAKE_DEBUG_POSTFIX)
 endif()
 
 option(PGEFL_ENABLE_RWOPS "Enable SDL_RWops interfaces (if this option is enabled, then PGE-FL has a build-time dependency on SDL2's headers)" OFF)
+option(PGEFL_DISABLE_SMBX38A "Disable loading of SMBX-38A content" OFF)
 
 if(NOT DEFINED PGE_FORCE_QT5 AND NOT DEFINED PGEFL_PREFER_QT5)
     option(PGE_FORCE_QT5 "Try to find Qt5 instead of Qt6 if available" ON)
@@ -47,7 +48,7 @@ macro(pgeflFindQt)
     endif()
 endmacro()
 
-if(NOT DEFINED PGEFL_QT_SUPPORT AND NOT VITA AND NOT PS2)
+if(NOT DEFINED PGEFL_QT_SUPPORT AND NOT VITA AND NOT PSP AND NOT PS2)
     pgeflFindQt()
 endif()
 
@@ -55,7 +56,7 @@ if(PGEFL_QT_SUPPORT)
     pgeflFindQt()
 endif()
 
-if(VITA OR PS2 OR PGEFL_USE_QT5 OR PGEFL_USE_QT6)
+if(VITA OR PSP OR PS2 OR PGEFL_USE_QT5 OR PGEFL_USE_QT6)
     set(OPT_DEF_PGEFL_QT_SUPPORT OFF)
 else()
     set(OPT_DEF_PGEFL_QT_SUPPORT ON)
@@ -64,7 +65,7 @@ endif()
 if(NOT PGEFL_QT_SUPPORT)
     option(PGEFL_QT_SUPPORT "Build also Qt variant" ${OPT_DEF_PGEFL_QT_SUPPORT})
 endif()
-if(PGEFL_QT_SUPPORT AND NOT VITA AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH)
+if(PGEFL_QT_SUPPORT AND NOT VITA AND NOT PSP AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH)
     message("== PGE-FL Qt Edition WILL be built!")
     if(POLICY CMP0071) # Automoc
         cmake_policy(SET CMP0071 NEW)
@@ -103,6 +104,25 @@ if(PGEFL_ENABLE_RWOPS)
     target_compile_definitions(pgefl PUBLIC -DPGEFL_ENABLE_RWOPS)
 endif()
 
+if(PGEFL_DISABLE_SMBX38A)
+    target_compile_definitions(pgefl PRIVATE -DPGEFL_DISABLE_SMBX38A)
+endif()
+
+if(NOT EMSCRIPTEN)
+    try_compile(HAS_STD_STOX_WRAPPED
+        ${CMAKE_CURRENT_BINARY_DIR}/cmake-checks
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/checks/stdstrtoi/has_std_stol.cpp
+        CMAKE_FLAGS -DCMAKE_CXX_STANDARD=11
+    )
+endif()
+
+if(NOT EMSCRIPTEN AND NOT HAS_STD_STOX_WRAPPED)
+    target_compile_definitions(pgefl PRIVATE -DPGEFL_MISSING_STD_STOX_FUNCS)
+endif()
+
+pgefl_target_disable_cxx_warning_flag(pgefl "c++20-extensions" CPP20EXTENSIONS)
+pgefl_target_disable_cxx_warning_flag(pgefl "c++20-attribute-extensions" CPP20ATTRIBEXTENSIONS)
+
 if(PGEFL_QT_SUPPORT)
     add_library(pgefl_qt STATIC
         ${PGE_FILE_LIBRARY_SRCS}
@@ -117,6 +137,10 @@ if(PGEFL_QT_SUPPORT)
 
     if(PGEFL_ENABLE_RWOPS)
         target_compile_definitions(pgefl_qt PUBLIC -DPGEFL_ENABLE_RWOPS)
+    endif()
+
+    if(PGEFL_DISABLE_SMBX38A)
+        target_compile_definitions(pgefl PRIVATE -DPGEFL_DISABLE_SMBX38A)
     endif()
 endif()
 

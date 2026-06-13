@@ -27,11 +27,8 @@
 #ifndef CSVReader_H
 #define CSVReader_H
 
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <type_traits>
-#include <sstream>
 #include <array>
 #include <exception>
 #include <stdexcept>

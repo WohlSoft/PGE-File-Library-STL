@@ -114,6 +114,7 @@ endif()
 if(LIBRARY_PROJECT
     AND NOT WIN32
     AND NOT VITA
+    AND NOT PSP
     AND NOT PS2
     AND NOT NINTENDO_DS
     AND NOT NINTENDO_3DS
@@ -154,5 +155,12 @@ macro(pgefl_disable_cxx_warning_flag WARNINGFLAG WARNING_VAR)
     check_cxx_compiler_flag("-W${WARNINGFLAG}" HAVE_CXX_W_${WARNING_VAR})
     if(HAVE_CXX_W_${WARNING_VAR})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-${WARNINGFLAG}")
+    endif()
+endmacro()
+
+macro(pgefl_target_disable_cxx_warning_flag TARGETNAME WARNINGFLAG WARNING_VAR)
+    check_cxx_compiler_flag("-W${WARNINGFLAG}" HAVE_CXX_W_${WARNING_VAR})
+    if(HAVE_CXX_W_${WARNING_VAR})
+        target_compile_options(${TARGETNAME} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-Wno-${WARNINGFLAG}>")
     endif()
 endmacro()

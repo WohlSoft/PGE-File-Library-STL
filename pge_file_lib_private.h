@@ -29,6 +29,7 @@
 #define PGE_FILE_LIB_PRIVATE_H_
 
 #include "pge_file_lib_globs.h"
+#include "src/mdx/common/mdx_value.h"
 
 #ifdef PGE_FILES_QT
 #include <QString>
@@ -92,6 +93,10 @@ inline void PGE_SPLITSTRING(PGESTRINGList &dst, const PGESTRING &src, PGESTRING 
 inline PGESTRING PGE_ReplSTRING(PGESTRING src, PGESTRING from, PGESTRING to)
 {
     return src.replace(from, to);
+}
+inline void PGE_ReplSTRING_inline(PGESTRING& src, PGESTRING from, PGESTRING to)
+{
+    src.replace(from, to);
 }
 inline PGESTRING PGE_RemSubSTRING(const PGESTRING &src, const PGESTRING &substr)
 {
@@ -265,12 +270,13 @@ inline PGESTRING PGE_URLDEC(const PGESTRING &src)
 
 #else /* ------ PGE_FILES_QT ------ */
 
+#ifndef __has_cpp_attribute
+#   define __has_cpp_attribute(x) 0 /* Don't fail on older compilers! */
+#endif
+
 #include <string>
 #include <vector>
 #include <utility>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <cstring>
 #include <algorithm>
 #include <map>
@@ -286,6 +292,38 @@ static char ToLowerFun(char ch)
 }
 #else
 #define ToLowerFun ::tolower
+#endif
+
+#ifdef PGEFL_MISSING_STD_STOX_FUNCS
+#   include <stdlib.h>
+/* Workaround for toolchains that has these definitions missing */
+namespace std
+{
+
+inline long stol(const std::string &str, size_t* pos = nullptr, int base = 10)
+{
+    (void)pos;
+    return ::strtol(str.c_str(), nullptr, base);
+}
+
+inline unsigned long long stoull(const std::string &str, size_t* pos = nullptr, int base = 10)
+{
+    (void)pos;
+    return ::strtoull(str.c_str(), nullptr, base);
+}
+
+inline float stof(const std::string &str, size_t* pos= nullptr)
+{
+    (void)pos;
+    return ::strtof(str.c_str(), nullptr);
+}
+
+inline float stod(const std::string &str, size_t* pos= nullptr)
+{
+    (void)pos;
+    return ::strtod(str.c_str(), nullptr);
+}
+}
 #endif
 
 typedef std::string::size_type pge_size_t;
@@ -340,7 +378,6 @@ namespace PGE_FileFormats_misc
     void RemoveSub(std::string &sInput, const std::string &sub);
     bool hasEnding(std::string const &fullString, std::string const &ending);
     PGESTRING url_encode(const PGESTRING &sSrc);
-    PGESTRING url_decode(const std::string &sSrc);
     std::string base64_encode(unsigned char const *bytes_to_encode, size_t in_len, bool no_padding = false);
     std::string base64_encode(std::string const &source, bool no_padding = false);
     std::string base64_decode(std::string const &encoded_string);
@@ -360,6 +397,11 @@ inline PGESTRING PGE_ReplSTRING(PGESTRING src, const PGESTRING &from, const PGES
 {
     PGE_FileFormats_misc::replaceAll(src, from, to);
     return src;
+}
+
+inline void PGE_ReplSTRING_inline(PGESTRING& src, const PGESTRING &from, const PGESTRING &to)
+{
+    PGE_FileFormats_misc::replaceAll(src, from, to);
 }
 
 inline PGESTRING PGE_RemSubSTRING(PGESTRING src, const PGESTRING &substr)
@@ -469,17 +511,16 @@ inline PGESTRING removeSpaces(const PGESTRING &src)
 template<typename T>
 PGESTRING fromNum(T num)
 {
-    std::ostringstream n;
-    n << num;
-    return n.str();
+    PGESTRING out;
+    MDX_save_value(out, num);
+    return out;
 }
 
 inline PGESTRING fromBoolToNum(bool num)
 {
-    std::ostringstream n;
-    n << static_cast<int>(num);
-    return n.str();
+    return fromNum((int)num);
 }
+
 #define PGE_URLENC(src) PGE_FileFormats_misc::url_encode(src)
 #define PGE_URLDEC(src) PGE_FileFormats_misc::url_decode(src)
 #define PGE_BASE64ENC(src)   PGE_FileFormats_misc::base64_encode(src)
@@ -490,6 +531,7 @@ inline PGESTRING fromBoolToNum(bool num)
 #define PGE_BASE64ENC_A(src) PGE_FileFormats_misc::base64_encodeA(src)
 #define PGE_BASE64DEC_A(src) PGE_FileFormats_misc::base64_decodeA(src)
 #endif /* ------ PGE_FILES_QT ------ */
+
 
 inline bool PGE_floatEqual(double l, double r, double precission)
 {
@@ -530,5 +572,22 @@ static inline int PGE_toNearestS(double o)
 
     return int(PGE_toNearestU(o)) * sign;
 }
+
+
+#if __has_cpp_attribute(likely)
+#   define PGE_ATTR_LIKELY [[likely]]
+#elif __has_cpp_attribute(__likely__)
+#   define PGE_ATTR_LIKELY [[__likely__]]
+#else
+#   define PGE_ATTR_LIKELY
+#endif
+
+#if __has_cpp_attribute(unlikely)
+#   define PGE_ATTR_UNLIKELY [[unlikely]]
+#elif __has_cpp_attribute(__unlikely__)
+#   define PGE_ATTR_UNLIKELY [[__unlikely__]]
+#else
+#   define PGE_ATTR_UNLIKELY
+#endif
 
 #endif // PGE_FILE_LIB_PRIVATE_H_

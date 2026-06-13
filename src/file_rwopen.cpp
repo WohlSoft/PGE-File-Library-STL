@@ -93,9 +93,15 @@ bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelDat
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
+#ifdef PGEFL_DISABLE_SMBX38A
+        FileData.meta.ReadFileValid = false;
+        FileData.meta.ERROR_info = "SMBX-38A unsupported";
+        return false;
+#else
         //Read SMBX65-38A LVL File
         if(!ReadSMBX38ALvlFile(file, FileData))
             return false;
+#endif
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
@@ -120,6 +126,50 @@ bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, LevelDat
     {
         if(!ReadNonSMBX64MetaDataF(file.getFilePath() + ".meta", FileData.metaData))
             FileData.meta.ERROR_info = "Can't open meta-file";
+    }
+
+    return true;
+}
+
+bool FileFormats::OpenLevelFileT(PGE_FileFormats_misc::TextInput &file, const LevelLoadCallbacks &cb)
+{
+    PGESTRING firstLine;
+
+    file.read(firstLine, 8);
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
+
+    if(PGE_StartsWith(firstLine, "SMBXFile"))
+    {
+#ifdef PGEFL_DISABLE_SMBX38A
+        if(!cb.on_error)
+            return false;
+
+        FileFormatsError error;
+        error.ERROR_info = "SMBX-38A unsupported";
+
+        cb.on_error(cb.userdata, error);
+
+        return false;
+#else
+        //Read SMBX65-38A LVL File
+        if(!ReadSMBX38ALvlFile(file, cb))
+            return false;
+#endif
+    }
+    else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
+    {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
+        //Read SMBX LVL File
+        if(!ReadSMBX64LvlFile(file, cb))
+            return false;
+    }
+    else
+    {
+        //Read PGE LVLX File
+        if(!ReadExtendedLvlFile(file, cb))
+            return false;
     }
 
     return true;
@@ -168,8 +218,14 @@ bool FileFormats::OpenLevelFileHeaderT(PGE_FileFormats_misc::TextInput &file, Le
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
+#ifdef PGEFL_DISABLE_SMBX38A
+        data.meta.ReadFileValid = false;
+        data.meta.ERROR_info = "SMBX-38A unsupported";
+        return false;
+#else
         //Read SMBX65-38A LVL File
         return ReadSMBX38ALvlFileHeaderT(file, data);
+#endif
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
@@ -234,6 +290,10 @@ bool FileFormats::SaveLevelFile(LevelData &FileData,
         return true;
     }
     //break;
+#ifdef PGEFL_DISABLE_SMBX38A
+    case LVL_SMBX38A:
+        break;
+#else
     case LVL_SMBX38A:
     {
         uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
@@ -245,6 +305,7 @@ bool FileFormats::SaveLevelFile(LevelData &FileData,
         return true;
     }
         //break;
+#endif // #ifdef PGEFL_DISABLE_SMBX38A
     }
 
     FileData.meta.ERROR_info = "Unsupported file type";
@@ -275,6 +336,10 @@ bool FileFormats::SaveLevelData(LevelData &FileData,
         return true;
     }
     //break;
+#ifdef PGEFL_DISABLE_SMBX38A
+    case LVL_SMBX38A:
+        break;
+#else
     case LVL_SMBX38A:
     {
         uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
@@ -282,6 +347,7 @@ bool FileFormats::SaveLevelData(LevelData &FileData,
         return true;
     }
         //break;
+#endif // #ifdef PGEFL_DISABLE_SMBX38A
     }
 
     FileData.meta.ERROR_info = "Unsupported file type";
@@ -353,9 +419,15 @@ bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldDat
 
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
+#ifdef PGEFL_DISABLE_SMBX38A
+        data.meta.ReadFileValid = false;
+        data.meta.ERROR_info = "SMBX-38A unsupported";
+        return false;
+#else
         //Read SMBX-38A WLD File
         if(!ReadSMBX38AWldFile(file, data))
             return false;
+#endif
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
@@ -380,6 +452,50 @@ bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, WorldDat
     {
         if(!ReadNonSMBX64MetaDataF(file.getFilePath() + ".meta", data.metaData))
             data.meta.ERROR_info = "Can't open meta-file";
+    }
+
+    return true;
+}
+
+bool FileFormats::OpenWorldFileT(PGE_FileFormats_misc::TextInput &file, const WorldLoadCallbacks &cb)
+{
+    PGESTRING firstLine;
+
+    file.read(firstLine, 8);
+    file.seek(0, PGE_FileFormats_misc::TextInput::begin);
+
+    if(PGE_StartsWith(firstLine, "SMBXFile"))
+    {
+#ifdef PGEFL_DISABLE_SMBX38A
+        if(!cb.on_error)
+            return false;
+
+        FileFormatsError error;
+        error.ERROR_info = "SMBX-38A unsupported";
+
+        cb.on_error(cb.userdata, error);
+
+        return false;
+#else
+        //Read SMBX-38A WLD File
+        if(!ReadSMBX38AWldFile(file, cb))
+            return false;
+#endif
+    }
+    else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
+    {
+        //Disable UTF8 for SMBX64 files
+        if(!file.reOpen(false))
+            return false;
+        //Read SMBX WLD File
+        if(!ReadSMBX64WldFile(file, cb))
+            return false;
+    }
+    else
+    {
+        //Read PGE WLDX File
+        if(!ReadExtendedWldFile(file, cb))
+            return false;
     }
 
     return true;
@@ -431,7 +547,13 @@ bool FileFormats::OpenWorldFileHeaderT(PGE_FileFormats_misc::TextInput &file, Wo
     if(PGE_StartsWith(firstLine, "SMBXFile"))
     {
         //Read SMBX-38A WLD File
+#ifdef PGEFL_DISABLE_SMBX38A
+        data.meta.ReadFileValid = false;
+        data.meta.ERROR_info = "SMBX-38A unsupported";
+        return false;
+#else
         return ReadSMBX38AWldFileHeaderT(file, data);
+#endif
     }
     else if(PGE_FileFormats_misc::PGE_DetectSMBXFile(firstLine))
     {
@@ -491,6 +613,10 @@ bool FileFormats::SaveWorldFile(WorldData &FileData,
         return true;
     }
     //break;
+#ifdef PGEFL_DISABLE_SMBX38A
+    case WLD_SMBX38A:
+        break;
+#else
     case WLD_SMBX38A:
     {
         uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
@@ -502,6 +628,7 @@ bool FileFormats::SaveWorldFile(WorldData &FileData,
         return true;
     }
         //break;
+#endif // #ifdef PGEFL_DISABLE_SMBX38A
     }
 
     FileData.meta.ERROR_info = "Unsupported file type";
@@ -530,6 +657,10 @@ bool FileFormats::SaveWorldData(WorldData &FileData,
         return true;
     }
     //break;
+#ifdef PGEFL_DISABLE_SMBX38A
+    case WLD_SMBX38A:
+        break;
+#else
     case WLD_SMBX38A:
     {
         uint32_t outVer = formatVersion == c_version_default ? c_latest_version_smbx38a : formatVersion;
@@ -537,6 +668,7 @@ bool FileFormats::SaveWorldData(WorldData &FileData,
         return true;
     }
         //break;
+#endif // #ifdef PGEFL_DISABLE_SMBX38A
     }
 
     FileData.meta.ERROR_info = "Unsupported file type";

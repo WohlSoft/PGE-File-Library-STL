@@ -84,247 +84,249 @@ static inline PGESTRING invalidLine_BOOL(long line, const PGESTRING &data)
 
 bool FileFormats::ReadNpcTXTFile(PGE_FileFormats_misc::TextInput &inf, NPCConfigFile &fileData, bool ignoreBad)
 {
-  // indented 2 spaces to avoid large diff hunk
-  try
-  {
-    PGESTRING line;           //Current Line data
-    PGESTRINGList params;
-    fileData = CreateEmpytNpcTXT();
-    bool doLog = !ignoreBad;
-
-    auto handlerSInt = [&](bool &dest_en, int32_t &dest, PGESTRING &input)
+    // BEFORE: indented 2 spaces to avoid large diff hunk
+    // REPLY: Spit on diff hung, do that just in next commit after :)
+    //        Don't make "zoo" of code styles in the same file.
+    try
     {
-        input = PGESTR_Simpl(input);
-        input = PGE_RemSubSTRING(input, " ");//Delete spaces
-        if(!SMBX64::IsSInt(input))
-        {
-            if(doLog)
-                fileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
+        PGESTRING line;           //Current Line data
+        PGESTRINGList params;
+        fileData = CreateEmpytNpcTXT();
+        bool doLog = !ignoreBad;
 
-            if(SMBX64::IsFloat(input))
-            {
-                dest = PGE_toNearestS(toDouble(input));
-                dest_en = true;
-            }
-        }
-        else
+        auto handlerSInt = [&](bool &dest_en, int32_t &dest, PGESTRING &input)
         {
-            if(input.size() > 9)
-                dest = 0;
+            input = PGESTR_Simpl(input);
+            input = PGE_RemSubSTRING(input, " ");//Delete spaces
+            if(!SMBX64::IsSInt(input))
+            {
+                if(doLog)
+                    fileData.unknownLines += invalidLine_SINT(inf.getCurrentLineNumber(), line);
+
+                if(SMBX64::IsFloat(input))
+                {
+                    dest = PGE_toNearestS(toDouble(input));
+                    dest_en = true;
+                }
+            }
             else
             {
-                dest = toInt(input);
-                dest_en = true;
+                if(input.size() > 9)
+                    dest = 0;
+                else
+                {
+                    dest = toInt(input);
+                    dest_en = true;
+                }
             }
-        }
-    };
+        };
 
-    auto handlerUInt = [&](bool &dest_en, uint32_t &dest, PGESTRING &input)
-    {
-        input = PGESTR_Simpl(input);
-        input = PGE_RemSubSTRING(input, " ");//Delete spaces
-        if(!SMBX64::IsUInt(input))
+        auto handlerUInt = [&](bool &dest_en, uint32_t &dest, PGESTRING &input)
         {
-            if(doLog)
-                fileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
-
-            if(SMBX64::IsFloat(input))
+            input = PGESTR_Simpl(input);
+            input = PGE_RemSubSTRING(input, " ");//Delete spaces
+            if(!SMBX64::IsUInt(input))
             {
-                double o = toDouble(input);
-                if(o < 0)
-                    o = -o;
-                dest = PGE_toNearestU(o);
-                dest_en = true;
+                if(doLog)
+                    fileData.unknownLines += invalidLine_UINT(inf.getCurrentLineNumber(), line);
+
+                if(SMBX64::IsFloat(input))
+                {
+                    double o = toDouble(input);
+                    if(o < 0)
+                        o = -o;
+                    dest = PGE_toNearestU(o);
+                    dest_en = true;
+                }
             }
-        }
-        else
-        {
-            if(input.size() > 9)
-                dest = 0;
             else
             {
-                dest = toUInt(input);
-                dest_en = true;
+                if(input.size() > 9)
+                    dest = 0;
+                else
+                {
+                    dest = toUInt(input);
+                    dest_en = true;
+                }
             }
-        }
-    };
+        };
 
-    auto handlerBool = [&](bool &dest_en, bool &dest, PGESTRING &input)
-    {
-        input = PGESTR_Simpl(input);
-        input = PGE_RemSubSTRING(input, " ");//Delete spaces
-        if(!SMBX64::IsBool(input))
+        auto handlerBool = [&](bool &dest_en, bool &dest, PGESTRING &input)
         {
-            if(doLog)
-                fileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
-
-            if(SMBX64::IsFloat(input))
+            input = PGESTR_Simpl(input);
+            input = PGE_RemSubSTRING(input, " ");//Delete spaces
+            if(!SMBX64::IsBool(input))
             {
-                dest = int(toDouble(input)) != 0;
-                dest_en = true;
+                if(doLog)
+                    fileData.unknownLines += invalidLine_BOOL(inf.getCurrentLineNumber(), line);
+
+                if(SMBX64::IsFloat(input))
+                {
+                    dest = int(toDouble(input)) != 0;
+                    dest_en = true;
+                }
             }
-        }
-        else
-        {
-            if(input.size() > 9)
-                dest = 0;
             else
             {
-                dest = static_cast<bool>(toInt(input) != 0);
+                if(input.size() > 9)
+                    dest = 0;
+                else
+                {
+                    dest = static_cast<bool>(toInt(input) != 0);
+                    dest_en = true;
+                }
+            }
+        };
+
+        auto handlerDouble = [&](bool &dest_en, double &dest, PGESTRING &input)
+        {
+            input = PGESTR_Simpl(input);
+            input = PGE_RemSubSTRING(input, " ");//Delete spaces
+            if(!SMBX64::IsFloat(input))
+            {
+                if(doLog)
+                    fileData.unknownLines += invalidLine_FLT(inf.getCurrentLineNumber(), line);
+            }
+            else
+            {
+                dest = toDouble(input);
                 dest_en = true;
             }
-        }
-    };
+        };
 
-    auto handlerDouble = [&](bool &dest_en, double &dest, PGESTRING &input)
-    {
-        input = PGESTR_Simpl(input);
-        input = PGE_RemSubSTRING(input, " ");//Delete spaces
-        if(!SMBX64::IsFloat(input))
+        auto handlerString = [&](bool &dest_en, PGESTRING &dest, PGESTRING &input)
         {
-            if(doLog)
-                fileData.unknownLines += invalidLine_FLT(inf.getCurrentLineNumber(), line);
-        }
-        else
+            dest    = removeQuotes(input);
+            dest_en = !IsEmpty(input);
+        };
+
+        typedef PGEHASH<PGESTRING, std::function<void(PGESTRING&)>> NpcCfgHandlerMap;
+#define SINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerSInt(fileData.en_##param_name, fileData.param_name, param);} }
+#define UINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerUInt(fileData.en_##param_name, fileData.param_name, param);} }
+#define BOOL_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerBool(fileData.en_##param_name, fileData.param_name, param);} }
+#define STR_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerString(fileData.en_##param_name, fileData.param_name, param);} }
+#define FLT_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerDouble(fileData.en_##param_name, fileData.param_name, param);} }
+
+        NpcCfgHandlerMap paramsHandler =
         {
-            dest = toDouble(input);
-            dest_en = true;
-        }
-    };
+            SINT_ENTRY(gfxoffsetx),
+            SINT_ENTRY(gfxoffsety),
+            UINT_ENTRY(width),
+            UINT_ENTRY(height),
+            UINT_ENTRY(gfxwidth),
+            UINT_ENTRY(gfxheight),
+            UINT_ENTRY(score),
+            UINT_ENTRY(health),
+            BOOL_ENTRY(playerblock),
+            BOOL_ENTRY(playerblocktop),
+            BOOL_ENTRY(npcblock),
+            BOOL_ENTRY(npcblocktop),
+            BOOL_ENTRY(grabside),
+            BOOL_ENTRY(grabtop),
+            BOOL_ENTRY(jumphurt),
+            BOOL_ENTRY(nohurt),
+            BOOL_ENTRY(noblockcollision),
+            BOOL_ENTRY(cliffturn),
+            BOOL_ENTRY(noyoshi),
+            BOOL_ENTRY(foreground),
+            FLT_ENTRY(speed),
+            BOOL_ENTRY(nofireball),
+            BOOL_ENTRY(nogravity),
+            UINT_ENTRY(frames),
+            UINT_ENTRY(framespeed),
+            UINT_ENTRY(framestyle),
+            BOOL_ENTRY(noiceball),
+            // Non-SMBX64 parameters (not working in SMBX <=1.3)
+            BOOL_ENTRY(nohammer),
+            BOOL_ENTRY(noshell),
+            STR_ENTRY(name),
+            STR_ENTRY(description),
+            STR_ENTRY(image),
+            STR_ENTRY(icon),
+            STR_ENTRY(script),
+            STR_ENTRY(group),
+            STR_ENTRY(category),
+            UINT_ENTRY(grid),
+            SINT_ENTRY(gridoffsetx),
+            SINT_ENTRY(gridoffsety),
+            UINT_ENTRY(gridalign),
+            BOOL_ENTRY(usedefaultcam),
+        };
 
-    auto handlerString = [&](bool &dest_en, PGESTRING &dest, PGESTRING &input)
-    {
-        dest    = removeQuotes(input);
-        dest_en = !IsEmpty(input);
-    };
-
-    typedef PGEHASH<PGESTRING, std::function<void(PGESTRING&)>> NpcCfgHandlerMap;
-    #define SINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerSInt(fileData.en_##param_name, fileData.param_name, param);} }
-    #define UINT_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerUInt(fileData.en_##param_name, fileData.param_name, param);} }
-    #define BOOL_ENTRY(param_name) { #param_name, [&](PGESTRING &param) { handlerBool(fileData.en_##param_name, fileData.param_name, param);} }
-    #define STR_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerString(fileData.en_##param_name, fileData.param_name, param);} }
-    #define FLT_ENTRY(param_name)  { #param_name, [&](PGESTRING &param) { handlerDouble(fileData.en_##param_name, fileData.param_name, param);} }
-
-    NpcCfgHandlerMap paramsHandler =
-    {
-        SINT_ENTRY(gfxoffsetx),
-        SINT_ENTRY(gfxoffsety),
-        UINT_ENTRY(width),
-        UINT_ENTRY(height),
-        UINT_ENTRY(gfxwidth),
-        UINT_ENTRY(gfxheight),
-        UINT_ENTRY(score),
-        UINT_ENTRY(health),
-        BOOL_ENTRY(playerblock),
-        BOOL_ENTRY(playerblocktop),
-        BOOL_ENTRY(npcblock),
-        BOOL_ENTRY(npcblocktop),
-        BOOL_ENTRY(grabside),
-        BOOL_ENTRY(grabtop),
-        BOOL_ENTRY(jumphurt),
-        BOOL_ENTRY(nohurt),
-        BOOL_ENTRY(noblockcollision),
-        BOOL_ENTRY(cliffturn),
-        BOOL_ENTRY(noyoshi),
-        BOOL_ENTRY(foreground),
-        FLT_ENTRY(speed),
-        BOOL_ENTRY(nofireball),
-        BOOL_ENTRY(nogravity),
-        UINT_ENTRY(frames),
-        UINT_ENTRY(framespeed),
-        UINT_ENTRY(framestyle),
-        BOOL_ENTRY(noiceball),
-        // Non-SMBX64 parameters (not working in SMBX <=1.3)
-        BOOL_ENTRY(nohammer),
-        BOOL_ENTRY(noshell),
-        STR_ENTRY(name),
-        STR_ENTRY(description),
-        STR_ENTRY(image),
-        STR_ENTRY(icon),
-        STR_ENTRY(script),
-        STR_ENTRY(group),
-        STR_ENTRY(category),
-        UINT_ENTRY(grid),
-        SINT_ENTRY(gridoffsetx),
-        SINT_ENTRY(gridoffsety),
-        UINT_ENTRY(gridalign),
-        BOOL_ENTRY(usedefaultcam),
-    };
-
-    //Read NPC.TXT File config
+        //Read NPC.TXT File config
 #define NextLine(line) inf.readCVSLine(line);
 
-    do
-    {
-        NextLine(line)
-        if(IsEmpty(PGE_RemSubSTRING(line, " ")))
-            continue;//Skip empty strings
+        do
+        {
+            NextLine(line)
+            if(IsEmpty(PGE_RemSubSTRING(line, " ")))
+                continue;//Skip empty strings
 
-        params.clear();
+            params.clear();
 
-        // split the Parameter and value (example: chicken=2)
+            // split the Parameter and value (example: chicken=2)
 #ifdef PGE_FILES_QT
-        int splitSign = line.indexOf('=');
-        if(splitSign < 0) // Invalid line
-        {
-            if(doLog)
-                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
-            continue;
-        }
-        params.push_back(line.mid(0, splitSign));
-        params.push_back(line.mid(splitSign + 1, -1));
+            int splitSign = line.indexOf('=');
+            if(splitSign < 0) // Invalid line
+            {
+                if(doLog)
+                    fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
+                continue;
+            }
+            params.push_back(line.mid(0, splitSign));
+            params.push_back(line.mid(splitSign + 1, -1));
 #else
-        size_t splitSign = line.find('=');
-        if(splitSign == std::string::npos)
-        {
-            if(doLog)
-                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
-            continue;
-        }
-        params.emplace_back(line.substr(0, splitSign));
-        params.emplace_back(line.substr(splitSign + 1, std::string::npos));
+            size_t splitSign = line.find('=');
+            if(splitSign == std::string::npos)
+            {
+                if(doLog)
+                    fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
+                continue;
+            }
+            params.emplace_back(line.substr(0, splitSign));
+            params.emplace_back(line.substr(splitSign + 1, std::string::npos));
 #endif
 
 // Note: This whole condition is always false
-//        if(params.size() != 2) // If string does not contain strings with "=" as separator
-//        {
-//            if(doLog)
-//                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
-//            if(doLog || (params.size() < 2))
-//                continue;
-//        }
+//          if(params.size() != 2) // If string does not contain strings with "=" as separator
+//          {
+//              if(doLog)
+//                  fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + " <wrong syntax!>\n";
+//              if(doLog || (params.size() < 2))
+//                  continue;
+//          }
 
-        params[0] = PGESTR_Trim(params[0]);
-        params[0] = PGESTR_Simpl(params[0]);
-        params[0] = PGE_RemSubSTRING(params[0], " "); //Delete spaces
-        params[0] = PGESTR_toLower(params[0]);//To lower case
-
-        params[1] = PGESTR_Trim(params[1]); // Trim it!
-
-        auto hand = paramsHandler.find(params[0]);
-        if(hand != paramsHandler.end())
-        {
-            PGEMAPVAL(hand)(params[1]);
+            params[0] = PGESTR_Trim(params[0]);
+            params[0] = PGESTR_Simpl(params[0]);
+            params[0] = PGE_RemSubSTRING(params[0], " "); //Delete spaces
+            params[0] = PGESTR_toLower(params[0]);//To lower case
+    
+            params[1] = PGESTR_Trim(params[1]); // Trim it!
+    
+            auto hand = paramsHandler.find(params[0]);
+            if(hand != paramsHandler.end())
+            {
+                PGEMAPVAL(hand)(params[1]);
+            }
+            else
+            {
+                // Custom value
+                fileData.entries[params[0]] = params[1];
+                if(doLog) //[DEPRECATED] Store unknown value into warnings list
+                    fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + "\n";
+            }
         }
-        else
-        {
-            // Custom value
-            fileData.entries[params[0]] = params[1];
-            if(doLog) //[DEPRECATED] Store unknown value into warnings list
-                fileData.unknownLines += fromNum(inf.getCurrentLineNumber()) + ": " + line + "\n";
-        }
+        while(!inf.eof());
+    
+        fileData.ReadFileValid = true;
+        return true;
     }
-    while(!inf.eof());
-
-    fileData.ReadFileValid = true;
-    return true;
-  }
-  catch(const std::exception& e)
-  {
-    fileData.errorString = e.what();
-    fileData.ReadFileValid = false;
-    return false;
-  }
+    catch(const std::exception& e)
+    {
+        fileData.errorString = e.what();
+        fileData.ReadFileValid = false;
+        return false;
+    }
 }
 
 

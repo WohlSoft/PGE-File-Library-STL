@@ -374,6 +374,9 @@ PlayerPoint FileFormats::CreateLvlPlayerPoint(unsigned int id)
 {
     PlayerPoint dummyPlayer;
     dummyPlayer.id = id;
+
+    dummyPlayer.w = 24;
+
     switch(id)
     {
     case 1:

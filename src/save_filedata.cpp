@@ -34,12 +34,15 @@ saveCharState FileFormats::CreateSavCharacterState()
 {
     saveCharState newData;
 
+    // rely on constructor
+#if 0
     newData.id          = 1;
     newData.health      = 0;
     newData.itemID      = 0;
     newData.mountID     = 0;
     newData.mountType   = 0;
     newData.state       = 1;
+#endif
 
     return newData;
 }
