@@ -113,7 +113,7 @@ namespace SMBX64
 #ifdef PGE_FILES_QT
         bool ok=true;
         *out = static_cast<long long>(input.toULongLong(&ok));
-        if(!ok) throw throw std::invalid_argument("Could not convert number (unsigned long long through signed)");
+        if(!ok) throw std::invalid_argument("Could not convert number (unsigned long long through signed)");
 #else
         if(input.size() != 0 && MDX_load_ulonglong(*out, input.c_str()) == input.c_str() + input.size()) PGE_ATTR_LIKELY
             return;
