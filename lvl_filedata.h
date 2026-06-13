@@ -1013,7 +1013,8 @@ struct LevelHead
 
     struct MusicOverrider
     {
-        enum Type {
+        enum Type
+        {
             LEVEL   = 0,
             SPECIAL = 1
         };
