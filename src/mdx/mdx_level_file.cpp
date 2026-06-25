@@ -54,7 +54,7 @@ MDX_SETUP_OBJECT(LevelHead,
 );
 
 MDX_SETUP_OBJECT(LevelSection,
-    MDX_FIELD_NONNEG_NOT_ONLY("SC", id); //Section ID
+    MDX_FIELD_NONNEG_NO_SKIP_NOT_ONLY("SC", id); //Section ID
     MDX_FIELD("L",  size_left); //Left side
     MDX_FIELD("R",  size_right);//Right side
     MDX_FIELD("T",  size_top); //Top side
