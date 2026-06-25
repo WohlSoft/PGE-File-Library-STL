@@ -68,7 +68,7 @@ bool MDX_BaseObject::save_object(std::string& out, const void* src, const void* 
     bool any_field = false;
     for(const auto* field : m_fields)
     {
-        bool not_only = (field->m_save_mode == MDX_BaseField::SaveMode::not_only);
+        bool not_only = ((int)field->m_save_mode & (int)MDX_BaseField::SaveMode::not_only);
         any_field |= field->try_save(out, src, ref) && !not_only;
     }
 

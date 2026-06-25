@@ -52,9 +52,10 @@ struct MDX_BaseField
 public:
     enum class SaveMode
     {
-        normal,   //!< store if can_save returns true
-        no_skip,  //!< always store
-        not_only, //!< if only these values are non-default, the object will be ignored
+        normal   = 0, //!< store if can_save returns true
+        no_skip  = 1, //!< always store
+        not_only = 2, //!< if only these values are non-default, the object will be ignored
+        no_skip_not_only = no_skip | not_only,
     } m_save_mode = SaveMode::normal;
 
 protected:

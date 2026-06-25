@@ -44,6 +44,7 @@
 #define MDX_FIELD_NONNEG(NAME, MEMBER_NAME) MDX_NonNegField<obj_t, decltype(obj_t::MEMBER_NAME)> MDX_FIELD_NAME(MEMBER_NAME){this, NAME, &obj_t::MEMBER_NAME}
 #define MDX_FIELD_NONNEG_NO_SKIP(NAME, MEMBER_NAME) MDX_NonNegField<obj_t, decltype(obj_t::MEMBER_NAME)> MDX_FIELD_NAME(MEMBER_NAME){this, NAME, &obj_t::MEMBER_NAME, MDX_BaseField::SaveMode::no_skip}
 #define MDX_FIELD_NONNEG_NOT_ONLY(NAME, MEMBER_NAME) MDX_NonNegField<obj_t, decltype(obj_t::MEMBER_NAME)> MDX_FIELD_NAME(MEMBER_NAME){this, NAME, &obj_t::MEMBER_NAME, MDX_BaseField::SaveMode::not_only}
+#define MDX_FIELD_NONNEG_NO_SKIP_NOT_ONLY(NAME, MEMBER_NAME) MDX_NonNegField<obj_t, decltype(obj_t::MEMBER_NAME)> MDX_FIELD_NAME(MEMBER_NAME){this, NAME, &obj_t::MEMBER_NAME, MDX_BaseField::SaveMode::no_skip_not_only}
 
 #define MDX_UNIQUE_FIELD_NAME(LOAD_FUNC) unique_field_ ## LOAD_FUNC
 #define MDX_UNIQUE_FIELD(NAME, LOAD_FUNC, SAVE_FUNC) MDX_UniqueField<obj_t> MDX_UNIQUE_FIELD_NAME(LOAD_FUNC){this, NAME, LOAD_FUNC, SAVE_FUNC}

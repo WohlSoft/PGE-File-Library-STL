@@ -143,7 +143,7 @@ inline bool MDX_BaseField::try_load(void* dest, const char*& field_name) const
 
 inline bool MDX_BaseField::try_save(std::string& out, const void* src, const void* ref) const
 {
-    if(m_save_mode != SaveMode::no_skip && !can_save(src, ref))
+    if(!((int)m_save_mode & (int)SaveMode::no_skip) && !can_save(src, ref))
         return false;
 
     auto old_size = out.size();
