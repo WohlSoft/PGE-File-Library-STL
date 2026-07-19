@@ -2547,7 +2547,7 @@ bool FileFormats::WriteExtendedLvlFile(PGE_FileFormats_misc::TextOutput &out, Le
             controls.push_back(event.ctrl_lock_keyboard);
             addArray = false;
 
-            for(const auto &control : controls)
+            for(const auto control : controls)
             {
                 if(control)
                     addArray = true;
