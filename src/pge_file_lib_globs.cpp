@@ -1181,6 +1181,12 @@ TextFileOutput::TextFileOutput(PGESTRING filePath, bool utf8, bool forceCRLF, Te
     }
 }
 
+TextFileOutput::TextFileOutput(FILE* output) : TextOutput()
+{
+    stream = output;
+    m_noClose = true;
+}
+
 TextFileOutput::~TextFileOutput()
 {
     close();
@@ -1251,7 +1257,7 @@ void TextFileOutput::close()
     file.flush();
     file.close();
 #else
-    if(stream)
+    if(stream && !m_noClose)
         fclose(stream);
     stream = nullptr;
 #endif
