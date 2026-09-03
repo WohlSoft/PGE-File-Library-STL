@@ -125,6 +125,9 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                         PGEX_UIntVal("CN", FileData.coins)
                         PGEX_UIntVal("PT", FileData.points)
                         PGEX_UIntVal("TS", FileData.totalStars)
+                        PGEX_SIntVal("TF", FileData.totalFails)
+                        PGEX_SLongVal("SR", FileData.speedrunTicks)
+                        PGEX_SLongVal("SW", FileData.speedrunWinTicks)
                         PGEX_SLongVal("WX", FileData.worldPosX)
                         PGEX_SLongVal("WY", FileData.worldPosY)
                         PGEX_ULongVal("HW", FileData.last_hub_warp)
@@ -280,6 +283,7 @@ bool FileFormats::ReadExtendedSaveFile(PGE_FileFormats_misc::TextInput &in, Game
                         PGEX_BoolArrVal("MG", level_info.medals_got)
                         PGEX_BoolArrVal("MB", level_info.medals_best)
                         PGEX_UIntVal("E", level_info.exits_got)
+                        PGEX_UIntVal("F", level_info.fails)
                     }
                     FileData.levelInfo.push_back(level_info);
                 }
@@ -387,6 +391,9 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
     out << PGEFile::value("CN", PGEFile::WriteInt(FileData.coins));
     out << PGEFile::value("PT", PGEFile::WriteInt(FileData.points));
     out << PGEFile::value("TS", PGEFile::WriteInt(FileData.totalStars));
+    out << PGEFile::value("TF", PGEFile::WriteInt(FileData.totalFails));
+    out << PGEFile::value("SR", PGEFile::WriteInt(FileData.speedrunTicks));
+    out << PGEFile::value("SW", PGEFile::WriteInt(FileData.speedrunWinTicks));
     out << PGEFile::value("WX", PGEFile::WriteInt(FileData.worldPosX));
     out << PGEFile::value("WY", PGEFile::WriteInt(FileData.worldPosY));
     out << PGEFile::value("HW", PGEFile::WriteInt(FileData.last_hub_warp));
@@ -523,6 +530,7 @@ bool FileFormats::WriteExtendedSaveFile(PGE_FileFormats_misc::TextOutput &out, G
                 out << PGEFile::value("MB", PGEFile::WriteBoolArr(slinfo.medals_best));
 
             out << PGEFile::value("E", PGEFile::WriteInt(slinfo.exits_got));
+            out << PGEFile::value("F", PGEFile::WriteInt(slinfo.fails));
 
             out << "\n";
         }

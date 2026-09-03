@@ -121,6 +121,7 @@ struct saveLevelInfo
     PGELIST<bool> medals_best;
     PGELIST<bool> medals_got;
     unsigned int exits_got;
+    unsigned int fails;
 };
 
 /*!
@@ -138,6 +139,12 @@ struct GamesaveHead
     unsigned int points = 0;
     //! Total stars
     unsigned int totalStars = 0;
+    //! Total fails
+    int totalFails = -1;
+    //! Total ticks of gameplay (including unsaved gameplay)
+    long speedrunTicks = -1;
+    //! Ticks of gameplay at first win
+    long speedrunWinTicks = 0;
 
     //! Last world map position X
     long worldPosX = 0;
@@ -179,6 +186,12 @@ struct GamesaveData
     unsigned int points = 0;
     //! Total stars
     unsigned int totalStars = 0;
+    //! Total fails
+    int totalFails = -1;
+    //! Total ticks of gameplay (including unsaved gameplay)
+    long speedrunTicks = -1;
+    //! Ticks of gameplay at first win
+    long speedrunWinTicks = 0;
 
     //! Last world map position X
     long worldPosX = 0;

@@ -55,6 +55,9 @@ static bool s_load_head(void* _FileData, GamesaveHead& dest)
     FileData.coins = dest.coins;
     FileData.points = dest.points;
     FileData.totalStars = dest.totalStars;
+    FileData.totalFails = dest.totalFails;
+    FileData.speedrunTicks = dest.speedrunTicks;
+    FileData.speedrunWinTicks = dest.speedrunWinTicks;
     FileData.worldPosX = dest.worldPosX;
     FileData.worldPosY = dest.worldPosY;
     FileData.last_hub_warp = dest.last_hub_warp;
@@ -81,6 +84,9 @@ static bool s_save_head(const void* _FileData, GamesaveHead& dest, pge_size_t in
     dest.coins = FileData.coins;
     dest.points = FileData.points;
     dest.totalStars = FileData.totalStars;
+    dest.totalFails = FileData.totalFails;
+    dest.speedrunTicks = FileData.speedrunTicks;
+    dest.speedrunWinTicks = FileData.speedrunWinTicks;
     dest.worldPosX = FileData.worldPosX;
     dest.worldPosY = FileData.worldPosY;
     dest.last_hub_warp = FileData.last_hub_warp;
