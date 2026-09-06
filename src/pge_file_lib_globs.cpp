@@ -1181,11 +1181,15 @@ TextFileOutput::TextFileOutput(PGESTRING filePath, bool utf8, bool forceCRLF, Te
     }
 }
 
+#ifndef PGE_FILES_QT
 TextFileOutput::TextFileOutput(FILE* output) : TextOutput()
 {
+    // TODO: eventually, truncate the output at zero length here.
+    // This will allow reuse of a r+ open file stream without reopening in w mode.
     stream = output;
     m_noClose = true;
 }
+#endif
 
 TextFileOutput::~TextFileOutput()
 {
