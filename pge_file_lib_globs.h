@@ -494,6 +494,13 @@ public:
      * \param utf8 Use UTF-8 encoding or will be used local 8-bin encoding
      */
     TextFileOutput(PGESTRING filePath, bool utf8 = false, bool forceCRLF = false, outputMode mode = truncate);
+#ifndef PGE_FILES_QT
+    /*!
+     * \brief Constructor that takes an already-opened file
+     * \param output FILE* to write to (won't close)
+     */
+    TextFileOutput(FILE* output);
+#endif
     /*!
      * \brief Destructor
      */
@@ -539,6 +546,7 @@ private:
 #else
     //! File input stream used in STL version of PGE file Library
     FILE *stream = nullptr;
+    bool m_noClose = false;
 #endif
 };
 

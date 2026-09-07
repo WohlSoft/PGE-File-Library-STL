@@ -46,6 +46,9 @@ MDX_SETUP_OBJECT(GamesaveHead,
     MDX_FIELD("CN", coins);
     MDX_FIELD("PT", points);
     MDX_FIELD("TS", totalStars);
+    MDX_FIELD("TF", totalFails);
+    MDX_FIELD("SR", speedrunTicks);
+    MDX_FIELD("SW", speedrunWinTicks);
     MDX_FIELD("WX", worldPosX);
     MDX_FIELD("WY", worldPosY);
     MDX_FIELD("HW", last_hub_warp);
@@ -86,6 +89,7 @@ MDX_SETUP_OBJECT(saveLevelInfo,
     MDX_FIELD("MG", medals_got);
     MDX_FIELD("MB", medals_best);
     MDX_FIELD("E", exits_got);
+    MDX_FIELD("F", fails);
 );
 
 static const char* MDX_DataSection_load_location(saveUserData::DataSection& s, const char* field_data)
