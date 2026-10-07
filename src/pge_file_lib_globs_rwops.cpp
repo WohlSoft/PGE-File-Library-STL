@@ -64,7 +64,7 @@ void RWopsTextInput::close()
 {
     m_filePath.clear();
     m_lineNumber = 0;
-    if(m_rwops)
+    if(m_rwops && !m_noClose)
         SDL_RWclose(m_rwops);
     m_rwops = nullptr;
 

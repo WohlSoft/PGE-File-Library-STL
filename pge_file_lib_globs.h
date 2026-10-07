@@ -342,6 +342,10 @@ public:
     virtual bool eof();
     virtual int64_t tell();
     virtual int seek(int64_t pos, positions relativeTo);
+    inline void noClose()
+    {
+        m_noClose = true;
+    }
 
 private:
     inline bool in_buffer() const
@@ -364,6 +368,7 @@ private:
     int64_t m_readOffset = 0;
     int64_t m_rwopsOffset = 0;
     bool m_bufferIsEof = false;
+    bool m_noClose = false;
 };
 
 #endif
