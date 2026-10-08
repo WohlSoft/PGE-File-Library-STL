@@ -1333,12 +1333,14 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, const 
                     cb.load_music_override(cb.userdata, mo);
                 });
             }
-            else if(cb.load_junk_line)
+            else
             {
                 // Unsupported line, just keep it
                 PGESTRING str;
                 dataReader.ReadRawLine(str);
-                cb.load_junk_line(cb.userdata, str);
+
+                if(cb.load_junk_line)
+                    cb.load_junk_line(cb.userdata, str);
             }
         }//while is not EOF
     }
