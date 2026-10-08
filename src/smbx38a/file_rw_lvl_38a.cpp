@@ -933,9 +933,20 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, const 
                         {
                             auto fieldReader = MakeDirectReader(nextFieldStr);
                             auto fullReader = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+
+                            // find referenced section
                             int sectionID = fullReader.ReadField<int>(1) - 1;
-                            eventdata.sets.push_back(LevelEvent_Sets());
-                            LevelEvent_Sets &nextSet = eventdata.sets.back();
+                            size_t foundSection = 0;
+                            for(; foundSection < eventdata.sets.size(); foundSection++)
+                            {
+                                if(eventdata.sets[foundSection].id == sectionID)
+                                    break;
+                            }
+
+                            if(foundSection == eventdata.sets.size())
+                                eventdata.sets.push_back(LevelEvent_Sets());
+
+                            LevelEvent_Sets &nextSet = eventdata.sets[foundSection];
                             nextSet.id = sectionID;
                             bool customSize = false;
                             unsigned int autoScrollType = 0;
@@ -1034,8 +1045,22 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, const 
                         {
                             auto fieldReader = MakeDirectReader(nextFieldStr);
                             auto fullReader = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+
+                            // find referenced section
                             int sectionID = fullReader.ReadField<int>(1) - 1;
-                            LevelEvent_Sets &nextSet = eventdata.sets[static_cast<pge_size_t>(sectionID)];
+                            size_t foundSection = 0;
+                            for(; foundSection < eventdata.sets.size(); foundSection++)
+                            {
+                                if(eventdata.sets[foundSection].id == sectionID)
+                                    break;
+                            }
+
+                            if(foundSection == eventdata.sets.size())
+                                eventdata.sets.push_back(LevelEvent_Sets());
+
+                            LevelEvent_Sets &nextSet = eventdata.sets[foundSection];
+                            nextSet.id = sectionID;
+
                             bool customBG = false;
                             long bgID = 0;
 
@@ -1074,8 +1099,22 @@ bool FileFormats::ReadSMBX38ALvlFile(PGE_FileFormats_misc::TextInput &in, const 
                         {
                             auto fieldReader = MakeDirectReader(nextFieldStr);
                             auto fullReader = MakeCSVReaderForPGESTRING(&fieldReader, ',');
+
+                            // find referenced section
                             int sectionID = fullReader.ReadField<int>(1) - 1;
-                            LevelEvent_Sets &nextSet = eventdata.sets[static_cast<pge_size_t>(sectionID)];
+                            size_t foundSection = 0;
+                            for(; foundSection < eventdata.sets.size(); foundSection++)
+                            {
+                                if(eventdata.sets[foundSection].id == sectionID)
+                                    break;
+                            }
+
+                            if(foundSection == eventdata.sets.size())
+                                eventdata.sets.push_back(LevelEvent_Sets());
+
+                            LevelEvent_Sets &nextSet = eventdata.sets[foundSection];
+                            nextSet.id = sectionID;
+
                             bool customMusic = false;
                             long music_id = 0;
 
