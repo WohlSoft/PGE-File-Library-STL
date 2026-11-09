@@ -29,6 +29,7 @@
 #define SMBX38A_PRIVATE_H
 
 #include <functional>
+#include <cstdlib>
 #include "smbx64.h"
 #include "smbx64_macro.h"
 #include "CSVReaderPGE.h"

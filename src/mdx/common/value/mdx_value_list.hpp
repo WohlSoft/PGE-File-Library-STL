@@ -36,6 +36,7 @@
 #ifndef MDX_VALUE_LIST_HPP
 #define MDX_VALUE_LIST_HPP
 
+#include <exception>
 #include "../mdx_value.h"
 #include "../mdx_exception.h"
 
