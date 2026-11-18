@@ -128,6 +128,8 @@ bool MDX_BaseFile::load_file(PGE_FileFormats_misc::TextInput& inf, const PGE_Fil
 bool MDX_BaseFile::save_file(PGE_FileFormats_misc::TextOutput& outf, const PGE_FileFormats_misc::SaveCallbacks& cb)
 {
     std::string out_buffer;
+    PGE_CLocaleKeeper lc_num_c;
+    (void)lc_num_c;
 
     try
     {

@@ -24,6 +24,7 @@
  * SOFTWARE.
  */
 
+#include <clocale>
 #include "pge_file_lib_globs.h"
 #include "pge_file_lib_private.h"
 #ifdef _WIN32
@@ -47,6 +48,23 @@
 #include <QFileInfo>
 #endif
 #include <memory>
+
+PGE_CLocaleKeeper::PGE_CLocaleKeeper()
+{
+    std::string prevLocale;
+    char *prevLocaleC = std::setlocale(LC_NUMERIC, "C");
+
+    if(prevLocaleC)
+        c_prevLoc.assign(prevLocaleC);
+}
+
+PGE_CLocaleKeeper::~PGE_CLocaleKeeper()
+{
+    if(!c_prevLoc.empty())
+        std::setlocale(LC_NUMERIC, c_prevLoc.c_str());
+}
+
+
 
 namespace PGE_FileFormats_misc
 {

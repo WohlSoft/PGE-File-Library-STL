@@ -66,6 +66,19 @@
 #include <cstdint>
 #include <string>
 
+/**
+ * @brief Keep the LC_NUMERIC locale being always "C" while this object is alive
+ */
+class PGE_CLocaleKeeper
+{
+    std::string c_prevLoc;
+
+public:
+    PGE_CLocaleKeeper();
+    ~PGE_CLocaleKeeper();
+};
+
+
 #ifdef PGE_FILES_QT
 #include <QString>
 #include <QStringList>
